@@ -1,0 +1,13 @@
+{
+  "name": "obs-clock-overlay-builder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "lint": "node scripts/check-js.mjs",
+    "typecheck": "node scripts/module-smoke.mjs",
+    "format:check": "node scripts/format-check.mjs",
+    "test": "node --test"
+  }
+}

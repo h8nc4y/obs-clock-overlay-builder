@@ -1,0 +1,607 @@
+import {
+  DEFAULT_CONFIG,
+  FONT_CANDIDATES,
+  TEMPLATES,
+  applyTemplate,
+  cloneDefaultConfig,
+  configToClockUrl,
+  contrastRatio,
+  hexToRgba,
+  normalizeConfig,
+  parseConfigFromQuery,
+  parseImportInput
+} from "./config.js";
+import { mountClock, recommendedObsSize } from "./render.js";
+import { createFormatters, formatClock } from "./time.js";
+
+const STORAGE_KEY = "obs-clock-builder:v1";
+const LONG_URL_WARNING = 1800;
+const TOO_LONG_URL_WARNING = 4000;
+const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
+
+const elements = {
+  templateGrid: byId("templateGrid"),
+  timezone: byId("timezone"),
+  localTimezone: byId("localTimezone"),
+  useLocalTimezone: byId("useLocalTimezone"),
+  cfTimezone: byId("cfTimezone"),
+  fetchCfDefaults: byId("fetchCfDefaults"),
+  hour12: byId("hour12"),
+  showSeconds: byId("showSeconds"),
+  showDate: byId("showDate"),
+  showWeekday: byId("showWeekday"),
+  dateFormat: byId("dateFormat"),
+  weekdayFormat: byId("weekdayFormat"),
+  labelText: byId("labelText"),
+  labelPosition: byId("labelPosition"),
+  fontPreset: byId("fontPreset"),
+  fontFamily: byId("fontFamily"),
+  localFontStatus: byId("localFontStatus"),
+  loadLocalFonts: byId("loadLocalFonts"),
+  localFontSelectWrap: byId("localFontSelectWrap"),
+  localFontSelect: byId("localFontSelect"),
+  textColor: byId("textColor"),
+  backgroundColor: byId("backgroundColor"),
+  backgroundOpacity: byId("backgroundOpacity"),
+  fontSize: byId("fontSize"),
+  dateSize: byId("dateSize"),
+  labelSize: byId("labelSize"),
+  fontWeight: byId("fontWeight"),
+  letterSpacing: byId("letterSpacing"),
+  lineHeight: byId("lineHeight"),
+  paddingX: byId("paddingX"),
+  paddingY: byId("paddingY"),
+  radius: byId("radius"),
+  borderColor: byId("borderColor"),
+  borderWidth: byId("borderWidth"),
+  borderOpacity: byId("borderOpacity"),
+  shadowColor: byId("shadowColor"),
+  shadowOpacity: byId("shadowOpacity"),
+  shadowBlur: byId("shadowBlur"),
+  shadowX: byId("shadowX"),
+  shadowY: byId("shadowY"),
+  strokeColor: byId("strokeColor"),
+  strokeWidth: byId("strokeWidth"),
+  contrastWarning: byId("contrastWarning"),
+  importInput: byId("importInput"),
+  importConfig: byId("importConfig"),
+  resetConfig: byId("resetConfig"),
+  importStatus: byId("importStatus"),
+  shareText: byId("shareText"),
+  copyShareText: byId("copyShareText"),
+  generateShareImage: byId("generateShareImage"),
+  shareImage: byId("shareImage"),
+  xIntent: byId("xIntent"),
+  shareImagePreview: byId("shareImagePreview"),
+  downloadShareImage: byId("downloadShareImage"),
+  previewShell: byId("previewShell"),
+  previewCustomColor: byId("previewCustomColor"),
+  clockPreview: byId("clockPreview"),
+  recommendedWidth: byId("recommendedWidth"),
+  recommendedHeight: byId("recommendedHeight"),
+  compactUrl: byId("compactUrl"),
+  generatedUrl: byId("generatedUrl"),
+  copyUrl: byId("copyUrl"),
+  openClock: byId("openClock"),
+  urlStatus: byId("urlStatus"),
+  urlWarning: byId("urlWarning")
+};
+
+const rangeFields = [
+  "backgroundOpacity",
+  "fontSize",
+  "dateSize",
+  "labelSize",
+  "fontWeight",
+  "letterSpacing",
+  "lineHeight",
+  "paddingX",
+  "paddingY",
+  "radius",
+  "borderWidth",
+  "borderOpacity",
+  "shadowOpacity",
+  "shadowBlur",
+  "shadowX",
+  "shadowY",
+  "strokeWidth"
+];
+const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
+const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
+const selectFields = ["dateFormat", "weekdayFormat", "labelPosition"];
+let state = loadInitialConfig();
+let shareBlob = null;
+let shareObjectUrl = "";
+
+const previewClock = mountClock(elements.clockPreview, state);
+
+init();
+
+function init() {
+  renderTemplateButtons();
+  renderFontOptions();
+  renderSwatches();
+  setupTimezoneCandidate();
+  bindForm();
+  bindPreviewBackground();
+  syncFormFromState();
+  updateEverything();
+}
+
+function loadInitialConfig() {
+  if (window.location.search) {
+    const fromUrl = parseConfigFromQuery(window.location.href);
+    if (JSON.stringify(fromUrl) !== JSON.stringify(DEFAULT_CONFIG)) {
+      return fromUrl;
+    }
+  }
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return normalizeConfig(JSON.parse(saved));
+    }
+  } catch {
+    // localStorage may be blocked; URL generation still works without it.
+  }
+  return cloneDefaultConfig();
+}
+
+function renderTemplateButtons() {
+  elements.templateGrid.textContent = "";
+  for (const template of TEMPLATES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "template-button";
+    button.dataset.template = template.id;
+    button.setAttribute("aria-pressed", "false");
+
+    const sample = document.createElement("span");
+    sample.className = "template-sample";
+    sample.textContent = template.sampleText;
+    sample.style.color = template.config.textColor;
+    sample.style.background = hexToRgba(template.config.backgroundColor, template.config.backgroundOpacity);
+    sample.style.borderColor = hexToRgba(template.config.borderColor, template.config.borderOpacity);
+    sample.style.borderRadius = `${Math.min(template.config.radius, 16)}px`;
+
+    const name = document.createElement("span");
+    name.className = "template-name";
+    name.textContent = template.name;
+
+    const note = document.createElement("span");
+    note.className = "template-note";
+    note.textContent = template.note;
+
+    button.append(sample, name, note);
+    button.addEventListener("click", () => {
+      state = applyTemplate(state, template.id);
+      syncFormFromState();
+      updateEverything("テンプレートを適用しました。");
+    });
+    elements.templateGrid.append(button);
+  }
+}
+
+function renderFontOptions() {
+  elements.fontPreset.textContent = "";
+  const customOption = document.createElement("option");
+  customOption.value = "";
+  customOption.textContent = "手入力またはPC内フォント";
+  elements.fontPreset.append(customOption);
+  for (const font of FONT_CANDIDATES) {
+    const option = document.createElement("option");
+    option.value = font;
+    option.textContent = font;
+    elements.fontPreset.append(option);
+  }
+}
+
+function renderSwatches() {
+  document.querySelectorAll(".swatches").forEach((swatches) => {
+    swatches.textContent = "";
+    const target = swatches.dataset.colorTarget;
+    for (const color of colorPresets) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "swatch";
+      button.style.background = color;
+      button.setAttribute("aria-label", `${target} を ${color} にする`);
+      button.addEventListener("click", () => {
+        state[target] = color;
+        syncFormFromState();
+        updateEverything();
+      });
+      swatches.append(button);
+    }
+  });
+}
+
+function setupTimezoneCandidate() {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (timezone) {
+    elements.localTimezone.textContent = timezone;
+    elements.useLocalTimezone.disabled = false;
+  } else {
+    elements.localTimezone.textContent = "取得できませんでした。手入力してください。";
+    elements.useLocalTimezone.disabled = true;
+  }
+}
+
+function bindForm() {
+  elements.timezone.addEventListener("input", () => updateState({ timezone: elements.timezone.value }));
+  elements.labelText.addEventListener("input", () => updateState({ label: elements.labelText.value }));
+  elements.fontFamily.addEventListener("input", () => {
+    elements.fontPreset.value = FONT_CANDIDATES.includes(elements.fontFamily.value) ? elements.fontFamily.value : "";
+    updateState({ fontFamily: elements.fontFamily.value });
+  });
+  elements.fontPreset.addEventListener("change", () => {
+    if (elements.fontPreset.value) {
+      updateState({ fontFamily: elements.fontPreset.value }, true);
+    }
+  });
+  for (const field of booleanFields) {
+    elements[field].addEventListener("change", () => updateState({ [field]: elements[field].checked }));
+  }
+  for (const field of selectFields) {
+    elements[field].addEventListener("change", () => updateState({ [field]: elements[field].value }));
+  }
+  for (const field of colorFields) {
+    elements[field].addEventListener("input", () => updateState({ [field]: elements[field].value }));
+  }
+  for (const field of rangeFields) {
+    elements[field].addEventListener("input", () => updateState({ [field]: Number(elements[field].value) }));
+  }
+
+  elements.useLocalTimezone.addEventListener("click", () => {
+    updateState({ timezone: elements.localTimezone.textContent }, true);
+  });
+  elements.fetchCfDefaults.addEventListener("click", fetchCloudflareDefaults);
+  elements.loadLocalFonts.addEventListener("click", loadLocalFonts);
+  elements.importConfig.addEventListener("click", importConfig);
+  elements.resetConfig.addEventListener("click", () => {
+    state = cloneDefaultConfig();
+    syncFormFromState();
+    updateEverything("初期設定へ戻しました。");
+  });
+  elements.compactUrl.addEventListener("change", () => updateEverything());
+  elements.copyUrl.addEventListener("click", () => copyText(elements.generatedUrl.value, elements.urlStatus, "URLをコピーしました。"));
+  elements.openClock.addEventListener("click", () => {
+    window.open(elements.generatedUrl.value, "_blank", "noopener");
+  });
+  elements.copyShareText.addEventListener("click", () =>
+    copyText(elements.shareText.value, elements.urlStatus, "投稿文をコピーしました。")
+  );
+  elements.generateShareImage.addEventListener("click", generateShareImage);
+  elements.shareImage.addEventListener("click", shareGeneratedImage);
+}
+
+function bindPreviewBackground() {
+  document.querySelectorAll('input[name="previewBg"]').forEach((radio) => {
+    radio.addEventListener("change", updatePreviewBackground);
+  });
+  elements.previewCustomColor.addEventListener("input", updatePreviewBackground);
+}
+
+function updateState(partial, sync = false) {
+  state = normalizeConfig({ ...state, ...partial });
+  if (sync) {
+    syncFormFromState();
+  } else {
+    syncOutputValues();
+  }
+  updateEverything();
+}
+
+function syncFormFromState() {
+  elements.timezone.value = state.timezone;
+  elements.hour12.checked = state.hour12;
+  elements.showSeconds.checked = state.showSeconds;
+  elements.showDate.checked = state.showDate;
+  elements.showWeekday.checked = state.showWeekday;
+  elements.dateFormat.value = state.dateFormat;
+  elements.weekdayFormat.value = state.weekdayFormat;
+  elements.labelText.value = state.label;
+  elements.labelPosition.value = state.labelPosition;
+  elements.fontFamily.value = state.fontFamily;
+  elements.fontPreset.value = FONT_CANDIDATES.includes(state.fontFamily) ? state.fontFamily : "";
+  for (const field of colorFields) {
+    elements[field].value = state[field];
+  }
+  for (const field of rangeFields) {
+    elements[field].value = String(state[field]);
+  }
+  syncOutputValues();
+  updateTemplatePressed();
+}
+
+function syncOutputValues() {
+  for (const field of rangeFields) {
+    const output = byId(`${field}Value`);
+    if (!output) {
+      continue;
+    }
+    const value = Number(elements[field].value);
+    if (["backgroundOpacity", "borderOpacity", "shadowOpacity", "lineHeight"].includes(field)) {
+      output.textContent = value.toFixed(2);
+    } else if (field === "letterSpacing" || field === "strokeWidth") {
+      output.textContent = `${value.toFixed(1)}px`;
+    } else if (field === "fontWeight") {
+      output.textContent = String(value);
+    } else {
+      output.textContent = `${value}px`;
+    }
+  }
+}
+
+function updateEverything(status = "") {
+  state = normalizeConfig(state);
+  previewClock.updateConfig(state);
+  persistState();
+  updatePreviewBackground();
+  updateShareText();
+  updateGeneratedUrl();
+  updateContrastWarning();
+  updateTemplatePressed();
+  if (status) {
+    elements.importStatus.textContent = status;
+  }
+  window.requestAnimationFrame(updateRecommendedSize);
+}
+
+function updateTemplatePressed() {
+  document.querySelectorAll(".template-button").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.template === state.template));
+  });
+}
+
+function updateGeneratedUrl() {
+  const baseUrl = new URL("./clock/", window.location.href).href;
+  const url = configToClockUrl(state, baseUrl, { compact: elements.compactUrl.checked });
+  elements.generatedUrl.value = url;
+  elements.urlStatus.textContent = `${url.length}文字`;
+  elements.urlWarning.hidden = true;
+  elements.urlWarning.textContent = "";
+  if (url.length > TOO_LONG_URL_WARNING) {
+    elements.urlWarning.hidden = false;
+    elements.urlWarning.textContent =
+      "URLがかなり長いです。デフォルト値を省略し、ラベルやフォント名を短くするとOBSやチャットで扱いやすくなります。";
+  } else if (url.length > LONG_URL_WARNING) {
+    elements.urlWarning.hidden = false;
+    elements.urlWarning.textContent = "URLが長めです。必要なら「デフォルト値を省略して短くする」を使ってください。";
+  }
+  updateXIntent(url);
+}
+
+function updateRecommendedSize() {
+  const size = recommendedObsSize(previewClock.element);
+  elements.recommendedWidth.textContent = `${size.width}px`;
+  elements.recommendedHeight.textContent = `${size.height}px`;
+}
+
+function updatePreviewBackground() {
+  const selected = document.querySelector('input[name="previewBg"]:checked')?.value ?? "checker";
+  elements.previewShell.classList.remove("preview-checker", "preview-light", "preview-dark", "preview-custom");
+  elements.previewShell.classList.add(`preview-${selected}`);
+  elements.previewShell.style.setProperty("--preview-custom", elements.previewCustomColor.value);
+}
+
+function updateContrastWarning() {
+  const ratio = contrastRatio(state.textColor, state.backgroundColor);
+  const warnings = [];
+  if (state.backgroundOpacity >= 0.45 && ratio < 4.5) {
+    warnings.push(`文字色と背景色のコントラストが低めです（${ratio.toFixed(1)}:1）。`);
+  }
+  if (state.backgroundOpacity < 0.25 && state.strokeWidth < 0.8 && state.shadowOpacity < 0.35) {
+    warnings.push("透明背景で縁取りと影が弱いため、ゲーム画面上で読みにくい可能性があります。");
+  }
+  elements.contrastWarning.hidden = warnings.length === 0;
+  elements.contrastWarning.textContent = warnings.join(" ");
+}
+
+function updateShareText() {
+  const text = `OBS用の時計オーバーレイを作ったよ！ テンプレート: ${templateName(state.template)} #OBS #配信素材`;
+  elements.shareText.value = text;
+}
+
+function updateXIntent(url) {
+  const params = new URLSearchParams({
+    text: elements.shareText.value,
+    url: new URL("./", window.location.href).href,
+    hashtags: "OBS,配信素材"
+  });
+  elements.xIntent.href = `https://twitter.com/intent/tweet?${params.toString()}`;
+  elements.xIntent.dataset.clockUrl = url;
+}
+
+async function fetchCloudflareDefaults() {
+  elements.cfTimezone.textContent = "確認中...";
+  try {
+    const response = await fetch("./api/defaults", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    const timezone = data.timezone || "未確認";
+    const country = data.country || "未確認";
+    elements.cfTimezone.textContent = `timezone: ${timezone} / country: ${country}`;
+    if (data.timezone) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "この候補を採用";
+      button.addEventListener("click", () => updateState({ timezone: data.timezone }, true));
+      elements.cfTimezone.append(" ", button);
+    }
+  } catch {
+    elements.cfTimezone.textContent = "取得できませんでした。Cloudflare外や静的配信だけでも問題なく使えます。";
+  }
+}
+
+async function loadLocalFonts() {
+  if (!("queryLocalFonts" in window)) {
+    elements.localFontStatus.textContent = "このブラウザでは queryLocalFonts が使えません。手入力欄を使ってください。";
+    return;
+  }
+  elements.localFontStatus.textContent = "読み込み中...";
+  try {
+    const fonts = await window.queryLocalFonts();
+    const names = [...new Set(fonts.map((font) => font.fullName || font.family).filter(Boolean))].sort((a, b) =>
+      a.localeCompare(b, "ja")
+    );
+    elements.localFontSelect.textContent = "";
+    for (const name of names) {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      elements.localFontSelect.append(option);
+    }
+    elements.localFontSelectWrap.classList.remove("is-hidden");
+    elements.localFontStatus.textContent = `${names.length}件のフォントを読み込みました。`;
+    elements.localFontSelect.addEventListener(
+      "change",
+      () => updateState({ fontFamily: elements.localFontSelect.value }, true),
+      { once: false }
+    );
+  } catch {
+    elements.localFontStatus.textContent = "フォント一覧の取得が拒否されました。手入力欄を使ってください。";
+  }
+}
+
+function importConfig() {
+  try {
+    state = parseImportInput(elements.importInput.value);
+    syncFormFromState();
+    updateEverything("設定を読み込みました。");
+  } catch (error) {
+    elements.importStatus.textContent = error instanceof Error ? error.message : "設定を読み込めませんでした。";
+  }
+}
+
+async function copyText(text, statusElement, successMessage) {
+  try {
+    await navigator.clipboard.writeText(text);
+    statusElement.textContent = successMessage;
+  } catch {
+    elements.generatedUrl.focus();
+    elements.generatedUrl.select();
+    const copied = document.execCommand("copy");
+    statusElement.textContent = copied ? successMessage : "コピーできませんでした。手動で選択してコピーしてください。";
+  }
+}
+
+async function generateShareImage() {
+  shareBlob = await createShareImageBlob();
+  if (shareObjectUrl) {
+    URL.revokeObjectURL(shareObjectUrl);
+  }
+  shareObjectUrl = URL.createObjectURL(shareBlob);
+  elements.shareImagePreview.src = shareObjectUrl;
+  elements.shareImagePreview.hidden = false;
+  elements.downloadShareImage.href = shareObjectUrl;
+  elements.downloadShareImage.hidden = false;
+  elements.urlStatus.textContent = "SNS向けPNG画像を生成しました。";
+}
+
+async function shareGeneratedImage() {
+  if (!shareBlob) {
+    await generateShareImage();
+  }
+  const file = new File([shareBlob], "obs-clock-preview.png", { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    await navigator.share({
+      files: [file],
+      title: "OBS Clock Overlay Builder",
+      text: elements.shareText.value,
+      url: new URL("./", window.location.href).href
+    });
+    return;
+  }
+  elements.urlStatus.textContent = "この環境では画像共有に非対応です。PNG保存、投稿文コピー、X投稿画面を使ってください。";
+}
+
+function createShareImageBlob() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1200;
+  canvas.height = 630;
+  const context = canvas.getContext("2d");
+  const formatters = createFormatters(state);
+  const formatted = formatClock(formatters, new Date());
+
+  context.fillStyle = "#fff7ef";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "#dff8ff";
+  context.fillRect(0, 0, canvas.width, 210);
+  context.fillStyle = "#ffe4ef";
+  context.fillRect(0, 420, canvas.width, 210);
+
+  drawRoundedRect(context, 120, 140, 960, 300, 34);
+  context.fillStyle = hexToRgba(state.backgroundColor, Math.max(state.backgroundOpacity, 0.78));
+  context.fill();
+  context.lineWidth = Math.max(2, state.borderWidth);
+  context.strokeStyle = hexToRgba(state.borderColor, Math.max(state.borderOpacity, 0.5));
+  context.stroke();
+
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.shadowColor = hexToRgba(state.shadowColor, state.shadowOpacity);
+  context.shadowBlur = state.shadowBlur;
+  context.shadowOffsetX = state.shadowX;
+  context.shadowOffsetY = state.shadowY;
+  context.fillStyle = state.textColor;
+  context.font = `${state.fontWeight} 86px ${canvasFontFamily(state.fontFamily)}`;
+  context.fillText(formatted.time, 600, 280);
+  context.font = `700 30px ${canvasFontFamily(state.fontFamily)}`;
+  const subline = [state.labelPosition === "hidden" ? "" : state.label, formatted.date, formatted.weekday]
+    .filter(Boolean)
+    .join("  ");
+  context.fillText(subline || templateName(state.template), 600, 355);
+
+  context.shadowColor = "transparent";
+  context.fillStyle = "#23232a";
+  context.font = "800 34px system-ui, sans-serif";
+  context.fillText("OBS Clock Overlay Builder", 600, 505);
+  context.font = "500 23px system-ui, sans-serif";
+  context.fillStyle = "#665f68";
+  context.fillText(new URL("./", window.location.href).href, 600, 552);
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), "image/png", 0.92);
+  });
+}
+
+function persistState() {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // URL remains the source of truth; localStorage is only a convenience.
+  }
+}
+
+function drawRoundedRect(context, x, y, width, height, radius) {
+  if (typeof context.roundRect === "function") {
+    context.beginPath();
+    context.roundRect(x, y, width, height, radius);
+    return;
+  }
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.arcTo(x + width, y, x + width, y + height, radius);
+  context.arcTo(x + width, y + height, x, y + height, radius);
+  context.arcTo(x, y + height, x, y, radius);
+  context.arcTo(x, y, x + width, y, radius);
+  context.closePath();
+}
+
+function canvasFontFamily(fontFamily) {
+  const clean = String(fontFamily)
+    .replace(/["'\\;\n\r]/g, " ")
+    .trim()
+    .slice(0, 80);
+  return `"${clean || "system-ui"}", system-ui, sans-serif`;
+}
+
+function templateName(templateId) {
+  return TEMPLATES.find((template) => template.id === templateId)?.name ?? "Custom";
+}
+
+function byId(id) {
+  return document.getElementById(id);
+}
