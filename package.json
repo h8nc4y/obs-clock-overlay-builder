@@ -4,11 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "cf:dry-run": "npm run build && wrangler deploy --dry-run --env staging",
+    "deploy:production": "npm run build && wrangler deploy --env production",
+    "deploy:staging": "npm run build && wrangler deploy --env staging",
     "dev": "node scripts/serve.mjs",
     "lint": "node scripts/check-js.mjs",
     "typecheck": "node scripts/module-smoke.mjs",
     "format:check": "node scripts/format-check.mjs",
     "http:smoke": "node scripts/http-smoke.mjs",
     "test": "node --test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.92.0"
   }
 }

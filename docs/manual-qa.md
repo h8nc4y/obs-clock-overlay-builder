@@ -68,10 +68,17 @@ Bad"; color:red;
 😀😀😀😀😀😀😀😀😀😀
 ```
 
+## Cloudflare Workers
+
+- `npm run build` で `dist/` が生成される。
+- `npm run cf:dry-run` が成功する。
+- Workers Static Assets で `/`、`/clock/`、`/clock`、`/api/defaults` が動作する。
+- rollback path は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイする。
+
 ## Cloudflare Pages
 
 - Build command は空欄。
 - Build output directory は `.` または `/`。
 - Functions directory は `functions`。
 - `/api/defaults` が使えない環境でも編集画面と時計画面が壊れない。
-- deploy、push、tag、release はこのQAでは実行しない。
+- GitHub Release writes はこのQAでは実行しない。

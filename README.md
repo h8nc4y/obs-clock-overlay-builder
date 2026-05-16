@@ -13,7 +13,7 @@ OBSのブラウザソースで使う、毎秒更新の時計オーバーレイUR
 - 編集画面だけ localStorage へ最後の設定を保存。OBS表示の再現性はURLパラメータが正です
 - PC内フォント読み込みボタン。`window.queryLocalFonts` 非対応時は手入力
 - CanvasによるSNS向けPNGプレビュー画像生成、投稿文コピー、X Web Intent
-- Cloudflare Pages Functions が使える場合だけ `/api/defaults` で `request.cf` の候補を返します。時計表示はAPIに依存しません
+- Cloudflare Workers または Pages Functions が使える場合だけ `/api/defaults` で `request.cf` の候補を返します。時計表示はAPIに依存しません
 
 ## ローカル起動
 
@@ -31,16 +31,35 @@ npm run dev
 
 単体ファイルとして `index.html` を開いても編集画面は動きますが、`/clock/` のパス確認にはローカルサーバーを使うのが確実です。
 
+## Cloudflare Workers 公開
+
+Cloudflareの新規公開先は Workers with Static Assets を第一候補にしています。Wrangler設定は `wrangler.jsonc`、Workerエントリは `worker/index.js` です。
+
+```bash
+npm install
+npm run build
+npm run cf:dry-run
+```
+
+デプロイ:
+
+```bash
+npm run deploy:staging
+npm run deploy:production
+```
+
+`/api/defaults` は Worker が返し、それ以外の静的ファイルは `dist/` の Static Assets から配信します。rollback は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイします。
+
 ## Cloudflare Pages 公開
 
-静的配信を第一候補にしています。
+既存の Pages 公開も互換として残しています。
 
 - Build command: 空欄
 - Build output directory: `.` または `/`
 - Dev command: `npm run dev`
 - Functions directory: `functions`
 
-`functions/api/defaults.js` は任意機能です。Cloudflare外やローカルで `/api/defaults` が使えなくても、編集画面は壊れず、OBS用時計画面はAPIへアクセスしません。
+`functions/api/defaults.js` は Pages 用の任意機能です。Cloudflare外やローカルで `/api/defaults` が使えなくても、編集画面は壊れず、OBS用時計画面はAPIへアクセスしません。
 
 ## OBS設定手順
 
@@ -100,9 +119,11 @@ Web Share API が画像ファイル共有に対応する環境では、共有ボ
 ```bash
 npm run lint
 npm run typecheck
+npm run build
 npm run format:check
 npm run test
 npm run http:smoke
+npm run cf:dry-run
 git diff --check
 ```
 

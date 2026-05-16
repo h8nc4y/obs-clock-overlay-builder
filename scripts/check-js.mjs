@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const roots = ["assets", "functions", "scripts", "tests"];
+const roots = ["assets", "functions", "scripts", "tests", "worker"];
 const files = roots.flatMap((root) => listFiles(root)).filter((file) => /\.(mjs|js)$/.test(file));
 let failed = false;
 

@@ -2,8 +2,8 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const roots = ["."];
-const allowed = /\.(html|css|js|mjs|md|json)$/;
-const ignoredDirectories = new Set([".git", "node_modules"]);
+const allowed = /\.(html|css|js|mjs|md|json|jsonc)$/;
+const ignoredDirectories = new Set([".git", "dist", "node_modules"]);
 const ignoredDirectoryPatterns = [
   /^chrome-.*-profile/,
   /^edge-.*-profile/,
