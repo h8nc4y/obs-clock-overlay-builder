@@ -9,7 +9,7 @@ OBSのブラウザソースで使う、毎秒更新の時計オーバーレイUR
 - デフォルトタイムゾーンは `Asia/Tokyo`
 - 24時間/12時間、秒、日付、曜日、ラベル、ラベル位置をURLに保存
 - 色、背景不透明度、角丸、余白、文字サイズ、文字間隔、行間、太さ、影、縁取り、枠線を調整
-- 生成URL、クエリ文字列、JSON、`c`パラメータ文字列からインポート
+- 生成URL、クエリ文字列、JSON、URLエンコード済みJSON、`c`パラメータ文字列からインポート
 - 編集画面だけ localStorage へ最後の設定を保存。OBS表示の再現性はURLパラメータが正です
 - PC内フォント読み込みボタン。`window.queryLocalFonts` 非対応時は手入力
 - CanvasによるSNS向けPNGプレビュー画像生成、投稿文コピー、X Web Intent
@@ -27,6 +27,7 @@ npm run dev
 
 - 編集画面: `http://localhost:4173/`
 - OBS用時計画面: `http://localhost:4173/clock/`
+- `/clock` でも確認できます。Cloudflare Pages向けに `_redirects` で `/clock` を `/clock/index.html` へリライトします。
 
 単体ファイルとして `index.html` を開いても編集画面は動きますが、`/clock/` のパス確認にはローカルサーバーを使うのが確実です。
 
@@ -36,6 +37,7 @@ npm run dev
 
 - Build command: 空欄
 - Build output directory: `.` または `/`
+- Dev command: `npm run dev`
 - Functions directory: `functions`
 
 `functions/api/defaults.js` は任意機能です。Cloudflare外やローカルで `/api/defaults` が使えなくても、編集画面は壊れず、OBS用時計画面はAPIへアクセスしません。
@@ -69,7 +71,7 @@ PCのシステム時刻がずれている場合は時計表示もずれます。
 
 ## フォント
 
-このリポジトリはフォントファイルを同梱していません。候補リストはフォント名だけを提示し、OBS側PCにインストール済みならその名前で表示されます。未インストール時は `system-ui` などへフォールバックします。
+このリポジトリはフォントファイルを同梱していません。候補リストはフォント名だけを提示し、OBS側PCにインストール済みならその名前で表示されます。未インストール時は `system-ui` などへフォールバックします。手入力欄には、原則として1つのフォント名を入れてください。
 
 セルフホストする場合は、各フォントの公式ライセンスを確認し、`public/fonts` などへフォントファイルを置いたうえで `docs/licenses` にライセンス表示を追加してください。
 
@@ -100,6 +102,7 @@ npm run lint
 npm run typecheck
 npm run format:check
 npm run test
+npm run http:smoke
 git diff --check
 ```
 
@@ -112,6 +115,8 @@ git diff --check
 - CSS string escaping
 
 ## 手動確認
+
+詳しい公開前QA手順は [docs/manual-qa.md](docs/manual-qa.md) にあります。
 
 - 編集画面で各テンプレートをクリックし、ライブプレビューへ即時反映されること
 - 背景確認を「透過チェッカー」「明るい背景」「暗い背景」「任意色」で切り替えられること

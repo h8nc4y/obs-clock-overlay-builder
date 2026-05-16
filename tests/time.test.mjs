@@ -17,6 +17,13 @@ test("can hide seconds", () => {
   assert.equal(formatted.time, "15:04");
 });
 
+test("formats 12-hour time with day period", () => {
+  const config = normalizeConfig({ hour12: true, timezone: "UTC" });
+  const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05Z"));
+
+  assert.equal(formatted.time, "03:04:05 PM");
+});
+
 test("formats date and weekday variants", () => {
   const config = normalizeConfig({
     timezone: "Asia/Tokyo",

@@ -4,6 +4,12 @@ import { join } from "node:path";
 const roots = ["."];
 const allowed = /\.(html|css|js|mjs|md|json)$/;
 const ignoredDirectories = new Set([".git", "node_modules"]);
+const ignoredDirectoryPatterns = [
+  /^chrome-.*-profile/,
+  /^edge-.*-profile/,
+  /^browser-localappdata$/,
+  /^browser-temp$/
+];
 const files = roots.flatMap((root) => listFiles(root)).filter((file) => allowed.test(file));
 const problems = [];
 
@@ -34,7 +40,7 @@ function listFiles(root) {
   }
   const entries = readdirSync(root, { withFileTypes: true });
   return entries.flatMap((entry) => {
-    if (ignoredDirectories.has(entry.name)) {
+    if (ignoredDirectories.has(entry.name) || ignoredDirectoryPatterns.some((pattern) => pattern.test(entry.name))) {
       return [];
     }
     const path = join(root, entry.name);

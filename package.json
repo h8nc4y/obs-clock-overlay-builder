@@ -8,6 +8,7 @@
     "lint": "node scripts/check-js.mjs",
     "typecheck": "node scripts/module-smoke.mjs",
     "format:check": "node scripts/format-check.mjs",
+    "http:smoke": "node scripts/http-smoke.mjs",
     "test": "node --test"
   }
 }

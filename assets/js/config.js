@@ -23,31 +23,31 @@ export const DEFAULT_CONFIG = Object.freeze({
   showWeekday: false,
   weekdayFormat: "ja-short",
   label: "JST",
-  labelPosition: "top",
-  fontFamily: "Noto Sans JP",
+  labelPosition: "hidden",
+  fontFamily: "Poppins",
   textColor: "#ffffff",
-  backgroundColor: "#1f2937",
-  backgroundOpacity: 0.72,
-  radius: 18,
-  paddingX: 24,
-  paddingY: 14,
-  fontSize: 44,
-  dateSize: 16,
-  labelSize: 14,
-  letterSpacing: 0.5,
-  lineHeight: 1.08,
-  fontWeight: 700,
-  gap: 6,
+  backgroundColor: "#000000",
+  backgroundOpacity: 0,
+  radius: 4,
+  paddingX: 8,
+  paddingY: 4,
+  fontSize: 48,
+  dateSize: 15,
+  labelSize: 12,
+  letterSpacing: 0.6,
+  lineHeight: 1,
+  fontWeight: 800,
+  gap: 4,
   shadowColor: "#000000",
-  shadowOpacity: 0.45,
-  shadowBlur: 14,
+  shadowOpacity: 0.62,
+  shadowBlur: 10,
   shadowX: 0,
-  shadowY: 4,
+  shadowY: 3,
   strokeColor: "#000000",
-  strokeWidth: 0,
+  strokeWidth: 1.2,
   borderColor: "#ffffff",
-  borderOpacity: 0.35,
-  borderWidth: 1
+  borderOpacity: 0,
+  borderWidth: 0
 });
 
 export const TEMPLATES = Object.freeze([
@@ -436,7 +436,7 @@ export function parseConfigFromQuery(input) {
       return cloneDefaultConfig();
     }
   }
-  return normalizeConfig(flatParamsToConfig(params));
+  return normalizeFlatQueryConfig(flatParamsToConfig(params));
 }
 
 export function parseImportInput(input) {
@@ -445,8 +445,9 @@ export function parseImportInput(input) {
     throw new Error("入力が空です。");
   }
 
-  if (text.startsWith("{")) {
-    return normalizeConfig(JSON.parse(text));
+  const jsonConfig = parseJsonLikeConfig(text);
+  if (jsonConfig) {
+    return jsonConfig;
   }
 
   const params = paramsFromUnknown(text);
@@ -473,9 +474,7 @@ export function configToClockUrl(config, baseHref, options = {}) {
 }
 
 export function cssStringLiteral(value) {
-  const safe = String(value ?? "")
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
-    .slice(0, 120);
+  const safe = truncateCodePoints(stripControlText(value), 120);
   return JSON.stringify(safe).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
 }
 
@@ -565,6 +564,18 @@ function flatParamsToConfig(params) {
   return raw;
 }
 
+function normalizeFlatQueryConfig(raw) {
+  const templateId = String(raw.template ?? "");
+  if (TEMPLATE_IDS.has(templateId)) {
+    return normalizeConfig({
+      ...getTemplate(templateId).config,
+      ...raw,
+      template: templateId
+    });
+  }
+  return normalizeConfig(raw);
+}
+
 function paramsFromUnknown(input) {
   if (input instanceof URLSearchParams) {
     return input;
@@ -589,6 +600,21 @@ function paramsFromUnknown(input) {
   }
   if (text.includes("=") && !text.startsWith("{")) {
     return new URLSearchParams(text);
+  }
+  return null;
+}
+
+function parseJsonLikeConfig(text) {
+  if (text.startsWith("{")) {
+    return normalizeConfig(JSON.parse(text));
+  }
+  try {
+    const decoded = decodeURIComponent(text);
+    if (decoded !== text && decoded.trim().startsWith("{")) {
+      return normalizeConfig(JSON.parse(decoded));
+    }
+  } catch {
+    return null;
   }
   return null;
 }
@@ -650,8 +676,16 @@ function safeText(value, fallback, maxLength) {
   if (value === undefined || value === null) {
     return fallback;
   }
-  const text = String(value).replace(/[\u0000-\u001f\u007f]/g, " ").trim();
-  return text ? text.slice(0, maxLength) : fallback;
+  const text = truncateCodePoints(stripControlText(value).trim(), maxLength);
+  return text ? text : fallback;
+}
+
+function stripControlText(value) {
+  return String(value ?? "").replace(/[\u0000-\u001f\u007f]/g, " ");
+}
+
+function truncateCodePoints(value, maxLength) {
+  return Array.from(String(value)).slice(0, maxLength).join("");
 }
 
 function toBase64Url(text) {

@@ -4,6 +4,8 @@ node_modules/
 Thumbs.db
 npm-debug.log*
 coverage/
-chrome-*-profile/
-edge-*-profile/
+chrome-*-profile*/
+edge-*-profile*/
+browser-localappdata/
+browser-temp/
 *-screenshot.png
