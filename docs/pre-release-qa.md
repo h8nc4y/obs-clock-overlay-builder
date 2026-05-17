@@ -1,6 +1,6 @@
 # Pre-release QA Notes
 
-最終更新: 2026/05/17 17:21:39 JST
+最終更新: 2026/05/17 18:09:25 JST
 
 ## Summary
 
@@ -40,6 +40,33 @@ Browserで確認した結果:
 
 OBS実機でのブラウザソース確認は未実施。OBS側では、生成URLをブラウザソースURLへ貼り、推奨幅・高さを入力し、透明背景、表示/非表示後の次tick、カスタムCSSの影響を確認する。
 
+## OBS実機確認 Plan
+
+OBS実機確認は [docs/manual-qa.md](manual-qa.md) の `OBS実機確認` に沿って実施する。
+
+確認するURL:
+
+- ローカル確認: `http://localhost:4173/clock/?c=...`
+- Cloudflare公開後: `https://<production-url>/clock/?c=...`
+
+OBSで入れる設定:
+
+- URL: 編集画面でコピーした生成URL。
+- 幅: 編集画面の推奨幅。切れる場合は20pxから80px追加。
+- 高さ: 編集画面の推奨高さ。切れる場合は20pxから80px追加。
+- 背景: OBS側で白背景やカスタムCSSを追加しない。
+
+合格基準:
+
+- 時計だけが表示され、編集UIは出ない。
+- 背景が透明で、配信画面上に時計だけが重なる。
+- 秒表示ありでは毎秒更新される。
+- ソース非表示から再表示後、次tickで現在時刻へ戻る。
+- URLを貼り直しても同じ見た目になる。
+- 文字切れがない。切れる場合はOBS側の幅・高さを増やせば解消できる。
+
+確認結果は `docs/manual-qa.md` の記録欄を使い、Issue #1へ転記する。
+
 ## `/api/defaults` Decision
 
 Workers Static Assets では、`/api/defaults` は動的処理を必要としない静的fallback JSONへ変更した。
@@ -78,6 +105,7 @@ Cloudflare staging/production deployは未実施。
 - `npm run cf:dry-run` は成功したが、Cloudflareアカウントの無料枠、Workers契約、支出上限、production URLは未確認。
 - 公式ドキュメント上、Static Assets requests は無料・無制限、Workers Free は100,000 requests/dayだが、実アカウント状態はこの作業内で確認していない。
 - 今回の変更では `/api/defaults` も静的アセット化し、Worker-first API実行を避けた。
+- Cloudflare docsでは、静的アセットに一致したリクエストは無料・無制限で、Worker scriptを呼ぶリクエストはWorkers pricingに従うとされている。`run_worker_first` はFree tier上限到達時に429の原因になり得るため、このリポジトリでは使わない。
 
 承認する場合の推奨文言:
 
@@ -93,8 +121,79 @@ Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の stagi
 参照:
 
 - Cloudflare Workers pricing: https://developers.cloudflare.com/workers/platform/pricing/
+- Cloudflare Static Assets billing and limitations: https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/
 - Wrangler assets `run_worker_first`: https://developers.cloudflare.com/workers/wrangler/configuration/
 - Workers Static Assets headers: https://developers.cloudflare.com/workers/static-assets/headers/
+
+## Cloudflare Deploy Approval Conditions
+
+実deploy前に、次のすべてを人間が確認する。
+
+- CloudflareアカウントがFreeまたは既存契約内で、今回のWorkers Static Assets deployに追加支払いが不要。
+- Cloudflareの支出上限、課金アラート、または請求管理画面で想定外の課金を防げる状態。
+- staging deployとproduction deployの対象が `obs-clock-overlay-builder-staging` と `obs-clock-overlay-builder` で正しい。
+- paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveを使わない。
+- secret、token、OAuth credential、実ユーザーデータをdeploy操作で外部送信しない。
+- `npm run cf:dry-run` が成功済み。
+
+承認後に実行する最小コマンド:
+
+```bash
+npm run deploy:staging
+npm run deploy:production
+```
+
+deploy後の確認:
+
+- staging URLとproduction URLを記録する。
+- `/`、`/clock/`、`/clock`、`/api/defaults` が200で開く。
+- `/api/defaults` が静的fallback JSONを返す。
+- `/api/defaults` の `Content-Type` が `application/json`。
+- Browser Console error/warning がない。
+- production URLの生成URLをOBSへ貼り、透明背景と時計更新を確認する。
+- 問題があればCloudflareの直近Worker versionへrollbackするか、直前のgit commitを再デプロイする。
+
+## GitHub Actions Decision
+
+GitHub docsでは、private repositoryのGitHub-hosted runnersはプランごとの無料分を超えるとrepository ownerへ課金される。無料枠、支出上限、支払い方法が未確認のため、自動実行される `push` / `pull_request` workflow は追加しない。
+
+追加する場合の最小案:
+
+- `workflow_dispatch` のみ。
+- `runs-on: ubuntu-latest`。
+- `npm ci`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run format:check`
+- `npm run test`
+- `npm run build`
+- `git diff --check`
+
+`push` / `pull_request` triggerは、無料枠と支出上限を確認してから追加する。
+
+参照:
+
+- GitHub Actions billing: https://docs.github.com/en/billing/concepts/product-billing/github-actions
+
+## Issue #1 Close Conditions
+
+公開する場合:
+
+- OBS実機確認が完了し、結果がIssue #1へ記録されている。
+- Cloudflare staging deployが承認済み条件内で完了し、URLと確認結果がIssue #1へ記録されている。
+- Cloudflare production deployが承認済み条件内で完了し、production URLと確認結果がIssue #1へ記録されている。
+- productionで `/`、`/clock/`、`/clock`、`/api/defaults`、headers、Browser Consoleを確認済み。
+- production URLの生成URLをOBSへ貼り、透明背景と時計更新を確認済み。
+- rollback pathが記録済み。
+- CIを使う場合は、無料枠・支出上限を確認済みで、実行結果が記録済み。CIを使わない場合は、ローカル検証で代替する判断がIssue #1へ記録済み。
+
+公開保留する場合:
+
+- OBS実機確認の結果、公開前に直すべき問題がIssueまたはPRで追跡されている。
+- Cloudflare deployを行わない理由が、費用、認証、契約状態、支出上限、または運用判断としてIssue #1へ記録されている。
+- 公開保留中もローカル利用に必要な手順、未確認事項、次に再開する条件がIssue #1へ記録されている。
+- CIを追加しない場合、その理由がprivate repoの無料枠・支出上限未確認として記録されている。
+- Issue #1を閉じる場合は、公開しない判断が明確で、残作業が別Issueへ移っている。
 
 ## Remaining Unknowns
 
