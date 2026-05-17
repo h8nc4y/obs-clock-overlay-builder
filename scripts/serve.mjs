@@ -18,12 +18,6 @@ const contentTypes = {
 
 const server = createServer((request, response) => {
   const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
-  if (url.pathname === "/api/defaults") {
-    response.writeHead(200, { "content-type": "application/json; charset=utf-8" });
-    response.end(JSON.stringify({ timezone: null, country: null, source: "local" }));
-    return;
-  }
-
   const filePath = resolvePath(url.pathname);
   if (!filePath) {
     response.writeHead(403);
@@ -36,7 +30,7 @@ const server = createServer((request, response) => {
     return;
   }
   response.writeHead(200, {
-    "content-type": contentTypes[extname(filePath)] || "application/octet-stream",
+    "content-type": contentTypeFor(url.pathname, filePath),
     "cache-control": "no-store"
   });
   createReadStream(filePath).pipe(response);
@@ -69,4 +63,11 @@ function resolvePath(pathname) {
     return target;
   }
   return target;
+}
+
+function contentTypeFor(pathname, filePath) {
+  if (pathname === "/api/defaults") {
+    return "application/json; charset=utf-8";
+  }
+  return contentTypes[extname(filePath)] || "application/octet-stream";
 }
