@@ -4,6 +4,8 @@
 
 Follow the global Codex instructions, global `config.toml`, and global rules for common autonomy, cost, GitHub, Cloudflare, and reporting policy. This file only keeps rules that are specific to this OBS clock overlay builder.
 
+Do not duplicate or narrow the global autonomy, GitHub, Cloudflare, or cost-guard policy here. If global policy changes, keep this file as a project-specific delta unless this app needs an explicit exception.
+
 Preserve the OBS clock overlay contract:
 
 - generated `/clock/?c=...` URLs are the source of truth for OBS reproducibility
