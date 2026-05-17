@@ -13,7 +13,7 @@ OBSのブラウザソースで使う、毎秒更新の時計オーバーレイUR
 - 編集画面だけ localStorage へ最後の設定を保存。OBS表示の再現性はURLパラメータが正です
 - PC内フォント読み込みボタン。`window.queryLocalFonts` 非対応時は手入力
 - CanvasによるSNS向けPNGプレビュー画像生成、投稿文コピー、X Web Intent
-- Cloudflare Workers または Pages Functions が使える場合だけ `/api/defaults` で `request.cf` の候補を返します。時計表示はAPIに依存しません
+- Workers Static Assets では `/api/defaults` を静的fallback JSONとして配信します。Pages Functions 互換では任意で `request.cf` の候補を返せます。時計表示はAPIに依存しません
 
 ## ローカル起動
 
@@ -48,7 +48,7 @@ npm run deploy:staging
 npm run deploy:production
 ```
 
-`/api/defaults` は Worker が返し、それ以外の静的ファイルは `dist/` の Static Assets から配信します。rollback は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイします。
+`/api/defaults` は `api/defaults` から静的JSONとして配信します。`_headers` でJSONの `Content-Type` と `Cache-Control: no-store` を指定し、`wrangler.jsonc` では `run_worker_first` を使いません。Workerエントリは Static Assets の補助エントリとして残し、通常の静的ファイル配信は `dist/` の Static Assets に任せます。rollback は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイします。
 
 ## Cloudflare Pages 公開
 
@@ -59,7 +59,7 @@ npm run deploy:production
 - Dev command: `npm run dev`
 - Functions directory: `functions`
 
-`functions/api/defaults.js` は Pages 用の任意機能です。Cloudflare外やローカルで `/api/defaults` が使えなくても、編集画面は壊れず、OBS用時計画面はAPIへアクセスしません。
+`functions/api/defaults.js` は Pages 用の任意機能です。Pages Functions で動かす場合だけ `request.cf` 由来の `timezone` / `country` 候補を返します。Cloudflare外やローカルで `/api/defaults` が静的fallbackだけでも、編集画面は壊れず、OBS用時計画面はAPIへアクセスしません。
 
 ## OBS設定手順
 
@@ -138,6 +138,7 @@ git diff --check
 ## 手動確認
 
 詳しい公開前QA手順は [docs/manual-qa.md](docs/manual-qa.md) にあります。
+直近の公開前QA判断は [docs/pre-release-qa.md](docs/pre-release-qa.md) に記録します。
 
 - 編集画面で各テンプレートをクリックし、ライブプレビューへ即時反映されること
 - 背景確認を「透過チェッカー」「明るい背景」「暗い背景」「任意色」で切り替えられること

@@ -7,7 +7,7 @@
 1. `npm run dev` を実行する。
 2. `http://localhost:4173/` を開く。
 3. `http://localhost:4173/clock/` と `http://localhost:4173/clock` を開く。
-4. `http://localhost:4173/api/defaults` がローカルfallback JSONを返すことを確認する。
+4. `http://localhost:4173/api/defaults` が静的fallback JSONを返すことを確認する。
 
 ## Builder
 
@@ -73,6 +73,7 @@ Bad"; color:red;
 - `npm run build` で `dist/` が生成される。
 - `npm run cf:dry-run` が成功する。
 - Workers Static Assets で `/`、`/clock/`、`/clock`、`/api/defaults` が動作する。
+- `/api/defaults` は Worker-first ではなく静的JSONとして配信される。
 - rollback path は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイする。
 
 ## Cloudflare Pages

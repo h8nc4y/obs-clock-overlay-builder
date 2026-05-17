@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
 const requiredArtifacts = [
   "index.html",
   "clock/index.html",
+  "api/defaults",
   "assets/css/styles.css",
   "assets/js/config.js",
   "assets/js/clock.js"
@@ -23,4 +24,10 @@ test("build creates required Cloudflare static assets", () => {
     assert.equal(statSync(path).isFile(), true, `${path} should be a file`);
     assert.ok(statSync(path).size > 0, `${path} should not be empty`);
   }
+
+  assert.deepEqual(JSON.parse(readFileSync(join("dist", "api/defaults"), "utf8")), {
+    timezone: null,
+    country: null,
+    source: "static"
+  });
 });
