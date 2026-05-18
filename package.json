@@ -13,6 +13,9 @@
     "typecheck": "node scripts/module-smoke.mjs",
     "format:check": "node scripts/format-check.mjs",
     "http:smoke": "node scripts/http-smoke.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "release:http-smoke": "node scripts/release-http-smoke.mjs",
+    "release:remote-smoke": "node scripts/release-remote-smoke.mjs",
     "test": "node --test"
   },
   "devDependencies": {

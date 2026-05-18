@@ -1,6 +1,6 @@
 # Pre-release QA Notes
 
-最終更新: 2026/05/17 18:09:25 JST
+最終更新: 2026/05/18 20:44:13 JST
 
 ## Summary
 
@@ -20,6 +20,108 @@
 - `git diff --check`
 
 `npm run cf:dry-run` は `wrangler deploy --dry-run --env staging` までで、実際のCloudflare deployは実行していない。
+
+## Release Preflight After PR #7
+
+PR #7 merge後の公開前release候補は、次の少数コマンドで再現する。
+
+```bash
+npm run release:check
+npm run release:http-smoke
+```
+
+`npm run release:check` は次を順に実行する。
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm run format:check`
+- `npm run test`
+- `npm run build`
+- `npm run cf:dry-run`
+- `git diff --check`
+
+`npm run release:http-smoke` は一時的に `npm run dev` を起動し、`/`、`/clock/`、`/clock`、`/api/defaults` を確認してから終了する。
+staging/production URLは次で確認する。
+
+```bash
+SMOKE_BASE_URL=https://<deploy-url> npm run release:remote-smoke
+```
+
+`npm run release:remote-smoke` は `/`、`/clock/`、`/clock`、`/api/defaults` のstatus、`Content-Type`、`/api/defaults` の `Cache-Control: no-store` とJSON bodyを確認する。
+
+OBS実機確認はCodexでは完了扱いにしない。確認結果は [manual-qa.md](manual-qa.md) の `OBS実機確認` 記録欄に記入し、Issue #1へ転記する。
+
+## Cloudflare Staging Verification Plan
+
+staging deployに進む前に確認すること:
+
+- `wrangler whoami` でCloudflareへログイン済みである。
+- `wrangler.jsonc` のstaging対象が `obs-clock-overlay-builder-staging` である。
+- `assets.directory` が `./dist`、`assets.binding` が `ASSETS`、`html_handling` が `auto-trailing-slash`、`not_found_handling` が `none` である。
+- `npm run cf:dry-run` が成功している。
+- paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveを要求されない。
+
+staging deploy後に確認すること:
+
+- staging URLを記録する。
+- `/` が200で編集画面を表示する。
+- `/clock/` が200で時計専用画面を表示する。
+- `/clock` が200で時計専用画面へ到達する。
+- `/api/defaults` が200で `{"timezone":null,"country":null,"source":"static"}` を返す。
+- `/api/defaults` の `Content-Type` が `application/json; charset=utf-8` を含む。
+- `/api/defaults` の `Cache-Control` が `no-store` を含む。
+- rollback pathとして、Cloudflareの直近Worker versionへ戻す、または直前のgit commitを再デプロイできることを記録する。
+
+production deployは、OBS実機確認が未完了の間は実行しない。
+
+## Cloudflare Staging Result
+
+実施日時: 2026/05/18 20:49:28 JST
+
+staging deploy:
+
+- command: `npm run deploy:staging`
+- worker: `obs-clock-overlay-builder-staging`
+- URL: `https://obs-clock-overlay-builder-staging.h8nc4y.workers.dev`
+- Current Version ID: `c9387fc1-fbb9-466b-b68c-f4adcd31d6a4`
+- binding: `env.ASSETS` のみ
+- paid plan変更、有料binding、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive要求: なし
+
+staging HTTP smoke:
+
+- `SMOKE_BASE_URL=https://obs-clock-overlay-builder-staging.h8nc4y.workers.dev npm run release:remote-smoke`
+- `/`: 200、`Content-Type: text/html`
+- `/clock/`: 200、`Content-Type: text/html`
+- `/clock`: 200、`Content-Type: text/html`
+- `/api/defaults`: 200、`Content-Type: application/json; charset=utf-8`
+- `/api/defaults`: `Cache-Control: no-store`
+- `/api/defaults`: `{"timezone":null,"country":null,"source":"static"}`
+
+staging Browser smoke:
+
+- `/`: `時計オーバーレイURLビルダー` を表示、Console error/warning 0件。
+- `/clock/`: `OBS Clock Overlay` を表示、`body` は `margin: 0px`、`overflow: hidden`、背景は透明、Console error/warning 0件。
+
+redirect / rewrite:
+
+- `/clock` は200で時計専用HTMLへ到達した。Cloudflare Static Assets の `html_handling: auto-trailing-slash` と `_redirects` 互換設定のどちらでも、利用者は `/clock` から時計画面へ到達できる。
+
+rollback path:
+
+- `npx wrangler versions list --env staging` と `npx wrangler deployments list --env staging` でversion/deployment一覧を確認済み。
+- 直前versionとして `f8152e51-fc91-4647-8219-78777ac226c6` が見える。
+- 問題があればCloudflareの直近Worker versionへrollbackするか、直前のgit commitを再デプロイする。
+
+production判断:
+
+- OBS実機確認が未完了のため、production deployは実行しない。
+- productionへ進む条件は、OBS実機確認の記録欄をIssue #1へ転記し、透明背景、毎秒更新、表示/非表示後の復帰、URL再貼り付け再現、文字切れが合格していること。
+
+production承認文言:
+
+```text
+OBS実機確認が完了し、Issue #1に結果を記録済みです。Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の production deploy を許可します。paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive、secret送信は禁止します。
+```
 
 ## Browser QA
 

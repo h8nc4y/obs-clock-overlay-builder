@@ -116,19 +116,22 @@ Web Share API が画像ファイル共有に対応する環境では、共有ボ
 
 ## 品質確認
 
-通常は次の順に確認します。
+通常のrelease preflightは次で確認します。
 
 ```bash
-npm run lint
-npm run typecheck  # module import smoke
-npm run build
-npm run format:check
-npm run test
-npm run cf:dry-run
-git diff --check
+npm run release:check
+npm run release:http-smoke
 ```
 
-`npm run http:smoke` はローカルサーバーが必要です。別ターミナルで `npm run dev` を起動してから実行してください。
+`npm run release:check` は `lint`、`typecheck`（module import smoke）、`format:check`、`test`、`build`、`cf:dry-run`、`git diff --check` を順に実行します。
+`npm run release:http-smoke` は一時的にローカルサーバーを起動し、`/`、`/clock/`、`/clock`、`/api/defaults` を確認してから終了します。
+stagingやproductionのURL確認には `SMOKE_BASE_URL` を指定して `release:remote-smoke` を実行します。
+
+```bash
+SMOKE_BASE_URL=https://example.workers.dev npm run release:remote-smoke
+```
+
+個別に確認する場合、`npm run http:smoke` はローカルサーバーが必要です。別ターミナルで `npm run dev` を起動してから実行してください。
 
 ```bash
 npm run dev
