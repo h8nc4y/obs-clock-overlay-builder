@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { normalizeConfig } from "../assets/js/config.js";
-import { createFormatters, formatClock, nextSecondDelay } from "../assets/js/time.js";
+import { createFormatters, formatClock, nextSecondDelay, normalizeHour } from "../assets/js/time.js";
 
 test("formats Tokyo time as HH:MM:SS by default", () => {
   const config = normalizeConfig({});
@@ -41,4 +41,10 @@ test("formats date and weekday variants", () => {
 test("next tick is scheduled near the next second boundary", () => {
   assert.equal(nextSecondDelay(new Date("2026-01-01T00:00:00.250Z"), 16), 766);
   assert.equal(nextSecondDelay(new Date("2026-01-01T00:00:00.999Z"), 16), 50);
+});
+
+test("normalizes 24-hour formatter edge hour to 00", () => {
+  assert.equal(normalizeHour("24"), "00");
+  assert.equal(normalizeHour("4"), "04");
+  assert.equal(normalizeHour(""), "00");
 });

@@ -112,6 +112,7 @@ const selectFields = ["dateFormat", "weekdayFormat", "labelPosition"];
 let state = loadInitialConfig();
 let shareBlob = null;
 let shareObjectUrl = "";
+let localFontSelectBound = false;
 
 const previewClock = mountClock(elements.clockPreview, state);
 
@@ -368,7 +369,7 @@ function updateGeneratedUrl() {
     elements.urlWarning.hidden = false;
     elements.urlWarning.textContent = "URLが長めです。必要なら「デフォルト値を省略して短くする」を使ってください。";
   }
-  updateXIntent(url);
+  updateXIntent();
 }
 
 function updateRecommendedSize() {
@@ -402,14 +403,13 @@ function updateShareText() {
   elements.shareText.value = text;
 }
 
-function updateXIntent(url) {
+function updateXIntent() {
   const params = new URLSearchParams({
     text: elements.shareText.value,
     url: new URL("./", window.location.href).href,
     hashtags: "OBS,配信素材"
   });
-  elements.xIntent.href = `https://twitter.com/intent/tweet?${params.toString()}`;
-  elements.xIntent.dataset.clockUrl = url;
+  elements.xIntent.href = `https://x.com/intent/tweet?${params.toString()}`;
 }
 
 async function fetchCloudflareDefaults() {
@@ -455,14 +455,18 @@ async function loadLocalFonts() {
     }
     elements.localFontSelectWrap.classList.remove("is-hidden");
     elements.localFontStatus.textContent = `${names.length}件のフォントを読み込みました。`;
-    elements.localFontSelect.addEventListener(
-      "change",
-      () => updateState({ fontFamily: elements.localFontSelect.value }, true),
-      { once: false }
-    );
+    bindLocalFontSelect();
   } catch {
     elements.localFontStatus.textContent = "フォント一覧の取得が拒否されました。手入力欄を使ってください。";
   }
+}
+
+function bindLocalFontSelect() {
+  if (localFontSelectBound) {
+    return;
+  }
+  elements.localFontSelect.addEventListener("change", () => updateState({ fontFamily: elements.localFontSelect.value }, true));
+  localFontSelectBound = true;
 }
 
 function importConfig() {
@@ -488,7 +492,13 @@ async function copyText(text, statusElement, successMessage) {
 }
 
 async function generateShareImage() {
-  shareBlob = await createShareImageBlob();
+  try {
+    shareBlob = await createShareImageBlob();
+  } catch {
+    shareBlob = null;
+    elements.urlStatus.textContent = "PNG画像を生成できませんでした。ブラウザを更新してもう一度試してください。";
+    return;
+  }
   if (shareObjectUrl) {
     URL.revokeObjectURL(shareObjectUrl);
   }
@@ -503,6 +513,9 @@ async function generateShareImage() {
 async function shareGeneratedImage() {
   if (!shareBlob) {
     await generateShareImage();
+    if (!shareBlob) {
+      return;
+    }
   }
   const file = new File([shareBlob], "obs-clock-preview.png", { type: "image/png" });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -562,8 +575,14 @@ function createShareImageBlob() {
   context.fillStyle = "#665f68";
   context.fillText(new URL("./", window.location.href).href, 600, 552);
 
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), "image/png", 0.92);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Canvas PNG generation failed."));
+      }
+    }, "image/png", 0.92);
   });
 }
 

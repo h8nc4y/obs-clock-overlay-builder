@@ -45,7 +45,7 @@
             </div>
             <div class="field inline-actions">
               <span>公開環境の候補</span>
-              <p id="cfTimezone" class="muted">Workers Static Assets では静的fallbackを返します。Pages Functionsなどの動的APIがある場合だけ候補を取得できます。</p>
+              <p id="cfTimezone" class="muted">公開先によっては候補を取得できない場合があります。その場合も手入力で使えます。</p>
               <button id="fetchCfDefaults" type="button">候補を確認</button>
             </div>
             <label class="toggle">
@@ -85,7 +85,7 @@
             <label class="field">
               <span>ラベル</span>
               <input id="labelText" type="text" maxlength="40" placeholder="LIVE / JST / 配信中">
-              <small>任意文字列は時計画面でも textContent で表示します。</small>
+              <small>入力した文字は、そのまま画面用の命令として実行されない形で表示します。</small>
             </label>
             <label class="field">
               <span>ラベル位置</span>

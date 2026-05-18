@@ -328,25 +328,25 @@ const WEEKDAY_FORMATS = new Set(["ja-short", "ja-long", "en-short", "en-long"]);
 const LABEL_POSITIONS = new Set(["top", "bottom", "left", "right", "hidden"]);
 const TEMPLATE_IDS = new Set(TEMPLATES.map((template) => template.id));
 
-const NUMBER_LIMITS = {
+export const NUMBER_LIMITS = {
   backgroundOpacity: [0, 1],
-  radius: [0, 80],
-  paddingX: [0, 120],
-  paddingY: [0, 100],
-  fontSize: [10, 180],
-  dateSize: [8, 90],
-  labelSize: [8, 80],
-  letterSpacing: [-2, 12],
-  lineHeight: [0.8, 2.2],
-  fontWeight: [100, 1000],
+  radius: [0, 48],
+  paddingX: [0, 80],
+  paddingY: [0, 60],
+  fontSize: [18, 120],
+  dateSize: [10, 56],
+  labelSize: [10, 48],
+  letterSpacing: [-1, 8],
+  lineHeight: [0.9, 1.8],
+  fontWeight: [300, 900],
   gap: [0, 40],
   shadowOpacity: [0, 1],
-  shadowBlur: [0, 80],
-  shadowX: [-80, 80],
-  shadowY: [-80, 80],
-  strokeWidth: [0, 12],
+  shadowBlur: [0, 36],
+  shadowX: [-20, 20],
+  shadowY: [-20, 20],
+  strokeWidth: [0, 8],
   borderOpacity: [0, 1],
-  borderWidth: [0, 16]
+  borderWidth: [0, 8]
 };
 
 export function cloneDefaultConfig() {
