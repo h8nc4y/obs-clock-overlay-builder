@@ -13,7 +13,7 @@ OBSのブラウザソースで使う、毎秒更新の時計オーバーレイUR
 - 編集画面だけ localStorage へ最後の設定を保存。OBS表示の再現性はURLパラメータが正です
 - PC内フォント読み込みボタン。`window.queryLocalFonts` 非対応時は手入力
 - CanvasによるSNS向けPNGプレビュー画像生成、投稿文コピー、X Web Intent
-- Workers Static Assets では `/api/defaults` を静的fallback JSONとして配信します。Pages Functions 互換では任意で `request.cf` の候補を返せます。時計表示はAPIに依存しません
+- `/api/defaults` は公開先の補助情報だけを返します。候補が取れない環境でも、時計表示はURLの設定だけで動きます
 
 ## ローカル起動
 
@@ -86,7 +86,7 @@ PCのシステム時刻がずれている場合は時計表示もずれます。
 /clock/?tz=Asia/Tokyo&hour12=0&seconds=1&date=0&weekday=0&font=Poppins&theme=soda
 ```
 
-不正な値は安全なデフォルトへ戻します。URL由来の任意文字列は `innerHTML` に入れず、時計表示は `textContent` で更新します。
+不正な値は安全な範囲へ戻します。URL由来の任意文字列はHTMLとして実行せず、表示用の文字として扱います。
 
 ## フォント
 
@@ -116,15 +116,24 @@ Web Share API が画像ファイル共有に対応する環境では、共有ボ
 
 ## 品質確認
 
+通常は次の順に確認します。
+
 ```bash
 npm run lint
-npm run typecheck
+npm run typecheck  # module import smoke
 npm run build
 npm run format:check
 npm run test
-npm run http:smoke
 npm run cf:dry-run
 git diff --check
+```
+
+`npm run http:smoke` はローカルサーバーが必要です。別ターミナルで `npm run dev` を起動してから実行してください。
+
+```bash
+npm run dev
+# 別ターミナル
+npm run http:smoke
 ```
 
 テスト対象:
@@ -134,6 +143,8 @@ git diff --check
 - default/invalid config fallback
 - time formatting
 - CSS string escaping
+- render visibility and CSS variables
+- range input and numeric normalization consistency
 
 ## 手動確認
 

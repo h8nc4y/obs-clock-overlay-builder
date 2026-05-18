@@ -99,7 +99,7 @@ function partsToObject(parts) {
   return object;
 }
 
-function normalizeHour(hour) {
+export function normalizeHour(hour) {
   if (!hour) {
     return "00";
   }
