@@ -1,6 +1,6 @@
 # Pre-release QA Notes
 
-最終更新: 2026/05/18 20:44:13 JST
+最終更新: 2026/05/20 18:35:31 JST
 
 ## Summary
 
@@ -50,6 +50,15 @@ SMOKE_BASE_URL=https://<deploy-url> npm run release:remote-smoke
 `npm run release:remote-smoke` は `/`、`/clock/`、`/clock`、`/api/defaults` のstatus、`Content-Type`、`/api/defaults` の `Cache-Control: no-store` とJSON bodyを確認する。
 
 OBS実機確認はCodexでは完了扱いにしない。確認結果は [manual-qa.md](manual-qa.md) の `OBS実機確認` 記録欄に記入し、Issue #1へ転記する。
+
+## Local Font Display Names
+
+PC内フォントはブラウザから英語名や内部名で返ることがある。日本語ユーザーが見つけやすい代表例だけ、UIでは日本語表示名を優先する。
+
+- `LightNovelPopV2 V2` は `ラノベPOP v2（LightNovelPopV2 V2）` と表示する。
+- `Meiryo`、`Yu Gothic`、`Yu Mincho`、`BIZ UDPGothic`、`BIZ UDPMincho` など、確信できるWindows系フォント名だけを日本語表示名へ寄せる。
+- 日本語表示名はUI上の補助であり、生成URL、import/export、`/clock/` のCSSには実際にブラウザで使うフォント名を保存する。
+- 不確かなフォント名は無理に登録しない。必要になった時点で、実際の `family` / `fullName` / `postscriptName` / `style` を確認して追加する。
 
 ## Cloudflare Staging Verification Plan
 

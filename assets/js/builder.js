@@ -11,6 +11,7 @@ import {
   parseConfigFromQuery,
   parseImportInput
 } from "./config.js";
+import { createLocalFontOption } from "./font-names.js";
 import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
 
@@ -443,22 +444,35 @@ async function loadLocalFonts() {
   elements.localFontStatus.textContent = "読み込み中...";
   try {
     const fonts = await window.queryLocalFonts();
-    const names = [...new Set(fonts.map((font) => font.fullName || font.family).filter(Boolean))].sort((a, b) =>
-      a.localeCompare(b, "ja")
-    );
+    const options = localFontOptions(fonts);
     elements.localFontSelect.textContent = "";
-    for (const name of names) {
+    for (const fontOption of options) {
       const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
+      option.value = fontOption.value;
+      option.textContent = fontOption.label;
+      option.dataset.displayName = fontOption.displayName;
+      option.dataset.searchText = fontOption.searchText;
+      option.title = fontOption.searchText;
       elements.localFontSelect.append(option);
     }
     elements.localFontSelectWrap.classList.remove("is-hidden");
-    elements.localFontStatus.textContent = `${names.length}件のフォントを読み込みました。`;
+    elements.localFontStatus.textContent = `${options.length}件のフォントを読み込みました。表示名が日本語でも、URLには実際のフォント名を保存します。`;
     bindLocalFontSelect();
   } catch {
     elements.localFontStatus.textContent = "フォント一覧の取得が拒否されました。手入力欄を使ってください。";
   }
+}
+
+function localFontOptions(fonts) {
+  const byValue = new Map();
+  for (const font of fonts) {
+    const fontOption = createLocalFontOption(font);
+    if (!fontOption.value || byValue.has(fontOption.value)) {
+      continue;
+    }
+    byValue.set(fontOption.value, fontOption);
+  }
+  return [...byValue.values()].sort((a, b) => a.label.localeCompare(b.label, "ja"));
 }
 
 function bindLocalFontSelect() {
