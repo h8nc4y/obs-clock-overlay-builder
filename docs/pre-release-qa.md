@@ -1,6 +1,6 @@
 # Pre-release QA Notes
 
-最終更新: 2026/05/20 18:35:31 JST
+最終更新: 2026/05/20 19:15:04 JST
 
 ## Summary
 
@@ -132,6 +132,61 @@ production承認文言:
 OBS実機確認が完了し、Issue #1に結果を記録済みです。Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の production deploy を許可します。paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive、secret送信は禁止します。
 ```
 
+## Cloudflare Production Result
+
+実施日時: 2026/05/20 19:13 JST
+
+production deploy:
+
+- command: `npm run deploy:production`
+- worker: `obs-clock-overlay-builder`
+- URL: `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
+- Current Version ID: `6894fb0e-86f1-431e-9770-06a3966a4997`
+- binding: `env.ASSETS` のみ
+- paid plan変更、有料binding、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive要求: なし
+
+production HTTP smoke:
+
+- `SMOKE_BASE_URL=https://obs-clock-overlay-builder.h8nc4y.workers.dev npm run release:remote-smoke`
+- `/`: 200、`Content-Type: text/html`
+- `/clock/`: 200、`Content-Type: text/html`
+- `/clock`: 200、最終的に時計専用HTMLへ到達
+- `/api/defaults`: 200、`Content-Type: application/json; charset=utf-8`
+- `/api/defaults`: `Cache-Control: no-store`
+- `/api/defaults`: `{"timezone":null,"country":null,"source":"static"}`
+
+production Browser smoke:
+
+- `/`: `時計オーバーレイURLビルダー` を表示、生成URLは `/clock/?c=...`、フォント表示名補足文あり、Console error/warning 0件。
+- `/clock/`: `OBS Clock Overlay` を表示、編集UIなし、`body` は `margin: 0px`、`overflow: hidden`、背景は透明、Console error/warning 0件。
+
+redirect / rewrite:
+
+- `release:remote-smoke` では `/clock` は200で時計専用HTMLへ到達した。
+- 低レベルHTTP確認では `/clock` から `/clock/` への `307 Temporary Redirect` が見える。利用者とOBSは最終的に `/clock/` の時計画面へ到達できる。
+
+rollback path:
+
+- `npx wrangler versions list --env production` と `npx wrangler deployments list --env production` でversion/deployment一覧を確認済み。
+- current version: `6894fb0e-86f1-431e-9770-06a3966a4997`
+- rollback候補として直近の別version `dc40f3d8-681a-4d5d-bdc4-d5ae29197084` が見える。ただし今回が初回production公開のため、公開済みとして検証済みの旧production versionはない。
+- 問題があれば `npx wrangler versions deploy dc40f3d8-681a-4d5d-bdc4-d5ae29197084@100 --env production --yes` で直近versionへ戻すか、直前のgit commitを `npm run deploy:production` で再デプロイする。
+
+production判断:
+
+- OBS実機確認はユーザー報告で全項目問題なし。
+- staging検証、production deploy、production HTTP smoke、production Browser smokeが完了したため、Issue #1の公開close条件は満たした。
+
+## Post-release Backlog
+
+今回のrelease完了条件から分離し、公開後改善として扱う項目:
+
+- backlog Issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/10
+- サイト全体の見た目、余白、操作導線の改善。
+- テンプレート内容、色、サイズ、配信画面上での読みやすさの追加調整。
+- 日本語フォント表示名エイリアスの追加。ただし実際の `family` / `fullName` / `postscriptName` / `style` を確認できたものだけ登録する。
+- GitHub Actions CI。private repository の無料枠・支出上限確認後に、まず `workflow_dispatch` のみで検討する。
+
 ## Browser QA
 
 対象: `http://127.0.0.1:4173/`
@@ -209,20 +264,18 @@ Pages Functions互換の `functions/api/defaults.js` は残している。Cloudf
 
 ## Cloudflare Deploy Decision
 
-Cloudflare staging/production deployは未実施。
+Cloudflare staging/production deployは完了した。
 
-理由:
+production公開前の判断:
 
-- `npm run cf:dry-run` は成功したが、Cloudflareアカウントの無料枠、Workers契約、支出上限、production URLは未確認。
-- 公式ドキュメント上、Static Assets requests は無料・無制限、Workers Free は100,000 requests/dayだが、実アカウント状態はこの作業内で確認していない。
-- 今回の変更では `/api/defaults` も静的アセット化し、Worker-first API実行を避けた。
-- Cloudflare docsでは、静的アセットに一致したリクエストは無料・無制限で、Worker scriptを呼ぶリクエストはWorkers pricingに従うとされている。`run_worker_first` はFree tier上限到達時に429の原因になり得るため、このリポジトリでは使わない。
+- user approvalにより、Cloudflare Freeまたは既存契約内でproduction deployを許可済み。
+- `wrangler deploy --dry-run --env production` でbindingが `env.ASSETS` のみであることを確認済み。
+- deploy中にpaid plan変更や有料binding要求は出なかった。
+- `/api/defaults` は静的アセットで、Worker-first API実行を避けている。
 
-承認する場合の推奨文言:
+公開後のproduction URL:
 
-```text
-Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の staging deploy と production deploy を許可します。paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive、secret送信は禁止します。
-```
+- `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
 
 費用目安:
 
@@ -308,14 +361,13 @@ GitHub docsでは、private repositoryのGitHub-hosted runnersはプランごと
 
 ## Remaining Unknowns
 
-- OBS実機でのブラウザソース表示。
 - GitHub Actions の無料枠、支出上限、CI実行結果。
 - Cloudflare account の契約状態、無料枠消費状況、支出上限。
-- staging/production deploy URL。
-- production公開後の実ブラウザ表示とrollback実行性。
+- production rollbackの実行そのもの。rollback候補と手順は確認済みだが、正常公開中のため実rollbackは行っていない。
+- ユーザーPCごとの実フォント返却名。代表例は対応済みだが、未知のフォントは内部名表示になる。
 
 ## Residual Risks
 
 - 実フォントはOBSを動かすPCに依存するため、ローカルBrowserとOBS実機で見た目が変わる可能性がある。
-- Cloudflare実deploy後のヘッダー適用、`/clock` handling、production URLは未確認。
 - GitHub Actionsを追加する場合、trigger設定次第でprivate repoのActions minutesを消費する可能性がある。
+- 今回が初回production公開のため、検証済みの旧production versionへのrollbackではなく、直近versionまたはgit commit再デプロイによる復旧になる。

@@ -35,6 +35,8 @@ npm run dev
 
 Cloudflareの新規公開先は Workers with Static Assets を第一候補にしています。Wrangler設定は `wrangler.jsonc`、Workerエントリは `worker/index.js` です。
 
+Production URL: https://obs-clock-overlay-builder.h8nc4y.workers.dev
+
 ```bash
 npm install
 npm run build
@@ -48,7 +50,7 @@ npm run deploy:staging
 npm run deploy:production
 ```
 
-`/api/defaults` は `api/defaults` から静的JSONとして配信します。`_headers` でJSONの `Content-Type` と `Cache-Control: no-store` を指定し、`wrangler.jsonc` では `run_worker_first` を使いません。Workerエントリは Static Assets の補助エントリとして残し、通常の静的ファイル配信は `dist/` の Static Assets に任せます。rollback は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイします。
+`/api/defaults` は `api/defaults` から静的JSONとして配信します。`_headers` でJSONの `Content-Type` と `Cache-Control: no-store` を指定し、`wrangler.jsonc` では `run_worker_first` を使いません。Workerエントリは Static Assets の補助エントリとして残し、通常の静的ファイル配信は `dist/` の Static Assets に任せます。rollback は `npx wrangler versions deploy <version-id>@100 --env production --yes` で直近 Worker version へ戻すか、直前の git commit を再デプロイします。
 
 ## Cloudflare Pages 公開
 
