@@ -106,6 +106,8 @@ URL再貼り付け再現: OK / NG
 - `PC内フォントを読み込む` はユーザー操作後だけ実行される。
 - `queryLocalFonts` 非対応環境では、手入力案内が表示される。
 - 権限拒否時も編集画面が壊れない。
+- `LightNovelPopV2 V2` は `ラノベPOP v2（LightNovelPopV2 V2）` のように、日本語名を先にした表示になる。
+- 日本語表示名を選んでも、手入力フォント名、生成URL、`/clock/` のCSSには実際のフォント名が入る。
 - OBSを動かすPCに無いフォント名を指定した場合、system fallbackで表示される。
 
 ## Sharing
