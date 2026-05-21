@@ -16,6 +16,14 @@ Preserve the OBS clock overlay contract:
 
 For Cloudflare deployment work in this static web app, prefer Workers with Static Assets. Cloudflare Pages compatibility may remain documented because `functions/api/defaults.js` is still a harmless optional fallback.
 
+For post-launch operations, keep `docs/post-launch-ops.md` aligned with production URL, rollback candidate, GitHub Actions cost state, Cloudflare binding state, and manual dashboard checks. Do not run production rollback as a drill while production is healthy; use version/help checks and staging-only drills when safe.
+
+Use the existing release check surface before release or operations changes:
+
+- `npm run release:check`
+- `npm run release:http-smoke`
+- `SMOKE_BASE_URL=<deploy-url> npm run release:remote-smoke`
+
 ## Language and Localization
 
 This project is maintained for a Japanese user and Japanese end users.
