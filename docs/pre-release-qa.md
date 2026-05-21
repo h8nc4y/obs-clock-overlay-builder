@@ -6,6 +6,8 @@
 
 公開前QAとして、ローカル自動検証、Browser視覚確認、`/api/defaults` の静的化判断、CI/Cloudflare公開前の残判断を整理した。
 
+production公開後の継続運用、費用確認、rollback手順、公開後backlogは [post-launch-ops.md](post-launch-ops.md) を参照する。
+
 ## Local Automated Checks
 
 次の検証はローカルで成功した。
@@ -141,7 +143,7 @@ production deploy:
 - command: `npm run deploy:production`
 - worker: `obs-clock-overlay-builder`
 - URL: `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
-- Current Version ID: `6894fb0e-86f1-431e-9770-06a3966a4997`
+- v0.1.0 launch Version ID: `6894fb0e-86f1-431e-9770-06a3966a4997`
 - binding: `env.ASSETS` のみ
 - paid plan変更、有料binding、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive要求: なし
 
@@ -168,9 +170,9 @@ redirect / rewrite:
 rollback path:
 
 - `npx wrangler versions list --env production` と `npx wrangler deployments list --env production` でversion/deployment一覧を確認済み。
-- current version: `6894fb0e-86f1-431e-9770-06a3966a4997`
+- v0.1.0 launch version: `6894fb0e-86f1-431e-9770-06a3966a4997`
 - rollback候補として直近の別version `dc40f3d8-681a-4d5d-bdc4-d5ae29197084` が見える。ただし今回が初回production公開のため、公開済みとして検証済みの旧production versionはない。
-- 問題があれば `npx wrangler versions deploy dc40f3d8-681a-4d5d-bdc4-d5ae29197084@100 --env production --yes` で直近versionへ戻すか、直前のgit commitを `npm run deploy:production` で再デプロイする。
+- 問題があれば `npx wrangler rollback dc40f3d8-681a-4d5d-bdc4-d5ae29197084 --env production --yes` で直近versionへ戻すか、直前のgit commitを `npm run deploy:production` で再デプロイする。
 
 production判断:
 

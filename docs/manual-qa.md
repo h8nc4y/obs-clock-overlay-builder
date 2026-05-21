@@ -109,6 +109,7 @@ URL再貼り付け再現: OK / NG
 - `LightNovelPopV2 V2` は `ラノベPOP v2（LightNovelPopV2 V2）` のように、日本語名を先にした表示になる。
 - 日本語表示名を選んでも、手入力フォント名、生成URL、`/clock/` のCSSには実際のフォント名が入る。
 - OBSを動かすPCに無いフォント名を指定した場合、system fallbackで表示される。
+- 同じ生成URLでも、OBSを動かすPCに対象フォントが無い場合は別の書体に見える。配信に使うPCで最後に確認する。
 
 ## Sharing
 

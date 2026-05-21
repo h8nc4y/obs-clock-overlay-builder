@@ -335,9 +335,9 @@ output {
 }
 
 .swatch {
-  width: 28px;
-  height: 28px;
-  min-height: 28px;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
   padding: 0;
   border: 1px solid rgba(0, 0, 0, 0.16);
   border-radius: 50%;
