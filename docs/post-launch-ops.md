@@ -6,11 +6,27 @@ production公開後の確認、費用リスク、rollback、公開後backlogを�
 
 - production URL: `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
 - Cloudflare worker: `obs-clock-overlay-builder`
+- latest recorded production version after post-launch hardening: `01775440-ed7c-4679-8813-a2ef8a9fc78c`
+- latest recorded staging version after post-launch hardening: `daf5fce0-86f8-4af9-8ae9-f1a7f033fac3`
 - v0.1.0 launch production version: `6894fb0e-86f1-431e-9770-06a3966a4997`
 - v0.1.0 launch rollback candidate observed: `dc40f3d8-681a-4d5d-bdc4-d5ae29197084`
 - GitHub release: `v0.1.0`
 - backlog issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/10
 - manual billing check issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/12
+
+## Post-launch Hardening Deployment
+
+2026/05/21にPR #13の内容をstagingとproductionへ反映しました。
+
+- PR: https://github.com/h8nc4y/obs-clock-overlay-builder/pull/13
+- merge commit: `d0a518fd654279e3cfae98188749386c0cbc7d98`
+- staging Version ID: `daf5fce0-86f8-4af9-8ae9-f1a7f033fac3`
+- production Version ID: `01775440-ed7c-4679-8813-a2ef8a9fc78c`
+- uploaded assets: `/index.html`, `/assets/css/styles.css`
+- binding: `env.ASSETS` のみ
+- staging remote smoke: pass
+- production remote smoke: pass
+- production Browser check: `/` は390px、768px、1280px相当で横スクロールなし、色スウォッチ最小36px、Console error/warningなし。`/clock/` は透明背景、編集UIなし、Console error/warningなし。
 
 ## Local Release Check
 
