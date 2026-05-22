@@ -158,6 +158,7 @@ npm run http:smoke
 詳しい公開前QA手順は [docs/manual-qa.md](docs/manual-qa.md) にあります。
 直近の公開前QA判断は [docs/pre-release-qa.md](docs/pre-release-qa.md) に記録します。
 production公開後の運用、費用確認、rollback手順、公開後backlogは [docs/post-launch-ops.md](docs/post-launch-ops.md) に記録します。
+v0.1.1候補と後続改善の整理は [docs/v0.1.1-backlog.md](docs/v0.1.1-backlog.md) にあります。
 
 - 編集画面で各テンプレートをクリックし、ライブプレビューへ即時反映されること
 - 背景確認を「透過チェッカー」「明るい背景」「暗い背景」「任意色」で切り替えられること

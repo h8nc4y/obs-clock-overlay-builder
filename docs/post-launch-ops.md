@@ -12,6 +12,7 @@ production公開後の確認、費用リスク、rollback、公開後backlogを�
 - v0.1.0 launch rollback candidate observed: `dc40f3d8-681a-4d5d-bdc4-d5ae29197084`
 - GitHub release: `v0.1.0`
 - backlog issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/10
+- v0.1.1 backlog: [v0.1.1-backlog.md](v0.1.1-backlog.md)
 - manual billing check issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/12
 
 ## Post-launch Hardening Deployment
