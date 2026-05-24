@@ -18,7 +18,13 @@ console.log("Release preflight checks passed.");
 
 function run(command) {
   return new Promise((resolve, reject) => {
-    const child = spawnShell(command, { stdio: "inherit" });
+    const child = spawnShell(command, {
+      env: {
+        ...process.env,
+        WRANGLER_WRITE_LOGS: process.env.WRANGLER_WRITE_LOGS ?? "false"
+      },
+      stdio: "inherit"
+    });
     child.on("error", reject);
     child.on("exit", (code) => {
       if (code === 0) {
