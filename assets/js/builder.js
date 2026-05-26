@@ -438,13 +438,20 @@ async function fetchCloudflareDefaults() {
 
 async function loadLocalFonts() {
   if (!("queryLocalFonts" in window)) {
-    elements.localFontStatus.textContent = "このブラウザでは queryLocalFonts が使えません。手入力欄を使ってください。";
+    elements.localFontStatus.textContent =
+      "このブラウザではPC内フォント一覧を読み込めません。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
     return;
   }
-  elements.localFontStatus.textContent = "読み込み中...";
+  elements.localFontStatus.textContent = "PC内フォント名を確認中...";
   try {
     const fonts = await window.queryLocalFonts();
     const options = localFontOptions(fonts);
+    if (options.length === 0) {
+      elements.localFontSelectWrap.classList.add("is-hidden");
+      elements.localFontStatus.textContent =
+        "読み込めるフォント名が見つかりませんでした。手入力フォント名を使ってください。";
+      return;
+    }
     elements.localFontSelect.textContent = "";
     for (const fontOption of options) {
       const option = document.createElement("option");
@@ -456,10 +463,11 @@ async function loadLocalFonts() {
       elements.localFontSelect.append(option);
     }
     elements.localFontSelectWrap.classList.remove("is-hidden");
-    elements.localFontStatus.textContent = `${options.length}件のフォントを読み込みました。表示名が日本語でも、URLには実際のフォント名を保存します。`;
+    elements.localFontStatus.textContent = `${options.length}件のフォント名を読み込みました。表示名が日本語でも、URLにはOBSで使う実際のフォント名を保存します。`;
     bindLocalFontSelect();
   } catch {
-    elements.localFontStatus.textContent = "フォント一覧の取得が拒否されました。手入力欄を使ってください。";
+    elements.localFontStatus.textContent =
+      "フォント一覧の取得が拒否されました。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
   }
 }
 

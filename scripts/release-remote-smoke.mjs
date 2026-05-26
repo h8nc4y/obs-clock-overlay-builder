@@ -14,7 +14,8 @@ const checks = [
     contentType: "application/json",
     cacheControl: "no-store",
     json: { timezone: null, country: null, source: "static" }
-  }
+  },
+  { path: "/favicon.ico", bodyIncludes: "<svg" }
 ];
 
 let failed = false;

@@ -128,7 +128,7 @@ npm run release:http-smoke
 ```
 
 `npm run release:check` は `lint`、`typecheck`（module import smoke）、`format:check`、`test`、`build`、`cf:dry-run`、`git diff --check` を順に実行します。
-`npm run release:http-smoke` は一時的にローカルサーバーを起動し、`/`、`/clock/`、`/clock`、`/api/defaults` を確認してから終了します。
+`npm run release:http-smoke` は一時的にローカルサーバーを起動し、`/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` を確認してから終了します。
 stagingやproductionのURL確認には `SMOKE_BASE_URL` を指定して `release:remote-smoke` を実行します。
 
 ```bash

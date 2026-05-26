@@ -186,6 +186,34 @@ small,
   line-height: 1.6;
 }
 
+.info-note {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-soft), white 45%);
+  color: #3a3038;
+  line-height: 1.65;
+}
+
+.info-note strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.92rem;
+}
+
+.info-note p,
+.copy-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.copy-hint {
+  margin-top: 8px;
+}
+
 .template-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
