@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="OBSブラウザソース向けの透明時計オーバーレイURLを作る静的ビルダー">
     <title>OBS Clock Overlay Builder</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2324a3b8'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M16 9v8l6 3' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="./assets/css/styles.css">
   </head>
   <body class="builder-page">
@@ -103,7 +104,11 @@
         <section class="panel">
           <div class="section-heading">
             <h2>フォント</h2>
-            <p>URLにはフォント名だけを保存します。OBS側のPCに無い場合はフォールバックします。</p>
+            <p>生成URLにはフォント名だけを保存します。フォントファイルは同梱しないため、OBSを動かすPCに同じフォントが必要です。</p>
+          </div>
+          <div class="info-note">
+            <strong>フォントの考え方</strong>
+            <p>この画面で選んだフォント名をURLに保存します。OBS側PCにそのフォントが無い場合は、近い標準フォントで表示され、見た目が変わることがあります。</p>
           </div>
           <div class="form-grid">
             <label class="field">
@@ -113,17 +118,17 @@
             <label class="field">
               <span>手入力フォント名</span>
               <input id="fontFamily" type="text" autocomplete="off" spellcheck="false">
-              <small>例: Noto Sans JP, M PLUS Rounded 1c, Poppins。OBSを動かすPCに無い場合は近い標準フォントで表示されます。</small>
+              <small>例: Noto Sans JP, M PLUS Rounded 1c, Poppins。OBS側PCに無い名前は標準フォントへ置き換わります。配信に使うPCで最後に確認してください。</small>
             </label>
             <div class="field inline-actions">
               <span>PC内フォント</span>
-              <p id="localFontStatus" class="muted">対応ブラウザだけ、クリック後に読み込みます。</p>
+              <p id="localFontStatus" class="muted">対応ブラウザだけ、ボタンを押したあとにPC内フォント名を読み込みます。読み込めない場合も手入力で使えます。</p>
               <button id="loadLocalFonts" type="button">PC内フォントを読み込む</button>
             </div>
             <label class="field is-hidden" id="localFontSelectWrap">
               <span>読み込んだフォント</span>
               <select id="localFontSelect"></select>
-              <small>日本語名で表示される場合も、URLにはOBSで使う実際のフォント名を保存します。</small>
+              <small>日本語名で表示される場合も、URLにはOBSで実際に使うフォント名を保存します。別PCでは同じフォントが必要です。</small>
             </label>
           </div>
         </section>
@@ -361,13 +366,14 @@
         <section class="preview-panel">
           <div class="section-heading">
             <h2>OBS用URL</h2>
-            <p>このURLだけで時計表示を復元できます。</p>
+            <p>このURLだけで時計表示を復元できます。コピーしてOBSのブラウザソースへ貼ります。</p>
           </div>
           <label class="toggle">
             <input id="compactUrl" type="checkbox">
             <span>デフォルト値を省略して短くする</span>
           </label>
-          <textarea id="generatedUrl" rows="5" readonly spellcheck="false"></textarea>
+          <textarea id="generatedUrl" rows="5" readonly spellcheck="false" aria-describedby="generatedUrlHelp urlStatus urlWarning"></textarea>
+          <p id="generatedUrlHelp" class="copy-hint">「別タブで確認」で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。</p>
           <div class="button-row">
             <button id="copyUrl" type="button">URLをコピー</button>
             <button id="openClock" type="button" class="secondary">別タブで確認</button>

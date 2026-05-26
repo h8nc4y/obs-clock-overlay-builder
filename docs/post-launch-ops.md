@@ -122,7 +122,7 @@ SMOKE_BASE_URL=https://obs-clock-overlay-builder.h8nc4y.workers.dev npm run rele
 - rollbackは選択したversionを100% trafficへ切り替えます。
 - Cloudflare connected resourcesはrollbackされません。このrepoは `env.ASSETS` のみなので、D1/KV/R2などの外部resource差分はありません。
 - 今回が初回production公開のため、検証済み旧productionへのrollbackではなく、直近versionまたはgit commit再デプロイでの復旧です。
-- rollback後は `/`、`/clock/`、`/clock`、`/api/defaults`、Browser Consoleを確認します。
+- rollback後は `/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico`、Browser Consoleを確認します。
 
 ### Staging Drill Result
 

@@ -13,9 +13,26 @@ test("color swatches keep touch-friendly dimensions", () => {
 
 test("font helper explains OBS-side fallback plainly", () => {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
 
-  assert.match(html, /OBSを動かすPCに無い場合は近い標準フォントで表示されます。/);
-  assert.match(html, /日本語名で表示される場合も、URLにはOBSで使う実際のフォント名を保存します。/);
+  assert.match(html, /フォントファイルは同梱しないため、OBSを動かすPCに同じフォントが必要です。/);
+  assert.match(html, /OBS側PCに無い名前は標準フォントへ置き換わります。/);
+  assert.match(html, /別PCでは同じフォントが必要です。/);
+  assert.match(html, /コピーしてOBSのブラウザソースへ貼ります。/);
+  assert.match(html, /背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。/);
+  assert.match(builder, /PC内フォント名を確認中\.\.\./);
+  assert.match(builder, /読み込めるフォント名が見つかりませんでした。/);
+  assert.match(builder, /OBS側PCで使えるフォント名を入れてください。/);
+});
+
+test("pages use embedded favicon to avoid browser 404 noise", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const clockHtml = readFileSync(new URL("../clock/index.html", import.meta.url), "utf8");
+  const favicon = readFileSync(new URL("../favicon.ico", import.meta.url), "utf8");
+
+  assert.match(html, /<link rel="icon" href="data:image\/svg\+xml,/);
+  assert.match(clockHtml, /<link rel="icon" href="data:image\/svg\+xml,/);
+  assert.match(favicon, /<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
 });
 
 test("v0.1.1 backlog keeps release candidates separate from manual checks", () => {

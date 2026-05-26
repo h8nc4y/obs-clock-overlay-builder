@@ -8,6 +8,7 @@ const requiredArtifacts = [
   "index.html",
   "clock/index.html",
   "api/defaults",
+  "favicon.ico",
   "assets/css/styles.css",
   "assets/js/config.js",
   "assets/js/clock.js"

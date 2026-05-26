@@ -50,7 +50,8 @@ OBS実機では、編集画面ではなく生成URLそのものをブラウザ�
 1. `npm run dev` を起動する。
 2. 編集画面 `http://localhost:4173/` を開く。
 3. 任意のテンプレートを選び、`OBS用URL` の生成URLをコピーする。
-4. 推奨幅と推奨高さをメモする。
+4. `別タブで確認` で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認する。
+5. 推奨幅と推奨高さをメモする。
 
 ### OBS設定
 
@@ -106,6 +107,7 @@ URL再貼り付け再現: OK / NG
 - `PC内フォントを読み込む` はユーザー操作後だけ実行される。
 - `queryLocalFonts` 非対応環境では、手入力案内が表示される。
 - 権限拒否時も編集画面が壊れない。
+- フォント欄の説明で、フォントファイルは同梱されず、OBSを動かすPCに同じフォントが必要なことが分かる。
 - `LightNovelPopV2 V2` は `ラノベPOP v2（LightNovelPopV2 V2）` のように、日本語名を先にした表示になる。
 - 日本語表示名を選んでも、手入力フォント名、生成URL、`/clock/` のCSSには実際のフォント名が入る。
 - OBSを動かすPCに無いフォント名を指定した場合、system fallbackで表示される。
@@ -135,7 +137,7 @@ Bad"; color:red;
 
 - `npm run build` で `dist/` が生成される。
 - `npm run cf:dry-run` が成功する。
-- Workers Static Assets で `/`、`/clock/`、`/clock`、`/api/defaults` が動作する。
+- Workers Static Assets で `/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` が動作する。
 - `/api/defaults` は Worker-first ではなく静的JSONとして配信される。
 - rollback path は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイする。
 

@@ -42,7 +42,7 @@ npm run release:http-smoke
 - `npm run cf:dry-run`
 - `git diff --check`
 
-`npm run release:http-smoke` は一時的に `npm run dev` を起動し、`/`、`/clock/`、`/clock`、`/api/defaults` を確認してから終了する。
+`npm run release:http-smoke` は一時的に `npm run dev` を起動し、`/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` を確認してから終了する。
 staging/production URLは次で確認する。
 
 ```bash
@@ -348,7 +348,7 @@ GitHub docsでは、private repositoryのGitHub-hosted runnersはプランごと
 - OBS実機確認が完了し、結果がIssue #1へ記録されている。
 - Cloudflare staging deployが承認済み条件内で完了し、URLと確認結果がIssue #1へ記録されている。
 - Cloudflare production deployが承認済み条件内で完了し、production URLと確認結果がIssue #1へ記録されている。
-- productionで `/`、`/clock/`、`/clock`、`/api/defaults`、headers、Browser Consoleを確認済み。
+- productionで `/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico`、headers、Browser Consoleを確認済み。
 - production URLの生成URLをOBSへ貼り、透明背景と時計更新を確認済み。
 - rollback pathが記録済み。
 - CIを使う場合は、無料枠・支出上限を確認済みで、実行結果が記録済み。CIを使わない場合は、ローカル検証で代替する判断がIssue #1へ記録済み。
