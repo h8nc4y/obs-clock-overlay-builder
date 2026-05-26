@@ -53,12 +53,15 @@ SMOKE_BASE_URL=https://obs-clock-overlay-builder.h8nc4y.workers.dev npm run rele
 
 公式docs上、public repository の標準GitHub-hosted runnerは無料ですが、private repository はプランごとの無料枠を超えるとrepository ownerへ課金されます。Actions billing APIは、この環境の `gh` token では `user` scope不足により確認できませんでした。
 
-CIを追加する前に人間が確認すること:
+2026/05/26にIssue #12の人間確認コメントで、GitHub billing dashboard上のActions利用状況、無料枠、上限設定、budget/alert確認は完了扱いになりました。支払い方法の詳細、数値、個人情報はrepo docsへ記録しません。
 
-- GitHub billing画面でActionsの無料枠、支出上限、支払い方法を確認する。
+CIを追加する前に維持すること:
+
+- GitHub billing画面でActionsの無料枠、支出上限、支払い方法を再確認する。
 - 最初に追加するworkflowは `workflow_dispatch` のみにする。
 - `push` / `pull_request` triggerは、支出上限確認後に追加する。
 - larger runner、自動artifact大量保存、外部有料サービス呼び出しは使わない。
+- 次回確認タイミング: GitHub Actions workflowを追加する前、`push` / `pull_request` triggerを追加する前、またはGitHub plan/billing設定を変更した後。
 
 tracking issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/12
 
@@ -72,13 +75,16 @@ tracking issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/12
 - `npx wrangler deploy --dry-run --env production` では `env.ASSETS` のみが表示されます。
 - `run_worker_first` は使っていません。
 
-公式docs上、Static Assetsに一致したリクエストは無料・無制限で、Worker scriptを呼ぶリクエストはWorkers pricingの対象です。Free planのWorker script requestは1日100,000 requestが目安です。Cloudflare dashboardの実アカウント無料枠消費状況と支出上限は、Codexからは未確認です。
+公式docs上、Static Assetsに一致したリクエストは無料・無制限で、Worker scriptを呼ぶリクエストはWorkers pricingの対象です。Free planのWorker script requestは1日100,000 requestが目安です。
 
-人間がCloudflare dashboardで確認すること:
+2026/05/26にIssue #12の人間確認コメントで、Cloudflare dashboard上のWorkers & Pages usage、Spend limit / Alert、有料plan変更なし、有料binding未使用の確認は完了扱いになりました。usage数値、契約詳細、account識別子、支払い情報はrepo docsへ記録しません。
 
-- Workers & Pages usageでStatic Assets / Worker invocationの使用状況を見る。
-- Billing / Spend limit / Alertを確認する。
+Cloudflare運用で維持すること:
+
+- Workers & Pages usageでStatic Assets / Worker invocationの使用状況を定期確認する。
+- Billing / Spend limit / Alertを再確認する。
 - paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveを有効化していないことを確認する。
+- 次回確認タイミング: production deploy前後、Cloudflare設定変更前後、月次の運用確認時、または有料bindingを追加する前。
 
 tracking issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/12
 

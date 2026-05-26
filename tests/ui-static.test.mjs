@@ -24,5 +24,6 @@ test("v0.1.1 backlog keeps release candidates separate from manual checks", () =
   assert.match(backlog, /## v0\.1\.1候補/);
   assert.match(backlog, /## 後続version候補/);
   assert.match(backlog, /## 人間確認待ち/);
-  assert.match(backlog, /Issue #12はcloseしません。/);
+  assert.match(backlog, /2026\/05\/26にIssue #12の人間確認コメントで完了扱いになりました。/);
+  assert.match(backlog, /数値、支払い詳細、account識別子、個人情報はrepo docsへ記録しません。/);
 });
