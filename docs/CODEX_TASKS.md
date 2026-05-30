@@ -446,3 +446,8 @@ Completed in the current Codex run. `tests/builder-initial-config.test.mjs` cove
 - T-04: `/api/defaults` `_headers` dependency and smoke-check guard documented.
 - T-05: Editor startup URL config priority fixed for default-equivalent explicit URL configs.
 - T-06: Narrow builder startup config-source tests added for CL-003 behavior.
+
+## Evidence Recorded, Not Queued
+
+- CL-002: Local browser evidence reproduced Neon HUD top/left glow clipping on `/clock/`. This is evidence only; no CSS/layout task is approved or queued. See `docs/LOCAL_REVIEW_VERIFICATION.md`.
+- CL-007: A decision packet exists at `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`. This is decision support only; Codex must not choose the publication/tracking policy.

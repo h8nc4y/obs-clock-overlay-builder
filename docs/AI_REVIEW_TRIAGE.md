@@ -113,15 +113,17 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 ### CL-002
 
 - Finding ID: CL-002
-- Reason confirmation is needed: The visual clipping concern needs browser/OBS evidence before any CSS/layout change.
-- Information needed: Screenshot or manual visual QA showing actual clipping, affected templates, and desired behavior.
-- Revisit condition: Reopen after visual evidence and ChatGPT approval.
+- Reason confirmation is needed: Local browser evidence now reproduces the visual clipping concern, but CSS/layout implementation still needs ChatGPT approval and desired behavior before any change.
+- Evidence gathered: 2026-05-31 local Chrome DevTools check reproduced Neon HUD top/left glow clipping on `/clock/`. `.clock-widget` rendered at `x=0`, `y=0` while Neon HUD uses an 18px text-shadow. Screenshots were saved only under ignored `browser-temp/`. See `docs/LOCAL_REVIEW_VERIFICATION.md`.
+- Information needed: ChatGPT decision on whether to fix CL-002 now, desired OBS sizing/layout behavior, and whether OBS real-device confirmation is required before implementation.
+- Revisit condition: Reopen after ChatGPT approves a concrete visual/layout task.
 
 ### CL-007
 
 - Finding ID: CL-007
 - Reason confirmation is needed: Commit/publication policy for AI coordination docs and operation metadata is a human/ChatGPT governance decision.
-- Information needed: Whether to track, ignore, redact, or split the AI coordination and operation metadata docs.
+- Information available: A local decision packet now exists at `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`.
+- Information needed: Whether to track as-is in a private repo, track redacted copies, split public/private docs, or ignore AI coordination docs.
 - Revisit condition: Reopen when the user or ChatGPT decides the policy.
 
 ## Rejected for this batch
@@ -150,5 +152,5 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 ## Open questions
 
 - Should AI coordination docs be committed, ignored, or redacted? This remains CL-007.
-- Should CL-002 be verified with Browser/OBS before a future visual patch?
+- Should CL-002 be implemented now that local browser evidence reproduced glow clipping, or should OBS real-device confirmation come first?
 - Should broader CL-005 builder testing/refactor work be scheduled for a later batch?

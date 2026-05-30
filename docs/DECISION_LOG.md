@@ -142,10 +142,25 @@ Use this template for future decisions.
 - Related files: `assets/js/builder.js`, `assets/js/builder-initial-config.js`, `tests/builder-initial-config.test.mjs`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`
 - Related review findings: CL-003, CL-005
 
+### 2026-05-31: Local verification and decision evidence recorded
+
+- Date: 2026-05-31
+- Decision: Record local-only verification evidence, CL-002 visual evidence, and a CL-007 decision packet without implementing CL-002 or deciding CL-007.
+- Context: ChatGPT asked Codex to review the completed local commits, run local-only validation, gather CL-002 evidence, and prepare CL-007 decision material. Push, PR, deploy, rollback, remote smoke, Cloudflare dashboard/API, GitHub Actions operations, dependency installs, and external API calls were out of scope.
+- Options considered:
+  - Only report evidence in chat.
+  - Record local verification and decision material in repository docs.
+  - Implement CL-002 or decide CL-007 directly.
+- Rationale: Repository docs preserve evidence for ChatGPT review while respecting the unapproved status of CL-002 implementation and the human/ChatGPT decision boundary for CL-007.
+- Consequences: `docs/LOCAL_REVIEW_VERIFICATION.md` and `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md` should be used as evidence packets. They do not authorize CSS/layout changes, publication decisions, push, PR, or deploy.
+- Status: Active evidence record; CL-002 implementation and CL-007 decision remain open.
+- Related files: `docs/LOCAL_REVIEW_VERIFICATION.md`, `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`
+- Related review findings: CL-002, CL-007
+
 ## Open decisions
 
 - Whether these docs should be committed to Git.
 - Whether secrets/config should be audited before external review.
-- Whether CL-002 should be verified with Browser/OBS evidence before a future visual/layout patch.
+- Whether CL-002 should be fixed now based on local browser evidence or first confirmed in OBS real-device QA.
 - Whether broader CL-005 builder testing/refactor work should be scheduled.
 - How to handle CL-007: track, ignore, redact, or split AI coordination docs and operation metadata.
