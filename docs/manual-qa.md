@@ -139,6 +139,7 @@ Bad"; color:red;
 - `npm run cf:dry-run` が成功する。
 - Workers Static Assets で `/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` が動作する。
 - `/api/defaults` は Worker-first ではなく静的JSONとして配信される。
+- `/api/defaults` の `Content-Type: application/json; charset=utf-8` と `Cache-Control: no-store` は `_headers` で指定している。`release:http-smoke` と `release:remote-smoke` でこの前提を確認する。
 - rollback path は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイする。
 
 ### 実deploy前の承認条件
@@ -163,7 +164,7 @@ Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の stagi
 - `/clock/` が時計だけを表示する。
 - `/clock` が時計画面へ到達する。
 - `/api/defaults` が `{"timezone":null,"country":null,"source":"static"}` を返す。
-- `/api/defaults` の `Content-Type` が `application/json` になる。
+- `/api/defaults` の `Content-Type` が `_headers` の指定どおり `application/json` になる。
 - Browser Console error/warning がない。
 - OBSのブラウザソースでproduction URLの生成URLが表示される。
 - 問題があれば、Cloudflareの直近Worker versionへrollbackするか、直前のgit commitを再デプロイする。

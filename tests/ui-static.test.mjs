@@ -44,3 +44,12 @@ test("v0.1.1 backlog keeps release candidates separate from manual checks", () =
   assert.match(backlog, /2026\/05\/26にIssue #12の人間確認コメントで完了扱いになりました。/);
   assert.match(backlog, /数値、支払い詳細、account識別子、個人情報はrepo docsへ記録しません。/);
 });
+
+test("copy fallback does not always select the generated URL field", () => {
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+  const copyTextBody = builder.match(/async function copyText\([^)]*\) \{(?<body>[\s\S]*?)\n\}/)?.groups?.body ?? "";
+
+  assert.doesNotMatch(copyTextBody, /elements\.generatedUrl\.focus\(\);\s*elements\.generatedUrl\.select\(\);/);
+  assert.match(copyTextBody, /fallback/i);
+  assert.match(copyTextBody, /text/);
+});
