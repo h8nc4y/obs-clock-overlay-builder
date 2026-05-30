@@ -2,7 +2,7 @@
 
 ## Status
 
-ChatGPT triage completed for the approved first-batch tasks.
+ChatGPT triage completed for the approved first-batch tasks and the approved second-batch follow-up scope.
 
 Claude findings remain advisory. This file records ChatGPT's current decision state so Codex can implement only approved work.
 
@@ -79,21 +79,34 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 - Validation: Read updated docs and run formatting checks.
 - Priority: P2
 
-## Deferred findings
-
 ### CL-003
 
 - Finding ID: CL-003
-- Reason for deferral: The issue is a rare editor-only `localStorage` precedence edge case and is not part of this first batch.
-- Information needed: ChatGPT decision that the edge case is worth changing now.
-- Revisit condition: Reopen when editor import/URL precedence work is prioritized.
+- Reason for approval: ChatGPT approved fixing the editor-only URL versus `localStorage` priority edge case after the first batch was preserved in a local commit.
+- Scope: Small editor startup bugfix only. Preserve `/clock/` behavior and do not change product requirements.
+- Implementation task: Treat the presence of a recognized URL config query as authoritative, even when it decodes to the default config, and fall back to saved editor state only when no recognized config query is present.
+- Acceptance criteria: An explicit default-equivalent URL config wins over saved editor state; no-query editor loads may still use saved editor state; malformed explicit config falls back safely to defaults rather than saved state.
+- Validation: Add a targeted unit test for the extracted startup decision helper, run the targeted test, then run local validation commands.
+- Priority: P1
 
-### CL-005
+### CL-005 narrow slice
+
+- Finding ID: CL-005 narrow slice
+- Reason for approval: ChatGPT approved a narrow test slice around `builder.js` behavior, without broad refactor, new dependencies, or DOM harness work.
+- Scope: Extract only the pure editor startup config-source decision needed for CL-003 and cover it with Node tests.
+- Implementation task: Add `assets/js/builder-initial-config.js`, wire `assets/js/builder.js` to it, and add targeted tests in `tests/builder-initial-config.test.mjs`.
+- Acceptance criteria: The test suite covers URL priority, saved editor-state fallback, malformed explicit URL fallback, and flat query priority without changing application behavior outside the approved startup path.
+- Validation: `node --test tests\builder-initial-config.test.mjs`, then local validation commands.
+- Priority: P2
+
+## Deferred findings
+
+### CL-005 broader scope
 
 - Finding ID: CL-005
-- Reason for deferral: Broader builder testing/refactor is valuable but outside this first batch. A tiny test that directly protects CL-001 is allowed.
-- Information needed: ChatGPT-approved scope for builder logic extraction or broader DOM/test harness work.
-- Revisit condition: Reopen when test/refactor scope is explicitly approved.
+- Reason for deferral: ChatGPT approved only a narrow helper extraction and regression tests for the editor startup config-source decision. Broader builder testing/refactor remains outside the current scope.
+- Information needed: ChatGPT-approved scope for additional builder logic extraction, DOM/test harness work, or UI automation.
+- Revisit condition: Reopen when broader test/refactor scope is explicitly approved.
 
 ## Needs additional confirmation
 
@@ -138,4 +151,4 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 
 - Should AI coordination docs be committed, ignored, or redacted? This remains CL-007.
 - Should CL-002 be verified with Browser/OBS before a future visual patch?
-- Should CL-003 and broader CL-005 work be scheduled for a later batch?
+- Should broader CL-005 builder testing/refactor work be scheduled for a later batch?

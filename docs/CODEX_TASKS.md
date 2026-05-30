@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved first-batch tasks were implemented in the current Codex run.
+Approved first-batch tasks were implemented in the first local commit on `approved-review-followups`. Approved second-batch follow-up tasks CL-003 and the narrow CL-005 test slice were implemented in the current Codex run.
 
 ## Source of truth
 
@@ -326,6 +326,117 @@ Header correctness still depends on running smoke checks in deploy workflows.
 
 Completed in the current Codex run. README, manual QA, operations docs, and product requirements now describe the `_headers` dependency and smoke-check guard for `/api/defaults` headers.
 
+### T-05
+
+### Priority
+
+P1
+
+### Source finding
+
+CL-003
+
+### Goal
+
+Fix the editor startup priority edge case where an explicit URL config matching defaults can be overridden by saved editor `localStorage`.
+
+### Scope
+
+Small editor-only startup behavior fix. Preserve `/clock/` behavior, generated URL format, product requirements, deployment files, dependencies, and broad UI behavior.
+
+### Files likely affected
+
+- `assets/js/builder.js`
+- `assets/js/builder-initial-config.js`
+- `tests/builder-initial-config.test.mjs`
+
+### Implementation plan
+
+1. Extract the initial editor config-source decision into a pure helper.
+2. Treat recognized config query keys as explicit URL config intent.
+3. Use saved editor state only when no recognized config query is present.
+4. Fall back to defaults when an explicit malformed config query is present.
+
+### Acceptance criteria
+
+Explicit URL config wins over saved editor state even if it decodes to defaults. No-query editor loads can still use saved editor state. Malformed explicit URL config falls back safely to defaults.
+
+### Validation commands
+
+- `node --test tests\builder-initial-config.test.mjs`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run format:check`
+- `npm run test`
+- `npm run build`
+
+### Out of scope
+
+- `/clock/` behavior changes.
+- CSS/layout changes.
+- Broad builder refactor.
+- Dependency changes.
+
+### Risks
+
+The helper must stay aligned with config query aliases supported by `assets/js/config.js`.
+
+### Completion notes
+
+Completed in the current Codex run. `assets/js/builder.js` now delegates startup config selection to `assets/js/builder-initial-config.js`, and explicit recognized config queries take priority over saved editor state.
+
+### T-06
+
+### Priority
+
+P2
+
+### Source finding
+
+CL-005 narrow slice
+
+### Goal
+
+Add a small automated test slice around the approved builder startup behavior without taking on the broader CL-005 refactor.
+
+### Scope
+
+Targeted Node tests for the pure initial config-source helper only.
+
+### Files likely affected
+
+- `tests/builder-initial-config.test.mjs`
+- `assets/js/builder-initial-config.js`
+
+### Implementation plan
+
+1. Add tests for default-equivalent URL priority, saved-state fallback, malformed explicit config fallback, and flat query priority.
+2. Keep tests independent of browser DOM harnesses or new dependencies.
+3. Run the targeted test and repository validation commands.
+
+### Acceptance criteria
+
+The approved CL-003 behavior has direct regression coverage. Broader builder UI behavior remains deferred unless ChatGPT approves it later.
+
+### Validation commands
+
+- `node --test tests\builder-initial-config.test.mjs`
+- `npm run test`
+
+### Out of scope
+
+- Full `builder.js` DOM test harness.
+- Clipboard, canvas, local font, or preview background automation.
+- New test dependencies.
+
+### Risks
+
+This narrow test slice does not replace manual QA for actual browser editor workflows.
+
+### Completion notes
+
+Completed in the current Codex run. `tests/builder-initial-config.test.mjs` covers four initial config-source cases.
+
 ## Completed tasks
 
 - T-00: Review coordination docs updated for completed Claude review and ChatGPT first-batch triage.
@@ -333,3 +444,5 @@ Completed in the current Codex run. README, manual QA, operations docs, and prod
 - T-02: Validation script naming and `npm test` `dist/` side effect documented.
 - T-03: Existing product requirements and non-goals consolidated in `docs/PRODUCT_REQUIREMENTS.md`.
 - T-04: `/api/defaults` `_headers` dependency and smoke-check guard documented.
+- T-05: Editor startup URL config priority fixed for default-equivalent explicit URL configs.
+- T-06: Narrow builder startup config-source tests added for CL-003 behavior.

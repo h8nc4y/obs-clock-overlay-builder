@@ -1,5 +1,4 @@
 import {
-  DEFAULT_CONFIG,
   FONT_CANDIDATES,
   TEMPLATES,
   applyTemplate,
@@ -8,9 +7,9 @@ import {
   contrastRatio,
   hexToRgba,
   normalizeConfig,
-  parseConfigFromQuery,
   parseImportInput
 } from "./config.js";
+import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
@@ -131,21 +130,11 @@ function init() {
 }
 
 function loadInitialConfig() {
-  if (window.location.search) {
-    const fromUrl = parseConfigFromQuery(window.location.href);
-    if (JSON.stringify(fromUrl) !== JSON.stringify(DEFAULT_CONFIG)) {
-      return fromUrl;
-    }
-  }
-  try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return normalizeConfig(JSON.parse(saved));
-    }
-  } catch {
-    // localStorage may be blocked; URL generation still works without it.
-  }
-  return cloneDefaultConfig();
+  return loadInitialConfigFromSources({
+    href: window.location.href,
+    search: window.location.search,
+    getSavedConfig: () => window.localStorage.getItem(STORAGE_KEY)
+  });
 }
 
 function renderTemplateButtons() {

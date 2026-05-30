@@ -4,23 +4,23 @@
 
 Prepared by Codex for upload or paste into ChatGPT.
 
-Update 2026-05-30: this handoff already served its original purpose of helping ChatGPT create a Claude Code review prompt. Claude review output is now in `docs/CLAUDE_REVIEW.md`, ChatGPT triage is now in `docs/AI_REVIEW_TRIAGE.md`, and approved Codex first-batch tasks are now in `docs/CODEX_TASKS.md`.
+Update 2026-05-30: this handoff already served its original purpose of helping ChatGPT create a Claude Code review prompt. Claude review output is now in `docs/CLAUDE_REVIEW.md`, ChatGPT triage is now in `docs/AI_REVIEW_TRIAGE.md`, and approved Codex first-batch plus second-batch follow-up tasks are now in `docs/CODEX_TASKS.md`.
 
-This file remains a historical context packet. It is not the current triage source of truth.
+This file remains a historical context packet. It is not the current triage source of truth. Use the latest Codex final report for exact branch, commit, and validation results.
 
 ## How this file should be used
 
 If this file is attached or pasted into ChatGPT now, use it only as repository context.
 
-The current workflow has moved past Claude prompt creation. ChatGPT should use `docs/CLAUDE_REVIEW.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, and the Codex final report to decide next steps. Codex should still implement only ChatGPT-approved tasks.
+The current workflow has moved past Claude prompt creation. ChatGPT should use `docs/CLAUDE_REVIEW.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, `docs/DECISION_LOG.md`, and the Codex final report to decide next steps. Codex should still implement only ChatGPT-approved tasks.
 
 ## Repository identity
 
 - Repository/folder name: `011_obs-clock-overlay-builder`
 - Package name: `obs-clock-overlay-builder`
 - Remote repository: `https://github.com/h8nc4y/obs-clock-overlay-builder.git`
-- Current branch observed by Codex: `master`
-- Working tree status observed before this file was created:
+- Current branch observed by Codex during the second-batch implementation: `approved-review-followups`
+- Historical working tree status observed before this file was first created:
   - `docs/AI_REVIEW_TRIAGE.md` untracked
   - `docs/CLAUDE_REVIEW.md` untracked
   - `docs/CODEX_TASKS.md` untracked
@@ -82,6 +82,8 @@ The project is maintained for a Japanese user and Japanese end users. UI copy an
 - Existing docs state Cloudflare paid bindings such as D1, KV, R2, Queues, Durable Objects, Workflows, Hyperdrive, Workers AI, and AI Gateway are not configured.
 - Claude review has been performed and pasted into `docs/CLAUDE_REVIEW.md`.
 - ChatGPT first-batch triage has been performed and recorded in `docs/AI_REVIEW_TRIAGE.md`.
+- ChatGPT later approved CL-003 and only a narrow CL-005 automated-test slice; broader CL-005 remains deferred.
+- The first-batch implementation is preserved in a local commit on `approved-review-followups`.
 
 ## Inferred assumptions
 
@@ -93,7 +95,7 @@ The project is maintained for a Japanese user and Japanese end users. UI copy an
 
 ## Current goal
 
-The immediate coordination goal is to implement only the ChatGPT-approved first-batch tasks while keeping deferred, confirmation-needed, and rejected-for-batch findings out of Codex scope.
+The immediate coordination goal is to implement only ChatGPT-approved review tasks. The first batch has been preserved locally, and the second approved scope is limited to CL-003 plus a narrow CL-005 test slice.
 
 The product goal appears to be a reliable, easy-to-use OBS clock overlay builder where the generated URL fully reproduces the clock display in OBS.
 
@@ -204,6 +206,7 @@ Data flow:
 - `index.html`: editor page.
 - `clock/index.html`: OBS clock-only page.
 - `assets/js/builder.js`: editor behavior.
+- `assets/js/builder-initial-config.js`: extracted pure helper for editor startup config-source priority.
 - `assets/js/config.js`: URL/config/sanitization core.
 - `assets/js/render.js`: clock rendering.
 - `assets/js/time.js`: time formatting and tick behavior.
@@ -213,6 +216,7 @@ Data flow:
 - `worker/index.js`: Workers Static Assets delegation.
 - `scripts/`: local and release validation utilities.
 - `tests/`: automated tests.
+- `tests/builder-initial-config.test.mjs`: targeted CL-003 regression tests for editor startup config-source priority.
 - `docs/manual-qa.md`: manual browser/OBS/font/share/security/deploy QA.
 - `docs/post-launch-ops.md`: production URL, billing/cost notes, Cloudflare binding state, rollback runbook.
 - `docs/pre-release-qa.md`: release QA record.
@@ -228,10 +232,10 @@ Data flow:
 ## Review coordination files
 
 - `docs/REVIEW_BRIEF.md`: completed by Codex as the pre-review repository context packet. It now notes that Claude review and ChatGPT triage happened after the brief was created.
-- `docs/CLAUDE_REVIEW.md`: Claude review output is present. The tracking table records first-batch triage status for each relevant finding.
-- `docs/AI_REVIEW_TRIAGE.md`: ChatGPT first-batch triage is recorded. Approved: CG-001, CL-001, CL-004 docs-only, CL-006 docs-only, CL-008 docs-only, CL-009 docs-only. Deferred: CL-003 and broader CL-005. Needs confirmation: CL-002 and CL-007. Rejected for this batch: deploy/rollback, dependency-adding lint/type tooling, and visual CSS changes without evidence.
-- `docs/CODEX_TASKS.md`: approved first-batch task queue T-00 through T-04.
-- `docs/DECISION_LOG.md`: governance decisions now include ChatGPT first-batch triage and the lightweight product requirements summary decision.
+- `docs/CLAUDE_REVIEW.md`: Claude review output is present. The tracking table records first-batch triage and second-batch CL-003/narrow CL-005 status.
+- `docs/AI_REVIEW_TRIAGE.md`: ChatGPT triage is recorded. Approved: CG-001, CL-001, CL-004 docs-only, CL-006 docs-only, CL-008 docs-only, CL-009 docs-only, CL-003, and CL-005 narrow slice. Needs confirmation: CL-002 and CL-007. Broader CL-005 remains deferred. Rejected for this batch: deploy/rollback, dependency-adding lint/type tooling, and visual CSS changes without evidence.
+- `docs/CODEX_TASKS.md`: approved task queue T-00 through T-06, with T-05/T-06 covering CL-003 and the narrow CL-005 test slice.
+- `docs/DECISION_LOG.md`: governance decisions now include ChatGPT first-batch triage, the lightweight product requirements summary decision, and the second-batch CL-003/narrow CL-005 decision.
 
 ## Known risks and review focus
 
@@ -321,10 +325,10 @@ No package-manager install, tests, external API calls, deploys, commits, pushes,
 - Whether generated/local directories such as `dist/`, `node_modules/`, `.wrangler/`, `.codegraph/`, and `.claude/` should be excluded from Claude's review prompt.
 - Whether a secrets/config audit should be completed before external review.
 - Whether CL-002 needs Browser/OBS visual evidence before a future CSS/layout task.
-- Whether CL-003 and broader CL-005 should be scheduled in a later batch.
+- Whether broader CL-005 builder testing/refactor work should be scheduled in a later batch.
 - How to handle CL-007 commit/publication policy for AI coordination docs and operation metadata.
 - Whether current production behavior should be re-verified before any future release or deploy.
 
 ## Requested next action for ChatGPT
 
-Please review `docs/CLAUDE_REVIEW.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, and the latest Codex final report. Decide whether the first-batch implementation is acceptable, then decide whether to commit these docs, request follow-up work for deferred items, or gather additional evidence for CL-002 and CL-007.
+Please review `docs/CLAUDE_REVIEW.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, `docs/DECISION_LOG.md`, and the latest Codex final report. Decide whether the implemented first-batch and second-batch scope is acceptable, then decide whether to request broader CL-005 work, gather evidence for CL-002, or resolve the CL-007 commit/publication policy.

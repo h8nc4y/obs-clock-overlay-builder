@@ -6,7 +6,7 @@ This brief was prepared by Codex from local repository inspection. It is a revie
 
 Confirmed facts are based on files and commands inspected in this working tree. Inferred assumptions are explicitly marked as inferred. Commands listed under validation are repository-supported commands; they were not run during creation of this brief unless the final Codex report says otherwise.
 
-Update 2026-05-30: Claude Code review has since been pasted into `docs/CLAUDE_REVIEW.md`, and ChatGPT triage has been recorded in `docs/AI_REVIEW_TRIAGE.md`. This file remains the pre-review repository context packet.
+Update 2026-05-30: Claude Code review has since been pasted into `docs/CLAUDE_REVIEW.md`, ChatGPT triage has been recorded in `docs/AI_REVIEW_TRIAGE.md`, and first-batch plus approved second-batch follow-up tasks are tracked in `docs/CODEX_TASKS.md`. This file remains the pre-review repository context packet.
 
 ## Project summary
 
@@ -102,7 +102,7 @@ Inferred: The project aims to stay lightweight, static-first, and easy to operat
 
 ### Missing or unclear
 
-- No formal product requirements document was found beyond README, QA docs, backlog, and agent instructions.
+- At original inspection, no formal product requirements document was found beyond README, QA docs, backlog, and agent instructions. A lightweight summary now exists at `docs/PRODUCT_REQUIREMENTS.md`.
 - No `.github/workflows/` directory was found during inspection.
 - It is unclear whether Claude should review the whole repository, a diff, or only the current release surface.
 - It is unclear whether a secrets/config audit should be performed before sharing repository content with external review tools.
@@ -172,6 +172,7 @@ No database or authentication system was identified.
 - `index.html`: editor UI entry point.
 - `clock/index.html`: OBS clock-only entry point.
 - `assets/js/builder.js`: editor behavior and generated URL workflow.
+- `assets/js/builder-initial-config.js`: extracted editor startup config-source priority helper.
 - `assets/js/config.js`: templates, defaults, URL config encoding, normalization, and sanitization.
 - `assets/js/render.js`: clock DOM rendering.
 - `assets/js/time.js`: clock formatting and second tick timing.
@@ -180,16 +181,16 @@ No database or authentication system was identified.
 - `functions/api/defaults.js`: optional Pages Function fallback.
 - `worker/index.js`: Workers Static Assets fetch entry point.
 - `scripts/`: build, lint, format, smoke, release, and local server utilities.
-- `tests/`: config, render, time, worker, build, font, and static UI tests.
+- `tests/`: config, render, time, worker, build, font, static UI, and builder startup priority tests.
 - `docs/manual-qa.md`: manual browser and OBS QA checklist.
 - `docs/post-launch-ops.md`: production URL, rollback, cost, and operations notes.
 - `docs/pre-release-qa.md`: release QA record.
 - `docs/v0.1.1-backlog.md`: post-launch improvement candidates.
 - `docs/PRODUCT_REQUIREMENTS.md`: lightweight summary of existing product requirements and non-goals.
 - `docs/licenses/fonts.md`: font license documentation area.
-- `docs/CLAUDE_REVIEW.md`: future Claude review record.
-- `docs/AI_REVIEW_TRIAGE.md`: future ChatGPT triage record.
-- `docs/CODEX_TASKS.md`: future Codex implementation queue generated only from approved triage.
+- `docs/CLAUDE_REVIEW.md`: Claude review record and finding-status tracker.
+- `docs/AI_REVIEW_TRIAGE.md`: ChatGPT triage record.
+- `docs/CODEX_TASKS.md`: Codex implementation queue generated only from approved triage.
 - `docs/DECISION_LOG.md`: durable product, architecture, review, and AI coordination decision log.
 
 ## Validation commands
@@ -215,7 +216,7 @@ For Codex automation, foreground dev servers should be started in the background
 
 ## Known risks and review focus
 
-- Requirement ambiguity: product goals are mostly spread across README, QA docs, backlog, AGENTS, and post-launch ops; a single requirements spec was not found.
+- Requirement ambiguity: product goals are still distributed across README, QA docs, backlog, AGENTS, and post-launch ops, though `docs/PRODUCT_REQUIREMENTS.md` now summarizes existing scope.
 - Architecture risk: static-first design is simple, but review should confirm the editor and clock surfaces remain separated.
 - Security risk: URL, label, font, import, and CSS string handling must remain sanitized and must not use `innerHTML`.
 - Data handling: editor `localStorage` must remain optional and must not become a clock-surface dependency.

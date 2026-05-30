@@ -127,11 +127,25 @@ Use this template for future decisions.
 - Related files: `docs/PRODUCT_REQUIREMENTS.md`, `README.md`, `AGENTS.md`, `docs/manual-qa.md`, `docs/post-launch-ops.md`
 - Related review findings: CL-006
 
+### 2026-05-30: ChatGPT approved CL-003 and a narrow CL-005 test slice
+
+- Date: 2026-05-30
+- Decision: ChatGPT approved a second local implementation batch for CL-003 and only the narrow CL-005 test slice needed to cover that startup behavior.
+- Context: The first-batch work was preserved in a local commit. ChatGPT then approved fixing the editor-only `loadInitialConfig()` URL versus `localStorage` priority edge case and adding small automated coverage around that behavior.
+- Options considered:
+  - Leave CL-003 deferred.
+  - Implement CL-003 with a minimal helper and tests.
+  - Expand into broader `builder.js` refactor or DOM test harness work.
+- Rationale: The approved scope addresses a concrete, low-risk editor startup inconsistency while avoiding broad refactor, dependency changes, CSS/layout work, or unapproved Claude suggestions.
+- Consequences: Codex may change `assets/js/builder.js`, add a focused pure helper, and add targeted tests. Broader CL-005 work, CL-002 visual changes, and CL-007 publication policy remain outside implementation scope.
+- Status: Active.
+- Related files: `assets/js/builder.js`, `assets/js/builder-initial-config.js`, `tests/builder-initial-config.test.mjs`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`
+- Related review findings: CL-003, CL-005
+
 ## Open decisions
 
 - Whether these docs should be committed to Git.
 - Whether secrets/config should be audited before external review.
 - Whether CL-002 should be verified with Browser/OBS evidence before a future visual/layout patch.
-- Whether CL-003 should be fixed in a later editor-state batch.
 - Whether broader CL-005 builder testing/refactor work should be scheduled.
 - How to handle CL-007: track, ignore, redact, or split AI coordination docs and operation metadata.
