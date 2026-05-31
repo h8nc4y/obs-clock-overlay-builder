@@ -437,6 +437,72 @@ This narrow test slice does not replace manual QA for actual browser editor work
 
 Completed in the current Codex run. `tests/builder-initial-config.test.mjs` covers four initial config-source cases.
 
+### T-07
+
+### Priority
+
+P1
+
+### Source finding
+
+CL-002
+
+### Goal
+
+Prevent Neon HUD glow from clipping at the top-left edge of `/clock/`.
+
+### Scope
+
+Use the smallest safe local change to reserve visual clearance for glow-heavy clock templates and keep the editor's recommended OBS size aligned with that clearance.
+
+### Files likely affected
+
+- `assets/css/styles.css`
+- `assets/js/render.js`
+- `tests/render.test.mjs`
+- `tests/ui-static.test.mjs`
+- `docs/LOCAL_REVIEW_VERIFICATION.md`
+- `docs/AI_REVIEW_TRIAGE.md`
+- `docs/CODEX_TASKS.md`
+- `docs/DECISION_LOG.md`
+- `docs/manual-qa.md`
+
+### Implementation plan
+
+1. Add a shared 18px visual safe inset for `/clock/`.
+2. Apply that inset as padding around `#clockRoot`.
+3. Reuse the same inset in `recommendedObsSize()`.
+4. Add focused tests for the CSS and recommended-size contract.
+5. Record local validation and note that OBS real-device verification is still pending.
+
+### Acceptance criteria
+
+`/clock/` remains clock-only and transparent, generated `/clock/?c=...` URLs remain authoritative, Neon HUD has visible top/left glow clearance in local browser evidence, and no unrelated UI/source/dependency/deployment changes are made.
+
+### Validation commands
+
+- `node --test tests\render.test.mjs tests\ui-static.test.mjs`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run format:check`
+- `npm run test`
+- `npm run build`
+- `npm run release:http-smoke`
+- `git diff --check`
+- Local headless browser screenshots/DOM dump against `http://127.0.0.1:4173/`
+
+### Out of scope
+
+OBS real-device verification, broad visual redesign, CL-007 final decision, broad CL-005 work, deploy, rollback, remote smoke, dependency changes, CI changes, and source behavior unrelated to CL-002.
+
+### Risks
+
+Local browser evidence does not guarantee OBS browser-source rendering. OBS must still be checked with a real generated URL and recommended dimensions.
+
+### Completion notes
+
+Implemented locally in the current Codex run. OBS real-device verification remains pending.
+
 ## Completed tasks
 
 - T-00: Review coordination docs updated for completed Claude review and ChatGPT first-batch triage.
@@ -446,8 +512,9 @@ Completed in the current Codex run. `tests/builder-initial-config.test.mjs` cove
 - T-04: `/api/defaults` `_headers` dependency and smoke-check guard documented.
 - T-05: Editor startup URL config priority fixed for default-equivalent explicit URL configs.
 - T-06: Narrow builder startup config-source tests added for CL-003 behavior.
+- T-07: CL-002 Neon HUD glow clipping fixed locally with a shared 18px visual safe inset; OBS real-device verification remains pending.
 
 ## Evidence Recorded, Not Queued
 
-- CL-002: Local browser evidence reproduced Neon HUD top/left glow clipping on `/clock/`. This is evidence only; no CSS/layout task is approved or queued. See `docs/LOCAL_REVIEW_VERIFICATION.md`.
+- CL-002: Local browser evidence first reproduced Neon HUD top/left glow clipping on `/clock/`; ChatGPT then approved the narrow safe-inset fix, which is now implemented locally. OBS real-device verification is still pending. See `docs/LOCAL_REVIEW_VERIFICATION.md`.
 - CL-007: A decision packet exists at `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`. This is decision support only; Codex must not choose the publication/tracking policy.

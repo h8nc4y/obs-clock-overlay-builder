@@ -534,6 +534,7 @@ details p {
 }
 
 .clock-page {
+  --clock-visual-safe-inset: 18px;
   width: 100vw;
   height: 100vh;
   margin: 0;
@@ -547,6 +548,7 @@ details p {
   width: max-content;
   height: max-content;
   margin: 0;
+  padding: var(--clock-visual-safe-inset);
   overflow: visible;
 }
 

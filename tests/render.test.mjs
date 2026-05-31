@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { normalizeConfig } from "../assets/js/config.js";
-import { applyClockStyles, mountClock } from "../assets/js/render.js";
+import { applyClockStyles, mountClock, recommendedObsSize } from "../assets/js/render.js";
 
 class FakeStyle {
   constructor() {
@@ -165,4 +165,12 @@ test("applyClockStyles writes expected CSS variables", () => {
   assert.equal(element.style.getPropertyValue("--clock-stroke-color"), "#ffffff");
   assert.equal(element.style.getPropertyValue("--clock-stroke-width"), "1.5px");
   assert.equal(element.style.getPropertyValue("--clock-shadow"), "1px 2px 6px rgba(0, 0, 0, 0.4)");
+});
+
+test("recommended OBS size reserves the shared visual safe inset around glow", () => {
+  const element = new FakeElement("div");
+  const size = recommendedObsSize(element);
+
+  assert.equal(size.width, 128 + 18 * 2);
+  assert.equal(size.height, 48 + 18 * 2);
 });

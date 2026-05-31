@@ -53,3 +53,12 @@ test("copy fallback does not always select the generated URL field", () => {
   assert.match(copyTextBody, /fallback/i);
   assert.match(copyTextBody, /text/);
 });
+
+test("clock page reserves visual safe inset for glow-heavy templates", () => {
+  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const clockPageBlock = css.match(/\.clock-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+  const clockRootBlock = css.match(/\.clock-page #clockRoot\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+
+  assert.match(clockPageBlock, /--clock-visual-safe-inset:\s*18px;/);
+  assert.match(clockRootBlock, /padding:\s*var\(--clock-visual-safe-inset\);/);
+});

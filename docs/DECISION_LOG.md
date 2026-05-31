@@ -151,16 +151,31 @@ Use this template for future decisions.
   - Only report evidence in chat.
   - Record local verification and decision material in repository docs.
   - Implement CL-002 or decide CL-007 directly.
-- Rationale: Repository docs preserve evidence for ChatGPT review while respecting the unapproved status of CL-002 implementation and the human/ChatGPT decision boundary for CL-007.
-- Consequences: `docs/LOCAL_REVIEW_VERIFICATION.md` and `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md` should be used as evidence packets. They do not authorize CSS/layout changes, publication decisions, push, PR, or deploy.
-- Status: Active evidence record; CL-002 implementation and CL-007 decision remain open.
+- Rationale: Repository docs preserve evidence for ChatGPT review while respecting that CL-002 implementation was not approved at that time and that CL-007 remains a human/ChatGPT decision.
+- Consequences: `docs/LOCAL_REVIEW_VERIFICATION.md` and `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md` should be used as evidence packets. This decision did not authorize CSS/layout changes, publication decisions, push, PR, or deploy.
+- Status: Historical evidence record; CL-002 implementation was later approved narrowly, while the CL-007 decision remains open.
 - Related files: `docs/LOCAL_REVIEW_VERIFICATION.md`, `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`
 - Related review findings: CL-002, CL-007
+
+### 2026-05-31: ChatGPT approved narrow CL-002 local fix
+
+- Date: 2026-05-31
+- Decision: Implement only the ChatGPT-approved CL-002 Neon HUD glow-clipping fix locally.
+- Context: Local browser evidence reproduced Neon HUD clipping at the `/clock/` viewport origin. ChatGPT then approved CL-002 implementation only and explicitly excluded CL-007 final decision, broad CL-005 work, deploy/rollback/remote smoke, dependency changes, CI, and unrelated UI redesign.
+- Options considered:
+  - Leave CL-002 as evidence only.
+  - Add a narrow visual safe inset for `/clock/` and align recommended OBS sizing.
+  - Redesign the clock/editor layout more broadly.
+- Rationale: A shared 18px visual safe inset addresses the reproduced glow clipping with a small, testable change while preserving generated URL reproducibility and the clock-only transparent surface.
+- Consequences: `/clock/` now reserves local visual clearance around glow-heavy templates, and `recommendedObsSize()` uses the same inset on both axes. OBS real-device verification is still required before treating CL-002 as production-verified.
+- Status: Implemented locally; OBS real-device verification pending.
+- Related files: `assets/css/styles.css`, `assets/js/render.js`, `tests/render.test.mjs`, `tests/ui-static.test.mjs`, `docs/LOCAL_REVIEW_VERIFICATION.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, `docs/manual-qa.md`
+- Related review findings: CL-002
 
 ## Open decisions
 
 - Whether these docs should be committed to Git.
 - Whether secrets/config should be audited before external review.
-- Whether CL-002 should be fixed now based on local browser evidence or first confirmed in OBS real-device QA.
+- Whether the locally implemented CL-002 fix passes OBS real-device browser-source QA.
 - Whether broader CL-005 builder testing/refactor work should be scheduled.
 - How to handle CL-007: track, ignore, redact, or split AI coordination docs and operation metadata.

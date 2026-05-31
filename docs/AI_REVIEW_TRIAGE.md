@@ -99,6 +99,17 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 - Validation: `node --test tests\builder-initial-config.test.mjs`, then local validation commands.
 - Priority: P2
 
+### CL-002
+
+- Finding ID: CL-002
+- Reason for approval: ChatGPT approved only the reproduced Neon HUD glow clipping fix after local evidence showed `.clock-widget` at the viewport origin with an 18px glow.
+- Scope: Add a small `/clock/` visual safe inset for glow-heavy templates and keep the editor's recommended OBS size calculation aligned with that inset.
+- Implementation task: Add a shared 18px visual safe inset in `assets/css/styles.css` and `assets/js/render.js`, then cover the CSS and recommended-size behavior with focused tests.
+- Acceptance criteria: `/clock/` remains clock-only and transparent; generated `/clock/?c=...` URLs remain the source of truth; Neon HUD has origin-side visual clearance; no editor redesign, font bundling, dependency change, deploy, or unrelated layout change.
+- Validation: `node --test tests\render.test.mjs tests\ui-static.test.mjs`, local validation commands, and local browser/headless screenshot evidence.
+- Priority: P1
+- Implementation status: Implemented locally by Codex; pending OBS real-device verification.
+
 ## Deferred findings
 
 ### CL-005 broader scope
@@ -113,10 +124,10 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 ### CL-002
 
 - Finding ID: CL-002
-- Reason confirmation is needed: Local browser evidence now reproduces the visual clipping concern, but CSS/layout implementation still needs ChatGPT approval and desired behavior before any change.
-- Evidence gathered: 2026-05-31 local Chrome DevTools check reproduced Neon HUD top/left glow clipping on `/clock/`. `.clock-widget` rendered at `x=0`, `y=0` while Neon HUD uses an 18px text-shadow. Screenshots were saved only under ignored `browser-temp/`. See `docs/LOCAL_REVIEW_VERIFICATION.md`.
-- Information needed: ChatGPT decision on whether to fix CL-002 now, desired OBS sizing/layout behavior, and whether OBS real-device confirmation is required before implementation.
-- Revisit condition: Reopen after ChatGPT approves a concrete visual/layout task.
+- Reason confirmation is needed: The narrow local fix is implemented, but OBS real-device behavior has not been verified.
+- Evidence gathered: 2026-05-31 local browser/headless evidence shows the post-fix Neon HUD clock rendered with visible top/left clearance and `--clock-shadow: 0px 0px 18px rgba(47, 255, 230, 0.58)`. Screenshots were saved only under ignored `browser-temp/`. See `docs/LOCAL_REVIEW_VERIFICATION.md`.
+- Information needed: OBS real-device confirmation using a generated `/clock/?c=...` URL and the editor's recommended width/height.
+- Revisit condition: Reopen if OBS still clips glow, if the recommended size is insufficient in OBS, or if ChatGPT approves a broader visual/layout change.
 
 ### CL-007
 
@@ -142,15 +153,15 @@ Claude findings remain advisory. This file records ChatGPT's current decision st
 - Risk accepted: Existing scripts remain syntax/import smoke checks.
 - Notes: Future dependency changes require separate approval.
 
-### Visual CSS changes without evidence
+### Visual CSS changes without evidence (historical)
 
 - Finding ID: CL-002 extension
-- Reason for rejection: CL-002 needs visual confirmation before changing layout or CSS.
-- Risk accepted: Potential clipping remains a deferred visual QA item.
-- Notes: Do not implement layout/CSS changes in this batch.
+- Reason for rejection: Historical first-batch rejection before local reproduction and ChatGPT's narrow CL-002 approval.
+- Risk accepted: No risk is accepted for the approved narrow CL-002 safe-inset fix. Broader visual redesign or unrelated layout/CSS changes remain unapproved.
+- Notes: Do not implement additional visual/layout changes beyond the approved CL-002 safe-inset fix unless ChatGPT approves them.
 
 ## Open questions
 
 - Should AI coordination docs be committed, ignored, or redacted? This remains CL-007.
-- Should CL-002 be implemented now that local browser evidence reproduced glow clipping, or should OBS real-device confirmation come first?
+- Has CL-002 been verified in OBS with a real browser source and generated `/clock/?c=...` URL?
 - Should broader CL-005 builder testing/refactor work be scheduled for a later batch?
