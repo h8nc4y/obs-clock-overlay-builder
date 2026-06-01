@@ -233,9 +233,10 @@ Data flow:
 
 - `docs/REVIEW_BRIEF.md`: completed by Codex as the pre-review repository context packet. It now notes that Claude review and ChatGPT triage happened after the brief was created.
 - `docs/CLAUDE_REVIEW.md`: Claude review output is present. The tracking table records first-batch triage and second-batch CL-003/narrow CL-005 status.
-- `docs/AI_REVIEW_TRIAGE.md`: ChatGPT triage is recorded. Approved: CG-001, CL-001, CL-004 docs-only, CL-006 docs-only, CL-008 docs-only, CL-009 docs-only, CL-003, and CL-005 narrow slice. Needs confirmation: CL-002 and CL-007. Broader CL-005 remains deferred. Rejected for this batch: deploy/rollback, dependency-adding lint/type tooling, and visual CSS changes without evidence.
-- `docs/CODEX_TASKS.md`: approved task queue T-00 through T-06, with T-05/T-06 covering CL-003 and the narrow CL-005 test slice.
-- `docs/DECISION_LOG.md`: governance decisions now include ChatGPT first-batch triage, the lightweight product requirements summary decision, and the second-batch CL-003/narrow CL-005 decision.
+- `docs/AI_REVIEW_TRIAGE.md`: ChatGPT triage is recorded. Approved: CG-001, CL-001, CL-004 docs-only, CL-006 docs-only, CL-008 docs-only, CL-009 docs-only, CL-003, CL-005 narrow slice, and the narrow CL-002 local safe-inset fix. Needs confirmation: CL-002 OBS real-device verification and CL-007 publication/tracking policy. Broader CL-005 remains deferred. Rejected for this batch: deploy/rollback, dependency-adding lint/type tooling, and unapproved visual changes beyond CL-002.
+- `docs/CODEX_TASKS.md`: approved task queue T-00 through T-07, with T-05/T-06 covering CL-003 and the narrow CL-005 test slice, and T-07 covering the CL-002 local safe-inset fix.
+- `docs/DECISION_LOG.md`: governance decisions now include ChatGPT first-batch triage, the lightweight product requirements summary decision, the second-batch CL-003/narrow CL-005 decision, and the narrow CL-002 local fix decision.
+- `docs/PR19_REVIEW_READINESS.md`: PR #19 readiness packet, merge gates, CL-007 private/public decision matrix, and human OBS checklist.
 
 ## Known risks and review focus
 
@@ -324,11 +325,11 @@ No package-manager install, tests, external API calls, deploys, commits, pushes,
 - Whether `docs/CHATGPT_HANDOFF.md` and the other AI coordination docs should be committed to Git.
 - Whether generated/local directories such as `dist/`, `node_modules/`, `.wrangler/`, `.codegraph/`, and `.claude/` should be excluded from Claude's review prompt.
 - Whether a secrets/config audit should be completed before external review.
-- Whether CL-002 needs Browser/OBS visual evidence before a future CSS/layout task.
+- Whether the locally implemented CL-002 safe-inset fix passes OBS real-device browser-source QA, or whether ChatGPT/user explicitly waives that gate for merge.
 - Whether broader CL-005 builder testing/refactor work should be scheduled in a later batch.
 - How to handle CL-007 commit/publication policy for AI coordination docs and operation metadata.
 - Whether current production behavior should be re-verified before any future release or deploy.
 
 ## Requested next action for ChatGPT
 
-Please review `docs/CLAUDE_REVIEW.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, `docs/DECISION_LOG.md`, and the latest Codex final report. Decide whether the implemented first-batch and second-batch scope is acceptable, then decide whether to request broader CL-005 work, gather evidence for CL-002, or resolve the CL-007 commit/publication policy.
+Please review `docs/PR19_REVIEW_READINESS.md`, `docs/CLAUDE_REVIEW.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, `docs/DECISION_LOG.md`, and the latest Codex final report. Decide whether PR #19 should remain draft until OBS real-device verification is completed, whether CL-007 private-repo tracking is acceptable for this PR, and whether any public-redaction work is required before merge or only before public exposure.

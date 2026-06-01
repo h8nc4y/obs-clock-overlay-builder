@@ -172,10 +172,26 @@ Use this template for future decisions.
 - Related files: `assets/css/styles.css`, `assets/js/render.js`, `tests/render.test.mjs`, `tests/ui-static.test.mjs`, `docs/LOCAL_REVIEW_VERIFICATION.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`, `docs/manual-qa.md`
 - Related review findings: CL-002
 
+### 2026-05-31: PR #19 remains draft until review gates are satisfied
+
+- Date: 2026-05-31
+- Decision: Keep PR #19 as a draft review-followup PR until human/ChatGPT gates are satisfied or explicitly waived.
+- Context: PR #19 now contains ChatGPT-approved first-batch work, CL-003, a narrow CL-005 test slice, the narrow CL-002 local safe-inset fix, and CL-007 decision evidence. Local validation and local browser/headless evidence exist, but OBS real-device verification remains pending and CL-007 public/private documentation policy is not fully decided.
+- Options considered:
+  - Mark the PR ready and merge based on local validation only.
+  - Keep the PR draft until OBS verification and CL-007 gates are resolved.
+  - Split all docs and implementation work into separate PRs after the fact.
+- Rationale: The draft gate preserves a clear boundary between local implementation evidence and final product/release confidence. It also prevents AI coordination docs and operational metadata from being exposed more broadly before ChatGPT/user decides CL-007.
+- Consequences: `docs/PR19_REVIEW_READINESS.md` records merge gates, the CL-007 decision matrix, and a human OBS checklist. Codex should not merge, deploy, mark ready, or perform public-redaction work unless ChatGPT/user explicitly approves that next step.
+- Status: Active.
+- Related files: `docs/PR19_REVIEW_READINESS.md`, `docs/LOCAL_REVIEW_VERIFICATION.md`, `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`
+- Related review findings: CL-002, CL-007
+
 ## Open decisions
 
-- Whether these docs should be committed to Git.
+- Whether these docs should remain tracked as-is if the repository is ever made public.
 - Whether secrets/config should be audited before external review.
 - Whether the locally implemented CL-002 fix passes OBS real-device browser-source QA.
+- Whether PR #19 can be merged after OBS verification, or whether ChatGPT/user wants an explicit OBS waiver.
 - Whether broader CL-005 builder testing/refactor work should be scheduled.
 - How to handle CL-007: track, ignore, redact, or split AI coordination docs and operation metadata.
