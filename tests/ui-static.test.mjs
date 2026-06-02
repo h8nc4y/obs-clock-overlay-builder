@@ -6,9 +6,10 @@ test("color swatches keep touch-friendly dimensions", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const swatchBlock = css.match(/\.swatch\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
-  assert.match(swatchBlock, /width:\s*36px;/);
-  assert.match(swatchBlock, /height:\s*36px;/);
-  assert.match(swatchBlock, /min-height:\s*36px;/);
+  assert.match(swatchBlock, /width:\s*40px;/);
+  assert.match(swatchBlock, /height:\s*40px;/);
+  assert.match(swatchBlock, /min-height:\s*40px;/);
+  assert.match(css, /@media \(pointer:\s*coarse\)\s*\{[\s\S]*?\.swatch\s*\{[\s\S]*?width:\s*44px;/);
 });
 
 test("font helper explains OBS-side fallback plainly", () => {
@@ -56,10 +57,15 @@ test("copy fallback does not always select the generated URL field", () => {
 
 test("clock page reserves visual safe inset for glow-heavy templates", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const clockHtml = readFileSync(new URL("../clock/index.html", import.meta.url), "utf8");
   const clockPageBlock = css.match(/\.clock-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
   const clockRootBlock = css.match(/\.clock-page #clockRoot\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
+  assert.match(clockHtml, /<html lang="ja" class="clock-page-root">/);
+  assert.match(clockHtml, /<body class="clock-page">/);
+  assert.match(css, /html\.clock-page-root\s*\{[\s\S]*?background:\s*transparent;/);
   assert.match(clockPageBlock, /--clock-visual-safe-inset:\s*18px;/);
+  assert.match(clockPageBlock, /background:\s*transparent;/);
   assert.match(clockRootBlock, /padding:\s*var\(--clock-visual-safe-inset\);/);
 });
 
@@ -69,4 +75,38 @@ test("editor live preview reserves visual safe inset around clock widget", () =>
 
   assert.match(previewStageBlock, /padding:\s*var\(--clock-visual-safe-inset,\s*18px\);/);
   assert.match(previewStageBlock, /overflow:\s*visible;/);
+});
+
+test("editor refresh keeps preview and OBS URL first in the task flow", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+
+  assert.ok(html.indexOf('class="preview-column"') < html.indexOf('class="control-surface"'));
+  assert.ok(html.indexOf('id="copyUrl"') < html.indexOf('id="previewShell"'));
+  assert.match(html, /<label class="field url-field" for="generatedUrl">/);
+  assert.match(html, /<span>生成URL<\/span>/);
+  assert.match(html, /<button id="copyUrl" type="button">OBS URLをコピー<\/button>/);
+  assert.match(css, /grid-template-areas:\s*"preview controls";/);
+});
+
+test("editor refresh has keyboard and responsive layout safeguards", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+
+  assert.match(html, /class="skip-link"/);
+  assert.match(html, /<main id="builderMain" class="builder-layout" tabindex="-1">/);
+  assert.match(css, /button,\s*\n\.button-like\s*\{[\s\S]*?min-height:\s*44px;/);
+  assert.match(css, /@media \(pointer:\s*coarse\)\s*\{[\s\S]*?min-height:\s*48px;/);
+  assert.match(css, /@media \(max-width:\s*820px\)\s*\{[\s\S]*?\.form-grid/);
+  assert.match(css, /@media \(max-width:\s*520px\)\s*\{[\s\S]*?flex:\s*0 0 auto;/);
+});
+
+test("editor refresh does not add risky HTML sinks", () => {
+  const changedSources = [
+    readFileSync(new URL("../index.html", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8")
+  ].join("\n");
+
+  assert.doesNotMatch(changedSources, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
 });

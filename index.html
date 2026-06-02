@@ -4,21 +4,75 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="OBSブラウザソース向けの透明時計オーバーレイURLを作る静的ビルダー">
-    <title>OBS Clock Overlay Builder</title>
+    <title>OBS時計URLビルダー</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2324a3b8'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='white' stroke-width='3'/%3E%3Cpath d='M16 9v8l6 3' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="./assets/css/styles.css">
   </head>
   <body class="builder-page">
+    <a class="skip-link" href="#builderMain">設定画面へ移動</a>
     <header class="topbar">
-      <div>
-        <p class="eyebrow">OBS Browser Source Clock</p>
-        <h1>時計オーバーレイURLビルダー</h1>
-        <p class="lead">見た目を調整して、生成URLをOBSのブラウザソースへ貼るだけ。URLだけで同じ時計を再現できます。</p>
+      <div class="topbar-copy">
+        <p class="eyebrow">OBS用 透明時計</p>
+        <h1>OBS時計URLビルダー</h1>
+        <p class="lead">プレビューを見ながら時計を調整し、OBSのブラウザソースへ貼るURLを作ります。保存や再現は生成URLだけで完結します。</p>
       </div>
-      <a class="quiet-link" href="./clock/" target="_blank" rel="noopener">時計画面を開く</a>
+      <div class="topbar-actions">
+        <a class="quiet-link" href="./clock/" target="_blank" rel="noopener">時計画面を開く</a>
+      </div>
     </header>
 
-    <main class="builder-layout">
+    <main id="builderMain" class="builder-layout" tabindex="-1">
+      <aside class="preview-column" aria-label="ライブプレビューとOBS用URL">
+        <section class="preview-panel preview-primary">
+          <div class="section-heading">
+            <h2>ライブプレビュー</h2>
+            <p>背景を切り替えて、配信画面に重ねた時の読みやすさを確認します。</p>
+          </div>
+          <div class="button-row primary-actions preview-actions">
+            <button id="copyUrl" type="button">OBS URLをコピー</button>
+            <button id="openClock" type="button" class="secondary">時計だけを確認</button>
+          </div>
+          <p id="urlStatus" class="status-line preview-status" role="status" aria-live="polite"></p>
+          <div class="preview-toolbar" aria-label="プレビュー背景">
+            <label><input type="radio" name="previewBg" value="checker" checked> 透過チェッカー</label>
+            <label><input type="radio" name="previewBg" value="light"> 明るい背景</label>
+            <label><input type="radio" name="previewBg" value="dark"> 暗い背景</label>
+            <label><input type="radio" name="previewBg" value="custom"> 任意色</label>
+            <input id="previewCustomColor" type="color" value="#5f7fbe" aria-label="任意プレビュー背景色">
+          </div>
+          <div id="previewShell" class="preview-shell preview-checker">
+            <div id="clockPreview" class="preview-stage"></div>
+          </div>
+          <div class="metrics-grid" aria-label="OBS推奨サイズ">
+            <div>
+              <span>推奨幅</span>
+              <strong id="recommendedWidth">未計測</strong>
+            </div>
+            <div>
+              <span>推奨高さ</span>
+              <strong id="recommendedHeight">未計測</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="preview-panel url-panel">
+          <div class="section-heading">
+            <h2>OBS用URL</h2>
+            <p>コピーしてOBSのブラウザソースへ貼ります。URLだけで同じ時計を復元できます。</p>
+          </div>
+          <label class="toggle" for="compactUrl">
+            <input id="compactUrl" type="checkbox">
+            <span>デフォルト値を省略して短くする</span>
+          </label>
+          <label class="field url-field" for="generatedUrl">
+            <span>生成URL</span>
+            <textarea id="generatedUrl" rows="5" readonly spellcheck="false" aria-describedby="generatedUrlHelp urlStatus urlWarning"></textarea>
+          </label>
+          <p id="generatedUrlHelp" class="copy-hint">「時計だけを確認」で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。</p>
+          <p id="urlWarning" class="warning" hidden></p>
+        </section>
+      </aside>
+
       <section class="control-surface" aria-label="時計デザイン設定">
         <section class="panel">
           <div class="section-heading">
@@ -34,9 +88,9 @@
             <p>時刻、日付、曜日、ラベルをURLへ保存します。</p>
           </div>
           <div class="form-grid">
-            <label class="field">
+            <label class="field" for="timezone">
               <span>タイムゾーン</span>
-              <input id="timezone" type="text" autocomplete="off" spellcheck="false">
+              <input id="timezone" type="text" autocomplete="off" spellcheck="false" aria-describedby="timezoneHelp">
               <small id="timezoneHelp">初期値は Asia/Tokyo。IANA名を指定します。</small>
             </label>
             <div class="field inline-actions">
@@ -49,23 +103,23 @@
               <p id="cfTimezone" class="muted">公開先によっては候補を取得できない場合があります。その場合も手入力で使えます。</p>
               <button id="fetchCfDefaults" type="button">候補を確認</button>
             </div>
-            <label class="toggle">
+            <label class="toggle" for="hour12">
               <input id="hour12" type="checkbox">
               <span>12時間表示にする</span>
             </label>
-            <label class="toggle">
+            <label class="toggle" for="showSeconds">
               <input id="showSeconds" type="checkbox">
               <span>秒を表示する</span>
             </label>
-            <label class="toggle">
+            <label class="toggle" for="showDate">
               <input id="showDate" type="checkbox">
               <span>日付を表示する</span>
             </label>
-            <label class="toggle">
+            <label class="toggle" for="showWeekday">
               <input id="showWeekday" type="checkbox">
               <span>曜日を表示する</span>
             </label>
-            <label class="field">
+            <label class="field" for="dateFormat">
               <span>日付フォーマット</span>
               <select id="dateFormat">
                 <option value="slash">YYYY/MM/DD</option>
@@ -74,7 +128,7 @@
                 <option value="jp">YYYY年M月D日</option>
               </select>
             </label>
-            <label class="field">
+            <label class="field" for="weekdayFormat">
               <span>曜日表記</span>
               <select id="weekdayFormat">
                 <option value="ja-short">短い日本語</option>
@@ -83,12 +137,12 @@
                 <option value="en-long">英語ロング</option>
               </select>
             </label>
-            <label class="field">
+            <label class="field" for="labelText">
               <span>ラベル</span>
-              <input id="labelText" type="text" maxlength="40" placeholder="LIVE / JST / 配信中">
-              <small>入力した文字は、そのまま画面用の命令として実行されない形で表示します。</small>
+              <input id="labelText" type="text" maxlength="40" placeholder="LIVE / JST / 配信中" aria-describedby="labelTextHelp">
+              <small id="labelTextHelp">入力した文字は、そのまま画面用の命令として実行されない形で表示します。</small>
             </label>
-            <label class="field">
+            <label class="field" for="labelPosition">
               <span>ラベル位置</span>
               <select id="labelPosition">
                 <option value="top">上</option>
@@ -111,21 +165,21 @@
             <p>この画面で選んだフォント名をURLに保存します。OBS側PCにそのフォントが無い場合は、近い標準フォントで表示され、見た目が変わることがあります。</p>
           </div>
           <div class="form-grid">
-            <label class="field">
+            <label class="field" for="fontPreset">
               <span>無料フォント候補</span>
               <select id="fontPreset"></select>
             </label>
-            <label class="field">
+            <label class="field" for="fontFamily">
               <span>手入力フォント名</span>
-              <input id="fontFamily" type="text" autocomplete="off" spellcheck="false">
-              <small>例: Noto Sans JP, M PLUS Rounded 1c, Poppins。OBS側PCに無い名前は標準フォントへ置き換わります。配信に使うPCで最後に確認してください。</small>
+              <input id="fontFamily" type="text" autocomplete="off" spellcheck="false" aria-describedby="fontFamilyHelp">
+              <small id="fontFamilyHelp">例: Noto Sans JP, M PLUS Rounded 1c, Poppins。OBS側PCに無い名前は標準フォントへ置き換わります。配信に使うPCで最後に確認してください。</small>
             </label>
             <div class="field inline-actions">
               <span>PC内フォント</span>
               <p id="localFontStatus" class="muted">対応ブラウザだけ、ボタンを押したあとにPC内フォント名を読み込みます。読み込めない場合も手入力で使えます。</p>
               <button id="loadLocalFonts" type="button">PC内フォントを読み込む</button>
             </div>
-            <label class="field is-hidden" id="localFontSelectWrap">
+            <label class="field is-hidden" id="localFontSelectWrap" for="localFontSelect">
               <span>読み込んだフォント</span>
               <select id="localFontSelect"></select>
               <small>日本語名で表示される場合も、URLにはOBSで実際に使うフォント名を保存します。別PCでは同じフォントが必要です。</small>
@@ -133,120 +187,137 @@
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel design-panel">
           <div class="section-heading">
             <h2>デザイン</h2>
             <p>ゲーム画面へ重ねても読めるように、影と縁取りを強めにできます。</p>
           </div>
-          <div class="form-grid">
-            <label class="field">
-              <span>文字色</span>
-              <input id="textColor" type="color">
-              <div class="swatches" data-color-target="textColor"></div>
-            </label>
-            <label class="field">
-              <span>背景色</span>
-              <input id="backgroundColor" type="color">
-              <div class="swatches" data-color-target="backgroundColor"></div>
-            </label>
-            <label class="field">
-              <span>背景不透明度</span>
-              <input id="backgroundOpacity" type="range" min="0" max="1" step="0.01">
-              <output id="backgroundOpacityValue"></output>
-            </label>
-            <label class="field">
-              <span>文字サイズ</span>
-              <input id="fontSize" type="range" min="18" max="120" step="1">
-              <output id="fontSizeValue"></output>
-            </label>
-            <label class="field">
-              <span>日付サイズ</span>
-              <input id="dateSize" type="range" min="10" max="56" step="1">
-              <output id="dateSizeValue"></output>
-            </label>
-            <label class="field">
-              <span>ラベルサイズ</span>
-              <input id="labelSize" type="range" min="10" max="48" step="1">
-              <output id="labelSizeValue"></output>
-            </label>
-            <label class="field">
-              <span>太さ</span>
-              <input id="fontWeight" type="range" min="300" max="900" step="100">
-              <output id="fontWeightValue"></output>
-            </label>
-            <label class="field">
-              <span>文字間隔</span>
-              <input id="letterSpacing" type="range" min="-1" max="8" step="0.1">
-              <output id="letterSpacingValue"></output>
-            </label>
-            <label class="field">
-              <span>行間</span>
-              <input id="lineHeight" type="range" min="0.9" max="1.8" step="0.01">
-              <output id="lineHeightValue"></output>
-            </label>
-            <label class="field">
-              <span>左右余白</span>
-              <input id="paddingX" type="range" min="0" max="80" step="1">
-              <output id="paddingXValue"></output>
-            </label>
-            <label class="field">
-              <span>上下余白</span>
-              <input id="paddingY" type="range" min="0" max="60" step="1">
-              <output id="paddingYValue"></output>
-            </label>
-            <label class="field">
-              <span>角丸</span>
-              <input id="radius" type="range" min="0" max="48" step="1">
-              <output id="radiusValue"></output>
-            </label>
-            <label class="field">
-              <span>枠線色</span>
-              <input id="borderColor" type="color">
-              <div class="swatches" data-color-target="borderColor"></div>
-            </label>
-            <label class="field">
-              <span>枠線幅</span>
-              <input id="borderWidth" type="range" min="0" max="8" step="1">
-              <output id="borderWidthValue"></output>
-            </label>
-            <label class="field">
-              <span>枠線不透明度</span>
-              <input id="borderOpacity" type="range" min="0" max="1" step="0.01">
-              <output id="borderOpacityValue"></output>
-            </label>
-            <label class="field">
-              <span>影色</span>
-              <input id="shadowColor" type="color">
-            </label>
-            <label class="field">
-              <span>影の濃さ</span>
-              <input id="shadowOpacity" type="range" min="0" max="1" step="0.01">
-              <output id="shadowOpacityValue"></output>
-            </label>
-            <label class="field">
-              <span>影ぼかし</span>
-              <input id="shadowBlur" type="range" min="0" max="36" step="1">
-              <output id="shadowBlurValue"></output>
-            </label>
-            <label class="field">
-              <span>影X</span>
-              <input id="shadowX" type="range" min="-20" max="20" step="1">
-              <output id="shadowXValue"></output>
-            </label>
-            <label class="field">
-              <span>影Y</span>
-              <input id="shadowY" type="range" min="-20" max="20" step="1">
-              <output id="shadowYValue"></output>
-            </label>
-            <label class="field">
-              <span>縁取り色</span>
-              <input id="strokeColor" type="color">
-            </label>
-            <label class="field">
-              <span>縁取り幅</span>
-              <input id="strokeWidth" type="range" min="0" max="8" step="0.5">
-              <output id="strokeWidthValue"></output>
-            </label>
+          <div class="design-groups">
+            <div class="control-group">
+              <h3>文字</h3>
+              <div class="form-grid dense-grid">
+                <label class="field" for="textColor">
+                  <span>文字色</span>
+                  <input id="textColor" type="color">
+                  <div class="swatches" data-color-target="textColor"></div>
+                </label>
+                <label class="field" for="fontSize">
+                  <span>文字サイズ</span>
+                  <input id="fontSize" type="range" min="18" max="120" step="1">
+                  <output id="fontSizeValue"></output>
+                </label>
+                <label class="field" for="dateSize">
+                  <span>日付サイズ</span>
+                  <input id="dateSize" type="range" min="10" max="56" step="1">
+                  <output id="dateSizeValue"></output>
+                </label>
+                <label class="field" for="labelSize">
+                  <span>ラベルサイズ</span>
+                  <input id="labelSize" type="range" min="10" max="48" step="1">
+                  <output id="labelSizeValue"></output>
+                </label>
+                <label class="field" for="fontWeight">
+                  <span>太さ</span>
+                  <input id="fontWeight" type="range" min="300" max="900" step="100">
+                  <output id="fontWeightValue"></output>
+                </label>
+                <label class="field" for="letterSpacing">
+                  <span>文字間隔</span>
+                  <input id="letterSpacing" type="range" min="-1" max="8" step="0.1">
+                  <output id="letterSpacingValue"></output>
+                </label>
+                <label class="field" for="lineHeight">
+                  <span>行間</span>
+                  <input id="lineHeight" type="range" min="0.9" max="1.8" step="0.01">
+                  <output id="lineHeightValue"></output>
+                </label>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <h3>背景と枠</h3>
+              <div class="form-grid dense-grid">
+                <label class="field" for="backgroundColor">
+                  <span>背景色</span>
+                  <input id="backgroundColor" type="color">
+                  <div class="swatches" data-color-target="backgroundColor"></div>
+                </label>
+                <label class="field" for="backgroundOpacity">
+                  <span>背景不透明度</span>
+                  <input id="backgroundOpacity" type="range" min="0" max="1" step="0.01">
+                  <output id="backgroundOpacityValue"></output>
+                </label>
+                <label class="field" for="paddingX">
+                  <span>左右余白</span>
+                  <input id="paddingX" type="range" min="0" max="80" step="1">
+                  <output id="paddingXValue"></output>
+                </label>
+                <label class="field" for="paddingY">
+                  <span>上下余白</span>
+                  <input id="paddingY" type="range" min="0" max="60" step="1">
+                  <output id="paddingYValue"></output>
+                </label>
+                <label class="field" for="radius">
+                  <span>角丸</span>
+                  <input id="radius" type="range" min="0" max="48" step="1">
+                  <output id="radiusValue"></output>
+                </label>
+                <label class="field" for="borderColor">
+                  <span>枠線色</span>
+                  <input id="borderColor" type="color">
+                  <div class="swatches" data-color-target="borderColor"></div>
+                </label>
+                <label class="field" for="borderWidth">
+                  <span>枠線幅</span>
+                  <input id="borderWidth" type="range" min="0" max="8" step="1">
+                  <output id="borderWidthValue"></output>
+                </label>
+                <label class="field" for="borderOpacity">
+                  <span>枠線不透明度</span>
+                  <input id="borderOpacity" type="range" min="0" max="1" step="0.01">
+                  <output id="borderOpacityValue"></output>
+                </label>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <h3>影と縁取り</h3>
+              <div class="form-grid dense-grid">
+                <label class="field" for="shadowColor">
+                  <span>影色</span>
+                  <input id="shadowColor" type="color">
+                </label>
+                <label class="field" for="shadowOpacity">
+                  <span>影の濃さ</span>
+                  <input id="shadowOpacity" type="range" min="0" max="1" step="0.01">
+                  <output id="shadowOpacityValue"></output>
+                </label>
+                <label class="field" for="shadowBlur">
+                  <span>影ぼかし</span>
+                  <input id="shadowBlur" type="range" min="0" max="36" step="1">
+                  <output id="shadowBlurValue"></output>
+                </label>
+                <label class="field" for="shadowX">
+                  <span>影X</span>
+                  <input id="shadowX" type="range" min="-20" max="20" step="1">
+                  <output id="shadowXValue"></output>
+                </label>
+                <label class="field" for="shadowY">
+                  <span>影Y</span>
+                  <input id="shadowY" type="range" min="-20" max="20" step="1">
+                  <output id="shadowYValue"></output>
+                </label>
+                <label class="field" for="strokeColor">
+                  <span>縁取り色</span>
+                  <input id="strokeColor" type="color">
+                </label>
+                <label class="field" for="strokeWidth">
+                  <span>縁取り幅</span>
+                  <input id="strokeWidth" type="range" min="0" max="8" step="0.5">
+                  <output id="strokeWidthValue"></output>
+                </label>
+              </div>
+            </div>
           </div>
           <p id="contrastWarning" class="warning" hidden></p>
         </section>
@@ -256,7 +327,7 @@
             <h2>URLインポート</h2>
             <p>生成URL全体、クエリ文字列、JSON、または c のエンコード済み文字列を貼れます。</p>
           </div>
-          <label class="field">
+          <label class="field" for="importInput">
             <span>貼り付け欄</span>
             <textarea id="importInput" rows="4" spellcheck="false"></textarea>
           </label>
@@ -272,7 +343,7 @@
             <h2>X共有・画像</h2>
             <p>X Web Intent は画像を直接添付できないため、画像保存と投稿文コピーを分けています。</p>
           </div>
-          <label class="field">
+          <label class="field" for="shareText">
             <span>投稿文</span>
             <textarea id="shareText" rows="3"></textarea>
           </label>
@@ -335,53 +406,6 @@
         </section>
       </section>
 
-      <aside class="preview-column" aria-label="ライブプレビューと生成URL">
-        <section class="preview-panel">
-          <div class="section-heading">
-            <h2>ライブプレビュー</h2>
-            <p>背景を切り替えて、透明時の見え方を確認できます。</p>
-          </div>
-          <div class="preview-toolbar">
-            <label><input type="radio" name="previewBg" value="checker" checked> 透過チェッカー</label>
-            <label><input type="radio" name="previewBg" value="light"> 明るい背景</label>
-            <label><input type="radio" name="previewBg" value="dark"> 暗い背景</label>
-            <label><input type="radio" name="previewBg" value="custom"> 任意色</label>
-            <input id="previewCustomColor" type="color" value="#5f7fbe" aria-label="任意プレビュー背景色">
-          </div>
-          <div id="previewShell" class="preview-shell preview-checker">
-            <div id="clockPreview" class="preview-stage"></div>
-          </div>
-          <div class="metrics-grid">
-            <div>
-              <span>推奨幅</span>
-              <strong id="recommendedWidth">未計測</strong>
-            </div>
-            <div>
-              <span>推奨高さ</span>
-              <strong id="recommendedHeight">未計測</strong>
-            </div>
-          </div>
-        </section>
-
-        <section class="preview-panel">
-          <div class="section-heading">
-            <h2>OBS用URL</h2>
-            <p>このURLだけで時計表示を復元できます。コピーしてOBSのブラウザソースへ貼ります。</p>
-          </div>
-          <label class="toggle">
-            <input id="compactUrl" type="checkbox">
-            <span>デフォルト値を省略して短くする</span>
-          </label>
-          <textarea id="generatedUrl" rows="5" readonly spellcheck="false" aria-describedby="generatedUrlHelp urlStatus urlWarning"></textarea>
-          <p id="generatedUrlHelp" class="copy-hint">「別タブで確認」で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。</p>
-          <div class="button-row">
-            <button id="copyUrl" type="button">URLをコピー</button>
-            <button id="openClock" type="button" class="secondary">別タブで確認</button>
-          </div>
-          <p id="urlStatus" class="status-line" role="status" aria-live="polite"></p>
-          <p id="urlWarning" class="warning" hidden></p>
-        </section>
-      </aside>
     </main>
 
     <script type="module" src="./assets/js/builder.js"></script>
