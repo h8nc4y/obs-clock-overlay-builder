@@ -1,38 +1,41 @@
 # Pre-release QA Notes
 
-最終更新: 2026/05/20 19:15:04 JST
+This document summarizes the release QA process in a public-safe form. Historical exact deployment URLs, Worker version identifiers, and private issue or PR links are intentionally omitted.
 
 ## Summary
 
-公開前QAとして、ローカル自動検証、Browser視覚確認、`/api/defaults` の静的化判断、CI/Cloudflare公開前の残判断を整理した。
+Pre-release QA combines local automated checks, local or browser visual checks, OBS manual checks, Cloudflare dry-run checks, and smoke checks. Production operations require separate release approval under the project cost policy.
 
-production公開後の継続運用、費用確認、rollback手順、公開後backlogは [post-launch-ops.md](post-launch-ops.md) を参照する。
+Production operations, rollback preparation, cost posture, and ongoing checks are tracked in [post-launch-ops.md](post-launch-ops.md).
 
 ## Local Automated Checks
 
-次の検証はローカルで成功した。
+Use these checks before release or operations changes:
 
-- `npm run lint`
-- `npm run typecheck`
-- `npm run format:check`
-- `npm run test`（18 tests）
-- `npm run build`
-- `npm run http:smoke`
-- `npm run cf:dry-run`
-- `git diff --check`
+```bash
+npm run lint
+npm run typecheck
+npm run format:check
+npm test
+npm run build
+git diff --check
+```
 
-`npm run cf:dry-run` は `wrangler deploy --dry-run --env staging` までで、実際のCloudflare deployは実行していない。
+Notes:
 
-## Release Preflight After PR #7
+- `npm run lint` is JavaScript syntax checking.
+- `npm run typecheck` is a module/import smoke check.
+- `npm test` may generate ignored `dist/` output.
+- `npm run cf:dry-run` uses Wrangler deploy dry-run and should be run only when Cloudflare auth/network use is appropriate.
 
-PR #7 merge後の公開前release候補は、次の少数コマンドで再現する。
+## Release Preflight
 
 ```bash
 npm run release:check
 npm run release:http-smoke
 ```
 
-`npm run release:check` は次を順に実行する。
+`release:check` includes:
 
 - `npm run lint`
 - `npm run typecheck`
@@ -42,334 +45,77 @@ npm run release:http-smoke
 - `npm run cf:dry-run`
 - `git diff --check`
 
-`npm run release:http-smoke` は一時的に `npm run dev` を起動し、`/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` を確認してから終了する。
-staging/production URLは次で確認する。
+`release:http-smoke` starts and stops a bounded local server, then checks `/`, `/clock/`, `/clock`, `/api/defaults`, and `/favicon.ico`.
+
+Remote smoke checks are explicit:
 
 ```bash
-SMOKE_BASE_URL=https://<deploy-url> npm run release:remote-smoke
+SMOKE_BASE_URL=<deploy-url> npm run release:remote-smoke
 ```
 
-`npm run release:remote-smoke` は `/`、`/clock/`、`/clock`、`/api/defaults` のstatus、`Content-Type`、`/api/defaults` の `Cache-Control: no-store` とJSON bodyを確認する。
+Do not run remote smoke checks against staging or production unless the current task allows it.
 
-OBS実機確認はCodexでは完了扱いにしない。確認結果は [manual-qa.md](manual-qa.md) の `OBS実機確認` 記録欄に記入し、Issue #1へ転記する。
+## Cloudflare Verification Plan
 
-## Local Font Display Names
+Before deploy:
 
-PC内フォントはブラウザから英語名や内部名で返ることがある。日本語ユーザーが見つけやすい代表例だけ、UIでは日本語表示名を優先する。
+- Confirm the intended staging or production Worker target.
+- Confirm `assets.directory`, `assets.binding`, `html_handling`, and `not_found_handling` in `wrangler.jsonc`.
+- Confirm no paid plan change, Workers AI, AI Gateway, R2, D1, KV, Queues, Durable Objects, Workflows, or Hyperdrive is required.
+- Confirm no secrets, OAuth credentials, or real user data are sent externally.
 
-- `LightNovelPopV2 V2` は `ラノベPOP v2（LightNovelPopV2 V2）` と表示する。
-- `Meiryo`、`Yu Gothic`、`Yu Mincho`、`BIZ UDPGothic`、`BIZ UDPMincho` など、確信できるWindows系フォント名だけを日本語表示名へ寄せる。
-- 日本語表示名はUI上の補助であり、生成URL、import/export、`/clock/` のCSSには実際にブラウザで使うフォント名を保存する。
-- 不確かなフォント名は無理に登録しない。必要になった時点で、実際の `family` / `fullName` / `postscriptName` / `style` を確認して追加する。
+After deploy, when deploy is authorized:
 
-## Cloudflare Staging Verification Plan
+- Record only the public URL if it is intentionally used as a demo or release reference.
+- Verify `/`, `/clock/`, `/clock`, `/api/defaults`, and `/favicon.ico`.
+- Verify `/api/defaults` `Content-Type`, `Cache-Control: no-store`, and static fallback body.
+- Verify editor and clock surfaces in browser.
+- Confirm rollback path without recording exact version identifiers in public docs.
 
-staging deployに進む前に確認すること:
+## OBS Manual QA
 
-- `wrangler whoami` でCloudflareへログイン済みである。
-- `wrangler.jsonc` のstaging対象が `obs-clock-overlay-builder-staging` である。
-- `assets.directory` が `./dist`、`assets.binding` が `ASSETS`、`html_handling` が `auto-trailing-slash`、`not_found_handling` が `none` である。
-- `npm run cf:dry-run` が成功している。
-- paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveを要求されない。
+OBS real-device verification is not completed by repository tests. Use [manual-qa.md](manual-qa.md) for the checklist.
 
-staging deploy後に確認すること:
+Minimum pass criteria:
 
-- staging URLを記録する。
-- `/` が200で編集画面を表示する。
-- `/clock/` が200で時計専用画面を表示する。
-- `/clock` が200で時計専用画面へ到達する。
-- `/api/defaults` が200で `{"timezone":null,"country":null,"source":"static"}` を返す。
-- `/api/defaults` の `Content-Type` が `application/json; charset=utf-8` を含む。
-- `/api/defaults` の `Cache-Control` が `no-store` を含む。
-- rollback pathとして、Cloudflareの直近Worker versionへ戻す、または直前のgit commitを再デプロイできることを記録する。
-
-production deployは、OBS実機確認が未完了の間は実行しない。
-
-## Cloudflare Staging Result
-
-実施日時: 2026/05/18 20:49:28 JST
-
-staging deploy:
-
-- command: `npm run deploy:staging`
-- worker: `obs-clock-overlay-builder-staging`
-- URL: `https://obs-clock-overlay-builder-staging.h8nc4y.workers.dev`
-- Current Version ID: `c9387fc1-fbb9-466b-b68c-f4adcd31d6a4`
-- binding: `env.ASSETS` のみ
-- paid plan変更、有料binding、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive要求: なし
-
-staging HTTP smoke:
-
-- `SMOKE_BASE_URL=https://obs-clock-overlay-builder-staging.h8nc4y.workers.dev npm run release:remote-smoke`
-- `/`: 200、`Content-Type: text/html`
-- `/clock/`: 200、`Content-Type: text/html`
-- `/clock`: 200、`Content-Type: text/html`
-- `/api/defaults`: 200、`Content-Type: application/json; charset=utf-8`
-- `/api/defaults`: `Cache-Control: no-store`
-- `/api/defaults`: `{"timezone":null,"country":null,"source":"static"}`
-
-staging Browser smoke:
-
-- `/`: `時計オーバーレイURLビルダー` を表示、Console error/warning 0件。
-- `/clock/`: `OBS Clock Overlay` を表示、`body` は `margin: 0px`、`overflow: hidden`、背景は透明、Console error/warning 0件。
-
-redirect / rewrite:
-
-- `/clock` は200で時計専用HTMLへ到達した。Cloudflare Static Assets の `html_handling: auto-trailing-slash` と `_redirects` 互換設定のどちらでも、利用者は `/clock` から時計画面へ到達できる。
-
-rollback path:
-
-- `npx wrangler versions list --env staging` と `npx wrangler deployments list --env staging` でversion/deployment一覧を確認済み。
-- 直前versionとして `f8152e51-fc91-4647-8219-78777ac226c6` が見える。
-- 問題があればCloudflareの直近Worker versionへrollbackするか、直前のgit commitを再デプロイする。
-
-production判断:
-
-- OBS実機確認が未完了のため、production deployは実行しない。
-- productionへ進む条件は、OBS実機確認の記録欄をIssue #1へ転記し、透明背景、毎秒更新、表示/非表示後の復帰、URL再貼り付け再現、文字切れが合格していること。
-
-production承認文言:
-
-```text
-OBS実機確認が完了し、Issue #1に結果を記録済みです。Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の production deploy を許可します。paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive、secret送信は禁止します。
-```
-
-## Cloudflare Production Result
-
-実施日時: 2026/05/20 19:13 JST
-
-production deploy:
-
-- command: `npm run deploy:production`
-- worker: `obs-clock-overlay-builder`
-- URL: `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
-- v0.1.0 launch Version ID: `6894fb0e-86f1-431e-9770-06a3966a4997`
-- binding: `env.ASSETS` のみ
-- paid plan変更、有料binding、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdrive要求: なし
-
-production HTTP smoke:
-
-- `SMOKE_BASE_URL=https://obs-clock-overlay-builder.h8nc4y.workers.dev npm run release:remote-smoke`
-- `/`: 200、`Content-Type: text/html`
-- `/clock/`: 200、`Content-Type: text/html`
-- `/clock`: 200、最終的に時計専用HTMLへ到達
-- `/api/defaults`: 200、`Content-Type: application/json; charset=utf-8`
-- `/api/defaults`: `Cache-Control: no-store`
-- `/api/defaults`: `{"timezone":null,"country":null,"source":"static"}`
-
-production Browser smoke:
-
-- `/`: `時計オーバーレイURLビルダー` を表示、生成URLは `/clock/?c=...`、フォント表示名補足文あり、Console error/warning 0件。
-- `/clock/`: `OBS Clock Overlay` を表示、編集UIなし、`body` は `margin: 0px`、`overflow: hidden`、背景は透明、Console error/warning 0件。
-
-redirect / rewrite:
-
-- `release:remote-smoke` では `/clock` は200で時計専用HTMLへ到達した。
-- 低レベルHTTP確認では `/clock` から `/clock/` への `307 Temporary Redirect` が見える。利用者とOBSは最終的に `/clock/` の時計画面へ到達できる。
-
-rollback path:
-
-- `npx wrangler versions list --env production` と `npx wrangler deployments list --env production` でversion/deployment一覧を確認済み。
-- v0.1.0 launch version: `6894fb0e-86f1-431e-9770-06a3966a4997`
-- rollback候補として直近の別version `dc40f3d8-681a-4d5d-bdc4-d5ae29197084` が見える。ただし今回が初回production公開のため、公開済みとして検証済みの旧production versionはない。
-- 問題があれば `npx wrangler rollback dc40f3d8-681a-4d5d-bdc4-d5ae29197084 --env production --yes` で直近versionへ戻すか、直前のgit commitを `npm run deploy:production` で再デプロイする。
-
-production判断:
-
-- OBS実機確認はユーザー報告で全項目問題なし。
-- staging検証、production deploy、production HTTP smoke、production Browser smokeが完了したため、Issue #1の公開close条件は満たした。
-
-## Post-release Backlog
-
-今回のrelease完了条件から分離し、公開後改善として扱う項目:
-
-- backlog Issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/10
-- サイト全体の見た目、余白、操作導線の改善。
-- テンプレート内容、色、サイズ、配信画面上での読みやすさの追加調整。
-- 日本語フォント表示名エイリアスの追加。ただし実際の `family` / `fullName` / `postscriptName` / `style` を確認できたものだけ登録する。
-- GitHub Actions CI。private repository の無料枠・支出上限確認後に、まず `workflow_dispatch` のみで検討する。
+- Generated `/clock/?c=...` URL is used, not the editor URL.
+- Clock-only surface is shown.
+- Transparent background works in OBS.
+- Seconds update once per second when enabled.
+- Source hide/show returns to current time within the next tick.
+- URL can be pasted again to reproduce the same appearance.
+- Text and glow are not clipped at the chosen OBS source size.
 
 ## Browser QA
 
-対象: `http://127.0.0.1:4173/`
+For editor and clock checks:
 
-Browserで確認した結果:
-
-- `/` は `時計オーバーレイURLビルダー` を表示し、1280x720で横スクロールなし。
-- テンプレート8種（Minimal Clear、Milk Tea、Pastel Pop、Soda、Sakura、Night Studio、Neon HUD、Mono Compact）がライブプレビューへ反映され、推奨幅・高さも更新された。
-- 背景確認の `透過チェッカー`、`明るい背景`、`暗い背景`、`任意色` が切り替わった。
-- 生成URLは `/clock/?c=...` 形式で、URLインポート後に `設定を読み込みました。` を表示した。
-- `/clock/?c=...` は時計だけを表示し、編集UIは出ない。`body` は `margin: 0px`、`overflow: hidden`、背景は透明。
-- `/clock/` は時計だけを表示し、デフォルト状態の背景は透明。
-- `/clock` も時計だけを表示した。
-- `/clock/?tz=UTC&hour12=1&seconds=0&date=1&weekday=1&font=Poppins&theme=soda` は `template-soda`、ラベル右、12時間表示、秒なし、日付・曜日表示で復元された。
-- `/api/defaults` は `{"timezone":null,"country":null,"source":"static"}` を返した。
-- Browser Console の error/warning は0件。
-
-OBS実機でのブラウザソース確認は未実施。OBS側では、生成URLをブラウザソースURLへ貼り、推奨幅・高さを入力し、透明背景、表示/非表示後の次tick、カスタムCSSの影響を確認する。
-
-## OBS実機確認 Plan
-
-OBS実機確認は [docs/manual-qa.md](manual-qa.md) の `OBS実機確認` に沿って実施する。
-
-確認するURL:
-
-- ローカル確認: `http://localhost:4173/clock/?c=...`
-- Cloudflare公開後: `https://<production-url>/clock/?c=...`
-
-OBSで入れる設定:
-
-- URL: 編集画面でコピーした生成URL。
-- 幅: 編集画面の推奨幅。切れる場合は20pxから80px追加。
-- 高さ: 編集画面の推奨高さ。切れる場合は20pxから80px追加。
-- 背景: OBS側で白背景やカスタムCSSを追加しない。
-
-合格基準:
-
-- 時計だけが表示され、編集UIは出ない。
-- 背景が透明で、配信画面上に時計だけが重なる。
-- 秒表示ありでは毎秒更新される。
-- ソース非表示から再表示後、次tickで現在時刻へ戻る。
-- URLを貼り直しても同じ見た目になる。
-- 文字切れがない。切れる場合はOBS側の幅・高さを増やせば解消できる。
-
-確認結果は `docs/manual-qa.md` の記録欄を使い、Issue #1へ転記する。
+- Check smartphone width around 390px.
+- Check tablet width around 768px.
+- Check desktop width 1280px or wider.
+- Confirm no unexpected horizontal scroll.
+- Confirm primary controls are usable.
+- Confirm console and network have no relevant errors.
+- Confirm `/clock/` has no editor UI and does not depend on editor `localStorage`.
 
 ## `/api/defaults` Decision
 
-Workers Static Assets では、`/api/defaults` は動的処理を必要としない静的fallback JSONへ変更した。
+Workers Static Assets serves `/api/defaults` as static fallback JSON. The OBS clock surface does not depend on this endpoint. `_headers` provides JSON `Content-Type` and `Cache-Control: no-store`, and smoke checks guard this deployment assumption.
 
-理由:
-
-- OBS用 `/clock/` は `/api/defaults` を呼ばず、URLパラメータだけで再現する。
-- 編集画面の `候補を確認` ボタンだけが `/api/defaults` を呼ぶ。
-- `timezone` / `country` 候補は便利機能であり、必須機能ではない。
-- `wrangler.jsonc` の `assets.run_worker_first` を外すことで、`/api/defaults` を含む静的アセットは Worker-first の動的実行を避けられる。
-- `_headers` で `/api/defaults` の `Content-Type: application/json; charset=utf-8` と `Cache-Control: no-store` を指定した。
-
-Pages Functions互換の `functions/api/defaults.js` は残している。Cloudflare Pagesで Functions を使う場合は `request.cf` 由来の候補を返せるが、OBS時計表示はこのAPIに依存しない。
+The optional `functions/api/defaults.js` file remains for Cloudflare Pages compatibility.
 
 ## CI Decision
 
-`.github/workflows/` は存在しない。GitHub Actions の自動実行workflowは追加していない。
-
-理由:
-
-- private repository の Actions minutes、無料枠、支出上限が未確認。
-- 自動実行の `push` / `pull_request` workflow を追加すると、以後のpushで実行が発生し得る。
-
-最小CI案:
-
-- まず `workflow_dispatch` のみで手動実行に限定する。
-- jobは `npm ci`、`npm run lint`、`npm run typecheck`、`npm run format:check`、`npm run test`、`npm run build`、`git diff --check`。
-- `push` / `pull_request` trigger は、無料枠と支出上限を確認してから追加する。
-
-## Cloudflare Deploy Decision
-
-Cloudflare staging/production deployは完了した。
-
-production公開前の判断:
-
-- user approvalにより、Cloudflare Freeまたは既存契約内でproduction deployを許可済み。
-- `wrangler deploy --dry-run --env production` でbindingが `env.ASSETS` のみであることを確認済み。
-- deploy中にpaid plan変更や有料binding要求は出なかった。
-- `/api/defaults` は静的アセットで、Worker-first API実行を避けている。
-
-公開後のproduction URL:
-
-- `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
-
-費用目安:
-
-- 静的アセット配信のみで無料枠内の場合: 0 JPY想定。
-- Workers Paid plan へ切り替えが必要な場合: 5 USD/month、約800 JPY/month（160 JPY/USD、為替未確認）。
-
-参照:
-
-- Cloudflare Workers pricing: https://developers.cloudflare.com/workers/platform/pricing/
-- Cloudflare Static Assets billing and limitations: https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/
-- Wrangler assets `run_worker_first`: https://developers.cloudflare.com/workers/wrangler/configuration/
-- Workers Static Assets headers: https://developers.cloudflare.com/workers/static-assets/headers/
-
-## Cloudflare Deploy Approval Conditions
-
-実deploy前に、次のすべてを人間が確認する。
-
-- CloudflareアカウントがFreeまたは既存契約内で、今回のWorkers Static Assets deployに追加支払いが不要。
-- Cloudflareの支出上限、課金アラート、または請求管理画面で想定外の課金を防げる状態。
-- staging deployとproduction deployの対象が `obs-clock-overlay-builder-staging` と `obs-clock-overlay-builder` で正しい。
-- paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveを使わない。
-- secret、token、OAuth credential、実ユーザーデータをdeploy操作で外部送信しない。
-- `npm run cf:dry-run` が成功済み。
-
-承認後に実行する最小コマンド:
-
-```bash
-npm run deploy:staging
-npm run deploy:production
-```
-
-deploy後の確認:
-
-- staging URLとproduction URLを記録する。
-- `/`、`/clock/`、`/clock`、`/api/defaults` が200で開く。
-- `/api/defaults` が静的fallback JSONを返す。
-- `/api/defaults` の `Content-Type` が `application/json`。
-- Browser Console error/warning がない。
-- production URLの生成URLをOBSへ貼り、透明背景と時計更新を確認する。
-- 問題があればCloudflareの直近Worker versionへrollbackするか、直前のgit commitを再デプロイする。
-
-## GitHub Actions Decision
-
-GitHub docsでは、private repositoryのGitHub-hosted runnersはプランごとの無料分を超えるとrepository ownerへ課金される。無料枠、支出上限、支払い方法が未確認のため、自動実行される `push` / `pull_request` workflow は追加しない。
-
-追加する場合の最小案:
-
-- `workflow_dispatch` のみ。
-- `runs-on: ubuntu-latest`。
-- `npm ci`
-- `npm run lint`
-- `npm run typecheck`
-- `npm run format:check`
-- `npm run test`
-- `npm run build`
-- `git diff --check`
-
-`push` / `pull_request` triggerは、無料枠と支出上限を確認してから追加する。
-
-参照:
-
-- GitHub Actions billing: https://docs.github.com/en/billing/concepts/product-billing/github-actions
-
-## Issue #1 Close Conditions
-
-公開する場合:
-
-- OBS実機確認が完了し、結果がIssue #1へ記録されている。
-- Cloudflare staging deployが承認済み条件内で完了し、URLと確認結果がIssue #1へ記録されている。
-- Cloudflare production deployが承認済み条件内で完了し、production URLと確認結果がIssue #1へ記録されている。
-- productionで `/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico`、headers、Browser Consoleを確認済み。
-- production URLの生成URLをOBSへ貼り、透明背景と時計更新を確認済み。
-- rollback pathが記録済み。
-- CIを使う場合は、無料枠・支出上限を確認済みで、実行結果が記録済み。CIを使わない場合は、ローカル検証で代替する判断がIssue #1へ記録済み。
-
-公開保留する場合:
-
-- OBS実機確認の結果、公開前に直すべき問題がIssueまたはPRで追跡されている。
-- Cloudflare deployを行わない理由が、費用、認証、契約状態、支出上限、または運用判断としてIssue #1へ記録されている。
-- 公開保留中もローカル利用に必要な手順、未確認事項、次に再開する条件がIssue #1へ記録されている。
-- CIを追加しない場合、その理由がprivate repoの無料枠・支出上限未確認として記録されている。
-- Issue #1を閉じる場合は、公開しない判断が明確で、残作業が別Issueへ移っている。
+GitHub Actions are intentionally not introduced by this document. If CI is added later, prefer `workflow_dispatch` first, then consider automatic triggers only after cost limits and billing posture are confirmed.
 
 ## Remaining Unknowns
 
-- GitHub Actions の無料枠、支出上限、CI実行結果。
-- Cloudflare account の契約状態、無料枠消費状況、支出上限。
-- production rollbackの実行そのもの。rollback候補と手順は確認済みだが、正常公開中のため実rollbackは行っていない。
-- ユーザーPCごとの実フォント返却名。代表例は対応済みだが、未知のフォントは内部名表示になる。
+- Future GitHub Actions cost posture if CI is introduced.
+- Future Cloudflare usage and spend-limit state at the time of each deployment.
+- OBS behavior on each user's machine, especially font availability and browser-source sizing.
 
 ## Residual Risks
 
-- 実フォントはOBSを動かすPCに依存するため、ローカルBrowserとOBS実機で見た目が変わる可能性がある。
-- GitHub Actionsを追加する場合、trigger設定次第でprivate repoのActions minutesを消費する可能性がある。
-- 今回が初回production公開のため、検証済みの旧production versionへのrollbackではなく、直近versionまたはgit commit再デプロイによる復旧になる。
+- OBS font rendering can differ from local browser rendering.
+- Cloudflare and GitHub billing posture must be checked outside this repository before cost-sensitive operations.
+- Rollback version choice must be confirmed from Cloudflare at the time of incident response.

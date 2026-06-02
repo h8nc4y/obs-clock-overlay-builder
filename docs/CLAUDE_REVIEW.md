@@ -71,7 +71,7 @@ Here is the report.
 | CL-004 | Tooling/Docs | `npm run lint`/`typecheck` が実体は `node --check` 構文検査 / import smoke で、linter/型検査ではない | Info | High | `package.json`、`scripts/check-js.mjs`、`scripts/module-smoke.mjs` | 名称から本物のlint/型検査と誤認し得る | 名称の説明追記、または将来のlint/型導入をbacklog化 | Documentation / ChatGPT decision |
 | CL-005 | Test | `assets/js/builder.js`（編集UI中核）に自動テストが無く manual QA 依存 | Medium | High | `tests/*`（builder用テスト無し）、`docs/manual-qa.md` | 編集UIロジック回帰がCIで検知できない | DOM抽出可能な純関数の切り出し＋テスト追加を検討 | Narrow startup test slice implemented; broader scope deferred |
 | CL-006 | Requirements/Docs | 要件・非目標が README/AGENTS/QA/backlog/REVIEW_BRIEF等に分散し単一specが無い | Medium | Medium | `README.md`, `AGENTS.md`, `docs/REVIEW_BRIEF.md`, `docs/manual-qa.md`, `docs/v0.1.1-backlog.md` | 将来agent/人の認識齟齬、scope creep | 軽量な正規要件サマリ（or REVIEW_BRIEFを正規化）を検討 | ChatGPT decision / Documentation |
-| CL-007 | Ops/Governance | AI調整doc＋ops docが未追跡で、Worker version ID / `*.workers.dev` subdomain / GitHub issueリンクを含む。commit可否と公開時の扱い未決 | Info | High | `git status`（未追跡docs）、`docs/post-launch-ops.md`、`docs/pre-release-qa.md` | 公開repo化時に運用メタデータが露出。版管理外で履歴が残らない | commit方針と公開可否をChatGPTで判断（secretではない旨は確認済み） | ChatGPT decision |
+| CL-007 | Ops/Governance | AI調整doc＋ops docが未追跡で、Worker version ID / Worker subdomain / GitHub issueリンクを含む。commit可否と公開時の扱い未決 | Info | High | `git status`（未追跡docs）、`docs/post-launch-ops.md`、`docs/pre-release-qa.md` | 公開repo化時に運用メタデータが露出。版管理外で履歴が残らない | commit方針と公開可否をChatGPTで判断（secretではない旨は確認済み） | ChatGPT decision |
 | CL-008 | Deployment | `/api/defaults` の正しい `Content-Type` が `_headers` 依存（拡張子なしファイル） | Low | Medium | `api/defaults`（拡張子なし）、`_headers`、`functions/api/defaults.js` | `_headers` 不適用時にCT不正。ただし `fetch.json()` はCT非依存、clock面は不使用で実害小 | remote-smokeでの継続監視、必要なら明示noteを追加 | Human manual QA / Documentation |
 | CL-009 | Test/Tooling | `npm test` が `tests/build.test.mjs` 経由で `dist/` を生成（純読み取りでない） | Info | High | `tests/build.test.mjs`（`spawnSync` build）、`scripts/build.mjs` | 読み取り専用前提のsandbox/CIで副作用 | testが書込む旨を明記（`dist/` はignore済） | Documentation |
 
@@ -183,7 +183,7 @@ Here is the report.
 - **Confidence:** High
 - **Evidence:**
   - `git status`: `docs/{AI_REVIEW_TRIAGE,CHATGPT_HANDOFF,CLAUDE_REVIEW,CODEX_TASKS,DECISION_LOG,REVIEW_BRIEF}.md` が未追跡。
-  - `docs/post-launch-ops.md` / `docs/pre-release-qa.md`: Cloudflare Worker **version ID**（UUID）、`*.h8nc4y.workers.dev` subdomain、GitHub issue/PRリンクを多数記載。
+  - `docs/post-launch-ops.md` / `docs/pre-release-qa.md`: Cloudflare Worker **version ID**（UUID）、Worker subdomain、GitHub issue/PRリンクを多数記載。
 - **What I observed:** これらは **secretではない**（token/key/credential/課金数値/個人情報は記載されておらず、各docは「数値・支払い・account識別子・個人情報を記録しない」と明記し規律も良好）。一方でversion IDやsubdomainは運用メタデータであり、commit可否（版管理外のまま履歴が残らない問題）と、将来の公開可否は未決(`DECISION_LOG.md` の Open decisions, `CHATGPT_HANDOFF.md` の Remaining uncertainties に明記)。
 - **Why it matters:** ①これらのガバナンスdocが版管理外だと、運用上の意思決定履歴が追えない。②repoが公開される場合、version ID/subdomain/issueリンクの露出許容範囲を判断しておく必要。
 - **放置リスク:** 履歴喪失、または公開時の運用情報露出。
@@ -273,7 +273,7 @@ Here is the report.
 - **CSS/style injection:** 色は厳格hex→`rgba()`、数値はclamp＋px、fontはJSON文字列リテラル、すべて `style.setProperty`（CSSOM検証）。`render.test.mjs` が hostile font の escape を確認。**問題なし。**
 - **malformed/oversized input:** 数値クランプ（`NUMBER_LIMITS`）、長文truncate（emoji=surrogate安全な `Array.from`）、`cssStringLiteral` 120 code-point制限。`config.test.mjs` の「hostile long CSS-like input」「😀×45」等で検証。**問題なし。**
 - **localStorage:** 編集画面のみ（`STORAGE_KEY="obs-clock-builder:v1"`）。読み書きとも try/catch でブロック時も動作継続。clock面は不参照。保存内容はconfigのみで個人情報なし。**privacy/security上の問題は確認されず。**
-- **secrets/config exposure:** token/key/credential/`.env`/account識別子は確認範囲で**皆無**。docはsecret不記載を明文化し規律も良好。`*.workers.dev` subdomain・Worker version ID・issueリンクは運用メタデータ（非secret）であり、扱いはCL-007として意思決定事項に整理（値は本報告に転記せず）。
+- **secrets/config exposure:** token/key/credential/`.env`/account識別子は確認範囲で**皆無**。docはsecret不記載を明文化し規律も良好。Worker subdomain・Worker version ID・issueリンクは運用メタデータ（非secret）であり、扱いはCL-007として意思決定事項に整理（値は本報告に転記せず）。
 - **Cloudflare/GitHub cost or deployment safety:** `ASSETS` のみ、有料binding無し、`run_worker_first` 無し、`.github/workflows/`不在。deploy系scriptは `build` 経由でdry-run/環境指定が明確。rollback runbookは安全側。**コスト/誤デプロイ面の具体的問題は確認されず**（ただし実dashboard状態は未検証＝docの手動確認に依存）。
 
 ---
@@ -337,7 +337,7 @@ Here is the report.
 
 1. **MVP-blocking閾値:** 本レビューはリリースブロッカー無しと判断。CL-005（builderテスト）/CL-006（要件集約）を「v0.1.1で対応すべき」とみなすか、backlog据え置きか。閾値の明示をお願いします。
 2. **AI coordination docのcommit:** `docs/{REVIEW_BRIEF,CLAUDE_REVIEW,AI_REVIEW_TRIAGE,CODEX_TASKS,DECISION_LOG,CHATGPT_HANDOFF}.md` を版管理に含めるか/ignoreするか（CL-007）。`DECISION_LOG.md` のOpen decisionにも未決として残っています。
-3. **secrets/config監査:** 本レビュー範囲ではsecret/credentialは検出されず。ただし repo公開や外部共有を広げる前に、Worker version ID・`*.workers.dev` subdomain・issueリンク等の運用メタデータ掲載可否を確認すべきか（CL-007）。
+3. **secrets/config監査:** 本レビュー範囲ではsecret/credentialは検出されず。ただし repo公開や外部共有を広げる前に、Worker version ID・Worker subdomain・issueリンク等の運用メタデータ掲載可否を確認すべきか（CL-007）。
 4. **deployment/costレビューのscope:** Cloudflare/GitHubのコスト・デプロイ安全性をClaudeレビュー対象に含め続けるか、ChatGPT/Codexの運用レビューに委ねるか（`REVIEW_BRIEF.md` の問いと重複）。
 5. **OBS実機再検証:** v0.1.0で実機確認済との記録があるが、v0.1.1（font help/usability変更）後やCL-002の視覚確認のため、リリース前にOBS実機再検証を必須とするか。
 

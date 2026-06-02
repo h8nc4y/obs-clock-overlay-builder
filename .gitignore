@@ -4,9 +4,17 @@ dist/
 .DS_Store
 Thumbs.db
 npm-debug.log*
+*.log
 coverage/
 chrome-*-profile*/
 edge-*-profile*/
 browser-localappdata/
 browser-temp/
+playwright-report/
+test-results/
+.claude/
+.codegraph/
+.env
+.env.local
+.env.*.local
 *-screenshot.png

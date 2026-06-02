@@ -158,7 +158,7 @@ No database or authentication system was identified.
 - Optional compatibility: Cloudflare Pages Functions.
 - Local analysis: CodeGraph index exists for JavaScript files.
 - Package manager: npm with `package-lock.json`.
-- Documented deployment target: `https://obs-clock-overlay-builder.h8nc4y.workers.dev`.
+- Documented deployment target: public demo URL in `README.md`.
 
 ## Important files and directories
 

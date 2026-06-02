@@ -1,169 +1,147 @@
 # OBS Clock Overlay Builder
 
-OBSのブラウザソースで使う、毎秒更新の時計オーバーレイURLを生成する静的Webサイトです。トップページで見た目を調整し、生成された `/clock/?c=...` のURLをOBSへ貼るだけで使えます。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Demo](https://img.shields.io/badge/demo-workers.dev-blue)](https://obs-clock-overlay-builder.h8nc4y.workers.dev)
 
-## 機能
+A zero-runtime-dependency static builder for transparent OBS browser-source clock overlay URLs.
 
-- 8種類のテンプレート: Minimal Clear、Milk Tea、Pastel Pop、Soda、Sakura、Night Studio、Neon HUD、Mono Compact
-- `/clock/` の時計専用画面。背景はデフォルト透明、`body margin: 0`、`overflow: hidden`
-- デフォルトタイムゾーンは `Asia/Tokyo`
-- 24時間/12時間、秒、日付、曜日、ラベル、ラベル位置をURLに保存
-- 色、背景不透明度、角丸、余白、文字サイズ、文字間隔、行間、太さ、影、縁取り、枠線を調整
-- 生成URL、クエリ文字列、JSON、URLエンコード済みJSON、`c`パラメータ文字列からインポート
-- 編集画面だけ localStorage へ最後の設定を保存。OBS表示の再現性はURLパラメータが正です
-- PC内フォント読み込みボタン。`window.queryLocalFonts` 非対応時は手入力
-- CanvasによるSNS向けPNGプレビュー画像生成、投稿文コピー、X Web Intent
-- `/api/defaults` は公開先の補助情報だけを返します。候補が取れない環境でも、時計表示はURLの設定だけで動きます
+Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 
-## ローカル起動
+## Features
 
-依存追加は不要です。Node.js が使える環境で次を実行します。
+- Transparent OBS clock overlay with a dedicated clock-only `/clock/` surface.
+- Reproducible `/clock/?c=...` URL contract for OBS browser sources.
+- Eight built-in templates: Minimal Clear, Milk Tea, Pastel Pop, Soda, Sakura, Night Studio, Neon HUD, and Mono Compact.
+- Zero runtime dependencies; the clock renders from URL and browser state only.
+- Static-first, free-tier-friendly Cloudflare Workers Static Assets hosting.
+- Japanese-first editor UI for non-programmer OBS users in Japan.
+- Optional browser features for local font discovery, clipboard copy, canvas preview export, and Web Share.
 
-```bash
-npm run dev
-```
+No screenshot is currently tracked in this repository, so this README does not show one.
 
-表示先:
+## Quick Start For OBS
 
-- 編集画面: `http://localhost:4173/`
-- OBS用時計画面: `http://localhost:4173/clock/`
-- `/clock` でも確認できます。Cloudflare Pages向けに `_redirects` で `/clock` を `/clock/index.html` へリライトします。
+1. Open the builder demo or run it locally.
+2. Customize the clock style in the editor.
+3. Copy the generated `/clock/?c=...` URL.
+4. Add an OBS Browser Source and paste that generated URL into the URL field.
+5. Use the recommended width and height shown by the editor. If any glow or text is clipped, add 20px to 80px in OBS.
+6. Keep the OBS source background transparent and avoid custom CSS that forces a background color.
 
-単体ファイルとして `index.html` を開いても編集画面は動きますが、`/clock/` のパス確認にはローカルサーバーを使うのが確実です。
+The OBS clock uses the computer's system clock. Server-side time correction is intentionally out of scope for this static app.
 
-## Cloudflare Workers 公開
+## Reproducibility Contract
 
-Cloudflareの新規公開先は Workers with Static Assets を第一候補にしています。Wrangler設定は `wrangler.jsonc`、Workerエントリは `worker/index.js` です。
-
-Production URL: https://obs-clock-overlay-builder.h8nc4y.workers.dev
-
-```bash
-npm install
-npm run build
-npm run cf:dry-run
-```
-
-デプロイ:
-
-```bash
-npm run deploy:staging
-npm run deploy:production
-```
-
-`/api/defaults` は `api/defaults` から静的JSONとして配信します。`_headers` でJSONの `Content-Type` と `Cache-Control: no-store` を指定し、`wrangler.jsonc` では `run_worker_first` を使いません。`/api/defaults` は拡張子なしの静的ファイルなので、JSONとしての `Content-Type` は `_headers` の指定が前提です。この前提は `release:http-smoke` と `release:remote-smoke` で確認します。Workerエントリは Static Assets の補助エントリとして残し、通常の静的ファイル配信は `dist/` の Static Assets に任せます。rollback は `npx wrangler versions deploy <version-id>@100 --env production --yes` で直近 Worker version へ戻すか、直前の git commit を再デプロイします。
-
-## Cloudflare Pages 公開
-
-既存の Pages 公開も互換として残しています。
-
-- Build command: 空欄
-- Build output directory: `.` または `/`
-- Dev command: `npm run dev`
-- Functions directory: `functions`
-
-`functions/api/defaults.js` は Pages 用の任意機能です。Pages Functions で動かす場合だけ `request.cf` 由来の `timezone` / `country` 候補を返します。Cloudflare外やローカルで `/api/defaults` が静的fallbackだけでも、編集画面は壊れず、OBS用時計画面はAPIへアクセスしません。
-
-## OBS設定手順
-
-1. OBSでソースを追加
-2. `ブラウザ` を選択
-3. 編集画面でコピーした生成URLをURL欄へ貼り付け
-4. 編集画面に表示された推奨幅・高さを入力
-5. 必要なら「表示されていないときにソースをシャットダウン」をオフ
-6. 透過されない場合はOBS側カスタムCSSや背景設定を確認
-
-PCのシステム時刻がずれている場合は時計表示もずれます。MVPではサーバー時刻補正は行いません。
-
-## URL設計
-
-標準形式は次です。
+The generated URL is the source of truth:
 
 ```text
 /clock/?c=<base64url encoded config>
 ```
 
-設定オブジェクトには `version` を含みます。`c` が無い場合は、後方互換用に次のようなフラットGETパラメータも読みます。
+- All visual state needed by `/clock/` is encoded into `?c=...`.
+- `/clock/` must not depend on editor `localStorage`.
+- Editor `localStorage` may help restore draft editing state, but it is not required for OBS playback.
+- Keep the generated `/clock/?c=...` URL with your OBS scene if you need to reproduce the same appearance later.
+- Invalid or unsupported URL values are normalized to safe defaults.
+- URL-provided labels and font names are rendered as text, not HTML.
+
+Older flat query parameters are still read for compatibility, for example:
 
 ```text
-/clock/?tz=Asia/Tokyo&hour12=0&seconds=1&date=0&weekday=0&font=Poppins&theme=soda
+/clock/?tz=Asia/Tokyo&hour12=0&seconds=1&date=0&weekday=0&font=system-ui&theme=soda
 ```
 
-不正な値は安全な範囲へ戻します。URL由来の任意文字列はHTMLとして実行せず、表示用の文字として扱います。
+## Privacy
 
-## フォント
+- No account is required.
+- There is no backend database.
+- Clock rendering is based on the URL and the local browser runtime.
+- This app does not intentionally send user clock configuration to its server.
+- Local font discovery, clipboard, canvas export, and Web Share are optional browser features. Browser permission prompts and browser behavior depend on the user's environment.
 
-このリポジトリはフォントファイルを同梱していません。候補リストはフォント名だけを提示し、OBS側PCにインストール済みならその名前で表示されます。未インストール時は `system-ui` などへフォールバックします。手入力欄には、原則として1つのフォント名を入れてください。
+## Development
 
-PC内フォントは、ブラウザから英語名や内部名で返る場合があります。分かりやすいものは `ラノベPOP v2（LightNovelPopV2 V2）` のように日本語名を先に表示しますが、生成URLにはOBSで実際に使うフォント名を保存します。日本語表示名は見つけやすくするための補助で、フォントファイル自体は同梱しません。
-
-セルフホストする場合は、各フォントの公式ライセンスを確認し、`public/fonts` などへフォントファイルを置いたうえで `docs/licenses` にライセンス表示を追加してください。
-
-## X共有
-
-X Web Intent は画像を直接添付できません。このサイトでは次の流れにしています。
-
-1. CanvasでPNGプレビュー画像を生成
-2. 投稿文をコピー
-3. X投稿画面を開く
-4. 保存したPNGを手動添付
-
-Web Share API が画像ファイル共有に対応する環境では、共有ボタンから画像付き共有を試します。
-
-## よくある問題
-
-- 背景が白い: 時計画面は透明です。OBSのブラウザソース設定やカスタムCSSを確認してください
-- フォントが反映されない: OBSを動かすPCにそのフォントが無い可能性があります
-- URLをなくした: 別ブラウザで再現するには生成URLが必要です。localStorageは編集画面の補助です
-- PC時刻が違う: システム時刻を修正してください
-- OBSで表示が切れる: 推奨幅・高さより少し大きめにしてください
-- Xに画像が付かない: X Web Intentでは画像の自動添付ができません。手動添付してください
-
-## 品質確認
-
-通常のrelease preflightは次で確認します。
+Install dependencies once, then use the npm scripts:
 
 ```bash
+npm install
+npm run dev
+npm test
+npm run build
 npm run release:check
-npm run release:http-smoke
 ```
 
-`npm run release:check` は `lint`、`typecheck`（module import smoke）、`format:check`、`test`、`build`、`cf:dry-run`、`git diff --check` を順に実行します。
-このリポジトリの `npm run lint` は ESLint ではなく `node --check` によるJavaScript構文チェックです。`npm run typecheck` はTypeScript型検査ではなく、主要moduleのimportとencode/decode/time formatを確認するsmoke checkです。`npm test` は `tests/build.test.mjs` からbuildを実行するため、ignore済みの `dist/` をローカル生成することがあります。
-`npm run release:http-smoke` は一時的にローカルサーバーを起動し、`/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` を確認してから終了します。
-stagingやproductionのURL確認には `SMOKE_BASE_URL` を指定して `release:remote-smoke` を実行します。
+Local URLs:
+
+- Builder: `http://localhost:4173/`
+- Clock surface: `http://localhost:4173/clock/`
+
+Useful checks:
+
+```bash
+npm run lint
+npm run typecheck
+npm run format:check
+npm test
+npm run build
+```
+
+Notes:
+
+- `npm run lint` is JavaScript syntax checking with `node --check`, not ESLint.
+- `npm run typecheck` is a module/import smoke check, not TypeScript checking.
+- `npm test` may rebuild ignored `dist/` output through the build tests.
+- `npm run release:check` includes `cf:dry-run`; run it only when Wrangler dry-run is safe in your environment.
+
+## Deployment
+
+The preferred deployment target is Cloudflare Workers with Static Assets. The static output is generated into `dist/`, and `wrangler.jsonc` keeps the Workers Static Assets configuration.
+
+Cloudflare Pages compatibility remains documented because `functions/api/defaults.js` is a harmless optional fallback. The OBS clock surface does not depend on `/api/defaults`.
+
+Remote smoke checks use an explicit base URL:
 
 ```bash
 SMOKE_BASE_URL=https://example.workers.dev npm run release:remote-smoke
 ```
 
-個別に確認する場合、`npm run http:smoke` はローカルサーバーが必要です。別ターミナルで `npm run dev` を起動してから実行してください。
+Do not deploy, roll back, or run remote smoke checks unless the current release policy allows it.
 
-```bash
-npm run dev
-# 別ターミナル
-npm run http:smoke
-```
+## Contributing
 
-テスト対象:
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- config encode/decode
-- query parse
-- default/invalid config fallback
-- time formatting
-- CSS string escaping
-- render visibility and CSS variables
-- range input and numeric normalization consistency
+Key project contracts:
 
-## 手動確認
+- Preserve `/clock/?c=...` reproducibility.
+- Keep `/clock/` clock-only and transparent-background friendly.
+- Do not make `/clock/` depend on editor `localStorage`.
+- Do not write untrusted URL, label, or font values with `innerHTML`.
+- Do not add dependencies, paid services, bundled fonts, or deployment behavior changes without discussion.
 
-詳しい公開前QA手順は [docs/manual-qa.md](docs/manual-qa.md) にあります。
-直近の公開前QA判断は [docs/pre-release-qa.md](docs/pre-release-qa.md) に記録します。
-production公開後の運用、費用確認、rollback手順、公開後backlogは [docs/post-launch-ops.md](docs/post-launch-ops.md) に記録します。
-v0.1.1候補と後続改善の整理は [docs/v0.1.1-backlog.md](docs/v0.1.1-backlog.md) にあります。
+## AI-Assisted Development
 
-- 編集画面で各テンプレートをクリックし、ライブプレビューへ即時反映されること
-- 背景確認を「透過チェッカー」「明るい背景」「暗い背景」「任意色」で切り替えられること
-- 生成URLを `/clock/` で開き、背景が透明で時計だけ表示されること
-- 秒境界付近で毎秒更新されること
-- 生成URLをインポート欄へ貼って同じ設定へ戻ること
-- URLを別ブラウザへ貼っても同じ見た目になること
+This repository records how ChatGPT, Claude Code, and Codex are used for review triage, implementation, and validation evidence. See [docs/HOW_WE_USE_CODEX.md](docs/HOW_WE_USE_CODEX.md).
+
+## 日本語概要
+
+OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける透明な時計オーバーレイ URL を作る静的 Web アプリです。
+
+使い方:
+
+1. ビルダーを開きます。
+2. 時計の見た目を調整します。
+3. 生成された `/clock/?c=...` URL をコピーします。
+4. OBS のブラウザソースに貼り付けます。
+5. 推奨幅と推奨高さを OBS に入力します。
+
+重要な約束:
+
+- OBS で再現するための正本は生成 URL です。
+- `/clock/` は時計だけを表示する面です。
+- 編集画面の保存状態がなくても、生成 URL だけで時計表示を再現できる必要があります。
+- フォントファイルは同梱していません。OBS を動かす PC に入っているフォント名を使います。
+
+## License
+
+MIT. See [LICENSE](LICENSE).
