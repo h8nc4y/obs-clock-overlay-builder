@@ -62,3 +62,11 @@ test("clock page reserves visual safe inset for glow-heavy templates", () => {
   assert.match(clockPageBlock, /--clock-visual-safe-inset:\s*18px;/);
   assert.match(clockRootBlock, /padding:\s*var\(--clock-visual-safe-inset\);/);
 });
+
+test("editor live preview reserves visual safe inset around clock widget", () => {
+  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+
+  assert.match(previewStageBlock, /padding:\s*var\(--clock-visual-safe-inset,\s*18px\);/);
+  assert.match(previewStageBlock, /overflow:\s*visible;/);
+});

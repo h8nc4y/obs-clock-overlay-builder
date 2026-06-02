@@ -457,6 +457,7 @@ output {
 
 .preview-stage {
   max-width: 100%;
+  padding: var(--clock-visual-safe-inset, 18px);
   overflow: visible;
 }
 
