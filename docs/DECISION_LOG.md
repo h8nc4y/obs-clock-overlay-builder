@@ -187,6 +187,21 @@ Use this template for future decisions.
 - Related files: `docs/PR19_REVIEW_READINESS.md`, `docs/LOCAL_REVIEW_VERIFICATION.md`, `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`, `docs/AI_REVIEW_TRIAGE.md`, `docs/CODEX_TASKS.md`
 - Related review findings: CL-002, CL-007
 
+### 2026-06-02: Phase 0 OSS readiness uses public-safe documentation
+
+- Date: 2026-06-02
+- Decision: Prepare the repository for future OSS publication with an MIT license, English-first README, contribution docs, code of conduct, Codex workflow documentation, package metadata, and a public-release scrub of operational metadata.
+- Context: ChatGPT approved Phase 0 OSS readiness while keeping the repository private and explicitly excluding deploys, remote smoke, YouTube API setup, dependency additions, CI, public visibility changes, and Codex for OSS submission.
+- Options considered:
+  - Leave docs private-only until the public switch.
+  - Remove AI coordination docs entirely.
+  - Keep governance evidence while generalizing operational metadata.
+- Rationale: The repository needs useful OSS-facing docs and future Codex-use evidence without exposing exact internal operation values that public users do not need.
+- Consequences: Public docs keep the intentional demo URL, but exact Worker version IDs, rollback IDs, private issue/PR URLs, local machine paths, and local workflow internals are generalized or removed where practical.
+- Status: Active for Phase 0.
+- Related files: `LICENSE`, `README.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `docs/HOW_WE_USE_CODEX.md`, `docs/post-launch-ops.md`, `docs/pre-release-qa.md`, `docs/CL007_AI_COORDINATION_DOCS_DECISION_PACKET.md`
+- Related review findings: CL-007
+
 ## Open decisions
 
 - Whether these docs should remain tracked as-is if the repository is ever made public.

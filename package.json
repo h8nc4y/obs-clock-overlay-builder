@@ -1,7 +1,14 @@
 {
   "name": "obs-clock-overlay-builder",
   "version": "0.1.0",
+  "description": "Static builder for reproducible transparent OBS clock overlay URLs.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h8nc4y/obs-clock-overlay-builder.git"
+  },
+  "homepage": "https://obs-clock-overlay-builder.h8nc4y.workers.dev",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",

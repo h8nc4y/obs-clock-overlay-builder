@@ -1,16 +1,14 @@
-# CL007_AI_COORDINATION_DOCS_DECISION_PACKET
+# CL007 AI Coordination Docs Decision Packet
 
 ## Status
 
-Prepared by Codex on 2026-05-31 as a local-only decision packet.
+This packet supports the CL-007 decision about tracking, redacting, or splitting AI coordination docs and operational metadata.
 
-This packet does not make the final CL-007 decision. ChatGPT or the user must decide whether to track, push, redact, split, or ignore AI coordination docs and operational metadata.
-
-No push, pull request, deploy, rollback, remote smoke, Cloudflare dashboard/API operation, GitHub Actions operation, dependency install, or external API call was performed for this packet.
+Phase 0 OSS readiness applies the public-safe default: keep useful governance evidence, but generalize operational metadata that public readers do not need.
 
 ## Files Inspected
 
-Currently tracked docs inspected:
+Tracked docs inspected during the CL-007 review process included:
 
 - `docs/CLAUDE_REVIEW.md`
 - `docs/AI_REVIEW_TRIAGE.md`
@@ -20,130 +18,79 @@ Currently tracked docs inspected:
 - `docs/REVIEW_BRIEF.md`
 - `docs/post-launch-ops.md`
 - `docs/pre-release-qa.md`
+- `docs/LOCAL_REVIEW_VERIFICATION.md`
+- `docs/PR19_REVIEW_READINESS.md`
 
 ## Scan Summary
 
-Exact high-risk token/key patterns requested in the review prompt were checked with file-list output only.
+High-risk token and key patterns were checked with file-list output first to avoid printing values. No confirmed secrets, private keys, OAuth tokens, payment details, private account identifiers, or raw user/customer data were confirmed in the inspected docs during this pass.
 
-The literal patterns are not repeated in this packet so future secret scans do not flag the decision packet itself as a false positive.
-
-Result:
-
-- No files matched those exact high-risk token/key patterns in the inspected docs.
-
-Generic governance and operations terms found in documentation context:
-
-- `token`
-- `credential`
-- `secret`
-- `account`
-- `payment`
-- `billing`
-- Cloudflare metadata terms
-- GitHub link and issue/PR terms
-- rollback/version terms
-
-These generic matches are not proof of secrets. They mostly appear in policy, warning, checklist, or operational-context text.
+Generic security and billing terms can appear in policy or checklist context. Those matches are not proof of secrets.
 
 ## Content Classification
 
-### Safe To Track In This Private Repo
+### Safe To Track
 
-Likely safe to track while the repository remains private:
+Likely safe to track:
 
-- ChatGPT, Claude Code, and Codex role separation.
-- Claude review text.
-- ChatGPT triage records.
-- Codex task queues limited to approved findings.
-- Decision log entries.
-- Product requirements summary.
-- Local validation command results.
-- Local browser evidence summaries.
-- Notes that secrets, payment details, private account identifiers, and raw user/customer data should not be recorded.
+- ChatGPT, Claude Code, and Codex role separation;
+- Claude review summaries;
+- ChatGPT triage records;
+- Codex task queues limited to approved findings;
+- decision log entries;
+- product requirements summary;
+- local validation command summaries;
+- notes that secrets, payment details, private account identifiers, and raw user/customer data should not be recorded.
 
-Reasoning:
+### Public-redaction Candidates
 
-- These items are governance and traceability records.
-- They are useful for future AI/human review.
-- No exact token/key pattern was found in the inspected docs.
+Generalize before public exposure:
 
-### Operational Metadata Requiring Human Decision Before Push Or Publication
+- exact Worker version identifiers;
+- exact rollback candidate identifiers;
+- private issue or PR URLs;
+- local machine paths;
+- local tool, plugin, browser-runtime, or sandbox implementation details;
+- account-specific dashboard values or billing details.
 
-Requires a human/ChatGPT decision before pushing broadly or exposing publicly:
+### Must Not Be Committed Or Published
 
-- Production deployment URL or `*.workers.dev` subdomain.
-- Cloudflare Worker name.
-- Worker version identifiers or rollback candidate identifiers.
-- GitHub issue, PR, and commit links.
-- Notes about GitHub Actions cost posture.
-- Notes about Cloudflare usage, spend-limit, billing, or paid-binding checks.
-- Browser/plugin/MCP availability notes that reveal local workflow details.
+Do not commit or publish:
 
-Reasoning:
+- API keys;
+- OAuth tokens;
+- GitHub personal access tokens;
+- Cloudflare API tokens;
+- private keys;
+- login secrets;
+- payment card or bank details;
+- raw customer/user data;
+- private account identifiers where project policy says not to record them.
 
-- These are generally not secrets by themselves.
-- They can still reveal operational structure, deployment history, or internal workflow.
-- Private-repo tracking may be useful, but public exposure should be intentional.
+If any are discovered later, report only the file path and risk category, not the value.
 
-### Should Be Redacted Before Any Public Repository Exposure
+## Recommended Public-safe Default
 
-Recommended redaction or abstraction before a public release:
+- Keep AI governance docs in Git because they are useful evidence.
+- Keep the public demo URL where intentionally used as demo documentation.
+- Replace exact deployment and rollback metadata with placeholders or process descriptions.
+- Replace private issue/PR URLs with issue or PR numbers when the number itself is useful.
+- Remove local workflow internals that do not help public contributors.
 
-- Replace exact Worker version identifiers with `redacted-version-id` or describe them as "current rollback candidate".
-- Consider replacing exact `*.workers.dev` subdomain or production URL with a placeholder if public exposure is not desired.
-- Replace private GitHub issue/PR links with issue numbers only, or remove links if the target repository remains private.
-- Remove local MCP/plugin/runtime inventory details if they are not useful to public users.
-- Keep policy statements, but remove any operational values that are not needed for public users.
+## Decision Options For Future Changes
 
-### Should Not Be Committed Or Pushed If Discovered
+### Option A: Track Public-safe Docs
 
-Do not commit or push:
+Best for OSS publication. Keep governance and validation evidence, but remove exact internal operational values.
 
-- API keys.
-- OAuth tokens.
-- GitHub personal access tokens.
-- Cloudflare API tokens.
-- Private keys.
-- Passwords.
-- Payment card or bank details.
-- Raw customer/user data.
-- Private account identifiers where the project policy says not to record them.
+### Option B: Split Public And Private Docs
 
-No such values were confirmed in the inspected docs during this pass. If any are discovered later, report only file path and risk category, not the value.
+Best if future operations require detailed private rollback or dashboard evidence. Public docs stay clean; private docs carry operational values outside the public repository.
 
-## Recommended Default
+### Option C: Keep Private-only Docs
 
-Recommended default for the current private repository:
+Best if the repository remains private. Requires a redaction pass before any public visibility switch.
 
-- Track the AI coordination docs and this decision packet in Git for private-repo continuity.
-- Keep operational metadata in private-repo docs only if it is needed for rollback, release, or review traceability.
-- Do not push or publish these docs beyond the private repository until ChatGPT or the user explicitly decides the CL-007 policy.
-- Before any public repository exposure, run a redaction pass focused on deployment URLs, Worker version identifiers, private GitHub links, and local workflow metadata.
+## Current Decision
 
-## Decision Options For ChatGPT Or User
-
-### Option A: Track As-Is In Private Repo
-
-- Best when private-repo continuity and auditability matter more than minimizing internal metadata.
-- Requires an explicit reminder that public exposure still needs a redaction pass.
-
-### Option B: Track Redacted Copies
-
-- Best when the repo might become public or shared more broadly soon.
-- Replace exact deployment and rollback metadata with placeholders while keeping governance structure.
-
-### Option C: Split Public And Private Docs
-
-- Best when product docs may become public, but review/ops details should stay private.
-- Keep public-facing docs clean and store operational evidence in private-only docs.
-
-### Option D: Ignore AI Coordination Docs
-
-- Best only if AI governance history should remain outside Git.
-- Risk: future ChatGPT, Claude, and Codex sessions lose durable decision context.
-
-## Current Non-Decision
-
-Codex did not decide CL-007.
-
-CL-007 remains open until ChatGPT or the user chooses how to handle tracking, pushing, and publication of AI coordination docs and operational metadata.
+For Phase 0 OSS readiness, Codex applies Option A within the approved scope. The user still controls the actual repository public visibility switch and any future detailed private/public documentation split.
