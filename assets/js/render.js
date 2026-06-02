@@ -1,6 +1,8 @@
 import { cssStringLiteral, hexToRgba, normalizeConfig } from "./config.js";
 import { createFormatters, formatClock } from "./time.js";
 
+export const CLOCK_VISUAL_SAFE_INSET = 18;
+
 export function mountClock(container, config, options = {}) {
   const root = document.createElement("div");
   const label = document.createElement("div");
@@ -93,7 +95,7 @@ export function applyClockStyles(element, config) {
 
 export function recommendedObsSize(element) {
   const rect = element.getBoundingClientRect();
-  const shadowPad = 32;
+  const shadowPad = CLOCK_VISUAL_SAFE_INSET * 2;
   return {
     width: Math.max(160, Math.ceil(rect.width + shadowPad)),
     height: Math.max(80, Math.ceil(rect.height + shadowPad))

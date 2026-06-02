@@ -38,6 +38,7 @@
 - `Asia/Tokyo` がデフォルトタイムゾーン。
 - 12時間表記、秒なし、日付あり、曜日あり、長いラベル、背景不透明度0をそれぞれ確認する。
 - 小さいviewport、横長viewport、縦長viewportで時計が意図せず切れないか確認する。切れる場合はOBS側の幅・高さを推奨値より大きめにする。
+- Neon HUDなど発光が強いテンプレートで、通常ブラウザとOBSの両方で上下左右の発光が切れないことを確認する。
 - OBSでブラウザソースに生成URLを貼り、推奨幅・高さを入力して表示される。
 - OBSで表示/非表示を切り替えても、再表示後の次tickで現在時刻になる。
 
@@ -89,6 +90,7 @@ OBSに入れた高さ:
 表示/非表示後の復帰: OK / NG
 URL再貼り付け再現: OK / NG
 文字切れ: なし / あり
+発光切れ: なし / あり
 気になった点:
 最終判断: 公開可 / 修正後に再確認 / 公開保留
 ```
@@ -96,7 +98,7 @@ URL再貼り付け再現: OK / NG
 ### 失敗時の切り分け
 
 - 背景が白い: 生成URLを通常ブラウザで開き、透明背景か確認する。通常ブラウザで透明なら、OBSのブラウザソース設定、カスタムCSS、シーン背景を確認する。
-- 文字が切れる: OBSの幅と高さを大きくする。影、縁取り、太字、長いラベルは必要サイズが増える。
+- 文字や発光が切れる: まず生成URLと推奨幅・高さが最新か確認し、それでも切れる場合はOBSの幅と高さを大きくする。影、縁取り、太字、長いラベルは必要サイズが増える。
 - 時計が動かない: URLを通常ブラウザで開き、秒が進むか確認する。通常ブラウザで動くなら、OBSのブラウザソースを再読み込みする。
 - 見た目が違う: OBSを動かすPCに同じフォントが入っているか確認する。未インストールなら別フォントへ置き換える。
 - 設定が戻らない: OBSに貼ったURLが `/clock/?c=...` 形式か確認する。編集画面のlocalStorageではなく、生成URLが再現の正。
@@ -139,6 +141,7 @@ Bad"; color:red;
 - `npm run cf:dry-run` が成功する。
 - Workers Static Assets で `/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` が動作する。
 - `/api/defaults` は Worker-first ではなく静的JSONとして配信される。
+- `/api/defaults` の `Content-Type: application/json; charset=utf-8` と `Cache-Control: no-store` は `_headers` で指定している。`release:http-smoke` と `release:remote-smoke` でこの前提を確認する。
 - rollback path は Cloudflare の直近 Worker version へ戻すか、直前の git commit を再デプロイする。
 
 ### 実deploy前の承認条件
@@ -163,7 +166,7 @@ Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の stagi
 - `/clock/` が時計だけを表示する。
 - `/clock` が時計画面へ到達する。
 - `/api/defaults` が `{"timezone":null,"country":null,"source":"static"}` を返す。
-- `/api/defaults` の `Content-Type` が `application/json` になる。
+- `/api/defaults` の `Content-Type` が `_headers` の指定どおり `application/json` になる。
 - Browser Console error/warning がない。
 - OBSのブラウザソースでproduction URLの生成URLが表示される。
 - 問題があれば、Cloudflareの直近Worker versionへrollbackするか、直前のgit commitを再デプロイする。

@@ -41,6 +41,8 @@ SMOKE_BASE_URL=https://obs-clock-overlay-builder.h8nc4y.workers.dev npm run rele
 
 `release:check` は `lint`、`typecheck`、`format:check`、`test`、`build`、`cf:dry-run`、`git diff --check` をまとめて実行します。
 
+このリポジトリの `lint` はESLintではなく `node --check` によるJavaScript構文チェックです。`typecheck` はTypeScript型検査ではなく、主要moduleのimportとencode/decode/time formatを確認するsmoke checkです。`test` は `tests/build.test.mjs` 経由でbuildを実行するため、ignore済みの `dist/` をローカル生成することがあります。
+
 ## GitHub Actions And Cost
 
 現状:
@@ -74,6 +76,7 @@ tracking issue: https://github.com/h8nc4y/obs-clock-overlay-builder/issues/12
 - D1、KV、R2、Queues、Durable Objects、Workflows、Hyperdrive、Workers AI、AI Gateway bindingはありません。
 - `npx wrangler deploy --dry-run --env production` では `env.ASSETS` のみが表示されます。
 - `run_worker_first` は使っていません。
+- `/api/defaults` は拡張子なしの静的JSONで、JSON `Content-Type` と `Cache-Control: no-store` は `_headers` の指定に依存します。`release:http-smoke` と `release:remote-smoke` でこのheader前提を確認します。
 
 公式docs上、Static Assetsに一致したリクエストは無料・無制限で、Worker scriptを呼ぶリクエストはWorkers pricingの対象です。Free planのWorker script requestは1日100,000 requestが目安です。
 

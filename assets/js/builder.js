@@ -1,5 +1,4 @@
 import {
-  DEFAULT_CONFIG,
   FONT_CANDIDATES,
   TEMPLATES,
   applyTemplate,
@@ -8,9 +7,9 @@ import {
   contrastRatio,
   hexToRgba,
   normalizeConfig,
-  parseConfigFromQuery,
   parseImportInput
 } from "./config.js";
+import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
@@ -131,21 +130,11 @@ function init() {
 }
 
 function loadInitialConfig() {
-  if (window.location.search) {
-    const fromUrl = parseConfigFromQuery(window.location.href);
-    if (JSON.stringify(fromUrl) !== JSON.stringify(DEFAULT_CONFIG)) {
-      return fromUrl;
-    }
-  }
-  try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return normalizeConfig(JSON.parse(saved));
-    }
-  } catch {
-    // localStorage may be blocked; URL generation still works without it.
-  }
-  return cloneDefaultConfig();
+  return loadInitialConfigFromSources({
+    href: window.location.href,
+    search: window.location.search,
+    getSavedConfig: () => window.localStorage.getItem(STORAGE_KEY)
+  });
 }
 
 function renderTemplateButtons() {
@@ -506,10 +495,31 @@ async function copyText(text, statusElement, successMessage) {
     await navigator.clipboard.writeText(text);
     statusElement.textContent = successMessage;
   } catch {
-    elements.generatedUrl.focus();
-    elements.generatedUrl.select();
-    const copied = document.execCommand("copy");
+    const copied = copyTextWithSelectionFallback(text);
     statusElement.textContent = copied ? successMessage : "コピーできませんでした。手動で選択してコピーしてください。";
+  }
+}
+
+function copyTextWithSelectionFallback(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "0";
+  textarea.style.top = "0";
+  textarea.style.width = "1px";
+  textarea.style.height = "1px";
+  textarea.style.opacity = "0";
+  textarea.style.pointerEvents = "none";
+  document.body.append(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+  try {
+    return document.execCommand("copy");
+  } finally {
+    textarea.remove();
+    window.getSelection()?.removeAllRanges();
   }
 }
 

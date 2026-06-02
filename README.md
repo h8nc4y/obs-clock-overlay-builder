@@ -50,7 +50,7 @@ npm run deploy:staging
 npm run deploy:production
 ```
 
-`/api/defaults` は `api/defaults` から静的JSONとして配信します。`_headers` でJSONの `Content-Type` と `Cache-Control: no-store` を指定し、`wrangler.jsonc` では `run_worker_first` を使いません。Workerエントリは Static Assets の補助エントリとして残し、通常の静的ファイル配信は `dist/` の Static Assets に任せます。rollback は `npx wrangler versions deploy <version-id>@100 --env production --yes` で直近 Worker version へ戻すか、直前の git commit を再デプロイします。
+`/api/defaults` は `api/defaults` から静的JSONとして配信します。`_headers` でJSONの `Content-Type` と `Cache-Control: no-store` を指定し、`wrangler.jsonc` では `run_worker_first` を使いません。`/api/defaults` は拡張子なしの静的ファイルなので、JSONとしての `Content-Type` は `_headers` の指定が前提です。この前提は `release:http-smoke` と `release:remote-smoke` で確認します。Workerエントリは Static Assets の補助エントリとして残し、通常の静的ファイル配信は `dist/` の Static Assets に任せます。rollback は `npx wrangler versions deploy <version-id>@100 --env production --yes` で直近 Worker version へ戻すか、直前の git commit を再デプロイします。
 
 ## Cloudflare Pages 公開
 
@@ -128,6 +128,7 @@ npm run release:http-smoke
 ```
 
 `npm run release:check` は `lint`、`typecheck`（module import smoke）、`format:check`、`test`、`build`、`cf:dry-run`、`git diff --check` を順に実行します。
+このリポジトリの `npm run lint` は ESLint ではなく `node --check` によるJavaScript構文チェックです。`npm run typecheck` はTypeScript型検査ではなく、主要moduleのimportとencode/decode/time formatを確認するsmoke checkです。`npm test` は `tests/build.test.mjs` からbuildを実行するため、ignore済みの `dist/` をローカル生成することがあります。
 `npm run release:http-smoke` は一時的にローカルサーバーを起動し、`/`、`/clock/`、`/clock`、`/api/defaults`、`/favicon.ico` を確認してから終了します。
 stagingやproductionのURL確認には `SMOKE_BASE_URL` を指定して `release:remote-smoke` を実行します。
 
