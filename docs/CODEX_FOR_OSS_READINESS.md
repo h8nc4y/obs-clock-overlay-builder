@@ -21,7 +21,7 @@ Facts confirmed from the public repository and local `master`:
 - Stars at inspection time: 0
 - Forks at inspection time: 0
 - Recent merged PR evidence includes PR #19 through PR #24.
-- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, and production demo are present.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, and production demo are present.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -68,6 +68,8 @@ Prioritize evidence that can be linked from a public application without exposin
 - More merged PRs showing sustained maintenance after public launch.
 - Release tags and concise release notes beyond `v0.1.0`.
 - A small public roadmap or good-first-issue list.
+- Public feedback guide and issue templates that invite OBS setup reports without requesting private data.
+- Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.
 - External mentions, users, stars, forks, or discussions if they happen organically.
@@ -89,6 +91,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - PRs #19 through #24 as recent maintenance examples.
 - `package.json` scripts for validation and release checks.
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
+- `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.
 
 ## Claims To Avoid
 
@@ -110,6 +113,7 @@ Do not claim any of the following unless future evidence exists:
 
 - Keep these readiness docs current.
 - Keep README, demo, license, and contribution docs public-safe.
+- Keep public feedback, roadmap, and changelog docs aligned with actual repository history.
 - Confirm GitHub profile visibility before applying.
 - Confirm the applicant is the primary/core maintainer.
 
@@ -117,6 +121,7 @@ Do not claim any of the following unless future evidence exists:
 
 - Record public-safe manual OBS QA.
 - Add a compact public roadmap.
+- Use public feedback templates to collect issue triage evidence.
 - Add a few issue labels and triage examples.
 - Continue using PRs for maintenance work.
 - Prefer small releases with release notes when meaningful changes land.

@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Demo
+    url: https://obs-clock-overlay-builder.h8nc4y.workers.dev
+    about: Try the public OBS Clock Overlay Builder demo.
+  - name: README
+    url: https://github.com/h8nc4y/obs-clock-overlay-builder#readme
+    about: Read setup, privacy, OBS usage, and development notes.
+  - name: Feedback Guide
+    url: https://github.com/h8nc4y/obs-clock-overlay-builder/blob/master/docs/FEEDBACK_GUIDE.md
+    about: Read what feedback is useful and what private information not to share.

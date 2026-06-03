@@ -18,6 +18,9 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Production demo: <https://obs-clock-overlay-builder.h8nc4y.workers.dev>
 - README: [../README.md](../README.md)
 - README screenshot: [assets/editor-preview.png](assets/editor-preview.png)
+- Feedback guide: [FEEDBACK_GUIDE.md](FEEDBACK_GUIDE.md)
+- Roadmap: [ROADMAP.md](ROADMAP.md)
+- Changelog: [../CHANGELOG.md](../CHANGELOG.md)
 - License: [../LICENSE](../LICENSE)
 - Contributing guide: [../CONTRIBUTING.md](../CONTRIBUTING.md)
 - Code of conduct: [../CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md)
@@ -25,6 +28,9 @@ The official page says applications are reviewed on a rolling basis and asks app
 ## Product And Operations Evidence
 
 - Product requirements: [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md)
+- Public feedback guide: [FEEDBACK_GUIDE.md](FEEDBACK_GUIDE.md)
+- Public roadmap: [ROADMAP.md](ROADMAP.md)
+- Changelog: [../CHANGELOG.md](../CHANGELOG.md)
 - Manual QA checklist: [manual-qa.md](manual-qa.md)
 - Pre-release QA: [pre-release-qa.md](pre-release-qa.md)
 - Post-launch operations: [post-launch-ops.md](post-launch-ops.md)
@@ -107,7 +113,7 @@ These are not blockers for maintaining the project, but they weaken a Codex for 
 
 - Public issue triage examples.
 - Release tags and release notes for meaningful updates.
-- Public roadmap or milestone notes.
+- Updates to the public roadmap or milestone notes as direction becomes concrete.
 - Public-safe OBS real-device QA record.
 - More maintenance PRs after public launch.
 - Organic stars, forks, discussions, or external mentions if they happen.
