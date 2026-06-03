@@ -1,0 +1,43 @@
+name: General feedback
+description: Share Japanese or English feedback about OBS setup, visual design, docs, or usability.
+title: "[Feedback]: "
+labels:
+  - feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        日本語でも英語でも大丈夫です。公開Issueに載せてもよい内容だけを書いてください。
+
+        Please do not include secrets, stream keys, private OBS scenes, tokens, OAuth credentials, billing details, or personal information.
+  - type: textarea
+    id: feedback
+    attributes:
+      label: Feedback / フィードバック
+      description: What felt good, confusing, missing, or hard to use?
+    validations:
+      required: true
+  - type: textarea
+    id: obs-setup
+    attributes:
+      label: OBS setup notes / OBS環境メモ
+      description: Optional public-safe OBS version, OS, source size, or scene notes.
+  - type: textarea
+    id: visual-design
+    attributes:
+      label: Visual, design, or readability feedback
+      description: Template style, clock readability, color, spacing, Japanese wording, or mobile layout.
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentation feedback
+      description: README, setup steps, troubleshooting, or examples that should be clearer.
+  - type: dropdown
+    id: screenshot
+    attributes:
+      label: Optional screenshot
+      description: Upload only public-safe screenshots. Remove private OBS scenes, chat, dashboards, accounts, and stream keys.
+      options:
+        - "No screenshot"
+        - "Public-safe screenshot attached"
+        - "Screenshot would contain private information"

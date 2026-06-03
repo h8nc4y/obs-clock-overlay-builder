@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest an improvement or new OBS overlay capability.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the proposal. Please do not include secrets, stream keys, private account data, billing details, or personal information.
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature proposal
+      description: What would you like to add or change?
+      placeholder: I would like the editor to...
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What stream, OBS scene, or workflow would this help?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: Explain the viewer or creator benefit.
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: What do you do today instead?
+  - type: textarea
+    id: scope
+    attributes:
+      label: Suggested scope
+      description: What is the smallest useful version of this feature?
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: Non-goals
+      description: Anything this feature should avoid?

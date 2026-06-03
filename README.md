@@ -119,6 +119,12 @@ Key project contracts:
 - Do not write untrusted URL, label, or font values with `innerHTML`.
 - Do not add dependencies, paid services, bundled fonts, or deployment behavior changes without discussion.
 
+Feedback and planning:
+
+- [Feedback guide](docs/FEEDBACK_GUIDE.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Changelog](CHANGELOG.md)
+
 ## AI-Assisted Development
 
 This repository records how ChatGPT, Claude Code, and Codex are used for review triage, implementation, and validation evidence. See [docs/HOW_WE_USE_CODEX.md](docs/HOW_WE_USE_CODEX.md).
@@ -178,6 +184,8 @@ npm run release:check
 ```
 
 - 開発手順と PR 期待値は [CONTRIBUTING.md](CONTRIBUTING.md) を確認してください。
+- 不具合報告、機能提案、感想は [docs/FEEDBACK_GUIDE.md](docs/FEEDBACK_GUIDE.md) を確認して GitHub Issues へ投稿してください。
+- 今後の方向性は [docs/ROADMAP.md](docs/ROADMAP.md)、変更履歴は [CHANGELOG.md](CHANGELOG.md) に記録します。
 - ライセンスは [LICENSE](LICENSE) を確認してください。
 - ChatGPT、Claude Code、Codex を使った開発フローは [docs/HOW_WE_USE_CODEX.md](docs/HOW_WE_USE_CODEX.md) に記録しています。
 

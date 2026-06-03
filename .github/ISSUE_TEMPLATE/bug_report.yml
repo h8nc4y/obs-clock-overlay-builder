@@ -1,0 +1,74 @@
+name: Bug report
+description: Report an OBS Browser Source or clock overlay bug.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please do not include secrets, stream keys, tokens, private dashboard screenshots, billing details, or personal information.
+
+        The generated `/clock/?c=...` URL may contain your visible label, font name, colors, and other display settings. Paste it only if it is safe to make public.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+      placeholder: The clock is clipped in OBS when...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: Windows 11 / macOS / Linux
+  - type: input
+    id: obs-version
+    attributes:
+      label: OBS version
+      placeholder: OBS 30.x
+  - type: input
+    id: browser
+    attributes:
+      label: Browser or OBS Browser Source
+      placeholder: OBS Browser Source / Chrome / Edge / Firefox
+  - type: textarea
+    id: generated-url
+    attributes:
+      label: Generated URL, if safe to share
+      description: Paste the `/clock/?c=...` URL only if it contains no personal or private information. Otherwise describe the settings.
+      placeholder: /clock/?c=... or a short settings description
+  - type: input
+    id: dimensions
+    attributes:
+      label: OBS Browser Source size
+      placeholder: Recommended 640x180, OBS source 720x240
+  - type: dropdown
+    id: screenshot
+    attributes:
+      label: Screenshot available?
+      description: Upload only public-safe screenshots with private OBS scenes, chat, dashboards, account data, and stream keys removed or blurred.
+      options:
+        - "No"
+        - "Yes, public-safe screenshot attached"
+        - "Not safe to share"
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: Any other public-safe context.
