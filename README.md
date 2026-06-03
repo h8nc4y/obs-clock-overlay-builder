@@ -17,7 +17,7 @@ Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 - Japanese-first editor UI for non-programmer OBS users in Japan.
 - Optional browser features for local font discovery, clipboard copy, canvas preview export, and Web Share.
 
-No screenshot is currently tracked in this repository, so this README does not show one.
+![OBS Clock Overlay Builder editor preview](docs/assets/editor-preview.png)
 
 ## Quick Start For OBS
 
