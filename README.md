@@ -123,6 +123,8 @@ Feedback and planning:
 
 - [Feedback guide](docs/FEEDBACK_GUIDE.md)
 - [Roadmap](docs/ROADMAP.md)
+- [YouTube Live overlay suite concept](docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
+- [Headline feature MVP requirements](docs/HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
 - [Changelog](CHANGELOG.md)
 
 ## AI-Assisted Development
@@ -186,6 +188,7 @@ npm run release:check
 - 開発手順と PR 期待値は [CONTRIBUTING.md](CONTRIBUTING.md) を確認してください。
 - 不具合報告、機能提案、感想は [docs/FEEDBACK_GUIDE.md](docs/FEEDBACK_GUIDE.md) を確認して GitHub Issues へ投稿してください。
 - 今後の方向性は [docs/ROADMAP.md](docs/ROADMAP.md)、変更履歴は [CHANGELOG.md](CHANGELOG.md) に記録します。
+- 将来構想としての YouTube Live 向け OBS オーバーレイ・スイートは [docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md](docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md) に記録しています。
 - ライセンスは [LICENSE](LICENSE) を確認してください。
 - ChatGPT、Claude Code、Codex を使った開発フローは [docs/HOW_WE_USE_CODEX.md](docs/HOW_WE_USE_CODEX.md) に記録しています。
 

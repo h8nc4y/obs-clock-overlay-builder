@@ -23,7 +23,7 @@ Facts confirmed from the public repository and local `master`:
 - `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
 - Recent merged PR evidence includes PR #19 through PR #26.
-- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, and production demo are present.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, and production demo are present.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -40,6 +40,7 @@ The project is public and maintained, but public traction is still early. Do not
 | Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
 | Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
 | Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
+| Future product direction | Partial | Public roadmap and YouTube Live overlay suite planning docs now describe a candidate headline direction. This is planning evidence, not implementation or adoption evidence. |
 
 ## Strengths
 
@@ -52,6 +53,7 @@ The project is public and maintained, but public traction is still early. Do not
 - Japanese-first UX and docs support a specific user group.
 - AI-assisted maintenance process is explicitly documented.
 - Local validation and release checks are documented and repeatedly used.
+- Headline feature planning docs describe a possible YouTube Live OBS overlay suite while keeping API/OAuth/data policy boundaries explicit.
 - Cloudflare cost and deploy boundaries are documented.
 
 ## Weaknesses
@@ -59,6 +61,7 @@ The project is public and maintained, but public traction is still early. Do not
 - Public traction is currently weak: 0 GitHub stars and 0 forks at inspection time.
 - No monthly download metric applies because this is not an npm package or library distribution.
 - Public issue triage and user feedback evidence remain weak in the evidence gathered for this packet.
+- YouTube Live overlay suite work is still exploration and requirements planning, not an implemented feature.
 - No GitHub Actions workflow exists; this is intentional for cost control, but it weakens automation evidence.
 - OBS real-device evidence remains a known manual QA limitation in older review packets.
 - The project is useful but narrow; it may not yet meet the "critical open-source software" framing without stronger ecosystem evidence.
@@ -72,6 +75,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - Release tags and concise release notes beyond the existing `v0.1.0` release.
 - A small public roadmap or good-first-issue list.
 - Public feedback guide and issue templates that invite OBS setup reports without requesting private data.
+- Public planning and feedback for the candidate YouTube Live overlay suite, including issue #30 and safe MVP requirements.
 - Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.
@@ -96,6 +100,8 @@ Prioritize evidence that can be linked from a public application without exposin
 - `package.json` scripts for validation and release checks.
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
 - `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.
+- `docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md`, `docs/HEADLINE_FEATURE_MVP_REQUIREMENTS.md`, and `docs/YOUTUBE_DATA_POLICY_BOUNDARY.md` for candidate headline feature planning.
+- Issue #30 for public YouTube Live overlay suite exploration: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 
 ## Claims To Avoid
 
@@ -109,6 +115,7 @@ Do not claim any of the following unless future evidence exists:
 - Production deploy by Codex, when the user performed deploy manually.
 - Codex Security usage, unless it is actually granted and used later.
 - API credits usage, unless credits are granted and used later.
+- Implemented YouTube Live integration, YouTube API access, OAuth support, or real chat/comment data handling unless those are actually designed, approved, implemented, and validated later.
 - Any private OpenAI Organization ID, account email, token, API key, billing value, or payment detail.
 
 ## Roadmap To Application
