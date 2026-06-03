@@ -9,6 +9,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Polish docs for OBS setup, troubleshooting, and contributor onboarding.
 - Keep Codex for OSS readiness evidence current without claiming application submission or acceptance.
 - Define the YouTube Live overlay suite concept, MVP requirements, and data/policy boundary before any integration work.
+- Prepare Candidate A keyword reaction overlay design docs before implementation.
 
 ## Medium Term
 
@@ -17,6 +18,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Use public issues to triage feedback, bugs, and small improvements.
 - Consider an optional simple/advanced control mode if feedback shows the editor is too dense for first-time users.
 - Explore a safe MVP prototype for a keyword reaction overlay using manual input or fixtures before any YouTube API/OAuth work.
+- Implement Candidate A in a small PR only after design, URL contract, fixture schema, and security/QA boundaries are reviewed.
 
 ## Long Term
 
@@ -32,6 +34,10 @@ Current planning docs:
 
 - [YouTube Live overlay suite concept](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
 - [Headline feature MVP requirements](HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
+- [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
+- [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
+- [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
+- [Candidate A security and QA plan](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YouTube data policy boundary](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 - [Issue #30: YouTube Live focused OBS overlay suite exploration](https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30)
 
@@ -40,7 +46,8 @@ Near-term sequence:
 1. Gather feedback on the suite direction and MVP scope.
 2. Keep the first prototype local, manual, or fixture-driven when possible.
 3. Validate OBS Browser Source behavior and URL/config reproducibility.
-4. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+4. Use Candidate A design docs to split a small implementation PR.
+5. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 
