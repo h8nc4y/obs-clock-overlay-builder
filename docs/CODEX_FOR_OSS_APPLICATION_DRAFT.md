@@ -57,7 +57,7 @@ Important constraint: the official form asks why the repository qualifies and su
 ### Conservative Current Draft
 
 ```text
-This is an early public OSS project in a specific streaming niche: reproducible OBS browser-source clock overlays. It provides a static, MIT-licensed tool with a live demo, clear /clock/?c=... reproducibility contract, Japanese-first docs, release checks, and documented AI-assisted maintenance.
+This is an early public OSS project in a specific streaming niche: reproducible OBS browser-source clock overlays. It provides a static, MIT-licensed tool with a live demo, a v0.1.0 GitHub Release/tag, a clear /clock/?c=... reproducibility contract, Japanese-first docs, release checks, and documented AI-assisted maintenance.
 ```
 
 Use now only if applying early and transparently.

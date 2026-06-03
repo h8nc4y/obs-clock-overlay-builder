@@ -2,7 +2,7 @@
 
 All notable public changes to this project will be recorded in this file.
 
-This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Release tags are pending; entries below describe repository history and should not be treated as published release notes until a tag exists.
+This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The `v0.1.0` GitHub Release and tag exist; later entries should be tied to future tags when releases are created.
 
 ## [Unreleased]
 
@@ -17,7 +17,9 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 - README now links to feedback, roadmap, changelog, and Codex-assisted maintenance evidence.
 - Codex for OSS readiness docs now record public feedback and roadmap docs as application-preparation evidence.
 
-## [0.1.0] - tag pending
+## [0.1.0] - 2026-05-20
+
+GitHub Release: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 
 ### Added
 
