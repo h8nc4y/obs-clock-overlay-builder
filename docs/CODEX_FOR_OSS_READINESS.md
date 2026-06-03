@@ -1,0 +1,150 @@
+# Codex for OSS Readiness
+
+## Status
+
+This document inventories the current readiness of `obs-clock-overlay-builder` for a future OpenAI Codex for Open Source application.
+
+It is a preparation packet only. It does not submit an application, claim acceptance, claim eligibility, or record private OpenAI account details.
+
+Official source checked: <https://openai.com/form/codex-for-oss/> on 2026-06-03.
+
+## Current Repository State
+
+Facts confirmed from the public repository and local `master`:
+
+- Repository: <https://github.com/h8nc4y/obs-clock-overlay-builder>
+- Visibility: public
+- Demo: <https://obs-clock-overlay-builder.h8nc4y.workers.dev>
+- License: MIT
+- GitHub About description: `Static OBS clock overlay builder with reproducible /clock/?c=... URLs.`
+- Topics: `obs`, `obs-studio`, `browser-source`, `clock`, `overlay`, `streaming`, `youtube-live`, `cloudflare-workers`, `javascript`
+- Stars at inspection time: 0
+- Forks at inspection time: 0
+- Recent merged PR evidence includes PR #19 through PR #24.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, and production demo are present.
+
+The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
+
+## Official Criteria Fit
+
+| Official signal | Current fit | Notes |
+|---|---|---|
+| Active open-source project | Partial to good | Public repo, recent PRs, MIT license, contribution docs, production demo. The public period is still short. |
+| Primary or core maintainer | Likely good | `h8nc4y` appears to be the repo owner and current maintainer. The actual applicant must confirm their role in the form. |
+| Public repository | Good | GitHub visibility is public. |
+| Meaningful usage / broad adoption / ecosystem importance | Weak today | Stars and forks are 0 at inspection time. The strongest current claim is ecosystem relevance for OBS browser-source overlays, not demonstrated adoption. |
+| Active maintenance evidence | Good for a young project | PR history shows repeated documentation, release, review, bugfix, and UI maintenance. |
+| PR review / issue triage / release workflow | Partial | PR workflow and release checks are documented. Issue triage evidence is limited. GitHub Actions are intentionally absent. |
+| Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
+| Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
+| Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
+
+## Strengths
+
+- Clear product niche: reproducible transparent OBS browser-source clock URLs.
+- Strong product contract: generated `/clock/?c=...` URL is the source of truth.
+- Small static architecture with zero runtime dependencies.
+- Public production demo.
+- MIT license, README, contribution guide, code of conduct, and README screenshot are present.
+- Japanese-first UX and docs support a specific user group.
+- AI-assisted maintenance process is explicitly documented.
+- Local validation and release checks are documented and repeatedly used.
+- Cloudflare cost and deploy boundaries are documented.
+
+## Weaknesses
+
+- Public traction is currently weak: 0 GitHub stars and 0 forks at inspection time.
+- No monthly download metric applies because this is not an npm package or library distribution.
+- No public issue triage history is visible in the evidence gathered for this packet.
+- No GitHub Actions workflow exists; this is intentional for cost control, but it weakens automation evidence.
+- OBS real-device evidence remains a known manual QA limitation in older review packets.
+- The project is useful but narrow; it may not yet meet the "critical open-source software" framing without stronger ecosystem evidence.
+
+## Objective Signals To Grow Before Applying
+
+Prioritize evidence that can be linked from a public application without exposing private data:
+
+- Public issues from real users or documented maintainer-created issue triage.
+- More merged PRs showing sustained maintenance after public launch.
+- Release tags and concise release notes beyond `v0.1.0`.
+- A small public roadmap or good-first-issue list.
+- Manual OBS QA evidence recorded in public-safe form.
+- README examples that show real OBS use without private account or stream data.
+- External mentions, users, stars, forks, or discussions if they happen organically.
+- Optional CI only after cost and trigger decisions are settled.
+
+## Evidence Usable In An Application
+
+- Public repo URL and public visibility.
+- Production demo URL.
+- README feature and privacy sections.
+- MIT license.
+- CONTRIBUTING and CODE_OF_CONDUCT.
+- `docs/HOW_WE_USE_CODEX.md` for AI-assisted maintenance workflow.
+- `docs/DECISION_LOG.md` for decisions and scope control.
+- `docs/AI_REVIEW_TRIAGE.md` for Claude finding triage and ChatGPT approval boundaries.
+- `docs/CODEX_TASKS.md` for Codex implementation queues.
+- `docs/CLAUDE_REVIEW.md` as advisory review evidence.
+- `docs/PR19_REVIEW_READINESS.md` as public-safe readiness evidence.
+- PRs #19 through #24 as recent maintenance examples.
+- `package.json` scripts for validation and release checks.
+- `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
+
+## Claims To Avoid
+
+Do not claim any of the following unless future evidence exists:
+
+- "Accepted into Codex for Open Source."
+- "OpenAI-endorsed" or "OpenAI-approved."
+- "Widely adopted," "critical infrastructure," or "broadly used."
+- Specific user counts, monthly downloads, traffic, stars, forks, or OBS installs beyond current public metrics.
+- GitHub Actions automation, if it remains absent.
+- Production deploy by Codex, when the user performed deploy manually.
+- Codex Security usage, unless it is actually granted and used later.
+- API credits usage, unless credits are granted and used later.
+- Any private OpenAI Organization ID, account email, token, API key, billing value, or payment detail.
+
+## Roadmap To Application
+
+### Phase 1: Ready Packet
+
+- Keep these readiness docs current.
+- Keep README, demo, license, and contribution docs public-safe.
+- Confirm GitHub profile visibility before applying.
+- Confirm the applicant is the primary/core maintainer.
+
+### Phase 2: Evidence Growth
+
+- Record public-safe manual OBS QA.
+- Add a compact public roadmap.
+- Add a few issue labels and triage examples.
+- Continue using PRs for maintenance work.
+- Prefer small releases with release notes when meaningful changes land.
+
+### Phase 3: Application Draft Finalization
+
+- Re-check the official form and character limits.
+- Re-check stars, forks, issues, PRs, release tags, and demo health.
+- Update application text with only verified facts.
+- Keep confidential fields outside the repository.
+
+### Phase 4: User-Only Submission
+
+- The user fills the OpenAI form.
+- The user supplies email and OpenAI Organization ID directly in the form.
+- Codex does not submit the application, operate the OpenAI site, create API keys, or perform OAuth.
+
+## Application Decision Gate
+
+Apply now only if the user is comfortable with a candid early-stage application that emphasizes niche ecosystem value and disciplined maintenance rather than adoption.
+
+Recommended gate before a stronger application:
+
+- Public repo remains healthy and current.
+- At least a few more public maintenance events exist after PR #24.
+- Public issue/triage or user feedback exists.
+- Demo remains live and current.
+- No secret-like values are present in application text.
+- The application text does not overstate adoption.
+
+Current recommendation: wait for more objective public signals unless the user wants to apply early with a conservative, transparent narrative.
