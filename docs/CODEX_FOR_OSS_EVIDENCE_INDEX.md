@@ -21,6 +21,7 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Feedback guide: [FEEDBACK_GUIDE.md](FEEDBACK_GUIDE.md)
 - Roadmap: [ROADMAP.md](ROADMAP.md)
 - Changelog: [../CHANGELOG.md](../CHANGELOG.md)
+- v0.1.0 GitHub Release: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - License: [../LICENSE](../LICENSE)
 - Contributing guide: [../CONTRIBUTING.md](../CONTRIBUTING.md)
 - Code of conduct: [../CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md)
@@ -31,6 +32,7 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Public feedback guide: [FEEDBACK_GUIDE.md](FEEDBACK_GUIDE.md)
 - Public roadmap: [ROADMAP.md](ROADMAP.md)
 - Changelog: [../CHANGELOG.md](../CHANGELOG.md)
+- v0.1.0 Release/tag: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - Manual QA checklist: [manual-qa.md](manual-qa.md)
 - Pre-release QA: [pre-release-qa.md](pre-release-qa.md)
 - Post-launch operations: [post-launch-ops.md](post-launch-ops.md)
@@ -80,6 +82,17 @@ Release workflow docs:
 - [pre-release-qa.md](pre-release-qa.md)
 - [post-launch-ops.md](post-launch-ops.md)
 - [manual-qa.md](manual-qa.md)
+
+Confirmed release evidence:
+
+- `v0.1.0` GitHub Release: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
+- Release title: `v0.1.0 - OBS時計オーバーレイビルダー初回公開`
+- Release state: published, not draft, not prerelease.
+- Published date: 2026-05-20.
+- Tag: `v0.1.0`.
+- Local tag object resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
+
+This is release-discipline evidence. It is not evidence of broad adoption, user count, stars, forks, or Codex for OSS acceptance.
 
 ## Claude Review To Codex Implementation Flow
 

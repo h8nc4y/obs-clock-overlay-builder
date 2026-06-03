@@ -20,7 +20,9 @@ Facts confirmed from the public repository and local `master`:
 - Topics: `obs`, `obs-studio`, `browser-source`, `clock`, `overlay`, `streaming`, `youtube-live`, `cloudflare-workers`, `javascript`
 - Stars at inspection time: 0
 - Forks at inspection time: 0
-- Recent merged PR evidence includes PR #19 through PR #24.
+- `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
+- `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
+- Recent merged PR evidence includes PR #19 through PR #26.
 - README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, and production demo are present.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
@@ -34,7 +36,7 @@ The project is public and maintained, but public traction is still early. Do not
 | Public repository | Good | GitHub visibility is public. |
 | Meaningful usage / broad adoption / ecosystem importance | Weak today | Stars and forks are 0 at inspection time. The strongest current claim is ecosystem relevance for OBS browser-source overlays, not demonstrated adoption. |
 | Active maintenance evidence | Good for a young project | PR history shows repeated documentation, release, review, bugfix, and UI maintenance. |
-| PR review / issue triage / release workflow | Partial | PR workflow and release checks are documented. Issue triage evidence is limited. GitHub Actions are intentionally absent. |
+| PR review / issue triage / release workflow | Partial to good | PR workflow and release checks are documented, and `v0.1.0` has a public GitHub Release/tag. Issue triage evidence is still limited. GitHub Actions are intentionally absent. |
 | Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
 | Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
 | Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
@@ -45,6 +47,7 @@ The project is public and maintained, but public traction is still early. Do not
 - Strong product contract: generated `/clock/?c=...` URL is the source of truth.
 - Small static architecture with zero runtime dependencies.
 - Public production demo.
+- Public `v0.1.0` GitHub Release/tag exists, improving release-discipline evidence.
 - MIT license, README, contribution guide, code of conduct, and README screenshot are present.
 - Japanese-first UX and docs support a specific user group.
 - AI-assisted maintenance process is explicitly documented.
@@ -55,7 +58,7 @@ The project is public and maintained, but public traction is still early. Do not
 
 - Public traction is currently weak: 0 GitHub stars and 0 forks at inspection time.
 - No monthly download metric applies because this is not an npm package or library distribution.
-- No public issue triage history is visible in the evidence gathered for this packet.
+- Public issue triage and user feedback evidence remain weak in the evidence gathered for this packet.
 - No GitHub Actions workflow exists; this is intentional for cost control, but it weakens automation evidence.
 - OBS real-device evidence remains a known manual QA limitation in older review packets.
 - The project is useful but narrow; it may not yet meet the "critical open-source software" framing without stronger ecosystem evidence.
@@ -66,7 +69,7 @@ Prioritize evidence that can be linked from a public application without exposin
 
 - Public issues from real users or documented maintainer-created issue triage.
 - More merged PRs showing sustained maintenance after public launch.
-- Release tags and concise release notes beyond `v0.1.0`.
+- Release tags and concise release notes beyond the existing `v0.1.0` release.
 - A small public roadmap or good-first-issue list.
 - Public feedback guide and issue templates that invite OBS setup reports without requesting private data.
 - Changelog entries and release notes that can be tied to tags once releases are created.
@@ -79,6 +82,7 @@ Prioritize evidence that can be linked from a public application without exposin
 
 - Public repo URL and public visibility.
 - Production demo URL.
+- `v0.1.0` GitHub Release/tag as release-discipline evidence.
 - README feature and privacy sections.
 - MIT license.
 - CONTRIBUTING and CODE_OF_CONDUCT.
