@@ -20,6 +20,9 @@ The official page says applications are reviewed on a rolling basis and asks app
 - README screenshot: [assets/editor-preview.png](assets/editor-preview.png)
 - Feedback guide: [FEEDBACK_GUIDE.md](FEEDBACK_GUIDE.md)
 - Roadmap: [ROADMAP.md](ROADMAP.md)
+- YouTube Live overlay suite concept: [YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
+- Headline feature MVP requirements: [HEADLINE_FEATURE_MVP_REQUIREMENTS.md](HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
+- YouTube data policy boundary: [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 - Changelog: [../CHANGELOG.md](../CHANGELOG.md)
 - v0.1.0 GitHub Release: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - License: [../LICENSE](../LICENSE)
@@ -31,6 +34,9 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Product requirements: [PRODUCT_REQUIREMENTS.md](PRODUCT_REQUIREMENTS.md)
 - Public feedback guide: [FEEDBACK_GUIDE.md](FEEDBACK_GUIDE.md)
 - Public roadmap: [ROADMAP.md](ROADMAP.md)
+- Headline feature planning: [YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
+- Safe MVP requirements: [HEADLINE_FEATURE_MVP_REQUIREMENTS.md](HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
+- YouTube data policy boundary: [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 - Changelog: [../CHANGELOG.md](../CHANGELOG.md)
 - v0.1.0 Release/tag: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - Manual QA checklist: [manual-qa.md](manual-qa.md)
@@ -63,6 +69,22 @@ Recent public PR history confirmed with GitHub metadata:
 - PR #17: <https://github.com/h8nc4y/obs-clock-overlay-builder/pull/17> — dashboard check record.
 
 Use current GitHub pages for exact latest PR state.
+
+## Public Planning Issues
+
+- Issue #28: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/28> — public feedback request.
+- Issue #29: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/29> — roadmap feedback and priorities.
+- Issue #30: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30> — YouTube Live focused OBS overlay suite exploration.
+
+These are public maintenance and planning signals. They are not user adoption evidence by themselves.
+
+## Candidate Headline Feature Planning
+
+- [YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md) positions the existing clock overlay as a possible first member of a future suite.
+- [HEADLINE_FEATURE_MVP_REQUIREMENTS.md](HEADLINE_FEATURE_MVP_REQUIREMENTS.md) prioritizes a safe manual/fixture keyword reaction overlay before any YouTube API/OAuth work.
+- [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md) records credential, privacy, data, and official-documentation review boundaries.
+
+This is planning evidence for future direction. It is not evidence that YouTube Live integration is implemented, that YouTube API access exists, or that the project has broad adoption.
 
 ## Validation And Release Workflow Evidence
 
