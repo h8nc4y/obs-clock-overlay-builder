@@ -6,15 +6,59 @@
 
 この文書は、実装、YouTube API calls、OAuth、API keys、scraping、real viewer data、deploy、external data sending を承認するものではありません。
 
+関連するスコープ固定記録: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+
 ## Security Principles
 
 - URL config、manual input、fixture text は untrusted として扱う。
 - text は HTML ではなく text として表示する。
 - untrusted values に `innerHTML` を使わない。
 - invalid config は safe defaults へ normalize する。
-- overlay playback は editor localStorage に依存しない。
+- overlay playback は editor `localStorage` に依存しない。
 - generated URLs に secrets、tokens、private account data、raw user data を入れない。
 - manual input、fixture data、generated config を external services へ送信しない。
+- overlay-only surface は transparent background と `body` margin 0 を守る。
+
+## Implementation Phases
+
+### Phase 1: Route/Static Skeleton
+
+最初の実装PRで確認すること:
+
+- `/overlay/keyword-reaction/` が 200 で開く。
+- overlay-only transparent surface。
+- `body` margin 0。
+- editor controls なし。
+- safe default text のみ表示。
+- external network request なし。
+- editor `localStorage` dependency なし。
+- `innerHTML` なし。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+
+### Phase 2: Manual Input + Toast
+
+skeleton 後の manual input + toast PR で確認すること:
+
+- editor から人工テキストを入力できる。
+- keyword に一致したら toast が表示される。
+- `displayPattern: "toast"` が初期 behavior。
+- `reactionStyle` と `intensity` が safe enum / numeric range に収まる。
+- generated URL で visual config と keyword rules が再現できる。
+- manual event text は generated OBS URL に default で入れない。
+- text-not-HTML samples が inert text として扱われる。
+- no YouTube API / no OAuth / no API key / no real data。
+
+### Phase 3: Fixture Playback
+
+fixture playback PR で確認すること:
+
+- fixture は人工データのみ。
+- `schemaVersion`、`overlayType`、`displayPattern`、`reactionStyle`、`matchMode` の validation がある。
+- fixture event order が deterministic。
+- overly long `displayText` と `keyword` が安全に制限される。
+- unsupported enum values が reject または safe fallback になる。
+- fixture payload を generated URL に default で入れない。
+- real YouTube data への拡張として扱わない。
 
 ## Input Surfaces
 
@@ -31,6 +75,8 @@ Candidate A の planned input surfaces:
 - maximum number of rules。
 - maximum fixture event count。
 - timing / intensity の accepted numeric ranges。
+- `matchMode` の accepted enum。
+- `reactionStyle` の accepted enum。
 - unknown enum values の safe fallback。
 
 ## URL Config Sanitization
@@ -38,9 +84,12 @@ Candidate A の planned input surfaces:
 実装前に設計したい checks:
 
 - invalid base64url config は safe fallback。
-- unsupported schema version は safe fallback。
+- unsupported `schemaVersion` は safe fallback。
+- unknown `overlayType` は safe fallback または error state。
 - unknown theme は default。
-- unknown display pattern は `toast`。
+- unknown `displayPattern` は `toast`。
+- unsupported `reactionStyle` は safe fallback。
+- unsupported `matchMode` は safe fallback。
 - unsafe color / style values は reject または normalize。
 - keyword rules は length-limited。
 - text は text APIs で代入し、HTML として解釈しない。
@@ -51,12 +100,15 @@ Candidate A の planned input surfaces:
 fixture parsing で reject または normalize すべきもの:
 
 - missing `schemaVersion`。
+- unsupported `overlayType`。
+- unsupported `displayPattern`。
 - missing / duplicate event ids。
 - negative `offsetMs`。
 - overly large `offsetMs`。
 - overly long `displayText`。
 - overly long `keyword`。
-- unsupported `styleHint`。
+- unsupported `reactionStyle`。
+- unsupported `matchMode`。
 - non-numeric `intensity`。
 - HTML-like text。
 
@@ -132,12 +184,12 @@ minimum checks:
 
 ## Generated URL Import/Export QA
 
-確認項目:
+import/export は初回 manual input + toast PR の必須範囲にしない。実装する場合の確認項目:
 
 - generated URL が visual config と keyword rules を round-trip する。
 - full URL import が動く。
-- 実装する場合は query string import が動く。
-- 実装する場合は config-only import が動く。
+- query string import が動く。
+- config-only import が動く。
 - invalid URL config は safe fallback。
 - default omission が overlay output を変えない。
 - generated URL は manual event text を default で含めない。
@@ -152,6 +204,7 @@ minimum checks:
 - no API keys。
 - no scraping。
 - no real viewer data。
+- no real comment data。
 - no external sending。
 - no backend storage。
 - no private dashboard data。

@@ -23,7 +23,7 @@ Facts confirmed from the public repository and local `master`:
 - `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
 - Recent merged PR evidence includes PR #19 through PR #26.
-- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design docs, and production demo are present.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs, and production demo are present.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -54,7 +54,7 @@ The project is public and maintained, but public traction is still early. Do not
 - AI-assisted maintenance process is explicitly documented.
 - Local validation and release checks are documented and repeatedly used.
 - Headline feature planning docs describe a possible YouTube Live OBS overlay suite while keeping API/OAuth/data policy boundaries explicit.
-- Candidate A design docs define a safe manual/fixture keyword reaction MVP scope before implementation.
+- Candidate A design and scope decision docs define a safe route/static skeleton first step, followed by manual input + toast before fixture playback.
 - Cloudflare cost and deploy boundaries are documented.
 
 ## Weaknesses
@@ -78,7 +78,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - A small public roadmap or good-first-issue list.
 - Public feedback guide and issue templates that invite OBS setup reports without requesting private data.
 - Public planning and feedback for the candidate YouTube Live overlay suite, including issue #30 and safe MVP requirements.
-- Candidate A implementation PR evidence after a small manual/fixture MVP is designed, implemented, and validated.
+- Candidate A implementation PR evidence after the route/static skeleton, manual input + toast, and later fixture playback are implemented and validated in small steps.
 - Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.
@@ -104,7 +104,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
 - `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.
 - `docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md`, `docs/HEADLINE_FEATURE_MVP_REQUIREMENTS.md`, and `docs/YOUTUBE_DATA_POLICY_BOUNDARY.md` for candidate headline feature planning.
-- `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A design evidence.
+- `docs/CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A implementation planning evidence.
 - Issue #30 for public YouTube Live overlay suite exploration: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 
 ## Claims To Avoid

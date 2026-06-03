@@ -10,6 +10,10 @@
 
 - Issue #30: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 - Safe MVP comment: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30#issuecomment-4613411826>
+- Implementation scope decision: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+- URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
+- Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
+- Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - Suite concept: [YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
 - MVP requirements: [HEADLINE_FEATURE_MVP_REQUIREMENTS.md](HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
 - Data boundary: [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -23,7 +27,7 @@ Candidate A の目的は、YouTube連携に入る前に「キーワードに反�
 - 配信者がプログラムを書かずに keyword rule を設定できるか。
 - 手入力イベントで分かりやすい reaction overlay を出せるか。
 - overlay-only page が透明背景の OBS Browser Source として使えるか。
-- 生成URLまたは importable config で表示設定を再現できるか。
+- generated URL で visual config と keyword rules を再現できるか。
 - untrusted text を HTML として扱わず、安全に表示できるか。
 
 ## 対象ユーザー
@@ -32,18 +36,30 @@ Candidate A の目的は、YouTube連携に入る前に「キーワードに反�
 - YouTube Live向けのchat-reactive visualを検討しているが、まだYouTube account接続はしたくない配信者。
 - 実YouTube連携前に、overlay UX、URL契約、fixture形式、QA境界を固めたい maintainer。
 
+## Path
+
+Candidate A の overlay-only page は、初回実装方針として次を採用する。
+
+```text
+/overlay/keyword-reaction/?c=...
+```
+
+これは route/static skeleton PR の対象path。将来 suite 化が進んだ場合は path 再編の可能性を残す。
+
 ## ユースケース
 
-- 配信者が editor で keyword と reaction style を設定し、手入力で反応を試す。
-- maintainer が synthetic fixture を再生して、表示密度やタイミングを確認する。
+- maintainer が route/static skeleton を通常ブラウザと OBS Browser Source で確認する。
+- 配信者が editor で keyword と `reactionStyle` を設定し、手入力で reaction を試す。
 - reviewer が generated overlay URL を通常ブラウザまたは OBS Browser Source で開き、同じ設定が再現されることを確認する。
-- 将来の実装PRで、keyword matching、animation timing、sanitization を fixture で検証する。
+- maintainer が後続PRで synthetic fixture を再生し、表示密度やタイミングを確認する。
 
 ## OBS Workflow
 
+route/static skeleton 後の想定workflow:
+
 1. editor / builder page を開く。
-2. reaction display pattern と keyword rules を設定する。
-3. manual input または synthetic fixture で反応を試す。
+2. `displayPattern`、`reactionStyle`、keyword rules を設定する。
+3. manual input で人工テキストを入力して反応を試す。
 4. generated overlay URL をコピーする。
 5. OBS Browser Source を追加する。
 6. 生成URLを貼る。
@@ -52,90 +68,97 @@ Candidate A の目的は、YouTube連携に入る前に「キーワードに反�
 
 時計ツールと同じく、設定用の editor surface と OBS用の overlay-only surface を分ける。
 
-## MVP範囲
+## Safe MVP Sequence
+
+Candidate A は次の順で小さく進める。
+
+1. Route/static skeleton。
+2. Manual input + toast。
+3. Fixture playback。
+4. Ticker / badge。
+5. URL import/export refinement。
+6. YouTube integration design。
+
+この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
+
+## First Implementation PR: Route/Static Skeleton
+
+最初の実装PRは route/static skeleton のみにする。
 
 含めるもの:
 
-- keyword testing 用の manual event input。
-- demo / QA 用の synthetic fixture playback。
-- 最初の表示パターンは1種類に絞る。
-- visual reproducibility のための generated URL または importable config。
-- 透明背景の overlay-only page。
-- user-provided label / event text の text-only rendering。
-- local validation と manual OBS QA checklist。
+- `/overlay/keyword-reaction/` の静的HTML entry。
+- overlay-only transparent surface。
+- 最小CSS。
+- safe default text。
+- no editor UI。
+- no external network。
+- no editor `localStorage` dependency。
+- no `innerHTML`。
 
 含めないもの:
 
-- YouTube API calls。
-- OAuth login。
-- API key 作成または保存。
+- editor integration。
+- manual input。
+- fixture playback。
+- generated URL editor。
+- config import/export UI。
+- YouTube API / OAuth / API key / scraping / real data。
+
+完了条件:
+
+- `/overlay/keyword-reaction/` が 200 で開く。
+- `body` margin 0。
+- transparent background。
+- editor UI が出ない。
+- safe default text のみ表示。
+- external network request なし。
+- editor `localStorage` dependency なし。
+- `innerHTML` なし。
+- tests / build / smoke が通る。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+
+初回 skeleton では `c` parser は未実装または最小 fallback でよい。
+
+## Second Implementation PR: Manual Input + Toast
+
+skeleton の次は manual input + toast を優先する。
+
+含めるもの:
+
+- editor から人工テキストを入力できる。
+- keyword に一致したら toast 表示する。
+- `displayPattern: "toast"` を初期値にする。
+- `reactionStyle` と `intensity` を安全な enum / numeric range に制限する。
+- generated URL で visual config と keyword rules が再現できる。
+- user-provided text は text として表示する。
+- no YouTube API / OAuth / API key / real data。
+
+含めないもの:
+
+- fixture playback。
+- ticker。
+- badge。
+- YouTube integration。
 - live chat / comment fetching。
-- scraping。
-- 実視聴者、実コメント、配信者データ。
-- moderation workflow。
-- author-centric browsing。
-- backend persistence。
-- Codex for OSS application submission。
+- OAuth login。
+- API key storage。
+- raw real comments。
 
-## 画面構成案
+## Fixture Playback
 
-### Editor / Builder Page
+fixture playback は manual input + toast の後続PRに分ける。
 
-editor は設定とテストに集中する。
+fixture は artificial events だけを扱う。timing、repeated events、missed keyword、visual density を確認するために使う。
 
-- keyword rule editor。
-- reaction style controls。
-- display pattern selector。
-- manual event input。
-- fixture playback controls。
-- preview area。
-- generated URL area。
-- recommended OBS size。
+fixture に含めてはいけないもの:
 
-editor は下書き復元のために localStorage を使ってもよいが、overlay-only page は editor localStorage に依存してはいけない。
-
-### Overlay-Only Page
-
-overlay-only page は OBS に貼る面。
-
-- editor controls を表示しない。
-- page background は透明。
-- body margin は 0。
-- visual state は URL/config driven。
-- config が missing / invalid / too long の場合は safe fallback。
-- Candidate A では external data fetching をしない。
-
-### Manual Event Input
-
-manual input は、maintainer または配信者が synthetic event text を入力して reaction を試すためのもの。real chat integration を意味しない。
-
-候補フィールド:
-
-- event text。
-- optional keyword override。
-- optional intensity。
-- trigger button。
-- clear/reset button。
-
-### Fixture Playback
-
-fixture playback は artificial events だけを扱う。timing、repeated events、missed keyword、visual density を確認するために使う。
-
-最小 controls:
-
-- built-in synthetic fixture の選択。
-- play。
-- pause。
-- restart。
-- 必要になった場合のみ playback speed。
-
-### Generated URL Area
-
-generated URL area では再現性の境界を明確にする。
-
-- visual config と keyword rules は encode してよい。
-- secrets、API keys、OAuth tokens、private identifiers、raw real comments は encode してはいけない。
-- 長いconfigは将来 import/export fallback を検討する。
+- real viewer names。
+- real comments / live chat messages。
+- channel IDs / account identifiers。
+- API keys / OAuth tokens / secrets。
+- private dashboard values。
+- personal data。
 
 ## 表示パターン案
 
@@ -147,7 +170,7 @@ generated URL area では再現性の境界を明確にする。
 
 - 初見で理解しやすい。
 - layout pressure が小さい。
-- manual / fixture MVP に向く。
+- manual input MVP に向く。
 - OBS確認がしやすい。
 
 リスク:
@@ -186,44 +209,60 @@ keyword reaction を小さな badge や count として見せる形式。
 
 ## MVP推奨
 
-最初は Toast を推奨する。
+最初の behavior MVP は Toast を推奨する。
 
 理由:
 
 - 最小の behavior surface で reaction overlay の価値を検証できる。
-- manual input と fixture playback で確認しやすい。
+- manual input で確認しやすい。
 - 時計ツールで学んだ safe inset、transparent background、generated URL reproducibility を活かしやすい。
 - Ticker と Badge は、config と overlay contract が安定した後の follow-up に分けられる。
+
+## Keyword Matching 初期方針
+
+初回は最小の matching から始める。
+
+- 英数字は case-insensitive を対象にする。
+- 日本語は完全一致または単純包含から始める。
+- 全角半角 normalization は初回MVPでは未実装または後続検討。
+- かな / カナ normalization は初回MVPでは未実装または後続検討。
+- Unicode normalization は初回MVPでは未実装または後続検討。
+
+日本語 normalization を実装済みとは書かない。
 
 ## 再現性契約の適用方針
 
 時計ツールでは `/clock/?c=...` が source of truth になっている。Candidate A も、visual configuration については同じ考え方を採用する。
 
 - generated URL が OBS playback の source of truth。
-- overlay-only page は editor localStorage に依存しない。
+- overlay-only page は editor `localStorage` に依存しない。
 - invalid config は safe defaults に normalize する。
 - user-provided strings は HTML ではなく text として表示する。
 - runtime manual input と fixture events は、private external data とは分離する。
+- secrets、API keys、OAuth tokens、private identifiers、raw real comments は URL に encode しない。
 
-未確定: path を `/overlay/?c=...` のような汎用形にするか、`/overlay/keyword-reaction/?c=...` のような具体形にするか。詳細は [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md) に分ける。
+詳細は [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md) に分ける。
 
-## 今後のPR分割案
+## 語彙
 
-この docs PR の後に想定する小さな実装PR:
+URL config と fixture schema は次の語彙に寄せる。
 
-1. local-only keyword reaction editor と overlay surface の route / static page skeleton。
-2. config encode/decode helper と tests。
-3. manual input MVP と toast display。
-4. synthetic fixture playback と fixture schema validation。
-5. Browser / OBS QA と docs 更新。
-6. toast が安定した後、ticker または badge を追加検討。
-7. YouTube integration design は data boundary review 後の別タスク。
+- `schemaVersion`
+- `overlayType: "keyword-reaction"`
+- `displayPattern: "toast" | "ticker" | "badge"`
+- `reactionStyle: "spark" | "pulse" | "soft" | "none"`
+- `intensity`
+- `keyword`
+- `matchMode`
+
+reaction visual style の呼び方は `reactionStyle` に揃える。
 
 ## 未確定事項
 
 - Candidate A を長期的にこの repository に置くか、将来 suite / umbrella repo に分けるか。
-- 最初の overlay path を generic にするか keyword-specific にするか。
-- fixture playback は built-in fixture list、pasted JSON、または両方にするか。
+- `matchMode` の最終enum。
+- `reactionStyle` の最終enum。
 - toast animation はどの程度なら便利で邪魔にならないか。
-- keyword matching は exact match、case-insensitive、または日本語/英語 normalization を含めるか。
-- 初回MVPの完了条件を local browser のみにするか、OBS Browser Source manual QA まで含めるか。
+- fixture playback は built-in fixture list、pasted JSON、または両方にするか。
+- import/export を manual input + toast の直後に入れるか、fixture playback 後に入れるか。
+- real YouTube integration を検討する場合の official documentation review、credential storage、quota/cost、privacy、data deletion / revocation 設計。
