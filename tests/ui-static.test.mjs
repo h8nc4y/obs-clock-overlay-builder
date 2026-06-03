@@ -74,7 +74,27 @@ test("editor live preview reserves visual safe inset around clock widget", () =>
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
   assert.match(previewStageBlock, /padding:\s*var\(--clock-visual-safe-inset,\s*18px\);/);
-  assert.match(previewStageBlock, /overflow:\s*visible;/);
+  assert.match(previewStageBlock, /overflow:\s*auto;/);
+  assert.match(previewStageBlock, /overscroll-behavior:\s*contain;/);
+});
+
+test("editor live preview contains oversized clock inside the preview column", () => {
+  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const previewPanelBlock =
+    css.match(/\.preview-panel\s*\{\s*background:\s*var\(--panel-strong\);(?<body>[^}]+)\}/)?.groups?.body ?? "";
+  const previewShellBlock = css.match(/\.preview-shell\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+  const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+  const previewClockBlock = css.match(/\.preview-stage \.clock-widget\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+
+  assert.match(previewPanelBlock, /min-width:\s*0;/);
+  assert.match(previewPanelBlock, /max-width:\s*100%;/);
+  assert.match(previewShellBlock, /min-width:\s*0;/);
+  assert.match(previewShellBlock, /max-width:\s*100%;/);
+  assert.match(previewStageBlock, /inline-size:\s*100%;/);
+  assert.match(previewStageBlock, /min-width:\s*0;/);
+  assert.match(previewStageBlock, /max-width:\s*100%;/);
+  assert.match(previewClockBlock, /flex:\s*0 0 auto;/);
+  assert.match(previewClockBlock, /max-width:\s*none;/);
 });
 
 test("editor refresh keeps preview and OBS URL first in the task flow", () => {
