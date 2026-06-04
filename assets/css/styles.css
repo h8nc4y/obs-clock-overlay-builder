@@ -813,7 +813,7 @@ details p {
   pointer-events: none;
 }
 
-.keyword-reaction-placeholder {
+.keyword-reaction-status {
   max-width: min(360px, calc(100vw - 36px));
   margin: 0;
   padding: 10px 14px;
@@ -825,6 +825,11 @@ details p {
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: 0;
+  white-space: pre-line;
+}
+
+.keyword-reaction-status[hidden] {
+  display: none;
 }
 
 .clock-widget {
