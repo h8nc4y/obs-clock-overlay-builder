@@ -2,9 +2,9 @@
 
 ## Status
 
-この文書は Candidate A: keyword reaction overlay の次PR「manual input + toast」に入る前のスコープ固定記録です。
+この文書は Candidate A: keyword reaction overlay の「manual input + toast」に入る前のスコープ固定記録です。PR #38 で editor preview 中心の manual input + toast preview は実装済みだが、この文書自体は implementation planning evidence として扱う。
 
-これは planning / implementation planning evidence です。manual input + toast が実装済みであること、YouTube API 連携が承認済みであること、Codex for OSS 申請済みまたは採択済みであること、利用者が多数いることを示す証拠ではありません。
+これは planning / implementation planning evidence です。Candidate A が fully implemented であること、YouTube API 連携が承認済みであること、Codex for OSS 申請済みまたは採択済みであること、利用者が多数いることを示す証拠ではありません。
 
 今回の目的は、次の実装PRを小さくし、editor preview 中心の安全な人工入力だけで keyword reaction の基本UXを確認できるようにすることです。YouTube API、OAuth、API key、scraping、実視聴者データ、実コメントデータ、external sending、deploy は引き続き非対象です。
 
@@ -13,6 +13,7 @@
 - [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
+- [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -104,7 +105,22 @@ overlay runtime の本格イベント表示は、editor preview の behavior と
 - 正規表現matching。
 - YouTube chat 向けに十分であるという断定。
 
-この文書は matching が実装済みであることを示さない。次PRへ渡す初期方針を記録するもの。
+この初期matching方針は PR #38 で最小previewとして実装された。NFKC、全角半角、かな / カナ normalization は実装済みではなく、後続検討として扱う。
+
+## Matching Normalization Follow-Up
+
+PR #38 の manual input + toast preview 後、次の小PRでは matching normalization と preview/config consistency を先に整える。
+
+固定する方針:
+
+- 英数字は引き続き case-insensitive。
+- 日本語は引き続き単純包含または完全一致。
+- NFKC、全角半角、かな / カナ normalization は後続検討。
+- preview 判定は generated URL に保存される config と同じ normalized config を source of truth にする。
+- manual input text は generated URL に含めない方針を維持する。
+- keyword が空または secret-like で fallback される場合、preview も fallback 後の normalized keyword で判定するか、fallback が起きたことを status で明示する。
+
+詳細は [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md) に分ける。この follow-up は高度normalization実装やYouTube連携を承認するものではない。
 
 ## Display Pattern And Reaction Style Policy
 
@@ -214,6 +230,19 @@ manual input は「テスト入力」であり、「OBSへ保存される実イ�
 - console に関連errorがない。
 - validation が通る。
 
+## Done Criteria For The Preview/Config Consistency Follow-Up
+
+manual input + toast 後の次PRの完了条件:
+
+- preview 判定と generated URL が同じ normalized config から作られる。
+- preview 判定は normalized `keyword` と normalized `matchMode` を使う。
+- secret-like keyword fallback 時に、入力実値を出さずに安全な fallback status を出す。
+- manual input text が generated URL に含まれない。
+- NFKC、全角半角、かな / カナ normalization は実装しない。
+- no YouTube API / no OAuth / no API key / no real data / no external network。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- `/overlay/keyword-reaction/` の skeleton / overlay-only surface を壊さない。
+
 ## Open Questions
 
 - toast duration、cooldown、queueing の初期値。
@@ -232,6 +261,8 @@ manual input は「テスト入力」であり、「OBSへ保存される実イ�
 
 - config helper の `intensity` は連続値を許容するが、初回UIは整数stepにする。
 - manual input text は generated URL に入れない。
+- preview 判定と generated URL config は同じ normalized config へ寄せる。
+- NFKC、全角半角、かな / カナ normalization は後続検討に残す。
 - `displayPattern` は初回 `toast` のみ。
 - `ticker` / `badge` と fixture playback は後続。
 - YouTube API / OAuth / API key / scraping / real data は非対象。
