@@ -2,18 +2,27 @@
 
 ## Status
 
-この文書は Candidate A keyword reaction overlay のテスト用 synthetic fixture JSON 形状案です。
+この文書は Candidate A keyword reaction overlay の fixture playback + schema validation に向けた schema draft です。
 
-この文書では fixture file を追加しません。将来 repository に fixture を置く場合も、完全な人工データだけを使います。fixture playback は manual input + toast が安定した後の後続PRに分ける。
+この文書では fixture file を追加しません。fixture playback、paste JSON import、overlay runtime、YouTube API integration、OAuth、API key、scraping、実データ取得を実装または承認するものでもありません。
 
-関連するスコープ固定記録: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+fixture は完全な人工データだけを扱う。実YouTube live chat、comment、replay data、実視聴者名、実コメント、チャンネルID、private account data、dashboard data は扱わない。
 
-## Fixtureの目的
+関連:
 
-- YouTube API、OAuth、API key、scraping、real viewer data を使わずに keyword reaction behavior を試す。
-- local tests と OBS QA で timing を再現できるようにする。
-- real integration 前に display density を確認する。
-- sample data を public-safe かつ synthetic に保つ。
+- [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
+- [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
+- [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
+- [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
+
+## Fixture Purpose
+
+- YouTube API、OAuth、API key、scraping、real viewer data を使わずに keyword reaction behavior を確認する。
+- local tests と OBS QA で timing、display density、repeated events を再現しやすくする。
+- real integration 前に safe DOM rendering、event ordering、validation boundary を固める。
+- sample data を public-safe synthetic に保つ。
+
+fixture playback は実YouTube連携の代替ではない。安全なローカル検証機能として扱う。
 
 ## Data Policy
 
@@ -21,38 +30,44 @@ fixture に含めてはいけないもの:
 
 - real viewer names。
 - real comments / live chat messages。
-- channel IDs / account identifiers。
+- YouTube channel IDs / account identifiers。
 - private stream titles。
 - dashboard data。
-- API keys、OAuth tokens、secrets、private keys。
-- 実ユーザーからコピーした personal data。
+- API keys。
+- OAuth tokens。
+- secrets / private keys。
+- private account data。
+- ユーザーが公開する意図のない personal data。
 
 fixture に含めてよいもの:
 
+- synthetic fixture IDs。
 - synthetic event IDs。
-- synthetic timestamps / offsets。
+- synthetic offsets。
 - artificial display text。
 - artificial keywords。
-- `matchMode`。
 - `reactionStyle`。
 - `intensity` values。
-- tests 用の expected match outcomes。
+- tests用の expected display / ordering notes。
 
 ## Vocabulary
 
-URL config と fixture schema は次の語彙を共有する。
+URL config と fixture schema は語彙をできるだけ揃える。ただし fixture event payload は generated URL に入れない。
 
 | Term | Meaning |
 |---|---|
-| `schemaVersion` | fixture schema version。URL config の `schemaVersion` と同じ命名に揃えるが、互換性は別々に判断してよい。 |
-| `overlayType` | Candidate A では `keyword-reaction`。 |
-| `displayPattern` | fixture が想定する visual pattern。初期実装は `toast`。 |
-| `keyword` | matching target keyword。 |
-| `matchMode` | matching mode。候補は `contains` / `exact`。 |
-| `reactionStyle` | reaction visual style。候補は `spark` / `pulse` / `soft` / `none`。 |
-| `intensity` | reaction animation / emphasis strength。 |
+| `schemaVersion` | fixture schema version。初回は `1`。URL config の `schemaVersion` と同じ命名に揃えるが、互換性は別々に判断する。 |
+| `fixtureId` | public-safe synthetic identifier。YouTube id ではない。 |
+| `description` | public-safe synthetic description。 |
+| `events` | artificial events array。 |
+| `id` | synthetic event id。YouTube message id ではない。 |
+| `offsetMs` | playback start からの相対 milliseconds。 |
+| `displayText` | artificial display text。HTML ではなく text として表示する。 |
+| `keyword` | artificial keyword。 |
+| `intensity` | reaction emphasis strength。`0` から `3`。 |
+| `reactionStyle` | reaction visual style。`spark` / `pulse` / `soft` / `none`。 |
 
-旧draftで分かれていた reaction visual style の呼び方は `reactionStyle` に寄せる。fixture側だけ別名にしない。
+旧 `styleHint` 語彙は使わない。fixture 側だけ別名にせず、`reactionStyle` に寄せる。
 
 ## Draft Schema
 
@@ -61,8 +76,6 @@ top-level shape:
 ```json
 {
   "schemaVersion": 1,
-  "overlayType": "keyword-reaction",
-  "displayPattern": "toast",
   "fixtureId": "synthetic-basic",
   "description": "Artificial keyword reaction demo events.",
   "events": [
@@ -71,7 +84,6 @@ top-level shape:
       "offsetMs": 0,
       "displayText": "hello overlay",
       "keyword": "hello",
-      "matchMode": "contains",
       "reactionStyle": "spark",
       "intensity": 1
     }
@@ -81,27 +93,24 @@ top-level shape:
 
 field notes:
 
-- `schemaVersion`: fixture schema version。breaking schema change では increment を検討する。
-- `overlayType`: Candidate A では `keyword-reaction`。他 overlay type の fixture と混ぜない。
-- `displayPattern`: fixture が想定する display pattern。初期は `toast`。
-- `fixtureId`: stable synthetic identifier。
-- `description`: public-safe explanation。
-- `events`: ordered artificial events。
-- `id`: synthetic event id。YouTube message id ではない。
-- `offsetMs`: fixture start からの playback offset。
-- `displayText`: artificial text。HTML ではなく text として表示する。
-- `keyword`: matching tests の想定 keyword。
-- `matchMode`: matching mode。初期候補は `contains` / `exact`。
-- `reactionStyle`: `spark`、`pulse`、`soft`、`none` などの optional visual style。
-- `intensity`: animation strength の optional numeric hint。
+- `schemaVersion`: required。`1` 以外は初回実装では safe error。
+- `fixtureId`: required。public-safe synthetic id。
+- `description`: optional。public-safe synthetic description。
+- `events`: required。array。
+- `id`: required。synthetic event id。重複は safe error または重複排除。
+- `offsetMs`: required。0以上の有限数。
+- `displayText`: required。人工テキスト。HTML として解釈しない。
+- `keyword`: required。人工keyword。secret-like value は reject または safe fallback。
+- `reactionStyle`: optional。unsupported value は `spark` など safe fallback。
+- `intensity`: optional。0から3へ clamp または safe fallback。
 
-## Larger Synthetic Sample
+`matchMode` は fixture event の必須fieldにしない。初回 playback は既存 generated URL config の normalized `keyword` / `matchMode` と fixture event の `displayText` を使って判定する方針を優先する。event ごとの `keyword` は QA sample や expected case の説明に使えるが、runtime source of truth を増やしすぎないよう実装PRで最終判断する。
+
+## Synthetic Sample
 
 ```json
 {
   "schemaVersion": 1,
-  "overlayType": "keyword-reaction",
-  "displayPattern": "toast",
   "fixtureId": "synthetic-toast-demo",
   "description": "Artificial events for toast reaction QA.",
   "events": [
@@ -110,27 +119,24 @@ field notes:
       "offsetMs": 0,
       "displayText": "hello stream",
       "keyword": "hello",
-      "matchMode": "contains",
       "reactionStyle": "spark",
       "intensity": 1
     },
     {
       "id": "evt-002",
       "offsetMs": 1800,
-      "displayText": "nice clock",
-      "keyword": "nice",
-      "matchMode": "contains",
+      "displayText": "配信開始です",
+      "keyword": "配信開始",
       "reactionStyle": "pulse",
       "intensity": 2
     },
     {
       "id": "evt-003",
       "offsetMs": 4200,
-      "displayText": "quiet moment",
-      "keyword": "none",
-      "matchMode": "exact",
-      "reactionStyle": "none",
-      "intensity": 0
+      "displayText": "888",
+      "keyword": "888",
+      "reactionStyle": "soft",
+      "intensity": 3
     }
   ]
 }
@@ -138,23 +144,46 @@ field notes:
 
 この sample は完全な人工データです。YouTube、配信、chat log、viewer、private account からコピーしたものではありません。
 
-## Validation案
+## Validation Policy
 
-将来の implementation tests で確認したいこと:
+初回実装で確認したい validation:
 
-- valid fixture が parse できる。
-- unknown fields は documented policy に従って ignore または reject される。
-- required fields missing の場合に分かりやすい error になる。
-- unsupported `schemaVersion` が safe error または fallback になる。
-- unsupported `overlayType` が reject または safe fallback になる。
-- unknown `displayPattern` が reject または `toast` fallback になる。
-- overly long `displayText` が安全に truncate される。
-- negative `offsetMs` が reject または clamp される。
-- non-numeric `intensity` が safe fallback になる。
-- unsupported `reactionStyle` が safe fallback になる。
-- unsupported `matchMode` が safe fallback になる。
-- HTML-like text が text としてのみ表示される。
-- fixture playback order が deterministic。
+- invalid JSON は safe error。
+- required fields missing は分かりやすい日本語 error。
+- unsupported `schemaVersion` は safe error。
+- `events` が配列でない場合は safe error。
+- event count は上限を設ける。初期候補は 30 events。
+- unknown fields は drop。
+- `offsetMs` は0以上の有限数だけを許可する。
+- event order は `offsetMs` 昇順に normalize する。
+- duplicate `id` は safe error または deterministic に重複排除する。
+- overly long `displayText` と `keyword` は reject、truncate、または safe fallback。初期候補は `displayText` 160 code points、`keyword` 80 code points。
+- secret-like `displayText` / `keyword` は reject または safe fallback。
+- unsupported `reactionStyle` は safe fallback。
+- non-numeric `intensity` は safe fallback。
+- HTML-like text は inert text として扱う。
+
+validation結果は入力実値をそのまま status、DOM、URL、console に出さない。特に secret-like value は値を表示しない。
+
+## Generated URL Boundary
+
+generated URL は config-only を維持する。
+
+初回 generated URL に入れないもの:
+
+- raw fixture JSON。
+- fixture event payloads。
+- `displayText` arrays。
+- manual input text。
+- API keys。
+- OAuth tokens。
+- client secrets。
+- private account identifiers。
+- real viewer identifiers。
+- raw real chat / comment data。
+- secret-like values。
+
+将来、`fixtureId` のような public-safe reference を generated URL に含めるかは後続検討とする。初回 fixture playback 実装では event payload を URL に入れない。
 
 ## Repository Placement Notes
 
@@ -165,30 +194,32 @@ field notes:
 - fixture が real viewer data ではないことを明記する。
 - fixture file は小さく保つ。
 - private account、dashboard、stream identifiers を含めない。
-- 可能なら unsafe fixture content を防ぐ tests を追加する。
+- unsafe fixture content を防ぐ tests を追加する。
+
+今回の docs-only PR では fixture JSON file は追加しない。
 
 ## Implementation Sequence
 
-fixture playback は route/static skeleton と manual input + toast の後続PRに分ける。
-
-順序:
+現在の順序:
 
 1. `/overlay/keyword-reaction/` route/static skeleton。
-2. manual input + toast。
-3. synthetic fixture playback。
+2. config helper。
+3. manual input + toast preview。
+4. preview/config consistency fix。
+5. fixture playback + schema validation。
 
-fixture schema は2番目のPRで必要な runtime event shape から学び、3番目のPRで validation と playback timing を加える。
+次の実装PRは built-in artificial fixture を優先し、paste JSON import は後続でもよい。
 
 ## Future YouTube Data Boundary
 
 将来の real YouTube integration は、この fixture schema の単純な延長として扱わない。
 
-real data を検討する前に必要なこと:
+real data を検討する前に必要なもの:
 
 - official YouTube documentation review。
 - data を display / store / replay できるかの設計。
 - retention / deletion expectation の記録。
-- credentials を generated URLs と Git に入れない設計。
+- credentials を generated URLs や Git に入れない設計。
 - API/OAuth work への separate human approval。
 - privacy and safety review。
 

@@ -88,15 +88,21 @@ tests で確認すること:
 
 ### Phase 3: Fixture Playback
 
+fixture playback + schema validation のスコープ固定は [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md) に分ける。
+
 fixture playback PR で確認すること:
 
 - fixture は人工データのみ。
-- `schemaVersion`、`overlayType`、`displayPattern`、`reactionStyle`、`matchMode` の validation がある。
+- `schemaVersion`、`fixtureId`、`events`、`offsetMs`、`displayText`、`keyword`、`reactionStyle`、`intensity` の validation がある。
 - fixture event order が deterministic。
 - overly long `displayText` と `keyword` が安全に制限される。
 - unsupported enum values が reject または safe fallback になる。
 - fixture payload を generated URL に default で入れない。
 - real YouTube data への拡張として扱わない。
+- 初回は editor preview 内の built-in artificial fixture を優先し、paste JSON input と overlay runtime 本格化は後続へ分けてよい。
+- 再生 / 停止 / リセットが安全に動き、timer cleanup がある。
+- generated URL は config-only のまま、fixture event data を含めない。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 ## Input Surfaces
 
@@ -149,6 +155,23 @@ manual input + toast 後の follow-up PR で確認すること:
 - fixture playback、ticker、badge、import/export、YouTube integration を同じPRへ混ぜない。
 
 ## Fixture Sanitization
+
+fixture playback + schema validation PR で追加確認すること:
+
+- invalid JSON は safe error。
+- `schemaVersion` mismatch は safe error。
+- `events` が配列でない場合は safe error。
+- event count limit を超えた場合は safe error。初期候補は 30 events。
+- `offsetMs` は0以上の有限数だけを扱う。
+- event order は `offsetMs` 昇順に normalize される。
+- overly long `displayText` / `keyword` は reject、truncate、または safe fallback。初期候補は `displayText` 160 code points、`keyword` 80 code points。
+- HTML-like text は `textContent` などの text API で inert text として扱う。
+- secret-like value は入力実値を status、DOM、URL、console に出さず reject または fallback する。
+- unknown fields は drop する。
+- playback start / stop / reset 後に古い timer が残らない。
+- generated URL に fixture event data、raw fixture JSON、displayText array が入らない。
+- 390px / 768px / 1280px で editor preview、controls、generated URL 欄が破綻しない。
+- `/overlay/keyword-reaction/` skeleton、`/clock/`、`/clock/?c=...` に回帰がない。
 
 fixture parsing で reject または normalize すべきもの:
 

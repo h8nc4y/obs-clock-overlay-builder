@@ -10,6 +10,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Keep Codex for OSS readiness evidence current without claiming application submission or acceptance.
 - Define the YouTube Live overlay suite concept, MVP requirements, and data/policy boundary before any integration work.
 - Keep Candidate A matching normalization and preview/config consistency policy explicit before the next implementation PR.
+- Fix Candidate A fixture playback + schema validation scope before implementation.
 
 ## Medium Term
 
@@ -20,7 +21,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Implement Candidate A first as a route/static skeleton for `/overlay/keyword-reaction/`.
 - Follow the skeleton with manual input + toast using editor preview, artificial manual text, config-only generated URLs, and integer UI steps for `intensity`.
 - Fix preview/config consistency so preview matching and generated URL config use the same normalized config.
-- Keep fixture playback after manual input + toast; keep ticker, badge, and import/export work as later follow-ups.
+- Start fixture playback implementation from built-in artificial fixtures and schema validation; keep paste JSON, overlay runtime, ticker, badge, and import/export as later follow-ups.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
 ## Long Term
@@ -40,6 +41,7 @@ Current planning docs:
 - [Candidate A implementation scope decision](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - [Candidate A manual input + toast scope decision](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [Candidate A matching normalization decision](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
+- [Candidate A fixture playback scope decision](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -53,8 +55,9 @@ Near-term sequence:
 2. Implement the first Candidate A PR as route/static skeleton only.
 3. Follow with manual input + toast once the overlay-only surface is stable; keep this PR editor preview centered and do not include manual input text in generated URLs.
 4. Fix preview/config consistency so normalized config is the source of truth for both generated URL and preview matching.
-5. Add fixture playback after preview/config consistency; keep ticker, badge, and import/export as later follow-ups.
-6. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+5. Fix fixture playback + schema validation scope; prefer built-in artificial fixture first.
+6. Add fixture playback after the scope decision; keep paste JSON, overlay runtime, ticker, badge, and import/export as later follow-ups.
+7. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 

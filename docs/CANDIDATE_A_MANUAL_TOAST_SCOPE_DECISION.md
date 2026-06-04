@@ -243,6 +243,14 @@ manual input + toast 後の次PRの完了条件:
 - `/clock/` と `/clock/?c=...` の既存契約を変えない。
 - `/overlay/keyword-reaction/` の skeleton / overlay-only surface を壊さない。
 
+## Fixture Playback Follow-Up
+
+PR #40 後の次段階は fixture playback + schema validation のスコープ固定とする。詳細は [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md) に分ける。
+
+fixture playback は manual input + toast preview の後続であり、初回は editor preview 内の artificial data only とする。manual input text は引き続き generated URL に含めない。
+
+初回 fixture playback 実装では、built-in artificial fixture を優先し、paste JSON import、fixture file保存、overlay本体runtime、ticker、badge、import/export、YouTube API / OAuth / API key / scraping / real data は後続へ分ける。
+
 ## Open Questions
 
 - toast duration、cooldown、queueing の初期値。
