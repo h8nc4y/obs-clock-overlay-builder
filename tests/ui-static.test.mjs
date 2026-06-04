@@ -146,6 +146,39 @@ test("editor keyword reaction preview uses normalized config as source of truth"
   assert.doesNotMatch(previewBody, /keywordReactionStatus\.textContent\s*=\s*elements\.keywordReactionKeyword/);
 });
 
+test("editor includes built-in artificial fixture playback controls", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+
+  assert.match(html, /id="keywordReactionFixture"/);
+  assert.match(html, /人工fixture再生/);
+  assert.match(html, /人工デモデータ/);
+  assert.match(html, /YouTube連携ではありません。/);
+  assert.match(html, /id="playKeywordReactionFixture"/);
+  assert.match(html, /id="stopKeywordReactionFixture"/);
+  assert.match(html, /id="resetKeywordReactionFixture"/);
+  assert.match(html, /id="keywordReactionFixtureStatus"/);
+  assert.match(builder, /keyword-reaction-fixture\.js/);
+  assert.match(builder, /getBuiltinKeywordReactionFixture/);
+  assert.match(builder, /validateKeywordReactionFixture/);
+  assert.match(builder, /buildFixturePlaybackSchedule/);
+});
+
+test("editor fixture playback keeps event data out of generated URLs and cleans timers", () => {
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+  const fixtureHelper = readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8");
+
+  assert.match(builder, /keywordReactionFixtureTimers/);
+  assert.match(builder, /setTimeout/);
+  assert.match(builder, /clearTimeout/);
+  assert.match(builder, /function stopKeywordReactionFixturePlayback/);
+  assert.match(builder, /function resetKeywordReactionFixturePlayback/);
+  assert.match(builder, /keywordReactionToastText\.textContent\s*=\s*event\.displayText/);
+  assert.doesNotMatch(builder, /keywordReactionConfigToUrl\([^)]*fixture/);
+  assert.doesNotMatch(builder, /keywordReactionGeneratedUrl\.value\s*=.*displayText/);
+  assert.match(fixtureHelper, /fixture event data/);
+});
+
 test("editor live preview reserves visual safe inset around clock widget", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -203,7 +236,8 @@ test("editor refresh does not add risky HTML sinks", () => {
     readFileSync(new URL("../index.html", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8")
+    readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8")
   ].join("\n");
 
   assert.doesNotMatch(changedSources, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
