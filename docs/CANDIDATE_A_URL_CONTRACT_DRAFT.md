@@ -50,6 +50,22 @@ Candidate A の初回実装方針では次を使う。
 
 本格的な config encode/decode、keyword rules、generated URL round-trip は manual input + toast 以降のPRで扱う。
 
+## Config Helper実装範囲
+
+`assets/js/keyword-reaction-config.js` に、URL config の土台として次の helper を追加する。
+
+- `DEFAULT_KEYWORD_REACTION_CONFIG`
+- `normalizeKeywordReactionConfig`
+- `encodeKeywordReactionConfig`
+- `decodeKeywordReactionConfig`
+- `parseKeywordReactionConfigFromQuery`
+
+初期 helper は、`schemaVersion`、`overlayType`、`displayPattern`、`reactionStyle`、`intensity`、`keyword`、`matchMode` だけを保持する。unknown fields、secret-like fields、private account data、raw user data に相当する fields は保持しない。
+
+`displayPattern` は URL config 語彙として `toast` / `ticker` / `badge` を受け付ける。ただし、現時点の overlay runtime はまだ static skeleton であり、ticker / badge 表示を実装済みとは扱わない。
+
+`matchMode` は `contains` / `exact` を正規語彙とする。入力互換として `includes` は `contains` へ normalize する。
+
 ## 語彙
 
 URL config と fixture schema は次の語彙に寄せる。
