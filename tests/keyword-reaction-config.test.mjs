@@ -1,12 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
+import * as keywordReactionConfig from "../assets/js/keyword-reaction-config.js";
+
+const {
   DEFAULT_KEYWORD_REACTION_CONFIG,
+  buildManualKeywordReactionConfig,
   decodeKeywordReactionConfig,
   encodeKeywordReactionConfig,
+  keywordReactionConfigToUrl,
+  keywordReactionMatches,
   normalizeKeywordReactionConfig,
   parseKeywordReactionConfigFromQuery
-} from "../assets/js/keyword-reaction-config.js";
+} = keywordReactionConfig;
 
 test("default keyword reaction config is stable", () => {
   assert.deepEqual(DEFAULT_KEYWORD_REACTION_CONFIG, {
@@ -156,4 +161,80 @@ test("parse keyword reaction config from URLSearchParams URL and full URL", () =
   assert.equal(parseKeywordReactionConfigFromQuery(new URL(`https://example.com/overlay/keyword-reaction/?c=${encoded}`)).intensity, 3);
   assert.equal(parseKeywordReactionConfigFromQuery(`https://example.com/overlay/keyword-reaction/?c=${encoded}#obs`).keyword, "overlay");
   assert.deepEqual(parseKeywordReactionConfigFromQuery("?keyword=ignored"), DEFAULT_KEYWORD_REACTION_CONFIG);
+});
+
+test("matches manual input with contains and exact rules", () => {
+  assert.equal(
+    keywordReactionMatches({
+      manualText: "HELLO stream",
+      keyword: "hello",
+      matchMode: "contains"
+    }),
+    true
+  );
+  assert.equal(
+    keywordReactionMatches({
+      manualText: "HELLO stream",
+      keyword: "hello",
+      matchMode: "exact"
+    }),
+    false
+  );
+  assert.equal(
+    keywordReactionMatches({
+      manualText: "HELLO",
+      keyword: "hello",
+      matchMode: "exact"
+    }),
+    true
+  );
+});
+
+test("matches Japanese manual input with simple contains and exact rules", () => {
+  assert.equal(
+    keywordReactionMatches({
+      manualText: "配信開始です",
+      keyword: "配信開始",
+      matchMode: "contains"
+    }),
+    true
+  );
+  assert.equal(
+    keywordReactionMatches({
+      manualText: "配信開始です",
+      keyword: "配信開始",
+      matchMode: "exact"
+    }),
+    false
+  );
+  assert.equal(
+    keywordReactionMatches({
+      manualText: "配信開始",
+      keyword: "配信開始",
+      matchMode: "exact"
+    }),
+    true
+  );
+});
+
+test("builds config-only keyword reaction URLs without manual text", () => {
+  const secretLikeManualText = ["sk", "manual-secret"].join("-");
+  const config = buildManualKeywordReactionConfig({
+    keyword: "hello",
+    manualText: secretLikeManualText,
+    matchMode: "contains",
+    reactionStyle: "pulse",
+    intensity: "2"
+  });
+  const url = keywordReactionConfigToUrl(config, "https://example.test/");
+  const parsed = parseKeywordReactionConfigFromQuery(url);
+
+  assert.match(url, /^https:\/\/example\.test\/overlay\/keyword-reaction\/\?c=/);
+  assert.equal(parsed.displayPattern, "toast");
+  assert.equal(parsed.keyword, "hello");
+  assert.equal(parsed.matchMode, "contains");
+  assert.equal(parsed.reactionStyle, "pulse");
+  assert.equal(parsed.intensity, 2);
+  assert.doesNotMatch(url, /manual-secret/);
+  assert.equal(Object.hasOwn(parsed, "manualText"), false);
 });

@@ -13,7 +13,8 @@ export const DEFAULT_KEYWORD_REACTION_CONFIG = Object.freeze({
 
 export const KEYWORD_REACTION_LIMITS = Object.freeze({
   intensity: [0, 3],
-  keywordLength: 80
+  keywordLength: 80,
+  manualTextLength: 160
 });
 
 const DISPLAY_PATTERNS = new Set(["toast", "ticker", "badge"]);
@@ -94,6 +95,39 @@ export function parseKeywordReactionConfigFromQuery(input) {
     return cloneDefaultKeywordReactionConfig();
   }
   return decodeKeywordReactionConfig(encoded);
+}
+
+export function buildManualKeywordReactionConfig(input = {}) {
+  const raw = input && typeof input === "object" && !Array.isArray(input) ? input : {};
+  return normalizeKeywordReactionConfig({
+    displayPattern: "toast",
+    reactionStyle: raw.reactionStyle,
+    intensity: raw.intensity,
+    keyword: raw.keyword,
+    matchMode: raw.matchMode
+  });
+}
+
+export function keywordReactionConfigToUrl(config, href, options = {}) {
+  const url = new URL("./overlay/keyword-reaction/", href);
+  url.searchParams.set("c", encodeKeywordReactionConfig(buildManualKeywordReactionConfig(config), { compact: options.compact ?? true }));
+  return url.href;
+}
+
+export function normalizeKeywordReactionManualText(value) {
+  return truncateCodePoints(stripControlText(value).trim(), KEYWORD_REACTION_LIMITS.manualTextLength);
+}
+
+export function keywordReactionMatches(input = {}) {
+  const raw = input && typeof input === "object" && !Array.isArray(input) ? input : {};
+  const manualText = normalizeKeywordReactionManualText(raw.manualText);
+  const keyword = truncateCodePoints(stripControlText(raw.keyword).trim(), KEYWORD_REACTION_LIMITS.keywordLength);
+  if (!manualText || !keyword) {
+    return false;
+  }
+  const text = manualText.toLocaleLowerCase("en-US");
+  const needle = keyword.toLocaleLowerCase("en-US");
+  return normalizeMatchMode(raw.matchMode) === "exact" ? text === needle : text.includes(needle);
 }
 
 function compactKeywordReactionConfig(config) {

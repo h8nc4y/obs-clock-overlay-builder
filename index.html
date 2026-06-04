@@ -42,6 +42,10 @@
           </div>
           <div id="previewShell" class="preview-shell preview-checker">
             <div id="clockPreview" class="preview-stage"></div>
+            <div id="keywordReactionToast" class="keyword-reaction-preview-toast" role="status" aria-live="polite" hidden>
+              <span class="keyword-reaction-preview-label">キーワード反応</span>
+              <span id="keywordReactionToastText" class="keyword-reaction-preview-text"></span>
+            </div>
           </div>
           <div class="metrics-grid" aria-label="OBS推奨サイズ">
             <div>
@@ -80,6 +84,68 @@
             <p>配信画面に合わせて、余白やラベル位置までまとめて切り替えます。</p>
           </div>
           <div class="template-grid" id="templateGrid"></div>
+        </section>
+
+        <section id="keywordReactionExperiment" class="panel candidate-experiment-panel" aria-labelledby="keywordReactionHeading">
+          <div class="section-heading">
+            <p class="eyebrow">Candidate A 実験</p>
+            <h2 id="keywordReactionHeading">キーワード反応オーバーレイ実験</h2>
+            <p>人工テキストでtoast previewだけを確認します。YouTube連携や実データ取得は行いません。</p>
+          </div>
+          <div class="info-note candidate-boundary-note">
+            <strong>安全境界</strong>
+            <p>人工テキストは生成URLへ入りません。生成URLは <code>/overlay/keyword-reaction/?c=...</code> の設定だけを持ち、YouTube API、OAuth、API key、scraping、実視聴者データは使いません。</p>
+          </div>
+          <div class="form-grid">
+            <label class="field" for="keywordReactionManualText">
+              <span>人工テキスト入力</span>
+              <textarea id="keywordReactionManualText" rows="3" maxlength="160" spellcheck="false" placeholder="例: hello、配信開始、初見さん歓迎" aria-describedby="keywordReactionManualHelp keywordReactionStatus"></textarea>
+              <small id="keywordReactionManualHelp">ここに入れた文はライブプレビューの判定だけに使います。生成URLやoverlay URLへ保存しません。</small>
+            </label>
+            <label class="field" for="keywordReactionKeyword">
+              <span>キーワード</span>
+              <input id="keywordReactionKeyword" type="text" maxlength="80" value="hello" autocomplete="off" spellcheck="false">
+            </label>
+            <label class="field" for="keywordReactionMatchMode">
+              <span>一致方法</span>
+              <select id="keywordReactionMatchMode">
+                <option value="contains">含む</option>
+                <option value="exact">完全一致</option>
+              </select>
+            </label>
+            <label class="field" for="keywordReactionIntensity">
+              <span>反応の強さ</span>
+              <select id="keywordReactionIntensity">
+                <option value="0">0 控えめ</option>
+                <option value="1" selected>1 標準</option>
+                <option value="2">2 強め</option>
+                <option value="3">3 かなり強め</option>
+              </select>
+            </label>
+            <label class="field" for="keywordReactionStyle">
+              <span>toastスタイル</span>
+              <select id="keywordReactionStyle">
+                <option value="spark" selected>spark</option>
+                <option value="pulse">pulse</option>
+                <option value="soft">soft</option>
+                <option value="none">none</option>
+              </select>
+            </label>
+          </div>
+          <div class="button-row">
+            <button id="testKeywordReaction" type="button">テスト表示</button>
+            <button id="clearKeywordReactionToast" type="button" class="secondary">toastを消す</button>
+          </div>
+          <p id="keywordReactionStatus" class="status-line" role="status" aria-live="polite"></p>
+          <label class="field url-field" for="keywordReactionGeneratedUrl">
+            <span>生成オーバーレイURL</span>
+            <textarea id="keywordReactionGeneratedUrl" rows="4" readonly spellcheck="false" aria-describedby="keywordReactionUrlHelp keywordReactionUrlStatus"></textarea>
+          </label>
+          <p id="keywordReactionUrlHelp" class="copy-hint"><code>/overlay/keyword-reaction/?c=...</code> は設定だけのURLです。人工テキストは含めません。</p>
+          <div class="button-row">
+            <button id="copyKeywordReactionUrl" type="button" class="secondary">生成オーバーレイURLをコピー</button>
+          </div>
+          <p id="keywordReactionUrlStatus" class="status-line" role="status" aria-live="polite"></p>
         </section>
 
         <section class="panel">

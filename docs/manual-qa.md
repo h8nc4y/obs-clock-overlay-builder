@@ -19,6 +19,21 @@
 - `デフォルト値を省略して短くする` をオンにしても、時計画面で同じ表示になる。
 - 推奨幅・高さが表示され、テンプレートやサイズ変更後に更新される。
 
+## Candidate A Manual Toast Preview
+
+- 編集画面に `キーワード反応オーバーレイ実験` が、通常の時計設定とは別セクションとして表示される。
+- `人工テキスト入力` に `HELLO stream`、`キーワード` に `hello`、`一致方法` に `含む` を入れて `テスト表示` を押すと、ライブプレビュー内にtoastが表示される。
+- `一致方法` を `完全一致` にした状態で `HELLO stream` を試すと、no-matchのstatusになりtoastが消える。
+- `人工テキスト入力` に `配信開始です`、`キーワード` に `配信開始` を入れ、`含む` ではmatch、`完全一致` ではno-matchになる。
+- `人工テキスト入力` に `配信開始`、`キーワード` に `配信開始`、`完全一致` ではmatchになる。
+- `toastスタイル` と `反応の強さ` を変えると、生成オーバーレイURLの `c` 設定が更新される。
+- `生成オーバーレイURL` は `/overlay/keyword-reaction/?c=...` 形式で、人工テキストの内容を含まない。
+- secret風の人工テキストや個人情報風の文字列を入れても、生成オーバーレイURLには含まれない。
+- `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLだが、現時点のoverlay runtimeはskeletonのままである。
+- 390px前後、768px前後、1280px以上で、toast preview、設定欄、生成URL欄に横スクロールが出ない。
+- Browser Console error/warning がなく、外部network request が発生しない。
+- YouTube API、OAuth、API key、scraping、実視聴者データ、実コメントデータを使わない。
+
 ## Design Refresh Viewports
 
 - 390px前後のスマートフォン幅で、ライブプレビュー、OBS用URL、設定フォームの順に理解でき、横スクロールが出ない。
