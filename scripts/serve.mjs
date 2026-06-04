@@ -46,6 +46,9 @@ function resolvePath(pathname) {
   if (cleanPath === "/clock") {
     cleanPath = "/clock/";
   }
+  if (cleanPath === "/overlay/keyword-reaction") {
+    cleanPath = "/overlay/keyword-reaction/";
+  }
   if (cleanPath.endsWith("/")) {
     cleanPath += "index.html";
   }

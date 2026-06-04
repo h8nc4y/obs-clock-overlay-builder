@@ -69,6 +69,29 @@ test("clock page reserves visual safe inset for glow-heavy templates", () => {
   assert.match(clockRootBlock, /padding:\s*var\(--clock-visual-safe-inset\);/);
 });
 
+test("keyword reaction overlay skeleton is transparent and static-only", () => {
+  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const overlayHtml = readFileSync(new URL("../overlay/keyword-reaction/index.html", import.meta.url), "utf8");
+  const redirects = readFileSync(new URL("../_redirects", import.meta.url), "utf8");
+  const overlayPageBlock = css.match(/\.keyword-reaction-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+  const overlaySurfaceBlock = css.match(/\.keyword-reaction-surface\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+
+  assert.match(overlayHtml, /<html lang="ja" class="keyword-reaction-page-root">/);
+  assert.match(overlayHtml, /<body class="keyword-reaction-page">/);
+  assert.match(overlayHtml, /Keyword reaction overlay ready/);
+  assert.match(overlayHtml, /aria-label="キーワード反応オーバーレイ"/);
+  assert.match(css, /html\.keyword-reaction-page-root\s*\{[\s\S]*?background:\s*transparent;/);
+  assert.match(overlayPageBlock, /margin:\s*0;/);
+  assert.match(overlayPageBlock, /background:\s*transparent;/);
+  assert.match(overlayPageBlock, /overflow:\s*hidden;/);
+  assert.match(overlaySurfaceBlock, /pointer-events:\s*none;/);
+  assert.match(redirects, /\/overlay\/keyword-reaction\s+\/overlay\/keyword-reaction\/index\.html\s+200/);
+  assert.doesNotMatch(
+    overlayHtml,
+    /<script|localStorage|innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
+});
+
 test("editor live preview reserves visual safe inset around clock widget", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";

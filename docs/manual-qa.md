@@ -52,6 +52,17 @@
 - OBSでブラウザソースに生成URLを貼り、推奨幅・高さを入力して表示される。
 - OBSで表示/非表示を切り替えても、再表示後の次tickで現在時刻になる。
 
+## Keyword Reaction Overlay Skeleton
+
+- `/overlay/keyword-reaction/` が開き、`Keyword reaction overlay ready` だけが控えめに表示される。
+- `/overlay/keyword-reaction` でも同じ静的画面へ到達する。
+- ページ背景は透明で、`body` の余白がない。
+- 編集UI、設定フォーム、時計UI、manual input、toast trigger、fixture playback は表示されない。
+- YouTube API、OAuth、API key、scraping、実視聴者データ、実コメントデータを使わない。
+- Browser Console error/warning がなく、外部network request が発生しない。
+- 390px前後、768px前後、1280px以上のいずれでも横スクロールが出ない。
+- `/clock/` と `/clock/?c=...` の時計専用画面に回帰がない。
+
 ## OBS実機確認
 
 OBS実機では、編集画面ではなく生成URLそのものをブラウザソースに貼って確認する。
