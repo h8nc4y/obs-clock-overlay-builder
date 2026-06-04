@@ -9,7 +9,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Polish docs for OBS setup, troubleshooting, and contributor onboarding.
 - Keep Codex for OSS readiness evidence current without claiming application submission or acceptance.
 - Define the YouTube Live overlay suite concept, MVP requirements, and data/policy boundary before any integration work.
-- Fix Candidate A keyword reaction overlay implementation scope before implementation.
+- Fix Candidate A keyword reaction overlay manual input + toast scope before implementation.
 
 ## Medium Term
 
@@ -18,7 +18,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Use public issues to triage feedback, bugs, and small improvements.
 - Consider an optional simple/advanced control mode if feedback shows the editor is too dense for first-time users.
 - Implement Candidate A first as a route/static skeleton for `/overlay/keyword-reaction/`.
-- Follow the skeleton with manual input + toast before fixture playback, ticker, badge, or import/export work.
+- Follow the skeleton with manual input + toast using editor preview, artificial manual text, config-only generated URLs, and integer UI steps for `intensity`.
+- Keep fixture playback after manual input + toast; keep ticker, badge, and import/export work as later follow-ups.
 
 ## Long Term
 
@@ -35,6 +36,7 @@ Current planning docs:
 - [YouTube Live overlay suite concept](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
 - [Headline feature MVP requirements](HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
 - [Candidate A implementation scope decision](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+- [Candidate A manual input + toast scope decision](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -46,7 +48,7 @@ Near-term sequence:
 
 1. Gather feedback on the suite direction and MVP scope.
 2. Implement the first Candidate A PR as route/static skeleton only.
-3. Follow with manual input + toast once the overlay-only surface is stable.
+3. Follow with manual input + toast once the overlay-only surface is stable; keep this PR editor preview centered and do not include manual input text in generated URLs.
 4. Add fixture playback after manual input + toast; keep ticker, badge, and import/export as later follow-ups.
 5. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 

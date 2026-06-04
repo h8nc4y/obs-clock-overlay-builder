@@ -6,7 +6,10 @@
 
 この文書では route を実装しません。Candidate A の初回実装方針として `/overlay/keyword-reaction/?c=...` を採用するが、将来 overlay suite 化が進んだ場合は path 再編の可能性を残す。
 
-関連するスコープ固定記録: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+関連するスコープ固定記録:
+
+- [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+- [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -66,6 +69,8 @@ Candidate A の初回実装方針では次を使う。
 
 `matchMode` は `contains` / `exact` を正規語彙とする。入力互換として `includes` は `contains` へ normalize する。
 
+`intensity` は helper 上では `0` から `3` の連続値を許容する。初回 manual input UI は理解しやすさを優先し、`0` / `1` / `2` / `3` の整数stepだけを生成する。runtime は連続値にも耐えるが、初回UIが生成する値は整数にする。
+
 ## 語彙
 
 URL config と fixture schema は次の語彙に寄せる。
@@ -122,7 +127,8 @@ encoded config に含めてはいけないもの:
 Candidate A では configuration と runtime event input を分ける。
 
 - URL config は visual settings と keyword rules を保持する。
-- manual event text は runtime test input であり、generated OBS URL に入れる必要はない。
+- manual event text は runtime test input であり、初回 manual input + toast PR の generated OBS URL には入れない。
+- generated URL は config-only とし、manual input text そのものを再現対象にしない。
 - built-in synthetic fixture id は public-safe かつ stable な場合のみ参照してよい。
 - pasted fixture JSON は大きくなりやすく、private data が混ざる危険もあるため、初期状態では share URL に encode しない。
 - fixture playback は manual input + toast の次段階に分ける。
