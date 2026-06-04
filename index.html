@@ -137,6 +137,16 @@
             <button id="clearKeywordReactionToast" type="button" class="secondary">toastを消す</button>
           </div>
           <p id="keywordReactionStatus" class="status-line" role="status" aria-live="polite"></p>
+          <div id="keywordReactionFixture" class="info-note keyword-reaction-fixture">
+            <strong>人工fixture再生</strong>
+            <p>内蔵の人工デモデータだけをpreview内で再生します。YouTube連携ではありません。fixture event dataは生成URLへ入りません。</p>
+            <div class="button-row">
+              <button id="playKeywordReactionFixture" type="button">人工fixtureを再生</button>
+              <button id="stopKeywordReactionFixture" type="button" class="secondary">停止</button>
+              <button id="resetKeywordReactionFixture" type="button" class="secondary">リセット</button>
+            </div>
+            <p id="keywordReactionFixtureStatus" class="status-line" role="status" aria-live="polite">人工デモデータ: 配信開始 / hello / 888</p>
+          </div>
           <label class="field url-field" for="keywordReactionGeneratedUrl">
             <span>生成オーバーレイURL</span>
             <textarea id="keywordReactionGeneratedUrl" rows="4" readonly spellcheck="false" aria-describedby="keywordReactionUrlHelp keywordReactionUrlStatus"></textarea>

@@ -30,6 +30,10 @@
 - `生成オーバーレイURL` は `/overlay/keyword-reaction/?c=...` 形式で、人工テキストの内容を含まない。
 - secret風の人工テキストや個人情報風の文字列を入れても、生成オーバーレイURLには含まれない。
 - secret風または空欄のキーワードでは、安全な既定値へ戻したstatusが表示され、入力したキーワード実値はstatusや生成オーバーレイURLへ出ない。
+- `人工fixtureを再生` で内蔵の人工デモデータがライブプレビュー内に順番にtoast表示される。
+- `人工fixture再生` の説明で、人工デモデータでありYouTube連携ではないことが分かる。
+- `停止` と `リセット` で古いtimerが残らず、後からtoastが再表示されない。
+- fixture再生中または再生後も、`生成オーバーレイURL` はconfig-onlyのままで、`配信開始`、`888`、fixture event payload、raw JSON、manual input textを含まない。
 - `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLだが、現時点のoverlay runtimeはskeletonのままである。
 - 390px前後、768px前後、1280px以上で、toast preview、設定欄、生成URL欄に横スクロールが出ない。
 - Browser Console error/warning がなく、外部network request が発生しない。

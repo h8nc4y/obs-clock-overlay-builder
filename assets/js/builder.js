@@ -18,6 +18,11 @@ import {
   keywordReactionMatches,
   normalizeKeywordReactionManualText
 } from "./keyword-reaction-config.js";
+import {
+  buildFixturePlaybackSchedule,
+  getBuiltinKeywordReactionFixture,
+  validateKeywordReactionFixture
+} from "./keyword-reaction-fixture.js";
 import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
 
@@ -102,6 +107,10 @@ const elements = {
   testKeywordReaction: byId("testKeywordReaction"),
   clearKeywordReactionToast: byId("clearKeywordReactionToast"),
   keywordReactionStatus: byId("keywordReactionStatus"),
+  playKeywordReactionFixture: byId("playKeywordReactionFixture"),
+  stopKeywordReactionFixture: byId("stopKeywordReactionFixture"),
+  resetKeywordReactionFixture: byId("resetKeywordReactionFixture"),
+  keywordReactionFixtureStatus: byId("keywordReactionFixtureStatus"),
   keywordReactionGeneratedUrl: byId("keywordReactionGeneratedUrl"),
   keywordReactionUrlStatus: byId("keywordReactionUrlStatus"),
   copyKeywordReactionUrl: byId("copyKeywordReactionUrl"),
@@ -135,6 +144,7 @@ let state = loadInitialConfig();
 let shareBlob = null;
 let shareObjectUrl = "";
 let localFontSelectBound = false;
+let keywordReactionFixtureTimers = [];
 
 const previewClock = mountClock(elements.clockPreview, state);
 
@@ -296,18 +306,31 @@ function bindKeywordReactionExperiment() {
     elements.keywordReactionStyle
   ];
   for (const input of configInputs) {
-    input.addEventListener("input", updateKeywordReactionExperiment);
-    input.addEventListener("change", updateKeywordReactionExperiment);
+    input.addEventListener("input", () => {
+      stopKeywordReactionFixturePlayback("設定を変更したためfixture再生を停止しました。");
+      updateKeywordReactionExperiment();
+    });
+    input.addEventListener("change", () => {
+      stopKeywordReactionFixturePlayback("設定を変更したためfixture再生を停止しました。");
+      updateKeywordReactionExperiment();
+    });
   }
   elements.keywordReactionManualText.addEventListener("input", () => {
+    stopKeywordReactionFixturePlayback("人工テキスト入力へ戻りました。fixture event dataは生成URLへ入りません。");
     hideKeywordReactionToast();
     elements.keywordReactionStatus.textContent = "人工テキストは生成URLへ入りません。";
   });
   elements.testKeywordReaction.addEventListener("click", testKeywordReactionPreview);
   elements.clearKeywordReactionToast.addEventListener("click", () => {
+    stopKeywordReactionFixturePlayback("fixture再生を停止しました。");
     hideKeywordReactionToast();
     elements.keywordReactionStatus.textContent = "toast previewを消しました。";
   });
+  elements.playKeywordReactionFixture.addEventListener("click", playKeywordReactionFixture);
+  elements.stopKeywordReactionFixture.addEventListener("click", () => {
+    stopKeywordReactionFixturePlayback("fixture再生を停止しました。");
+  });
+  elements.resetKeywordReactionFixture.addEventListener("click", resetKeywordReactionFixturePlayback);
   elements.copyKeywordReactionUrl.addEventListener("click", () =>
     copyText(elements.keywordReactionGeneratedUrl.value, elements.keywordReactionStatus, "生成オーバーレイURLをコピーしました。")
   );
@@ -433,6 +456,7 @@ function updateKeywordReactionExperiment() {
 }
 
 function testKeywordReactionPreview() {
+  stopKeywordReactionFixturePlayback("人工テキスト入力の確認へ切り替えました。");
   const config = readKeywordReactionConfig();
   const manualText = normalizeKeywordReactionManualText(elements.keywordReactionManualText.value);
   const keyword = config.keyword;
@@ -458,6 +482,65 @@ function testKeywordReactionPreview() {
   elements.keywordReactionStatus.textContent = keywordUsedSafeFallback
     ? `${KEYWORD_REACTION_FALLBACK_STATUS} ライブプレビュー内にtoastを表示しています。`
     : "一致しました。ライブプレビュー内にtoastを表示しています。";
+}
+
+function playKeywordReactionFixture() {
+  stopKeywordReactionFixturePlayback();
+  const result = validateKeywordReactionFixture(getBuiltinKeywordReactionFixture());
+  if (!result.ok) {
+    hideKeywordReactionToast();
+    elements.keywordReactionFixtureStatus.textContent = result.errors[0] ?? "fixtureを再生できませんでした。";
+    return;
+  }
+
+  const schedule = buildFixturePlaybackSchedule(result.fixture);
+  if (schedule.length === 0) {
+    hideKeywordReactionToast();
+    elements.keywordReactionFixtureStatus.textContent = "再生できるfixture eventがありません。";
+    return;
+  }
+
+  elements.keywordReactionFixtureStatus.textContent =
+    "人工fixtureを再生中です。YouTube連携ではありません。fixture event dataは生成URLへ入りません。";
+
+  for (const [index, item] of schedule.entries()) {
+    const timerId = window.setTimeout(() => {
+      showKeywordReactionFixtureEvent(item.event, index + 1, schedule.length);
+    }, item.delayMs);
+    keywordReactionFixtureTimers.push(timerId);
+  }
+
+  const lastDelay = schedule[schedule.length - 1]?.delayMs ?? 0;
+  const finishTimerId = window.setTimeout(() => {
+    keywordReactionFixtureTimers = [];
+    elements.keywordReactionFixtureStatus.textContent =
+      "人工fixtureの再生が完了しました。生成URLは設定だけのままです。";
+  }, lastDelay + 1200);
+  keywordReactionFixtureTimers.push(finishTimerId);
+}
+
+function showKeywordReactionFixtureEvent(event, index, total) {
+  applyKeywordReactionToastConfig(event);
+  elements.keywordReactionToastText.textContent = event.displayText;
+  elements.keywordReactionToast.hidden = false;
+  elements.keywordReactionFixtureStatus.textContent = `人工fixture ${index}/${total}: preview内にtoastを表示しています。`;
+}
+
+function stopKeywordReactionFixturePlayback(statusMessage = "") {
+  if (keywordReactionFixtureTimers.length > 0) {
+    for (const timerId of keywordReactionFixtureTimers) {
+      window.clearTimeout(timerId);
+    }
+    keywordReactionFixtureTimers = [];
+  }
+  if (statusMessage) {
+    elements.keywordReactionFixtureStatus.textContent = statusMessage;
+  }
+}
+
+function resetKeywordReactionFixturePlayback() {
+  stopKeywordReactionFixturePlayback("人工fixtureをリセットしました。人工デモデータは生成URLへ入りません。");
+  hideKeywordReactionToast();
 }
 
 function applyKeywordReactionToastConfig(config) {
