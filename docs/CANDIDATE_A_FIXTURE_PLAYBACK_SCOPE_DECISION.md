@@ -4,7 +4,7 @@
 
 この文書は Candidate A: keyword reaction overlay の次段階である fixture playback + schema validation のスコープ固定記録です。
 
-これは docs-only の implementation planning evidence です。fixture playback、paste JSON import、overlay runtime、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
+これは implementation planning evidence です。PR #42 で built-in artificial fixture + schema validation + editor preview playback は実装済みだが、paste JSON import、overlay runtime、fixture event linkage、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
 
 関連:
 
@@ -12,6 +12,7 @@
 - [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
+- [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -48,6 +49,28 @@ fixture playback は実YouTube連携の代替ではない。表示、タイミ�
 - speed control。
 - loop playback。
 - YouTube API / OAuth / API key / scraping / real data。
+
+## Post-PR #42 Boundary
+
+PR #42 時点の built-in fixture playback は editor preview 内の artificial data only です。
+
+現時点で実装済みと扱うもの:
+
+- built-in artificial fixture `demo-basic`。
+- fixture schema validation / normalize / playback schedule helper。
+- editor preview 内の再生 / 停止 / リセット。
+- generated URL config-only 境界。
+
+現時点で未実装のまま扱うもの:
+
+- `/overlay/keyword-reaction/` 本体runtimeで fixture event を読むこと。
+- fixture event を overlay本体へ流す event source。
+- paste JSON import。
+- fixture file保存。
+- ticker / badge runtime。
+- YouTube API / OAuth / API key / scraping / real data。
+
+次の overlay runtime PR は config-aware skeleton に限定し、fixture event linkage は後続PRへ分ける。
 
 ## Fixture Schema Policy
 
@@ -157,7 +180,8 @@ URLへ入れないもの:
 
 - paste JSON import。
 - fixture files under repository。
-- overlay 本体 runtime。
+- overlay 本体 runtime の event rendering。
+- fixture event を overlay 本体 runtime へ流す linkage。
 - ticker / badge。
 - import/export UI。
 - speed control。

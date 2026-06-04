@@ -22,8 +22,8 @@ Facts confirmed from the public repository and local `master`:
 - Forks at inspection time: 0
 - `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
-- Recent merged PR evidence includes PR #19 through PR #26.
-- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs including manual input + toast scope, matching normalization policy, and fixture playback scope, and production demo are present.
+- Recent merged PR evidence includes PR #19 through PR #42.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs including manual input + toast scope, matching normalization policy, fixture playback scope, overlay runtime scope, and production demo are present.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -40,7 +40,7 @@ The project is public and maintained, but public traction is still early. Do not
 | Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
 | Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
 | Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
-| Future product direction | Partial | Public roadmap, YouTube Live overlay suite planning docs, and Candidate A design/scope docs describe a candidate headline direction. Matching normalization and fixture playback scope docs are implementation planning evidence, not user adoption evidence. |
+| Future product direction | Partial | Public roadmap, YouTube Live overlay suite planning docs, and Candidate A design/scope docs describe a candidate headline direction. Matching normalization, fixture playback scope, and overlay runtime scope docs are implementation planning evidence, not user adoption evidence. |
 
 ## Strengths
 
@@ -57,7 +57,8 @@ The project is public and maintained, but public traction is still early. Do not
 - Candidate A design and scope decision docs define a safe route/static skeleton first step, followed by manual input + toast before fixture playback.
 - Candidate A manual input + toast scope decision records the next implementation boundary without claiming it is already implemented.
 - Candidate A matching normalization decision records a narrow follow-up policy for preview/config consistency without claiming advanced Unicode normalization or user adoption.
-- Candidate A fixture playback scope decision records artificial-data-only fixture playback and schema validation boundaries without claiming fixture playback is implemented or adopted.
+- Candidate A fixture playback scope decision records artificial-data-only fixture playback and schema validation boundaries; PR #42 implements the editor preview version, but this is not user adoption evidence.
+- Candidate A overlay runtime scope decision records a config-aware skeleton boundary before event source, fixture linkage, or YouTube integration.
 - Cloudflare cost and deploy boundaries are documented.
 
 ## Weaknesses
@@ -84,7 +85,8 @@ Prioritize evidence that can be linked from a public application without exposin
 - Candidate A implementation PR evidence after the route/static skeleton, manual input + toast, and later fixture playback are implemented and validated in small steps.
 - Planning evidence that fixes manual input + toast scope before implementation, while clearly separating it from adoption evidence.
 - Planning evidence that fixes matching normalization and preview/config consistency before the next implementation PR, while clearly separating it from adoption evidence.
-- Planning evidence that fixes fixture playback and schema validation scope before implementation, while clearly separating it from adoption evidence.
+- Planning evidence and PR evidence for editor-preview fixture playback and schema validation, while clearly separating it from adoption evidence.
+- Planning evidence that fixes overlay runtime scope before implementation, while clearly separating it from adoption evidence.
 - Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.
@@ -110,7 +112,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
 - `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.
 - `docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md`, `docs/HEADLINE_FEATURE_MVP_REQUIREMENTS.md`, and `docs/YOUTUBE_DATA_POLICY_BOUNDARY.md` for candidate headline feature planning.
-- `docs/CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md`, `docs/CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md`, `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A implementation planning evidence.
+- `docs/CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md`, `docs/CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A implementation planning evidence.
 - Issue #30 for public YouTube Live overlay suite exploration: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 
 ## Claims To Avoid

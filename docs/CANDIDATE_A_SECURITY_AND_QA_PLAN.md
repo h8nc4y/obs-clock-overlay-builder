@@ -11,6 +11,7 @@
 - [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
+- [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -103,6 +104,29 @@ fixture playback PR で確認すること:
 - 再生 / 停止 / リセットが安全に動き、timer cleanup がある。
 - generated URL は config-only のまま、fixture event data を含めない。
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+### Phase 4: Config-Aware Overlay Runtime Skeleton
+
+fixture playback の後続では、`/overlay/keyword-reaction/` 本体を config-aware overlay runtime skeleton に進める。
+
+この phase で確認すること:
+
+- `/overlay/keyword-reaction/?c=valid-config` が safe normalized config を読む。
+- `/overlay/keyword-reaction/?c=invalid-config` が safe default へ fallback する。
+- invalid fallback 時に raw `c`、secret-like value、入力実値を画面、status、consoleへ出さない。
+- 通常 idle は transparent / no visible text。
+- `debug=1` などの明示queryがある場合だけ public-safe status を表示する。
+- debug 表示に manual input text、fixture event data、raw JSON、`displayText` array、secret-like value を出さない。
+- event source、fixture linkage、toast event発火runtimeを実装しない。
+- generated URL は config-only のまま、manual input text と fixture event data を含めない。
+- `textContent` など safe DOM API を使い、`innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- no external network。
+- no editor `localStorage` dependency。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- 390px / 768px / 1280px で unexpected horizontal scroll がない。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+
+この phase は overlay本体が config を読めるようにするだけであり、event rendering、fixture playbackのoverlay連携、ticker、badge、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 
@@ -216,6 +240,8 @@ overlay-only surface:
 - toast が端で clipping しない。
 - repeated events が配信画面を恒久的に覆わない。
 - invalid config は safe default または empty state。
+- config-aware skeleton では、イベントがない通常idle時に画面を覆う default text を出さない。
+- debug表示は明示query時だけ出し、OBS本番利用の既定にはしない。
 
 OBS checks:
 
@@ -274,6 +300,7 @@ import/export は初回 manual input + toast PR の必須範囲にしない。�
 - default omission が overlay output を変えない。
 - generated URL は manual event text を default で含めない。
 - generated URL は fixture event payloads を default で含めない。
+- overlay runtime は generated URL の config fields だけを読み、event payload、manual input text、raw JSON を読まない。
 
 ## Privacy Checklist
 
