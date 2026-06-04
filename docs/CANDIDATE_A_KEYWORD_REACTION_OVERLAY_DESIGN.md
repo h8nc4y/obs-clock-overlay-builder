@@ -159,9 +159,15 @@ skeleton の次は manual input + toast を優先する。
 
 ## Fixture Playback
 
+現在の次段階は fixture playback + schema validation のスコープ固定です。詳細は [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md) に分ける。
+
 fixture playback は manual input + toast の後続PRに分ける。
 
 fixture は artificial events だけを扱う。timing、repeated events、missed keyword、visual density を確認するために使う。
+
+初回実装は editor preview 内の playback に限定する。built-in artificial fixture を優先し、paste JSON input、fixture file追加、overlay本体runtime、ticker、badge、import/export、YouTube integration は後続PRへ分けてよい。
+
+fixture playback は `/overlay/keyword-reaction/` の本格イベントruntimeを実装済みにするものではない。overlay-only skeleton は引き続き維持し、実YouTube連携前の安全な表示・timing・QA検証として扱う。
 
 fixture に含めてはいけないもの:
 
