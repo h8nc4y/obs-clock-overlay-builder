@@ -48,6 +48,23 @@ skeleton 後の manual input + toast PR で確認すること:
 - text-not-HTML samples が inert text として扱われる。
 - no YouTube API / no OAuth / no API key / no real data。
 
+### Config Helper Tests
+
+manual input + toast の前段として、`assets/js/keyword-reaction-config.js` で config encode/decode helper を追加する。
+
+tests で確認すること:
+
+- default config が安定している。
+- unsupported `schemaVersion`、`overlayType`、enum values が safe default へ fallback する。
+- `displayPattern`、`reactionStyle`、`matchMode` が決めた語彙へ normalize される。
+- `intensity` が safe range に clamp される。
+- `keyword` が trim / length limit され、secret-like value は default に戻る。
+- encode / decode round trip が安定している。
+- invalid `c` parameter は safe default へ fallback する。
+- unknown fields、secret-like fields、raw user data indicators は normalized config に保持しない。
+
+この helper は URL config の土台であり、manual input UI、toast trigger、keyword matching runtime、fixture playback、YouTube integration を実装したものではない。
+
 ### Phase 3: Fixture Playback
 
 fixture playback PR で確認すること:
