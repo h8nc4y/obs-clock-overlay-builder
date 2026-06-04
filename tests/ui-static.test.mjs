@@ -92,6 +92,45 @@ test("keyword reaction overlay skeleton is transparent and static-only", () => {
   );
 });
 
+test("editor includes separated manual keyword reaction toast controls", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /id="keywordReactionExperiment"/);
+  assert.match(html, /Candidate A 実験/);
+  assert.match(html, /キーワード反応オーバーレイ実験/);
+  assert.match(html, /人工テキスト入力/);
+  assert.match(html, /YouTube連携や実データ取得は行いません。/);
+  assert.match(html, /id="keywordReactionManualText"/);
+  assert.match(html, /id="keywordReactionKeyword"/);
+  assert.match(html, /id="keywordReactionMatchMode"/);
+  assert.match(html, /value="contains"/);
+  assert.match(html, /value="exact"/);
+  assert.match(html, /id="keywordReactionIntensity"/);
+  assert.match(html, /value="0"/);
+  assert.match(html, /value="1"/);
+  assert.match(html, /value="2"/);
+  assert.match(html, /value="3"/);
+  assert.match(html, /id="keywordReactionStyle"/);
+  assert.match(html, /id="testKeywordReaction"/);
+  assert.match(html, /id="keywordReactionGeneratedUrl"/);
+  assert.match(html, /id="copyKeywordReactionUrl"/);
+  assert.match(html, /id="keywordReactionStatus"/);
+  assert.match(html, /id="keywordReactionToastText"/);
+});
+
+test("editor keyword reaction preview keeps manual input out of generated URLs", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+  const configHelper = readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8");
+
+  assert.match(html, /人工テキストは生成URLへ入りません。/);
+  assert.match(html, /\/overlay\/keyword-reaction\/\?c=/);
+  assert.match(builder, /keywordReactionConfigToUrl/);
+  assert.match(builder, /keywordReactionToastText\.textContent/);
+  assert.match(configHelper, /function keywordReactionConfigToUrl/);
+  assert.doesNotMatch(configHelper, /manualText[^\n]*searchParams|searchParams[^\n]*manualText/);
+});
+
 test("editor live preview reserves visual safe inset around clock widget", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -148,7 +187,8 @@ test("editor refresh does not add risky HTML sinks", () => {
   const changedSources = [
     readFileSync(new URL("../index.html", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8")
+    readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8")
   ].join("\n");
 
   assert.doesNotMatch(changedSources, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);

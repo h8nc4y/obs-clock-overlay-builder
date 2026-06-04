@@ -11,6 +11,12 @@ import {
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
+import {
+  buildManualKeywordReactionConfig,
+  keywordReactionConfigToUrl,
+  keywordReactionMatches,
+  normalizeKeywordReactionManualText
+} from "./keyword-reaction-config.js";
 import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
 
@@ -84,7 +90,20 @@ const elements = {
   copyUrl: byId("copyUrl"),
   openClock: byId("openClock"),
   urlStatus: byId("urlStatus"),
-  urlWarning: byId("urlWarning")
+  urlWarning: byId("urlWarning"),
+  keywordReactionManualText: byId("keywordReactionManualText"),
+  keywordReactionKeyword: byId("keywordReactionKeyword"),
+  keywordReactionMatchMode: byId("keywordReactionMatchMode"),
+  keywordReactionIntensity: byId("keywordReactionIntensity"),
+  keywordReactionStyle: byId("keywordReactionStyle"),
+  testKeywordReaction: byId("testKeywordReaction"),
+  clearKeywordReactionToast: byId("clearKeywordReactionToast"),
+  keywordReactionStatus: byId("keywordReactionStatus"),
+  keywordReactionGeneratedUrl: byId("keywordReactionGeneratedUrl"),
+  keywordReactionUrlStatus: byId("keywordReactionUrlStatus"),
+  copyKeywordReactionUrl: byId("copyKeywordReactionUrl"),
+  keywordReactionToast: byId("keywordReactionToast"),
+  keywordReactionToastText: byId("keywordReactionToastText")
 };
 
 const rangeFields = [
@@ -124,6 +143,7 @@ function init() {
   renderSwatches();
   setupTimezoneCandidate();
   bindForm();
+  bindKeywordReactionExperiment();
   bindPreviewBackground();
   syncFormFromState();
   updateEverything();
@@ -265,6 +285,31 @@ function bindForm() {
   elements.shareImage.addEventListener("click", shareGeneratedImage);
 }
 
+function bindKeywordReactionExperiment() {
+  const configInputs = [
+    elements.keywordReactionKeyword,
+    elements.keywordReactionMatchMode,
+    elements.keywordReactionIntensity,
+    elements.keywordReactionStyle
+  ];
+  for (const input of configInputs) {
+    input.addEventListener("input", updateKeywordReactionExperiment);
+    input.addEventListener("change", updateKeywordReactionExperiment);
+  }
+  elements.keywordReactionManualText.addEventListener("input", () => {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent = "人工テキストは生成URLへ入りません。";
+  });
+  elements.testKeywordReaction.addEventListener("click", testKeywordReactionPreview);
+  elements.clearKeywordReactionToast.addEventListener("click", () => {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent = "toast previewを消しました。";
+  });
+  elements.copyKeywordReactionUrl.addEventListener("click", () =>
+    copyText(elements.keywordReactionGeneratedUrl.value, elements.keywordReactionStatus, "生成オーバーレイURLをコピーしました。")
+  );
+}
+
 function bindPreviewBackground() {
   document.querySelectorAll('input[name="previewBg"]').forEach((radio) => {
     radio.addEventListener("change", updatePreviewBackground);
@@ -330,6 +375,7 @@ function updateEverything(status = "") {
   updatePreviewBackground();
   updateShareText();
   updateGeneratedUrl();
+  updateKeywordReactionExperiment();
   updateContrastWarning();
   updateTemplatePressed();
   if (status) {
@@ -360,6 +406,61 @@ function updateGeneratedUrl() {
     elements.urlWarning.textContent = "URLが長めです。必要なら「デフォルト値を省略して短くする」を使ってください。";
   }
   updateXIntent();
+}
+
+function readKeywordReactionConfig() {
+  return buildManualKeywordReactionConfig({
+    keyword: elements.keywordReactionKeyword.value,
+    matchMode: elements.keywordReactionMatchMode.value,
+    intensity: elements.keywordReactionIntensity.value,
+    reactionStyle: elements.keywordReactionStyle.value
+  });
+}
+
+function updateKeywordReactionExperiment() {
+  const config = readKeywordReactionConfig();
+  const url = keywordReactionConfigToUrl(config, window.location.href);
+  elements.keywordReactionGeneratedUrl.value = url;
+  elements.keywordReactionUrlStatus.textContent = `${url.length}文字 / 設定のみ`;
+  applyKeywordReactionToastConfig(config);
+}
+
+function testKeywordReactionPreview() {
+  const config = readKeywordReactionConfig();
+  const manualText = normalizeKeywordReactionManualText(elements.keywordReactionManualText.value);
+  const keyword = elements.keywordReactionKeyword.value.trim();
+  applyKeywordReactionToastConfig(config);
+
+  if (!manualText) {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent = "人工テキストを入力してください。";
+    return;
+  }
+  if (!keyword) {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent = "キーワードを入力してください。";
+    return;
+  }
+  const matched = keywordReactionMatches({ manualText, keyword, matchMode: config.matchMode });
+  if (!matched) {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent = "一致しませんでした。人工テキストかキーワードを変えて確認してください。";
+    return;
+  }
+
+  elements.keywordReactionToastText.textContent = manualText;
+  elements.keywordReactionToast.hidden = false;
+  elements.keywordReactionStatus.textContent = "一致しました。ライブプレビュー内にtoastを表示しています。";
+}
+
+function applyKeywordReactionToastConfig(config) {
+  elements.keywordReactionToast.dataset.style = config.reactionStyle;
+  elements.keywordReactionToast.dataset.intensity = String(config.intensity);
+}
+
+function hideKeywordReactionToast() {
+  elements.keywordReactionToast.hidden = true;
+  elements.keywordReactionToastText.textContent = "";
 }
 
 function updateRecommendedSize() {
