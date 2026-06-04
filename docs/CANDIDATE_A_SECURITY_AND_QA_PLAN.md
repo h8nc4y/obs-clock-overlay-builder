@@ -6,7 +6,10 @@
 
 この文書は、実装、YouTube API calls、OAuth、API keys、scraping、real viewer data、deploy、external data sending を承認するものではありません。
 
-関連するスコープ固定記録: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+関連するスコープ固定記録:
+
+- [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+- [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -40,13 +43,26 @@
 skeleton 後の manual input + toast PR で確認すること:
 
 - editor から人工テキストを入力できる。
-- keyword に一致したら toast が表示される。
+- keyword に一致したら preview 内で toast が表示される。
 - `displayPattern: "toast"` が初期 behavior。
 - `reactionStyle` と `intensity` が safe enum / numeric range に収まる。
+- 初回UIが生成する `intensity` は `0` / `1` / `2` / `3` の整数step。
+- runtime は helper 方針どおり `0` から `3` の連続値に耐える。
+- `matchMode: "contains"` / `"exact"` の最小matchingだけを扱う。
 - generated URL で visual config と keyword rules が再現できる。
 - manual event text は generated OBS URL に default で入れない。
-- text-not-HTML samples が inert text として扱われる。
+- manual input text は generated URL に含めない。
+- manual input text と keyword に長さ制限がある。
+- text-not-HTML samples が `textContent` などで inert text として扱われる。
+- untrusted values に `innerHTML` を使わない。
+- 390px / 768px / 1280px で editor preview と controls が破綻しない。
+- `/overlay/keyword-reaction/` の overlay-only surface が壊れない。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- console に関連errorがない。
+- external network request がない。
 - no YouTube API / no OAuth / no API key / no real data。
+
+この phase は editor preview 中心のbehavior確認であり、overlay runtime の本格イベント表示、fixture playback、ticker / badge runtime、YouTube integration を実装済みにしない。
 
 ### Config Helper Tests
 
@@ -144,6 +160,8 @@ hello <strong>overlay</strong>
 
 期待結果: 入力は inert text として表示されるか、安全に normalize される。実行されたり、page structure を変えたりしてはいけない。
 
+manual input + toast PR では、少なくとも manual input text と keyword についてこの境界を確認する。HTML-like input を `innerHTML` へ渡さず、`textContent` などの text API で表示する。
+
 ## OBS Browser Source QA
 
 overlay-only surface:
@@ -183,6 +201,7 @@ editor surface を実装する場合の確認:
 - 1280px 以上の desktop width。
 - unexpected horizontal scroll がない。
 - manual input と generated URL が使いやすい。
+- generated URL が manual input text を含まないことを確認できる。
 - preview が重要 controls を押し出さない。
 - controls に visible focus states がある。
 - buttons / inputs が tap-friendly。

@@ -11,6 +11,7 @@
 - Issue #30: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 - Safe MVP comment: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30#issuecomment-4613411826>
 - Implementation scope decision: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
+- Manual input + toast scope decision: [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -124,26 +125,37 @@ Candidate A は次の順で小さく進める。
 
 skeleton の次は manual input + toast を優先する。
 
+このPRは editor preview 中心の初回behavior確認に限定する。toast は人工テキストに対する preview 検証用であり、実YouTube連携やOBS本番面への live event injection ではない。
+
 含めるもの:
 
 - editor から人工テキストを入力できる。
-- keyword に一致したら toast 表示する。
+- keyword に一致したら preview 内で toast 表示する。
 - `displayPattern: "toast"` を初期値にする。
 - `reactionStyle` と `intensity` を安全な enum / numeric range に制限する。
+- 初回UIが生成する `intensity` は `0` / `1` / `2` / `3` の整数stepにする。
+- runtime は config helper と同じく `0` から `3` の連続値に耐える。
+- `matchMode: "contains"` / `"exact"` の最小matchingを扱う。
 - generated URL で visual config と keyword rules が再現できる。
-- user-provided text は text として表示する。
+- manual input text そのものは初回 generated URL に含めない。
+- user-provided text は HTML ではなく text として表示する。
 - no YouTube API / OAuth / API key / real data。
 
 含めないもの:
 
 - fixture playback。
+- fixture JSON files。
+- import/export UI。
 - ticker。
 - badge。
+- overlay runtime の本格イベント表示。
 - YouTube integration。
 - live chat / comment fetching。
 - OAuth login。
 - API key storage。
 - raw real comments。
+
+`/overlay/keyword-reaction/` は引き続き overlay-only page として維持する。初回 manual input + toast PR では、overlay 側は config helper の読み込み準備または safe default 維持に留めてよい。
 
 ## Fixture Playback
 
