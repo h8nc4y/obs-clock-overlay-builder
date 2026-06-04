@@ -7,6 +7,7 @@ import test from "node:test";
 const requiredArtifacts = [
   "index.html",
   "clock/index.html",
+  "overlay/keyword-reaction/index.html",
   "api/defaults",
   "favicon.ico",
   "assets/css/styles.css",

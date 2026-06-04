@@ -1,5 +1,13 @@
 const baseUrl = process.env.SMOKE_BASE_URL || "http://127.0.0.1:4173";
-const targets = ["/", "/clock/", "/clock", "/api/defaults", "/favicon.ico"];
+const targets = [
+  "/",
+  "/clock/",
+  "/clock",
+  "/overlay/keyword-reaction/",
+  "/overlay/keyword-reaction",
+  "/api/defaults",
+  "/favicon.ico"
+];
 let failed = false;
 
 for (const target of targets) {
