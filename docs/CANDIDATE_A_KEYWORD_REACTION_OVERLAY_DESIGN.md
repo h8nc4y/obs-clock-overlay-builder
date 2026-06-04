@@ -12,6 +12,7 @@
 - Safe MVP comment: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30#issuecomment-4613411826>
 - Implementation scope decision: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - Manual input + toast scope decision: [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
+- Overlay runtime scope decision: [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -76,9 +77,11 @@ Candidate A は次の順で小さく進める。
 1. Route/static skeleton。
 2. Manual input + toast。
 3. Fixture playback。
-4. Ticker / badge。
-5. URL import/export refinement。
-6. YouTube integration design。
+4. Config-aware overlay runtime skeleton。
+5. Event source / fixture linkage。
+6. Ticker / badge。
+7. URL import/export refinement。
+8. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -167,7 +170,7 @@ fixture は artificial events だけを扱う。timing、repeated events、misse
 
 初回実装は editor preview 内の playback に限定する。built-in artificial fixture を優先し、paste JSON input、fixture file追加、overlay本体runtime、ticker、badge、import/export、YouTube integration は後続PRへ分けてよい。
 
-fixture playback は `/overlay/keyword-reaction/` の本格イベントruntimeを実装済みにするものではない。overlay-only skeleton は引き続き維持し、実YouTube連携前の安全な表示・timing・QA検証として扱う。
+fixture playback は `/overlay/keyword-reaction/` の本格イベントruntimeを実装済みにするものではない。PR #42 時点の built-in fixture playback は editor preview 内に限定される。overlay-only skeleton は引き続き維持し、実YouTube連携前の安全な表示・timing・QA検証として扱う。
 
 fixture に含めてはいけないもの:
 
@@ -177,6 +180,30 @@ fixture に含めてはいけないもの:
 - API keys / OAuth tokens / secrets。
 - private dashboard values。
 - personal data。
+
+## Next Overlay Runtime PR: Config-Aware Skeleton
+
+fixture playback の後続では、`/overlay/keyword-reaction/` 本体runtimeを config-aware skeleton として小さく進める。
+
+このPRで入れるもの:
+
+- `/overlay/keyword-reaction/` が `?c=...` を読む。
+- keyword reaction config helper で safe normalized config へ fallback / normalize する。
+- 通常 idle は transparent / no visible text にする。
+- `debug=1` のような明示queryがある場合だけ public-safe status を表示する。
+- no editor UI / no external network / no localStorage dependency を維持する。
+- text rendering は `textContent` 等の safe DOM API に限定する方針を tests / QA に残す。
+
+このPRで入れないもの:
+
+- toast event発火runtime。
+- event source。
+- built-in fixture event を overlay本体へ流す処理。
+- paste JSON import。
+- ticker / badge runtime。
+- YouTube API / OAuth / API key / scraping / real data。
+
+詳細は [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 
@@ -282,5 +309,6 @@ reaction visual style の呼び方は `reactionStyle` に揃える。
 - `reactionStyle` の最終enum。
 - toast animation はどの程度なら便利で邪魔にならないか。
 - fixture playback は built-in fixture list、pasted JSON、または両方にするか。
-- import/export を manual input + toast の直後に入れるか、fixture playback 後に入れるか。
+- event source と fixture linkage を config-aware overlay runtime skeleton の直後に入れるか、さらに synthetic event rendering PR を挟むか。
+- import/export を overlay runtime skeleton の後に入れるか、fixture linkage 後に入れるか。
 - real YouTube integration を検討する場合の official documentation review、credential storage、quota/cost、privacy、data deletion / revocation 設計。

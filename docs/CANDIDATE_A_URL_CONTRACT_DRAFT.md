@@ -10,6 +10,7 @@
 
 - [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -52,6 +53,59 @@ Candidate A の初回実装方針では次を使う。
 - `innerHTML` なし。
 
 本格的な config encode/decode、keyword rules、generated URL round-trip は manual input + toast 以降のPRで扱う。
+
+## Overlay Runtime Config Scope
+
+次の overlay runtime 実装PRは config-aware skeleton に限定する。`/overlay/keyword-reaction/` は `?c=...` を読み、`assets/js/keyword-reaction-config.js` の helper で safe normalized config へ寄せる。
+
+overlay runtime が読む範囲:
+
+- `schemaVersion`。
+- `overlayType`。
+- `displayPattern`。
+- `reactionStyle`。
+- `intensity`。
+- `keyword`。
+- `matchMode`。
+- public-safe visual config。
+
+overlay runtime が次PRで読まないもの:
+
+- manual input text。
+- fixture event data。
+- raw fixture JSON。
+- raw user JSON。
+- `displayText` array。
+- event source。
+- YouTube API response。
+- OAuth token / API key / secret-like value。
+
+次PRの overlay runtime は event source を実装しない。configを読める transparent idle surface として振る舞い、toast event発火runtime、fixture linkage、ticker、badge、import/exportは後続へ分ける。
+
+## Invalid Config And Debug Display
+
+missing / invalid / unsupported `c` は safe default へ fallback する。
+
+fallback時の方針:
+
+- raw `c` value を画面、status、consoleへ出さない。
+- secret-like value や入力実値を表示しない。
+- generated URL は config-only のままにする。
+- normal idle では何も表示しない。
+
+debug/status 表示は `debug=1` のような明示queryがある場合だけ使う。debug表示に出してよいのは、overlay ready、fallback発生、public-safe enum などの低リスク情報だけにする。
+
+debug表示に出さないもの:
+
+- raw config。
+- manual input text。
+- fixture event data。
+- `displayText` array。
+- API key。
+- OAuth token。
+- real viewer id。
+- raw comment data。
+- private account data。
 
 ## Config Helper実装範囲
 
@@ -121,6 +175,10 @@ encoded config に含めてはいけないもの:
 - private dashboard values。
 - billing / payment details。
 - ユーザーが公開する意図のない personal data。
+- manual input text。
+- fixture event payloads。
+- raw fixture JSON。
+- `displayText` arrays。
 
 ## Manual / Fixture MVPでのURLモデル
 
@@ -153,15 +211,13 @@ config outline:
   "timing": {
     "durationMs": 2400,
     "cooldownMs": 800
-  },
-  "fixture": {
-    "mode": "built-in",
-    "id": "synthetic-basic"
   }
 }
 ```
 
 この sample は人工データであり、real viewer data を含まない。
+
+次の config-aware overlay runtime skeleton では、上記のような config fields を読むだけに留める。fixture event data、manual input text、raw JSON、`displayText` arrays は `c` に入れず、overlay本体も読まない。
 
 ## Keyword Normalization
 
