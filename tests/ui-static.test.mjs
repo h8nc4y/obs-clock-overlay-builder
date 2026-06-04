@@ -131,6 +131,21 @@ test("editor keyword reaction preview keeps manual input out of generated URLs",
   assert.doesNotMatch(configHelper, /manualText[^\n]*searchParams|searchParams[^\n]*manualText/);
 });
 
+test("editor keyword reaction preview uses normalized config as source of truth", () => {
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+  const previewBody =
+    builder.match(/function testKeywordReactionPreview\(\) \{(?<body>[\s\S]*?)\n\}\n\nfunction applyKeywordReactionToastConfig/)?.groups
+      ?.body ?? "";
+
+  assert.match(previewBody, /const keyword = config\.keyword;/);
+  assert.doesNotMatch(previewBody, /elements\.keywordReactionKeyword\.value/);
+  assert.match(previewBody, /keywordReactionMatches\(\{\s*manualText,\s*keyword,\s*matchMode:\s*config\.matchMode\s*\}\)/);
+  assert.match(previewBody, /keywordReactionKeywordUsedSafeFallback\(config\)/);
+  assert.match(builder, /function keywordReactionKeywordUsedSafeFallback\(config\)/);
+  assert.match(builder, /キーワードは安全な既定値に戻しました。生成URLには入力テキストは含まれません。/);
+  assert.doesNotMatch(previewBody, /keywordReactionStatus\.textContent\s*=\s*elements\.keywordReactionKeyword/);
+});
+
 test("editor live preview reserves visual safe inset around clock widget", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";

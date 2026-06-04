@@ -29,6 +29,7 @@
 - `toastスタイル` と `反応の強さ` を変えると、生成オーバーレイURLの `c` 設定が更新される。
 - `生成オーバーレイURL` は `/overlay/keyword-reaction/?c=...` 形式で、人工テキストの内容を含まない。
 - secret風の人工テキストや個人情報風の文字列を入れても、生成オーバーレイURLには含まれない。
+- secret風または空欄のキーワードでは、安全な既定値へ戻したstatusが表示され、入力したキーワード実値はstatusや生成オーバーレイURLへ出ない。
 - `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLだが、現時点のoverlay runtimeはskeletonのままである。
 - 390px前後、768px前後、1280px以上で、toast preview、設定欄、生成URL欄に横スクロールが出ない。
 - Browser Console error/warning がなく、外部network request が発生しない。

@@ -12,6 +12,7 @@ import {
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import {
+  DEFAULT_KEYWORD_REACTION_CONFIG,
   buildManualKeywordReactionConfig,
   keywordReactionConfigToUrl,
   keywordReactionMatches,
@@ -23,6 +24,8 @@ import { createFormatters, formatClock } from "./time.js";
 const STORAGE_KEY = "obs-clock-builder:v1";
 const LONG_URL_WARNING = 1800;
 const TOO_LONG_URL_WARNING = 4000;
+const KEYWORD_REACTION_FALLBACK_STATUS =
+  "キーワードは安全な既定値に戻しました。生成URLには入力テキストは含まれません。";
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
 
 const elements = {
@@ -423,12 +426,17 @@ function updateKeywordReactionExperiment() {
   elements.keywordReactionGeneratedUrl.value = url;
   elements.keywordReactionUrlStatus.textContent = `${url.length}文字 / 設定のみ`;
   applyKeywordReactionToastConfig(config);
+  if (keywordReactionKeywordUsedSafeFallback(config)) {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent = KEYWORD_REACTION_FALLBACK_STATUS;
+  }
 }
 
 function testKeywordReactionPreview() {
   const config = readKeywordReactionConfig();
   const manualText = normalizeKeywordReactionManualText(elements.keywordReactionManualText.value);
-  const keyword = elements.keywordReactionKeyword.value.trim();
+  const keyword = config.keyword;
+  const keywordUsedSafeFallback = keywordReactionKeywordUsedSafeFallback(config);
   applyKeywordReactionToastConfig(config);
 
   if (!manualText) {
@@ -436,26 +444,30 @@ function testKeywordReactionPreview() {
     elements.keywordReactionStatus.textContent = "人工テキストを入力してください。";
     return;
   }
-  if (!keyword) {
-    hideKeywordReactionToast();
-    elements.keywordReactionStatus.textContent = "キーワードを入力してください。";
-    return;
-  }
   const matched = keywordReactionMatches({ manualText, keyword, matchMode: config.matchMode });
   if (!matched) {
     hideKeywordReactionToast();
-    elements.keywordReactionStatus.textContent = "一致しませんでした。人工テキストかキーワードを変えて確認してください。";
+    elements.keywordReactionStatus.textContent = keywordUsedSafeFallback
+      ? `${KEYWORD_REACTION_FALLBACK_STATUS} 一致しませんでした。人工テキストを変えて確認してください。`
+      : "一致しませんでした。人工テキストかキーワードを変えて確認してください。";
     return;
   }
 
   elements.keywordReactionToastText.textContent = manualText;
   elements.keywordReactionToast.hidden = false;
-  elements.keywordReactionStatus.textContent = "一致しました。ライブプレビュー内にtoastを表示しています。";
+  elements.keywordReactionStatus.textContent = keywordUsedSafeFallback
+    ? `${KEYWORD_REACTION_FALLBACK_STATUS} ライブプレビュー内にtoastを表示しています。`
+    : "一致しました。ライブプレビュー内にtoastを表示しています。";
 }
 
 function applyKeywordReactionToastConfig(config) {
   elements.keywordReactionToast.dataset.style = config.reactionStyle;
   elements.keywordReactionToast.dataset.intensity = String(config.intensity);
+}
+
+function keywordReactionKeywordUsedSafeFallback(config) {
+  const rawKeyword = elements.keywordReactionKeyword.value.trim();
+  return config.keyword === DEFAULT_KEYWORD_REACTION_CONFIG.keyword && rawKeyword !== DEFAULT_KEYWORD_REACTION_CONFIG.keyword;
 }
 
 function hideKeywordReactionToast() {
