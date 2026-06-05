@@ -10,8 +10,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Keep Codex for OSS readiness evidence current without claiming application submission or acceptance.
 - Define the YouTube Live overlay suite concept, MVP requirements, and data/policy boundary before any integration work.
 - Keep Candidate A matching normalization, preview/config consistency, overlay runtime, single synthetic event, and event source shape decisions aligned with the actual PR sequence.
-- Keep event transport, fixture linkage, toast queue runtime, ticker, badge, and YouTube integration separated from the next queue helper PR.
-- Keep Candidate A queue / transport scope explicit before queue helper implementation.
+- Keep event transport, fixture linkage, toast queue runtime, ticker, badge, and YouTube integration separated from the next overlay queue connection PR.
+- Keep Candidate A overlay queue connection scope explicit before connecting queue helper to overlay runtime.
 
 ## Medium Term
 
@@ -27,6 +27,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - After the config-aware skeleton, define and implement a single synthetic event rendering PR using an explicit `demo=1` public-safe flag.
 - After single synthetic event rendering, define event source shape helper + tests before event transport or fixture linkage.
 - After event shape helper, define queue / transport boundaries and implement queue helper + tests before event transport or fixture linkage.
+- After queue helper + tests, define overlay runtime queue connection scope before connecting `demo=1` rendering to the queue helper.
 - Keep transport, event source, built-in fixture linkage, toast queue runtime, ticker, badge, and real integration as separate follow-up PRs.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
@@ -52,6 +53,7 @@ Current planning docs:
 - [Candidate A single synthetic event scope decision](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [Candidate A event source shape decision](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [Candidate A queue / transport scope decision](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
+- [Candidate A overlay queue connection scope decision](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -72,8 +74,10 @@ Near-term sequence:
 9. Define event source shape helper + tests; keep generated URLs config-only and keep event payloads out of URLs.
 10. Define queue / transport boundaries; keep generated URLs config-only and keep queue state, event payloads, and transport payloads out of URLs.
 11. Implement queue helper + tests only; keep transport, event source, fixture linkage, and toast queue runtime out of that PR.
-12. Consider event source and fixture linkage only after the normalized event shape and queue helper are stable.
-13. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+12. Define overlay runtime queue connection scope; keep `demo=1` as the only queued event source for the next implementation PR.
+13. Implement overlay runtime queue connection only after that scope is fixed; keep transport, fixture linkage, and real integration out of that PR.
+14. Consider event source and fixture linkage only after the normalized event shape, queue helper, and overlay queue connection are stable.
+15. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 

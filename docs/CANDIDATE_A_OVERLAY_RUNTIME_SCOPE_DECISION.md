@@ -14,6 +14,7 @@
 - [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -38,20 +39,25 @@ PR #44 で config-aware overlay runtime skeleton は実装済みです。
 
 次段階で扱う `demo=1` は public-safe demo flag であり、event source、fixture linkage、YouTube integration ではありません。通常 idle は引き続き transparent / no visible text とする。
 
-## Post-PR #48 Queue Handoff
+## Post-PR #50 Queue Handoff
 
-PR #46 で `demo=1` fixed synthetic event rendering、PR #48 で event shape helper は実装済みです。
+PR #46 で `demo=1` fixed synthetic event rendering、PR #48 で event shape helper、PR #50 で queue helper + tests は実装済みです。
 
-次の実装PR候補は queue helper + tests に限定する。queue は overlay runtime 内部で normalized event を順番表示するための仕組みであり、transport は editor / manual / fixture / future integration から overlay へeventを渡す経路として後続に分ける。
+次のスコープ固定は [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md) に分ける。次の実装PR候補は overlay runtime queue connection に限定し、`demo=1` fixed synthetic event を queue helper 経由で表示する。
+
+queue は overlay runtime 内部で normalized event を順番表示するための仕組みであり、transport は editor / manual / fixture / future integration から overlay へeventを渡す経路として後続に分ける。
 
 次PRで維持する境界:
 
 - 通常 idle は transparent / no visible text のまま。
 - `debug=1` は public-safe status 表示専用。
 - `demo=1` は public-safe display test flag のまま。
+- queue に入れるeventは `demo=1` の fixed synthetic event だけ。
 - generated URL は config-only のまま。
 - queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays、secret-like values を URL へ入れない。
 - event source、fixture linkage、transport、toast queue runtime、ticker、badge、paste JSON import、YouTube integration は後続。
+- timer は bounded `setTimeout` のみとし、`setInterval` と unbounded loop は使わない。
+- play / clear / unmount / re-run で timer cleanup を確認する。
 - no external network / no localStorage transport / no YouTube API / no OAuth / no API key / no real data。
 
 ## Historical Config-Aware Skeleton Implementation Scope
@@ -256,7 +262,7 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 1. overlay runtime event rendering for a single synthetic event shape, scoped by [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)。
 2. event shape helper + tests, scoped by [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)。
 3. queue helper + tests, scoped by [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)。
-4. overlay runtime queue connection and timer cleanup。
+4. overlay runtime queue connection and timer cleanup, scoped by [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)。
 5. transport scope decision before any cross-window channel。
 6. built-in fixture linkage from safe artificial fixture to overlay runtime。
 7. paste JSON import design and validation。
