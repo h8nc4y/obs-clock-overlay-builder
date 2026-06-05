@@ -7,7 +7,8 @@ import {
   DEFAULT_KEYWORD_REACTION_EVENT,
   buildDemoKeywordReactionEvent as buildNormalizedDemoKeywordReactionEvent
 } from "./keyword-reaction-event.js";
-import { dequeueKeywordReactionEvent, enqueueKeywordReactionEvent } from "./keyword-reaction-queue.js";
+import { enqueueKeywordReactionLocalInput } from "./keyword-reaction-intake-queue.js";
+import { dequeueKeywordReactionEvent } from "./keyword-reaction-queue.js";
 
 const DEBUG_STATUS_ELEMENT_ID = "keywordReactionOverlayStatus";
 const DEMO_EVENT_ELEMENT_ID = "keywordReactionOverlayDemo";
@@ -62,7 +63,7 @@ export function buildKeywordReactionDemoEvent(state) {
     reactionStyle: state.reactionStyle,
     intensity: state.intensity
   });
-  const queue = enqueueKeywordReactionEvent([], demoEvent);
+  const queue = enqueueKeywordReactionLocalInput([], demoEvent);
   const { event } = dequeueKeywordReactionEvent(queue);
   if (!event) {
     return null;

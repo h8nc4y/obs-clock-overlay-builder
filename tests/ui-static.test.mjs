@@ -78,6 +78,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
     new URL("../assets/js/keyword-reaction-event-intake.js", import.meta.url),
     "utf8"
   );
+  const overlayIntakeQueueHelper = readFileSync(
+    new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url),
+    "utf8"
+  );
   const overlayQueueHelper = readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8");
   const redirects = readFileSync(new URL("../_redirects", import.meta.url), "utf8");
   const overlayPageBlock = css.match(/\.keyword-reaction-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -113,9 +117,12 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.match(overlayEventHelper, /キーワード反応デモ/);
   assert.match(overlayEventIntakeHelper, /KEYWORD_REACTION_LOCAL_EVENT_SOURCE_TYPES/);
   assert.match(overlayEventIntakeHelper, /normalizeKeywordReactionEvent/);
+  assert.match(overlayRuntime, /from "\.\/keyword-reaction-intake-queue\.js"/);
+  assert.match(overlayRuntime, /\benqueueKeywordReactionLocalInput\b/);
   assert.match(overlayRuntime, /from "\.\/keyword-reaction-queue\.js"/);
-  assert.match(overlayRuntime, /\benqueueKeywordReactionEvent\b/);
+  assert.doesNotMatch(overlayRuntime, /\benqueueKeywordReactionEvent\b/);
   assert.match(overlayRuntime, /\bdequeueKeywordReactionEvent\b/);
+  assert.match(overlayIntakeQueueHelper, /\benqueueKeywordReactionEvent\b/);
   assert.match(overlayQueueHelper, /DEFAULT_KEYWORD_REACTION_QUEUE_LIMIT\s*=\s*5/);
   assert.match(overlayRuntime, /setTimeout/);
   assert.match(overlayRuntime, /clearTimeout/);
