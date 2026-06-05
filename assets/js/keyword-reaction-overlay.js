@@ -3,16 +3,19 @@ import {
   KEYWORD_REACTION_OVERLAY_TYPE,
   parseKeywordReactionConfigFromQuery
 } from "./keyword-reaction-config.js";
+import {
+  DEFAULT_KEYWORD_REACTION_EVENT,
+  buildDemoKeywordReactionEvent as buildNormalizedDemoKeywordReactionEvent
+} from "./keyword-reaction-event.js";
 
 const DEBUG_STATUS_ELEMENT_ID = "keywordReactionOverlayStatus";
 const DEMO_EVENT_ELEMENT_ID = "keywordReactionOverlayDemo";
-const DEMO_DISPLAY_PATTERN = "toast";
-const DEFAULT_DEMO_INTENSITY = 1;
+const DEFAULT_DEMO_INTENSITY = DEFAULT_KEYWORD_REACTION_EVENT.intensity;
 const MIN_DEMO_INTENSITY = 0;
 const MAX_DEMO_INTENSITY = 3;
 
-export const KEYWORD_REACTION_DEMO_EVENT_TEXT = "キーワード反応デモ";
-export const KEYWORD_REACTION_DEMO_DURATION_MS = 2400;
+export const KEYWORD_REACTION_DEMO_EVENT_TEXT = DEFAULT_KEYWORD_REACTION_EVENT.displayText;
+export const KEYWORD_REACTION_DEMO_DURATION_MS = DEFAULT_KEYWORD_REACTION_EVENT.durationMs;
 
 let demoHideTimer = null;
 let demoTimerHost = null;
@@ -53,12 +56,17 @@ export function buildKeywordReactionDemoEvent(state) {
   if (!state?.demo) {
     return null;
   }
+  const event = buildNormalizedDemoKeywordReactionEvent({
+    displayPattern: state.displayPattern,
+    reactionStyle: state.reactionStyle,
+    intensity: state.intensity
+  });
   return {
-    text: KEYWORD_REACTION_DEMO_EVENT_TEXT,
-    displayPattern: DEMO_DISPLAY_PATTERN,
-    reactionStyle: normalizeDemoReactionStyle(state.reactionStyle),
-    intensity: normalizeDemoIntensity(state.intensity),
-    durationMs: KEYWORD_REACTION_DEMO_DURATION_MS
+    text: event.displayText,
+    displayPattern: event.displayPattern,
+    reactionStyle: event.reactionStyle,
+    intensity: normalizeDemoIntensity(event.intensity),
+    durationMs: event.durationMs
   };
 }
 
@@ -141,11 +149,6 @@ function hideKeywordReactionOverlayElement(element) {
   delete element.dataset.pattern;
   delete element.dataset.style;
   delete element.dataset.intensity;
-}
-
-function normalizeDemoReactionStyle(value) {
-  const normalized = String(value ?? "");
-  return ["spark", "pulse", "soft", "none"].includes(normalized) ? normalized : "spark";
 }
 
 function normalizeDemoIntensity(value) {
