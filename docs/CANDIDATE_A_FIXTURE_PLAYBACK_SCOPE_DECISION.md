@@ -13,6 +13,7 @@
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -93,6 +94,19 @@ event fields:
 - `reactionStyle`: `spark` / `pulse` / `soft` / `none`。
 
 旧 `styleHint` 語彙は使わず、`reactionStyle` へ寄せる。sample は `hello`、`配信開始`、`888` のような人工的で安全な文言だけにする。
+
+## Event Shape Follow-Up
+
+fixture event は、将来 [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) の normalized event shape へ寄せる。
+
+初期方針:
+
+- `sourceType: "fixture"` を使う。
+- built-in artificial fixture 由来の event だけを扱う。
+- raw fixture JSON を render layer へ直接渡さない。
+- fixture event data、`displayText` arrays、raw JSON は generated URL へ入れない。
+- paste JSON import、fixture file保存、overlay本体へのfixture linkageは後続PRへ分ける。
+- fixture sample は real viewer data、raw comment data、private account data を含めない。
 
 ## Validation Policy
 

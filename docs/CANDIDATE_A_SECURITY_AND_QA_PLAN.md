@@ -13,6 +13,7 @@
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
+- [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 
 ## Security Principles
 
@@ -153,6 +154,28 @@ config-aware overlay runtime skeleton の後続では、`/overlay/keyword-reacti
 - `/clock/` と `/clock/?c=...` の既存契約を変えない。
 
 この phase は OBS Browser Source で toast 表示と透明背景を確認するための public-safe demo event であり、fixture playback、event source、YouTube integrationを実装済みにしない。
+
+### Phase 6: Event Source Shape Helper
+
+single synthetic event rendering の後続では、event transport ではなく normalized event shape helper を先に固定する。
+
+この phase で確認すること:
+
+- `manual` / `fixture` / `demo` の `sourceType` 境界が明確である。
+- manual input text は generated URL に含まれない。
+- fixture event data、raw fixture JSON、`displayText` arrays は generated URL に含まれない。
+- `demo=1` は public-safe display test flag のままで、event sourceや実データ入力として扱わない。
+- `displayText` は `textContent` など safe DOM API で表示する前提で扱われる。
+- HTML-like text は HTML として実行されない。
+- secret-like values は reject または safe fallback され、raw値を status、DOM、console、generated URL に出さない。
+- event payload、event queue state、raw JSON、real viewer id、raw comment data は URL へ入れない。
+- 複数eventやqueueは後続PRへ分け、bounded queue、最大件数、timer cleanup、stop/reset を設計してから扱う。
+- `setInterval` や無限loopは使わず、`setTimeout` を使う場合は `clearTimeout` 管理を必須にする。
+- no external network。
+- no editor `localStorage` dependency。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は helper shape と tests の境界固定であり、event transport、fixture linkage、toast queue、ticker、badge、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

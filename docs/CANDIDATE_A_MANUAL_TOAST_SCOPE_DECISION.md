@@ -14,6 +14,7 @@
 - [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
+- [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -167,6 +168,18 @@ URLに入れないもの:
 - ユーザーが公開する意図のない personal data。
 
 manual input text は preview testing input であり、OBS再現のsource of truthにはしない。OBS再現のsource of truthは、時計ツールと同じく generated config URL とする。
+
+## Event Shape Follow-Up
+
+manual input の preview event は、将来 [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) の normalized event shape へ寄せる。
+
+初期方針:
+
+- `sourceType: "manual"` を使う。
+- manual input text は editor preview の人工入力であり、generated URL へ含めない。
+- raw manual form state を overlay render layer へ直接渡さない。
+- manual input text、raw JSON、`displayText` arrays、secret-like values を generated URL へ入れない。
+- overlay本体へmanual eventを送る transport は後続PRへ分ける。
 
 ## Text-Not-HTML Boundary
 

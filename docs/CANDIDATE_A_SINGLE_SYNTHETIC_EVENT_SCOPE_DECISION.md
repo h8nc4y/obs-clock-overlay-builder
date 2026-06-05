@@ -9,6 +9,7 @@
 関連:
 
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
@@ -63,6 +64,19 @@
 - generated URL の config-only 境界を壊さない。
 
 `demo=1` は event source ではありません。実装PRで polling、message channel、fixture playback、YouTube integration を追加しない。
+
+## Event Shape Follow-Up
+
+PR #46 で `demo=1` fixed synthetic event rendering は実装済みです。ただし、これは event source 実装ではなく public-safe display test flag として扱う。
+
+次の event shape helper PR では、`demo=1` の固定人工eventも [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) の normalized event shape へ寄せる方針とする。
+
+維持する境界:
+
+- demo event text はコード内固定の人工データだけにする。
+- `demo=1` は generated URL の `c` に入れない。
+- demo event payload、raw `c`、keyword実値、manual input text、fixture event data、secret-like value を debug/status 表示に出さない。
+- `demo` は `sourceType` の一候補だが、event transport や実データ入力を意味しない。
 
 ## `debug=1`との関係
 
