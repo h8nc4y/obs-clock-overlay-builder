@@ -12,6 +12,7 @@
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
+- [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 
 ## 契約の目的
 
@@ -122,6 +123,30 @@ config-aware overlay runtime skeleton の後続では、single synthetic event r
 
 single synthetic event の text はコード内の固定人工データだけにする。generated URL は config-only を維持し、`c` には visual config と keyword rules だけを入れる。
 
+## Event Payload Boundary
+
+event source shape の次段階でも、generated URL は config-only を維持する。
+
+URLへ入れないもの:
+
+- normalized event payload。
+- `eventId`。
+- event `displayText`。
+- manual input text。
+- fixture event data。
+- raw fixture JSON。
+- raw user JSON。
+- `displayText` arrays。
+- event queue state。
+- raw YouTube API response。
+- real viewer id。
+- raw comment / live chat data。
+- secret-like values。
+
+`eventId` や `fixtureId` を将来 public-safe reference として URL に含めるかは未確定です。初期 event shape helper PR では、event payload と event reference を URL へ入れない。
+
+詳細は [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) に分ける。
+
 ## Config Helper実装範囲
 
 `assets/js/keyword-reaction-config.js` に、URL config の土台として次の helper を追加する。
@@ -194,6 +219,7 @@ encoded config に含めてはいけないもの:
 - fixture event payloads。
 - raw fixture JSON。
 - `displayText` arrays。
+- event payloads。
 
 ## Manual / Fixture MVPでのURLモデル
 

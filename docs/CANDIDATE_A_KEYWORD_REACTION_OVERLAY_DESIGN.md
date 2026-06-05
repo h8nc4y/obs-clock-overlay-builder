@@ -14,6 +14,7 @@
 - Manual input + toast scope decision: [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - Overlay runtime scope decision: [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - Single synthetic event scope decision: [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
+- Event source shape decision: [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -80,10 +81,11 @@ Candidate A は次の順で小さく進める。
 3. Fixture playback。
 4. Config-aware overlay runtime skeleton。
 5. Single synthetic event rendering via explicit `demo=1`。
-6. Event source / fixture linkage。
-7. Ticker / badge。
-8. URL import/export refinement。
-9. YouTube integration design。
+6. Event source shape helper。
+7. Event source / fixture linkage。
+8. Ticker / badge。
+9. URL import/export refinement。
+10. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -232,6 +234,20 @@ config-aware overlay runtime skeleton の後続では、`/overlay/keyword-reacti
 - YouTube API / OAuth / API key / scraping / real data。
 
 詳細は [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md) に分ける。
+
+## Next Planning PR: Event Source Shape
+
+single synthetic event rendering の後続では、event transport や fixture linkage の前に normalized event shape を固定する。
+
+このdocs-only方針で固定するもの:
+
+- manual input、built-in fixture、`demo=1` を同じ normalized event shape へ寄せる。
+- `sourceType: "manual" | "fixture" | "demo"` の境界を明確にする。
+- generated URL へ event payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- `displayText` は HTML ではなく text として扱い、`textContent` 等の safe DOM API で表示する。
+- next implementation PR は event shape helper + tests に限定し、event transport、fixture linkage、toast queue、ticker、badge、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 
