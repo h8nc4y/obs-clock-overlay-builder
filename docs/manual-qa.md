@@ -34,7 +34,7 @@
 - `人工fixture再生` の説明で、人工デモデータでありYouTube連携ではないことが分かる。
 - `停止` と `リセット` で古いtimerが残らず、後からtoastが再表示されない。
 - fixture再生中または再生後も、`生成オーバーレイURL` はconfig-onlyのままで、`配信開始`、`888`、fixture event payload、raw JSON、manual input textを含まない。
-- `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLだが、現時点のoverlay runtimeはskeletonのままである。
+- `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLはconfig-onlyで、通常idleでは無表示、`demo=1` を明示した時だけ固定の人工eventを表示する。
 - 390px前後、768px前後、1280px以上で、toast preview、設定欄、生成URL欄に横スクロールが出ない。
 - Browser Console error/warning がなく、外部network request が発生しない。
 - YouTube API、OAuth、API key、scraping、実視聴者データ、実コメントデータを使わない。
@@ -77,8 +77,11 @@
 - `/overlay/keyword-reaction/` が開き、通常idle時は透明で何も表示されない。
 - `/overlay/keyword-reaction` でも同じoverlay runtimeへ到達する。
 - `/overlay/keyword-reaction/?debug=1` では `Keyword reaction overlay ready`、`config: fallback`、`pattern: toast` のようなpublic-safe statusだけが控えめに表示される。
+- `/overlay/keyword-reaction/?demo=1` では、固定の人工文言 `キーワード反応デモ` が1件toast表示され、短時間後に消える。
+- `/overlay/keyword-reaction/?demo=1&debug=1` では、public-safe statusと固定人工toastだけが表示され、raw `c`、keyword実値、manual input text、fixture event data、secret-like値は表示されない。
 - validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
+- `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。
 - ページ背景は透明で、`body` の余白がない。
 - 編集UI、設定フォーム、時計UI、manual input、toast trigger、fixture playback は表示されない。
 - localStorage に依存しない。
