@@ -77,11 +77,13 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   const overlayPageBlock = css.match(/\.keyword-reaction-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
   const overlaySurfaceBlock = css.match(/\.keyword-reaction-surface\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
   const overlayStatusBlock = css.match(/\.keyword-reaction-status\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+  const overlayDemoBlock = css.match(/\.keyword-reaction-demo-toast\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
   assert.match(overlayHtml, /<html lang="ja" class="keyword-reaction-page-root">/);
   assert.match(overlayHtml, /<body class="keyword-reaction-page">/);
   assert.match(overlayHtml, /aria-label="キーワード反応オーバーレイ"/);
   assert.match(overlayHtml, /id="keywordReactionOverlayStatus"/);
+  assert.match(overlayHtml, /id="keywordReactionOverlayDemo"/);
   assert.match(overlayHtml, /hidden aria-hidden="true" inert/);
   assert.match(overlayHtml, /<script type="module" src="\.\.\/\.\.\/assets\/js\/keyword-reaction-overlay\.js"><\/script>/);
   assert.match(css, /html\.keyword-reaction-page-root\s*\{[\s\S]*?background:\s*transparent;/);
@@ -91,12 +93,21 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.match(overlaySurfaceBlock, /pointer-events:\s*none;/);
   assert.match(overlayStatusBlock, /white-space:\s*pre-line;/);
   assert.match(css, /\.keyword-reaction-status\[hidden\]\s*\{[\s\S]*?display:\s*none;/);
+  assert.match(overlayDemoBlock, /justify-self:\s*end;/);
+  assert.match(overlayDemoBlock, /width:\s*min\(320px,\s*calc\(100vw - 36px\)\);/);
+  assert.match(overlayDemoBlock, /pointer-events:\s*none;/);
+  assert.match(css, /\.keyword-reaction-demo-toast\[hidden\]\s*\{[\s\S]*?display:\s*none;/);
   assert.match(redirects, /\/overlay\/keyword-reaction\s+\/overlay\/keyword-reaction\/index\.html\s+200/);
   assert.match(overlayRuntime, /parseKeywordReactionConfigFromQuery/);
   assert.match(overlayRuntime, /textContent/);
   assert.match(overlayRuntime, /debug"\)\s*===\s*"1"/);
+  assert.match(overlayRuntime, /demo"\)\s*===\s*"1"/);
   assert.match(overlayRuntime, /Keyword reaction overlay ready/);
+  assert.match(overlayRuntime, /キーワード反応デモ/);
+  assert.match(overlayRuntime, /setTimeout/);
+  assert.match(overlayRuntime, /clearTimeout/);
   assert.doesNotMatch(overlayHtml, /Keyword reaction overlay ready/);
+  assert.doesNotMatch(overlayHtml, /キーワード反応デモ/);
   assert.doesNotMatch(overlayRuntime, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
   assert.doesNotMatch(overlayRuntime, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
 });
