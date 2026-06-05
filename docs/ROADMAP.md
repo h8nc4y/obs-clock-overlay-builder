@@ -9,10 +9,9 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Polish docs for OBS setup, troubleshooting, and contributor onboarding.
 - Keep Codex for OSS readiness evidence current without claiming application submission or acceptance.
 - Define the YouTube Live overlay suite concept, MVP requirements, and data/policy boundary before any integration work.
-- Keep Candidate A matching normalization and preview/config consistency policy explicit before the next implementation PR.
-- Keep Candidate A overlay runtime scope explicit before the next implementation PR.
-- Keep Candidate A single synthetic event rendering scope explicit before the next implementation PR.
-- Keep Candidate A event source shape explicit before event transport, fixture linkage, or YouTube integration.
+- Keep Candidate A matching normalization, preview/config consistency, overlay runtime, single synthetic event, and event source shape decisions aligned with the actual PR sequence.
+- Keep event transport, fixture linkage, toast queue runtime, ticker, badge, and YouTube integration separated from the next queue helper PR.
+- Keep Candidate A queue / transport scope explicit before queue helper implementation.
 
 ## Medium Term
 
@@ -27,7 +26,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Implement the next small Candidate A PR as a config-aware overlay runtime skeleton for `/overlay/keyword-reaction/`.
 - After the config-aware skeleton, define and implement a single synthetic event rendering PR using an explicit `demo=1` public-safe flag.
 - After single synthetic event rendering, define event source shape helper + tests before event transport or fixture linkage.
-- Keep event source, built-in fixture linkage, toast queue, ticker, badge, and real integration as separate follow-up PRs.
+- After event shape helper, define queue / transport boundaries and implement queue helper + tests before event transport or fixture linkage.
+- Keep transport, event source, built-in fixture linkage, toast queue runtime, ticker, badge, and real integration as separate follow-up PRs.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
 ## Long Term
@@ -51,6 +51,7 @@ Current planning docs:
 - [Candidate A overlay runtime scope decision](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [Candidate A single synthetic event scope decision](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [Candidate A event source shape decision](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- [Candidate A queue / transport scope decision](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -69,8 +70,10 @@ Near-term sequence:
 7. Define and implement a config-aware overlay runtime skeleton that reads `?c=...`, stays transparent when idle, and shows debug status only by explicit flag.
 8. Define and implement single synthetic event rendering via explicit `demo=1`; keep idle transparent and keep event source / fixture linkage out of that PR.
 9. Define event source shape helper + tests; keep generated URLs config-only and keep event payloads out of URLs.
-10. Consider event source and fixture linkage only after the normalized event shape is stable.
-11. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+10. Define queue / transport boundaries; keep generated URLs config-only and keep queue state, event payloads, and transport payloads out of URLs.
+11. Implement queue helper + tests only; keep transport, event source, fixture linkage, and toast queue runtime out of that PR.
+12. Consider event source and fixture linkage only after the normalized event shape and queue helper are stable.
+13. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 

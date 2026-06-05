@@ -14,6 +14,7 @@
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -176,6 +177,31 @@ single synthetic event rendering の後続では、event transport ではなく 
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 この phase は helper shape と tests の境界固定であり、event transport、fixture linkage、toast queue、ticker、badge、YouTube integrationを実装済みにしない。
+
+### Phase 7: Queue Helper And Transport Boundary
+
+event shape helper の後続では、transport ではなく queue helper + tests を先に固定する。
+
+この phase で確認すること:
+
+- queue helper + tests に限定する。
+- queue は normalized event shape だけを扱う。
+- bounded queue の最大件数を守る。初期候補は 5 events。
+- overflow時は古い未表示eventをdropし、最新eventを残す。
+- repeated enqueue でも順序とscheduleが deterministic である。
+- queue helper は DOM、timer id、network、localStorage に依存しない。
+- timer runtimeを実装する場合は後続PRに分け、`setTimeout` id管理と `clearTimeout` cleanupを確認する。
+- stop / reset / unmount / new sequence で古いtimerが残らない方針を維持する。
+- generated URL に queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- transport、event source、fixture linkage、toast queue runtimeを実装しない。
+- no localStorage transport。
+- no external network。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `displayText` は後続renderingでも `textContent` など safe DOM API を使う。
+- `innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+
+この phase は queue helper と transport境界の固定であり、cross-window transport、BroadcastChannel、postMessage、fixture linkage、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

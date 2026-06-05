@@ -13,13 +13,14 @@
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
+- [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
 ## Purpose
 
-次の実装PRへ渡す前に、overlay本体runtimeが将来受け取る event payload の正規形を決める。
+event shape helper 実装へ渡す前に、overlay本体runtimeが将来受け取る event payload の正規形を決めた。
 
 目的:
 
@@ -163,30 +164,30 @@ event rendering は text-not-HTML を守る。
 
 初期event renderingは単一eventから始める。
 
+- PR #48 で event shape helper は実装済み。次段階は [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md) で queue と transport の境界を固定してから、queue helper + tests へ進める。
 - queueは後続PR。
 - 複数eventを扱う場合は bounded queue、最大件数、drop policy、timer cleanup、stop/reset を設計してから実装する。
 - `setInterval` や無限loopは禁止。
 - `setTimeout` を使う場合は timer id を保持し、`clearTimeout` 管理を必須にする。
 - page reload / remount / stop / reset 後に古いtimerが残らないことを tests または manual QA で確認する。
 
-## Next Implementation PR Candidate
+## Post-PR #48 Handoff
 
-次の小実装PR候補は event shape helper + tests に限定する。
-
-候補helper:
+PR #48 で次の helper は実装済みです。
 
 - `normalizeKeywordReactionEvent`
 - `buildDemoKeywordReactionEvent`
-- `normalizeManualKeywordReactionEvent`
-- `normalizeFixtureKeywordReactionEvent`
-- `buildKeywordReactionEventRenderModel`
 
-初回helper PRで入れないもの:
+この文書の `sourceType` 境界は維持する。manual / fixture / demo の normalized event shape は、将来のqueue helperが受け取る内部eventの土台として扱う。
+
+次の小実装PR候補は queue helper + tests に限定する。event transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は引き続き後続に分ける。
+
+次PRで入れないもの:
 
 - event transport。
 - overlay本体へのmanual event送信。
 - fixture linkage。
-- toast queue。
+- toast queue runtime。
 - ticker / badge runtime。
 - paste JSON import。
 - YouTube API / OAuth / API key / scraping / real data。
@@ -218,7 +219,7 @@ event rendering は text-not-HTML を守る。
 - deploy。
 - Codex for OSS application submission。
 
-## Done Criteria For The Next Implementation PR
+## Done Criteria For The Event Shape Helper PR
 
 - normalized event shape が helper tests で固定される。
 - `manual` / `fixture` / `demo` の `sourceType` 境界が tests で確認される。
@@ -228,6 +229,15 @@ event rendering は text-not-HTML を守る。
 - no event transport / no fixture linkage / no toast queue。
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 - validation が通る。
+
+## Done Criteria For The Queue Helper Follow-Up
+
+- queue helper + tests に限定されている。
+- normalized event shape だけを queue に入れる。
+- bounded queue、最大件数、overflow policy、timer cleanup 方針が tests または docs で確認される。
+- queue state、event payload、transport payload は generated URL に入らない。
+- no event transport / no fixture linkage / no toast queue runtime。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 ## Open Questions
 
