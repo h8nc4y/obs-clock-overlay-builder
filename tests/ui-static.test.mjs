@@ -73,6 +73,7 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const overlayHtml = readFileSync(new URL("../overlay/keyword-reaction/index.html", import.meta.url), "utf8");
   const overlayRuntime = readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8");
+  const overlayEventHelper = readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8");
   const redirects = readFileSync(new URL("../_redirects", import.meta.url), "utf8");
   const overlayPageBlock = css.match(/\.keyword-reaction-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
   const overlaySurfaceBlock = css.match(/\.keyword-reaction-surface\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -99,17 +100,20 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.match(css, /\.keyword-reaction-demo-toast\[hidden\]\s*\{[\s\S]*?display:\s*none;/);
   assert.match(redirects, /\/overlay\/keyword-reaction\s+\/overlay\/keyword-reaction\/index\.html\s+200/);
   assert.match(overlayRuntime, /parseKeywordReactionConfigFromQuery/);
+  assert.match(overlayRuntime, /buildDemoKeywordReactionEvent/);
   assert.match(overlayRuntime, /textContent/);
   assert.match(overlayRuntime, /debug"\)\s*===\s*"1"/);
   assert.match(overlayRuntime, /demo"\)\s*===\s*"1"/);
   assert.match(overlayRuntime, /Keyword reaction overlay ready/);
-  assert.match(overlayRuntime, /キーワード反応デモ/);
+  assert.match(overlayEventHelper, /キーワード反応デモ/);
   assert.match(overlayRuntime, /setTimeout/);
   assert.match(overlayRuntime, /clearTimeout/);
   assert.doesNotMatch(overlayHtml, /Keyword reaction overlay ready/);
   assert.doesNotMatch(overlayHtml, /キーワード反応デモ/);
   assert.doesNotMatch(overlayRuntime, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
   assert.doesNotMatch(overlayRuntime, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
+  assert.doesNotMatch(overlayEventHelper, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
+  assert.doesNotMatch(overlayEventHelper, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
 });
 
 test("editor includes separated manual keyword reaction toast controls", () => {
@@ -258,6 +262,7 @@ test("editor refresh does not add risky HTML sinks", () => {
     readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
   ].join("\n");
 

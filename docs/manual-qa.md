@@ -79,6 +79,7 @@
 - `/overlay/keyword-reaction/?debug=1` では `Keyword reaction overlay ready`、`config: fallback`、`pattern: toast` のようなpublic-safe statusだけが控えめに表示される。
 - `/overlay/keyword-reaction/?demo=1` では、固定の人工文言 `キーワード反応デモ` が1件toast表示され、短時間後に消える。
 - `/overlay/keyword-reaction/?demo=1&debug=1` では、public-safe statusと固定人工toastだけが表示され、raw `c`、keyword実値、manual input text、fixture event data、secret-like値は表示されない。
+- event shape helper 導入後も、`demo=1` の表示文言は固定人工textのままで、event payload、eventId、displayText、manual input text、fixture event data は生成URLに含まれない。
 - validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。
