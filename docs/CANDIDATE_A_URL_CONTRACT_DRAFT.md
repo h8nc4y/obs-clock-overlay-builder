@@ -17,6 +17,7 @@
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 
 ## 契約の目的
 
@@ -263,6 +264,33 @@ URLへ入れないもの:
 - secret-like values。
 
 overlay runtime が `demo=1` を local intake helper と queue helper 経由へ寄せる場合も、URL契約を広げない。manual / fixture runtime connection、transport、fixture linkage は後続PRへ分ける。
+
+## First Transport Decision URL Boundary
+
+first transport decision 後も、generated URL は config-only を維持する。
+
+次PR候補の same-window internal dispatch helper + tests でも、URLへ入れないもの:
+
+- same-window internal dispatch payload。
+- transport payload。
+- normalized event payload。
+- queue state。
+- queue length / current index。
+- manual input text。
+- fixture event data。
+- raw fixture JSON。
+- raw user JSON。
+- `displayText` arrays。
+- raw `postMessage` payload。
+- `BroadcastChannel` payload。
+- `localStorage` transport state。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- private account data。
+- secret-like values。
+
+`postMessage`、`BroadcastChannel`、`localStorage` transport、external network transport を採用する場合も、URLをevent transportにしない。URLはvisual configとkeyword rulesの再現性契約に留める。
 
 ## Config Helper実装範囲
 

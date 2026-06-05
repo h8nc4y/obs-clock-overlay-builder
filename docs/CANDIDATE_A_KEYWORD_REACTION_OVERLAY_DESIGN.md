@@ -20,6 +20,7 @@
 - Transport scope decision: [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - Local intake queue connection scope decision: [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - Local intake overlay runtime scope decision: [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- First transport decision: [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -94,10 +95,12 @@ Candidate A は次の順で小さく進める。
 11. Local event intake helper。
 12. Local intake to queue connection。
 13. Local intake to overlay runtime connection for `demo=1` only。
-14. Event source / fixture linkage。
-15. Ticker / badge。
-16. URL import/export refinement。
-17. YouTube integration design。
+14. First transport decision。
+15. Same-window internal dispatch helper + tests。
+16. Event source / fixture linkage。
+17. Ticker / badge。
+18. URL import/export refinement。
+19. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -329,7 +332,7 @@ overlay runtime queue connection の後続では、eventをoverlayへ渡すtrans
 
 - same-window internal dispatch、same-origin `postMessage`、`BroadcastChannel`、URL config、`localStorage`、external network、future YouTube integration の比較。
 - 初回は transport実装に入らない。
-- 次PR候補は overlay runtime local event intake helper + tests、または same-window internal dispatch設計docs。
+- PR #58 後の次PR候補は same-window internal dispatch helper + tests に限定する。
 - event intakeは normalized event shape だけを受け付ける。
 - generated URL へ transport payload、event payload、queue state、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
 - `localStorage` transportは初期非推奨。
@@ -369,6 +372,23 @@ local intake to queue helper + tests の後続では、overlay runtime の `demo
 - transport、fixture linkage、toast queue runtime複数source対応、ticker、badge、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
+
+## Next Planning PR: First Transport Decision
+
+local intake to overlay runtime connection の後続では、最初の transport 実装候補を docs-only で決める。
+
+このdocs-only方針で固定するもの:
+
+- no transport yet、same-window internal dispatch、same-origin `postMessage`、`BroadcastChannel`、URL config、`localStorage` transport、external network、future YouTube integration を比較する。
+- まだ `postMessage` / `BroadcastChannel` / `localStorage` transportへ進まない。
+- 次PR候補は same-window internal dispatch helper + tests に限定する。
+- same-window internal dispatch は transportではなく同一document内の internal handoff として扱う。
+- generated URL へ dispatch payload、transport payload、event payload、queue state、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- `localStorage` transportは初期採用しない。
+- external network transportは禁止する。
+- YouTube integrationは別boundary reviewと人間承認後。
+
+詳細は [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md) に分ける。transport実装、event source、fixture linkage、YouTube integrationはまだ後続です。
 
 ## 表示パターン案
 

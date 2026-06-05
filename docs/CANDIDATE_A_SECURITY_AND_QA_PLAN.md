@@ -19,6 +19,7 @@
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 
 ## Security Principles
 
@@ -313,6 +314,25 @@ local intake to queue helper の後続では、overlay runtime の `demo=1` 経�
 - `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
 
 この phase は `demo=1` の fixed synthetic event を local intake + queue helper 経由にする接続確認であり、manual / fixture runtime connection、transport、fixture linkage、YouTube integrationを実装済みにしない。
+
+### Phase 12: First Transport Decision
+
+local intake to overlay runtime connection の後続では、transport実装へ進む前に first transport implementation decision を docs-only で固定する。
+
+この phase で確認すること:
+
+- no transport yet、same-window internal dispatch、same-origin `postMessage`、`BroadcastChannel`、URL config、`localStorage` transport、external network、future YouTube integration を比較する。
+- 初回は `postMessage`、`BroadcastChannel`、`localStorage` transportへ進まない。
+- 次PR候補は same-window internal dispatch helper + tests に限定する。
+- same-window internal dispatch は transportではなく、同一document内の internal handoff として扱う。
+- generated URL に dispatch payload、transport payload、event payload、queue state、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- `localStorage` transportは初期採用しない。
+- external network transportは禁止する。
+- YouTube integration は別boundary reviewと人間承認後にする。
+- text-not-HTML 方針を維持する。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs-only の判断であり、transport、event source、fixture linkage、overlay runtime追加実装を実装済みにしない。
 
 ## Input Surfaces
 
