@@ -85,6 +85,8 @@
 - local event intake helper導入後も、manual / fixture / demo のraw local input、event payload、transport payload、queue stateは生成URL、debug表示、画面には出ない。
 - local intake to overlay runtime接続後も、overlay runtimeへ通すのは `demo=1` の固定人工eventだけで、manual / fixture runtime接続、transport、fixture linkage、queue state表示は追加されない。
 - local intake to queue helper導入後も、local intake payload、event payload、queue state、eventId、displayText、manual input text、fixture event dataは生成URLに含まれない。
+- same-window internal dispatch helper導入後も、同一ページ内のnormalized event handoffだけを扱い、overlay runtime接続、editor UI接続、postMessage、BroadcastChannel、localStorage transport、fixture linkageは追加されない。
+- internal dispatch payload、event payload、queue state、eventId、displayText、manual input text、fixture event dataは生成URLに含まれない。
 - validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。

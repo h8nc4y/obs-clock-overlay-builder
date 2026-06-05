@@ -82,6 +82,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
     new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url),
     "utf8"
   );
+  const overlayInternalDispatchHelper = readFileSync(
+    new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url),
+    "utf8"
+  );
   const overlayQueueHelper = readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8");
   const redirects = readFileSync(new URL("../_redirects", import.meta.url), "utf8");
   const overlayPageBlock = css.match(/\.keyword-reaction-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -123,6 +127,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.doesNotMatch(overlayRuntime, /\benqueueKeywordReactionEvent\b/);
   assert.match(overlayRuntime, /\bdequeueKeywordReactionEvent\b/);
   assert.match(overlayIntakeQueueHelper, /\benqueueKeywordReactionEvent\b/);
+  assert.match(overlayInternalDispatchHelper, /KEYWORD_REACTION_INTERNAL_EVENT_NAME/);
+  assert.match(overlayInternalDispatchHelper, /validateKeywordReactionLocalEventInput/);
+  assert.match(overlayInternalDispatchHelper, /EventTarget/);
+  assert.match(overlayInternalDispatchHelper, /CustomEvent/);
   assert.match(overlayQueueHelper, /DEFAULT_KEYWORD_REACTION_QUEUE_LIMIT\s*=\s*5/);
   assert.match(overlayRuntime, /setTimeout/);
   assert.match(overlayRuntime, /clearTimeout/);
@@ -141,6 +149,15 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
     overlayEventIntakeHelper,
     /document|window|innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
   );
+  assert.doesNotMatch(
+    overlayInternalDispatchHelper,
+    /postMessage|BroadcastChannel|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
+  );
+  assert.doesNotMatch(
+    overlayInternalDispatchHelper,
+    /document|window|innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
+  assert.doesNotMatch(overlayInternalDispatchHelper, /setTimeout|setInterval|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/);
 });
 
 test("editor includes separated manual keyword reaction toast controls", () => {
@@ -292,6 +309,7 @@ test("editor refresh does not add risky HTML sinks", () => {
     readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-event-intake.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
   ].join("\n");
 
