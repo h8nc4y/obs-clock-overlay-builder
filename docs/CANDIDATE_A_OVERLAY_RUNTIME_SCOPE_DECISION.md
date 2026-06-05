@@ -15,6 +15,7 @@
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -59,6 +60,22 @@ queue は overlay runtime 内部で normalized event を順番表示するため
 - timer は bounded `setTimeout` のみとし、`setInterval` と unbounded loop は使わない。
 - play / clear / unmount / re-run で timer cleanup を確認する。
 - no external network / no localStorage transport / no YouTube API / no OAuth / no API key / no real data。
+
+## Post-PR #52 Transport Decision Handoff
+
+PR #52 で overlay runtime queue connection は実装済みです。
+
+現時点で実装済みと扱うもの:
+
+- `demo=1` fixed synthetic event を queue helper 経由で表示する。
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- invalid `c` fallback は raw valueを表示しない。
+- generated URL は config-only のまま。
+
+次段階は transport decision です。詳細は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。
+
+transport decisionでも、event source、fixture linkage、toast queue runtime複数source対応、ticker、badge、paste JSON import、YouTube integration は後続に分ける。YouTube API / OAuth / API key / scraping / real data は別boundary reviewと人間承認まで扱わない。
 
 ## Historical Config-Aware Skeleton Implementation Scope
 
@@ -263,7 +280,7 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 2. event shape helper + tests, scoped by [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)。
 3. queue helper + tests, scoped by [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)。
 4. overlay runtime queue connection and timer cleanup, scoped by [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)。
-5. transport scope decision before any cross-window channel。
+5. transport scope decision before any cross-window channel, scoped by [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)。
 6. built-in fixture linkage from safe artificial fixture to overlay runtime。
 7. paste JSON import design and validation。
 8. ticker / badge runtime。

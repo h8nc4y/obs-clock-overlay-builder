@@ -14,6 +14,7 @@
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -175,6 +176,34 @@ URLへ入れないもの:
 将来、`eventId`、`fixtureId`、queue id のような public-safe reference を URL に含めるかは未確定です。次の queue helper + tests PR では、event reference や queue state を URL へ入れない。
 
 transport を設計する場合も、URL を raw event transport にしない。URL は visual config と keyword rules の再現性契約に留める。
+
+## Transport Scope URL Boundary
+
+transport scope decision 後も、generated URL は config-only を維持する。
+
+URLへ入れないもの:
+
+- transport payload。
+- event payload。
+- queue state。
+- queue length / current index。
+- same-window internal dispatch payload。
+- raw `postMessage` payload。
+- `BroadcastChannel` payload。
+- `localStorage` transport state。
+- manual input text。
+- fixture event data。
+- raw fixture JSON。
+- raw user JSON。
+- `displayText` arrays。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- private account data。
+- billing / payment info。
+- secret-like values。
+
+URL config は OBS再現性のための設定だけを持つ。event transportやqueue stateはURLの責務ではない。
 
 ## Config Helper実装範囲
 

@@ -16,6 +16,7 @@
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -234,6 +235,27 @@ queue helper + tests の後続では、overlay runtime queue connection を小�
 - `demo=1` は public-safe display test flag のまま。
 
 この phase は `demo=1` の fixed synthetic event を queue helper 経由にする接続確認であり、transport、fixture linkage、manual input event injection、YouTube integrationを実装済みにしない。
+
+### Phase 9: Transport Scope Decision
+
+overlay runtime queue connection の後続では、transportを実装する前に候補比較と安全境界をdocs-onlyで固定する。
+
+この phase で確認すること:
+
+- same-window internal dispatch、same-origin `postMessage`、`BroadcastChannel`、URL config、`localStorage`、external network、future YouTube integration を比較する。
+- 初回は transport実装に入らない。
+- 次の実装候補は overlay runtime local event intake helper + tests、または same-window internal dispatch設計docsに分ける。
+- event intake は `normalizeKeywordReactionEvent` で normalized event shape へ寄せる。
+- invalid event は safe reject / fallback する。
+- raw value を status、DOM、console、generated URL に出さない。
+- generated URL に transport payload、event payload、queue state、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- same-origin `postMessage` を将来使う場合は origin / source確認をQA対象にする。
+- `BroadcastChannel` を将来使う場合は channel名、lifetime、cleanup、OBS Browser Source互換性をQA対象にする。
+- no localStorage transport by default。
+- no external network。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- transport実装を含めない。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
 
 ## Input Surfaces
 
