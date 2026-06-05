@@ -17,6 +17,7 @@
 - Event source shape decision: [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - Queue / transport scope decision: [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - Overlay queue connection scope decision: [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- Transport scope decision: [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -314,6 +315,23 @@ queue helper + tests の後続では、overlay runtime が queue helper をど�
 - transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md) に分ける。
+
+## Next Planning PR: Transport Scope
+
+overlay runtime queue connection の後続では、eventをoverlayへ渡すtransport候補をdocs-onlyで整理する。
+
+このdocs-only方針で固定するもの:
+
+- same-window internal dispatch、same-origin `postMessage`、`BroadcastChannel`、URL config、`localStorage`、external network、future YouTube integration の比較。
+- 初回は transport実装に入らない。
+- 次PR候補は overlay runtime local event intake helper + tests、または same-window internal dispatch設計docs。
+- event intakeは normalized event shape だけを受け付ける。
+- generated URL へ transport payload、event payload、queue state、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- `localStorage` transportは初期非推奨。
+- external network transportは禁止。
+- YouTube integrationは別boundary reviewと人間承認後。
+
+詳細は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。transport実装、fixture linkage、toast queue runtime複数source対応、ticker、badge、YouTube integrationはまだ後続です。
 
 ## 表示パターン案
 

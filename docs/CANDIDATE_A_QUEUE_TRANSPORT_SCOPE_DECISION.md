@@ -12,6 +12,7 @@
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -28,7 +29,7 @@ PR #48 で `normalizeKeywordReactionEvent` と `buildDemoKeywordReactionEvent` �
 - transport を editor / manual / fixture / future integration から overlay へeventを渡す経路として扱う。
 - PR #50 で入った queue helper + tests を、transport や event source とは別の pure helper として扱う。
 - 次段階を overlay runtime queue connection に限定し、`demo=1` fixed synthetic event を queue helper 経由にする。
-- transport、fixture linkage、event source、YouTube integration を後続に分ける。
+- PR #52 後の transport decision を別docsに分け、transport、fixture linkage、event source、YouTube integration を後続に分ける。
 - generated URL config-only 境界と text-not-HTML 境界を維持する。
 
 ## Post-PR #50 Queue Helper Status
@@ -298,13 +299,26 @@ queue helper と後続runtimeは text-not-HTML を維持する。
 - `/overlay/keyword-reaction/` の idle / debug / demo 挙動に回帰がない。
 - validation が通る。
 
+## Post-PR #52 Transport Decision Handoff
+
+PR #52 で overlay runtime queue connection は実装済みです。
+
+実装済みとして扱うもの:
+
+- `demo=1` fixed synthetic event を queue helper 経由で既存toast表示へ渡す。
+- 通常 idle、`debug=1`、invalid `c` fallback、fixed synthetic toastの既存境界を維持する。
+- queue state、event payload、transport payload、manual input text、fixture event data を URL や debug 表示へ出さない。
+- repeated `demo=1` / re-run で古いtimerが残らないことを tests / manual QA で確認する。
+
+次段階は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。transport実装、fixture linkage、event source、toast queue runtime複数source対応、YouTube integration はまだ実装しない。
+
 ## Follow-Up Split
 
 後続PRへ分けるもの:
 
 1. queue helper + tests。PR #50で完了。
-2. overlay runtime への queue 接続と timer cleanup。
-3. transport scope decision。
+2. overlay runtime への queue 接続と timer cleanup。PR #52で完了。
+3. transport scope decision。[CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) で扱う。
 4. same-origin transport prototype if approved。
 5. built-in fixture linkage from safe artificial fixture to overlay runtime。
 6. toast queue runtime QA。

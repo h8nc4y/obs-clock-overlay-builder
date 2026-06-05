@@ -14,6 +14,7 @@
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -113,6 +114,29 @@ future integration は現段階の normalized event source として扱わない
 - YouTube API / OAuth / API key / scraping / real data は別途 boundary review と人間承認が必要。
 - YouTube API仕様や規約適合はこの文書で断定しない。
 - future integration を扱う場合も、raw API response をrender layerやgenerated URLへ直接渡さない設計が必要。
+
+## Event Intake / Transport Boundary
+
+transportを検討する場合も、受け取り境界は normalized event shape に限定する。
+
+event intake が受けてよいもの:
+
+- `normalizeKeywordReactionEvent` で safe normalized event へ寄せられる payload。
+- `sourceType: "manual" | "fixture" | "demo"`。
+- public-safe `eventId`、`displayText`、`displayPattern`、`reactionStyle`、bounded `intensity`、bounded `durationMs` / `offsetMs`。
+
+event intake が受けないもの:
+
+- raw transport payload。
+- raw manual input text。
+- raw fixture JSON。
+- raw YouTube comment / live chat content。
+- real viewer identifier。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- queue state。
+- secret-like values。
+
+transport実装はまだ後続です。次段階の詳細は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。
 
 ## Generated URL Config-Only Boundary
 
