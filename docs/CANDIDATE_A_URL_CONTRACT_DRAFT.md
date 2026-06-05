@@ -13,6 +13,7 @@
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -58,7 +59,7 @@ Candidate A の初回実装方針では次を使う。
 
 ## Overlay Runtime Config Scope
 
-次の overlay runtime 実装PRは config-aware skeleton に限定する。`/overlay/keyword-reaction/` は `?c=...` を読み、`assets/js/keyword-reaction-config.js` の helper で safe normalized config へ寄せる。
+PR #44 の overlay runtime 実装PRは config-aware skeleton に限定した。`/overlay/keyword-reaction/` は `?c=...` を読み、`assets/js/keyword-reaction-config.js` の helper で safe normalized config へ寄せる。
 
 overlay runtime が読む範囲:
 
@@ -71,7 +72,7 @@ overlay runtime が読む範囲:
 - `matchMode`。
 - public-safe visual config。
 
-overlay runtime が次PRで読まないもの:
+overlay runtime が config-aware skeleton で読まないもの:
 
 - manual input text。
 - fixture event data。
@@ -82,7 +83,7 @@ overlay runtime が次PRで読まないもの:
 - YouTube API response。
 - OAuth token / API key / secret-like value。
 
-次PRの overlay runtime は event source を実装しない。configを読める transparent idle surface として振る舞い、toast event発火runtime、fixture linkage、ticker、badge、import/exportは後続へ分ける。
+config-aware skeleton の overlay runtime は event source を実装しない。configを読める transparent idle surface として振る舞い、toast event発火runtime、fixture linkage、ticker、badge、import/exportは後続へ分ける。
 
 ## Invalid Config And Debug Display
 
@@ -146,6 +147,34 @@ URLへ入れないもの:
 `eventId` や `fixtureId` を将来 public-safe reference として URL に含めるかは未確定です。初期 event shape helper PR では、event payload と event reference を URL へ入れない。
 
 詳細は [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) に分ける。
+
+## Queue / Transport URL Boundary
+
+queue / transport の次段階でも、generated URL は config-only を維持する。
+
+URLへ入れないもの:
+
+- queue state。
+- queue length / current index。
+- playback schedule state。
+- transport payload。
+- event payload。
+- `eventId`。
+- event `displayText`。
+- manual input text。
+- fixture event data。
+- raw fixture JSON。
+- raw user JSON。
+- `displayText` arrays。
+- raw `postMessage` payload。
+- `BroadcastChannel` payload。
+- real viewer id。
+- raw comment / live chat data。
+- secret-like values。
+
+将来、`eventId`、`fixtureId`、queue id のような public-safe reference を URL に含めるかは未確定です。次の queue helper + tests PR では、event reference や queue state を URL へ入れない。
+
+transport を設計する場合も、URL を raw event transport にしない。URL は visual config と keyword rules の再現性契約に留める。
 
 ## Config Helper実装範囲
 
@@ -220,6 +249,8 @@ encoded config に含めてはいけないもの:
 - raw fixture JSON。
 - `displayText` arrays。
 - event payloads。
+- event queue state。
+- transport payloads。
 
 ## Manual / Fixture MVPでのURLモデル
 
@@ -258,7 +289,7 @@ config outline:
 
 この sample は人工データであり、real viewer data を含まない。
 
-次の config-aware overlay runtime skeleton では、上記のような config fields を読むだけに留める。fixture event data、manual input text、raw JSON、`displayText` arrays は `c` に入れず、overlay本体も読まない。
+config-aware overlay runtime skeleton では、上記のような config fields を読むだけに留める。fixture event data、manual input text、raw JSON、`displayText` arrays は `c` に入れず、overlay本体も読まない。
 
 ## Keyword Normalization
 

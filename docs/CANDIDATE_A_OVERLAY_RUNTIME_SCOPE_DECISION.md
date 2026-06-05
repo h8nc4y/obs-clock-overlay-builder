@@ -13,12 +13,13 @@
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
+- [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
 ## Purpose
 
-次の実装PRでは、現在 transparent static skeleton である `/overlay/keyword-reaction/` を config-aware な overlay runtime skeleton に進める。
+PR #44 では、transparent static skeleton だった `/overlay/keyword-reaction/` を config-aware な overlay runtime skeleton に進めた。
 
 目的は、OBS Browser Source で開かれる overlay-only page が generated URL の `?c=...` を読めるようにし、将来の event rendering の前に URL、fallback、debug、transparent idle、text-not-HTML の境界を固定することです。
 
@@ -37,9 +38,25 @@ PR #44 で config-aware overlay runtime skeleton は実装済みです。
 
 次段階で扱う `demo=1` は public-safe demo flag であり、event source、fixture linkage、YouTube integration ではありません。通常 idle は引き続き transparent / no visible text とする。
 
-## Next Implementation PR Scope
+## Post-PR #48 Queue Handoff
 
-次の実装PRは config-aware overlay runtime skeleton に限定する。
+PR #46 で `demo=1` fixed synthetic event rendering、PR #48 で event shape helper は実装済みです。
+
+次の実装PR候補は queue helper + tests に限定する。queue は overlay runtime 内部で normalized event を順番表示するための仕組みであり、transport は editor / manual / fixture / future integration から overlay へeventを渡す経路として後続に分ける。
+
+次PRで維持する境界:
+
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status 表示専用。
+- `demo=1` は public-safe display test flag のまま。
+- generated URL は config-only のまま。
+- queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays、secret-like values を URL へ入れない。
+- event source、fixture linkage、transport、toast queue runtime、ticker、badge、paste JSON import、YouTube integration は後続。
+- no external network / no localStorage transport / no YouTube API / no OAuth / no API key / no real data。
+
+## Historical Config-Aware Skeleton Implementation Scope
+
+PR #44 の実装PRは config-aware overlay runtime skeleton に限定した。
 
 入れてよいもの:
 
@@ -114,7 +131,7 @@ debug/status 表示は local QA と reviewer 確認用に限定する。
 
 ## Event Source Policy
 
-次の実装PRでは event source を実装しない。
+config-aware skeleton では event source を実装しない。
 
 将来候補としてのみ整理する:
 
@@ -177,7 +194,7 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 - style attribute や CSS custom property へ untrusted text を直接流さない。
 - class名、dataset、style値は enum / bounded numeric / validated color など public-safe normalized values から作る。
 
-この方針は次の実装PRの skeleton でも、後続の event rendering PR でも review blocker として扱う。
+この方針は config-aware skeleton でも、後続の event rendering PR でも review blocker として扱う。
 
 ## Overlay Page Contract
 
@@ -216,7 +233,7 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 - deploy。
 - Codex for OSS application submission。
 
-## Done Criteria For The Next Implementation PR
+## Done Criteria For The Config-Aware Skeleton Implementation PR
 
 - `/overlay/keyword-reaction/?c=...` が safe normalized config を読む。
 - missing / invalid `c` が safe default へ fallback する。
@@ -237,12 +254,16 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 後続PRへ分けるもの:
 
 1. overlay runtime event rendering for a single synthetic event shape, scoped by [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)。
-2. built-in fixture linkage from safe artificial fixture to overlay runtime。
-3. paste JSON import design and validation。
-4. ticker / badge runtime。
-5. import/export UI。
-6. same-origin local event channel design。
-7. YouTube integration design after boundary review and human approval。
+2. event shape helper + tests, scoped by [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)。
+3. queue helper + tests, scoped by [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)。
+4. overlay runtime queue connection and timer cleanup。
+5. transport scope decision before any cross-window channel。
+6. built-in fixture linkage from safe artificial fixture to overlay runtime。
+7. paste JSON import design and validation。
+8. ticker / badge runtime。
+9. import/export UI。
+10. same-origin local event channel design。
+11. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

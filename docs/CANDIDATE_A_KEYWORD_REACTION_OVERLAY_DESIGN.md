@@ -15,6 +15,7 @@
 - Overlay runtime scope decision: [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - Single synthetic event scope decision: [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - Event source shape decision: [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- Queue / transport scope decision: [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -82,10 +83,12 @@ Candidate A は次の順で小さく進める。
 4. Config-aware overlay runtime skeleton。
 5. Single synthetic event rendering via explicit `demo=1`。
 6. Event source shape helper。
-7. Event source / fixture linkage。
-8. Ticker / badge。
-9. URL import/export refinement。
-10. YouTube integration design。
+7. Queue / transport scope decision。
+8. Queue helper + tests。
+9. Event source / fixture linkage。
+10. Ticker / badge。
+11. URL import/export refinement。
+12. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -185,9 +188,9 @@ fixture に含めてはいけないもの:
 - private dashboard values。
 - personal data。
 
-## Next Overlay Runtime PR: Config-Aware Skeleton
+## Prior Overlay Runtime PR: Config-Aware Skeleton
 
-fixture playback の後続では、`/overlay/keyword-reaction/` 本体runtimeを config-aware skeleton として小さく進める。
+fixture playback の後続で、`/overlay/keyword-reaction/` 本体runtimeを config-aware skeleton として小さく進めた。
 
 このPRで入れるもの:
 
@@ -209,9 +212,9 @@ fixture playback の後続では、`/overlay/keyword-reaction/` 本体runtimeを
 
 詳細は [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
 
-## Next Overlay Runtime PR: Single Synthetic Event
+## Prior Overlay Runtime PR: Single Synthetic Event
 
-config-aware overlay runtime skeleton の後続では、`/overlay/keyword-reaction/` 本体runtimeで 1 件だけの public-safe synthetic event を表示する。
+config-aware overlay runtime skeleton の後続で、`/overlay/keyword-reaction/` 本体runtimeで 1 件だけの public-safe synthetic event を表示する範囲を固定した。
 
 このPRで入れるもの:
 
@@ -235,9 +238,9 @@ config-aware overlay runtime skeleton の後続では、`/overlay/keyword-reacti
 
 詳細は [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md) に分ける。
 
-## Next Planning PR: Event Source Shape
+## Prior Planning PR: Event Source Shape
 
-single synthetic event rendering の後続では、event transport や fixture linkage の前に normalized event shape を固定する。
+single synthetic event rendering の後続で、event transport や fixture linkage の前に normalized event shape を固定した。
 
 このdocs-only方針で固定するもの:
 
@@ -245,9 +248,25 @@ single synthetic event rendering の後続では、event transport や fixture l
 - `sourceType: "manual" | "fixture" | "demo"` の境界を明確にする。
 - generated URL へ event payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
 - `displayText` は HTML ではなく text として扱い、`textContent` 等の safe DOM API で表示する。
-- next implementation PR は event shape helper + tests に限定し、event transport、fixture linkage、toast queue、ticker、badge、YouTube integration は後続に分ける。
+- event shape helper + tests に限定し、event transport、fixture linkage、toast queue、ticker、badge、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) に分ける。
+
+## Next Planning PR: Queue / Transport Scope
+
+event shape helper + tests の後続では、event source や fixture linkage の前に queue と transport の境界を固定する。
+
+このdocs-only方針で固定するもの:
+
+- queue は overlay runtime 内部で normalized event を順番表示するための仕組み。
+- transport は editor / manual / fixture / future integration から overlay へeventを渡す経路。
+- 次の実装PRは queue helper + tests に限定する。
+- 初回queueは bounded queue、最大5件、古い未表示eventをdropして最新eventを残す方針にする。
+- timer runtimeは後続接続PRに分け、`setTimeout` id管理と `clearTimeout` cleanup を必須にする。
+- generated URL へ queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 
@@ -353,6 +372,6 @@ reaction visual style の呼び方は `reactionStyle` に揃える。
 - `reactionStyle` の最終enum。
 - toast animation はどの程度なら便利で邪魔にならないか。
 - fixture playback は built-in fixture list、pasted JSON、または両方にするか。
-- event source と fixture linkage を config-aware overlay runtime skeleton の直後に入れるか、さらに synthetic event rendering PR を挟むか。
+- event source と fixture linkage を queue helper + tests の直後に入れるか、transport scope decision をさらに挟むか。
 - import/export を overlay runtime skeleton の後に入れるか、fixture linkage 後に入れるか。
 - real YouTube integration を検討する場合の official documentation review、credential storage、quota/cost、privacy、data deletion / revocation 設計。

@@ -29,6 +29,7 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Candidate A overlay runtime scope decision: [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - Candidate A single synthetic event scope decision: [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - Candidate A event source shape decision: [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- Candidate A queue / transport scope decision: [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - Candidate A keyword reaction overlay design: [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - Candidate A URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Candidate A fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -47,7 +48,7 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Public roadmap: [ROADMAP.md](ROADMAP.md)
 - Headline feature planning: [YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md](YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md)
 - Safe MVP requirements: [HEADLINE_FEATURE_MVP_REQUIREMENTS.md](HEADLINE_FEATURE_MVP_REQUIREMENTS.md)
-- Candidate A implementation planning docs: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md), [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md), [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md), [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md), [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md), [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md), [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md), [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md), [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md), [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md), [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
+- Candidate A implementation planning docs: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md), [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md), [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md), [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md), [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md), [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md), [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md), [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md), [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md), [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md), [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md), [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - YouTube data policy boundary: [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 - Changelog: [../CHANGELOG.md](../CHANGELOG.md)
 - v0.1.0 Release/tag: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
@@ -103,12 +104,13 @@ These are public maintenance and planning signals. They are not user adoption ev
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md) fixes the config-aware overlay runtime skeleton scope before event source, fixture linkage, or YouTube integration.
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md) fixes the public-safe `demo=1` single synthetic event rendering scope before event source, fixture linkage, or YouTube integration.
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) fixes the normalized event payload shape before event transport, fixture linkage, toast queue, or YouTube integration.
+- [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md) fixes the queue helper and transport boundary before transport, fixture linkage, toast queue runtime, or YouTube integration.
 - [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md) defines the Candidate A product and OBS workflow.
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md) drafts the URL reproducibility boundary.
 - [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md) drafts artificial fixture data shape.
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md) records security and QA checks for a future implementation PR.
 
-This is planning and implementation planning evidence for future direction. The matching normalization, fixture playback scope, overlay runtime scope, single synthetic event scope, and event source shape policies are not adoption evidence, and they do not claim advanced Unicode normalization, overlay runtime event source implementation, YouTube Live integration, YouTube API access, or broad adoption.
+This is planning and implementation planning evidence for future direction. The matching normalization, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape, and queue / transport policies are not adoption evidence, and they do not claim advanced Unicode normalization, overlay runtime event source implementation, transport implementation, YouTube Live integration, YouTube API access, or broad adoption.
 
 ## Validation And Release Workflow Evidence
 
