@@ -11,6 +11,7 @@
 - [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -106,6 +107,20 @@ debug表示に出さないもの:
 - real viewer id。
 - raw comment data。
 - private account data。
+
+## Demo Flag Boundary
+
+config-aware overlay runtime skeleton の後続では、single synthetic event rendering の確認用に `demo=1` を使う方針とする。
+
+`demo=1` は event data ではなく public-safe display test flag です。
+
+- `demo=1` は `c` parameter の一部にしない。
+- `demo=1` は synthetic event `displayText` をURLへ入れる仕組みではない。
+- `demo=1` は manual input text、fixture event data、raw JSON、YouTube data を読む許可ではない。
+- `demo=1` は event source、fixture linkage、YouTube integration ではない。
+- `debug=1` と共存してよいが、debug表示に raw `c`、keyword実値、synthetic event raw payload、secret-like value を出さない。
+
+single synthetic event の text はコード内の固定人工データだけにする。generated URL は config-only を維持し、`c` には visual config と keyword rules だけを入れる。
 
 ## Config Helper実装範囲
 

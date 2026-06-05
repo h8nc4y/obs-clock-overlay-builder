@@ -13,6 +13,7 @@
 - Implementation scope decision: [CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md](CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md)
 - Manual input + toast scope decision: [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - Overlay runtime scope decision: [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- Single synthetic event scope decision: [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -78,10 +79,11 @@ Candidate A は次の順で小さく進める。
 2. Manual input + toast。
 3. Fixture playback。
 4. Config-aware overlay runtime skeleton。
-5. Event source / fixture linkage。
-6. Ticker / badge。
-7. URL import/export refinement。
-8. YouTube integration design。
+5. Single synthetic event rendering via explicit `demo=1`。
+6. Event source / fixture linkage。
+7. Ticker / badge。
+8. URL import/export refinement。
+9. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -204,6 +206,32 @@ fixture playback の後続では、`/overlay/keyword-reaction/` 本体runtimeを
 - YouTube API / OAuth / API key / scraping / real data。
 
 詳細は [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
+
+## Next Overlay Runtime PR: Single Synthetic Event
+
+config-aware overlay runtime skeleton の後続では、`/overlay/keyword-reaction/` 本体runtimeで 1 件だけの public-safe synthetic event を表示する。
+
+このPRで入れるもの:
+
+- 明示query `demo=1` の時だけ、コード内固定の人工イベントを表示する。
+- 通常 idle は transparent / no visible text のまま維持する。
+- `debug=1` は public-safe status 表示用として維持する。
+- `demo=1` と `debug=1` が共存しても raw値やsecret-like valueを出さない。
+- 初回表示対象は `displayPattern: "toast"` のみ。
+- `reactionStyle` / `intensity` は normalized config 由来の public-safe value だけを使う。
+- synthetic event text は `textContent` 等の safe DOM API で表示する。
+- 短時間表示後に消し、timer cleanup を行う。
+
+このPRで入れないもの:
+
+- event source。
+- built-in fixture event を overlay本体へ流す処理。
+- fixture playback。
+- paste JSON import。
+- ticker / badge runtime。
+- YouTube API / OAuth / API key / scraping / real data。
+
+詳細は [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 

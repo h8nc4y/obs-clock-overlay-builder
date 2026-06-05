@@ -11,6 +11,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Define the YouTube Live overlay suite concept, MVP requirements, and data/policy boundary before any integration work.
 - Keep Candidate A matching normalization and preview/config consistency policy explicit before the next implementation PR.
 - Keep Candidate A overlay runtime scope explicit before the next implementation PR.
+- Keep Candidate A single synthetic event rendering scope explicit before the next implementation PR.
 
 ## Medium Term
 
@@ -23,7 +24,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Fix preview/config consistency so preview matching and generated URL config use the same normalized config.
 - Keep fixture playback artificial and editor-preview scoped; keep paste JSON, overlay runtime event rendering, ticker, badge, and import/export as later follow-ups.
 - Implement the next small Candidate A PR as a config-aware overlay runtime skeleton for `/overlay/keyword-reaction/`.
-- After the config-aware skeleton, consider event source and built-in fixture linkage only as separate follow-up PRs.
+- After the config-aware skeleton, define and implement a single synthetic event rendering PR using an explicit `demo=1` public-safe flag.
+- After single synthetic event rendering, consider event source and built-in fixture linkage only as separate follow-up PRs.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
 ## Long Term
@@ -45,6 +47,7 @@ Current planning docs:
 - [Candidate A matching normalization decision](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [Candidate A fixture playback scope decision](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
 - [Candidate A overlay runtime scope decision](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [Candidate A single synthetic event scope decision](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -61,8 +64,9 @@ Near-term sequence:
 5. Fix fixture playback + schema validation scope; prefer built-in artificial fixture first.
 6. Add built-in artificial fixture playback in editor preview only; keep paste JSON, overlay runtime event rendering, ticker, badge, and import/export as later follow-ups.
 7. Define and implement a config-aware overlay runtime skeleton that reads `?c=...`, stays transparent when idle, and shows debug status only by explicit flag.
-8. Consider event source and fixture linkage after the overlay runtime skeleton is stable.
-9. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+8. Define and implement single synthetic event rendering via explicit `demo=1`; keep idle transparent and keep event source / fixture linkage out of that PR.
+9. Consider event source and fixture linkage after the single synthetic event path is stable.
+10. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 

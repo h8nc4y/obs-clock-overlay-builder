@@ -12,6 +12,7 @@
 - [CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md)
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -127,6 +128,31 @@ fixture playback の後続では、`/overlay/keyword-reaction/` 本体を config
 - `/clock/` と `/clock/?c=...` の既存契約を変えない。
 
 この phase は overlay本体が config を読めるようにするだけであり、event rendering、fixture playbackのoverlay連携、ticker、badge、YouTube integrationを実装済みにしない。
+
+### Phase 5: Single Synthetic Event Rendering
+
+config-aware overlay runtime skeleton の後続では、`/overlay/keyword-reaction/` 本体で 1 件だけの public-safe synthetic event を表示する。
+
+この phase で確認すること:
+
+- 通常 `/overlay/keyword-reaction/` は transparent / no visible text。
+- `demo=1` の時だけ public-safe synthetic event を 1 件表示する。
+- `debug=1` の時だけ public-safe status を表示する。
+- `demo=1` と `debug=1` が共存しても raw `c`、keyword実値、manual input text、fixture event data、secret-like value を画面、status、consoleへ出さない。
+- `/overlay/keyword-reaction/?c=invalid&demo=1` が safe default へ fallback し、raw invalid value を表示しない。
+- event text はコード内固定の人工文言だけにする。
+- generated URL は config-only のまま、synthetic event text、manual input text、fixture event data、raw JSON、`displayText` array を含めない。
+- `textContent` など safe DOM API を使い、`innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- demo event は短時間表示して消え、timer cleanup がある。
+- no external network。
+- no editor `localStorage` dependency。
+- no event source / no fixture linkage / no toast event queue。
+- no ticker / no badge / no paste JSON import。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- 390px / 768px / 1280px で unexpected horizontal scroll がない。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+
+この phase は OBS Browser Source で toast 表示と透明背景を確認するための public-safe demo event であり、fixture playback、event source、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 
