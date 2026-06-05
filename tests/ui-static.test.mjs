@@ -284,6 +284,7 @@ test("editor refresh does not add risky HTML sinks", () => {
     readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-event-intake.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
   ].join("\n");
 
