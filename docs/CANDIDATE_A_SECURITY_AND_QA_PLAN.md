@@ -18,6 +18,7 @@
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -285,6 +286,33 @@ local event intake helper の後続では、transportやoverlay runtime connecti
 - `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
 
 この phase は local intake と queue helper の pure connection であり、overlay runtime connection、transport、fixture linkage、toast queue runtime、YouTube integrationを実装済みにしない。
+
+### Phase 11: Local Intake To Overlay Runtime Connection
+
+local intake to queue helper の後続では、overlay runtime の `demo=1` 経路だけを local intake helper -> queue helper -> existing overlay toast display へ寄せる。
+
+この phase で確認すること:
+
+- `demo=1` fixed synthetic event だけを local intake input として扱う。
+- local intake helper が `sourceType: "demo"` を normalized event へ寄せる。
+- local intake to queue helper が bounded queue へ normalized event だけを入れる。
+- queue から取り出した normalized event を既存toast表示へ渡す。
+- manual input event、fixture event、external event は runtime connection しない。
+- transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、external network は実装しない。
+- generated URL に local intake payload、event payload、queue state、manual input text、fixture event data、transport payload、raw JSON、`displayText` arrays を入れない。
+- debug/status に raw `c`、keyword実値、manual input text、fixture event data、queue state、secret-like value を出さない。
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- `demo=1` は public-safe fixed synthetic event のみ。
+- timer runtime は bounded `setTimeout` のみを使い、`setInterval` と unbounded loop は使わない。
+- repeated run / non-demo run で `clearTimeout` cleanup を維持する。
+- event `displayText` は `textContent` など safe DOM API で表示する。
+- `innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
+
+この phase は `demo=1` の fixed synthetic event を local intake + queue helper 経由にする接続確認であり、manual / fixture runtime connection、transport、fixture linkage、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

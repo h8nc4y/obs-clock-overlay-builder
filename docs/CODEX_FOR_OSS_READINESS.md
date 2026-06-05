@@ -22,9 +22,9 @@ Facts confirmed from the public repository and local `master`:
 - Forks at inspection time: 0
 - `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
-- Recent merged PR evidence includes PR #19 through PR #54.
+- Recent merged PR evidence includes PR #19 through PR #56.
 - README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs including manual input + toast scope, matching normalization policy, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape decision, queue / transport scope decision, overlay queue connection scope decision, transport scope decision, and production demo are present.
-- Local intake to queue connection scope decision docs are implementation planning evidence only; they are not implementation evidence or adoption evidence.
+- Local intake to queue connection scope decision docs and local intake overlay runtime scope decision docs are implementation planning evidence only; they are not adoption evidence.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -66,6 +66,7 @@ The project is public and maintained, but public traction is still early. Do not
 - Candidate A overlay queue connection scope decision records the next runtime connection boundary before transport, fixture linkage, toast queue runtime, or YouTube integration. This is implementation planning evidence, not implementation or adoption evidence.
 - Candidate A transport scope decision records transport candidates and event intake boundaries before transport implementation, fixture linkage, external network, or YouTube integration. This is implementation planning evidence, not implementation or adoption evidence.
 - Candidate A local intake queue connection scope decision records how local intake output should be normalized before entering queue helper state. This is implementation planning evidence, not implementation or adoption evidence.
+- Candidate A local intake overlay runtime scope decision records a narrow `demo=1` connection boundary before manual / fixture runtime connection, transport, or YouTube integration. This is implementation planning evidence, not adoption evidence.
 - Cloudflare cost and deploy boundaries are documented.
 
 ## Weaknesses
@@ -125,7 +126,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
 - `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.
 - `docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md`, `docs/HEADLINE_FEATURE_MVP_REQUIREMENTS.md`, and `docs/YOUTUBE_DATA_POLICY_BOUNDARY.md` for candidate headline feature planning.
-- `docs/CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md`, `docs/CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md`, `docs/CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A implementation planning evidence.
+- `docs/CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md`, `docs/CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md`, `docs/CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A implementation planning evidence.
 - Issue #30 for public YouTube Live overlay suite exploration: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 
 ## Claims To Avoid
