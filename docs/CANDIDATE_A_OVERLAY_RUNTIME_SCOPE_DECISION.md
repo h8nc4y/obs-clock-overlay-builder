@@ -12,6 +12,7 @@
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
+- [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -20,6 +21,21 @@
 次の実装PRでは、現在 transparent static skeleton である `/overlay/keyword-reaction/` を config-aware な overlay runtime skeleton に進める。
 
 目的は、OBS Browser Source で開かれる overlay-only page が generated URL の `?c=...` を読めるようにし、将来の event rendering の前に URL、fallback、debug、transparent idle、text-not-HTML の境界を固定することです。
+
+## Post-PR #44 Boundary
+
+PR #44 で config-aware overlay runtime skeleton は実装済みです。
+
+現時点で実装済みと扱うもの:
+
+- `/overlay/keyword-reaction/` が `?c=...` を読み、既存 helper で safe normalized config へ寄せる。
+- 通常 idle は transparent / no visible text。
+- `debug=1` の時だけ public-safe status を表示する。
+- raw `c`、keyword実値、manual input text、fixture event data、secret-like value を debug 表示しない。
+
+次段階は [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md) で固定する single synthetic event rendering です。
+
+次段階で扱う `demo=1` は public-safe demo flag であり、event source、fixture linkage、YouTube integration ではありません。通常 idle は引き続き transparent / no visible text とする。
 
 ## Next Implementation PR Scope
 
@@ -220,7 +236,7 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 
 後続PRへ分けるもの:
 
-1. overlay runtime event rendering for a single synthetic event shape。
+1. overlay runtime event rendering for a single synthetic event shape, scoped by [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)。
 2. built-in fixture linkage from safe artificial fixture to overlay runtime。
 3. paste JSON import design and validation。
 4. ticker / badge runtime。
