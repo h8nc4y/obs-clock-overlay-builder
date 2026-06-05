@@ -16,6 +16,7 @@
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -234,6 +235,34 @@ URLへ入れないもの:
 - secret-like values。
 
 local intake to queue helper は URL契約を広げない。raw local input は helper内で normalized event へ寄せるが、その payload や queue state は OBS再現用URLの責務にしない。
+
+## Local Intake Overlay Runtime URL Boundary
+
+local intake to overlay runtime connection の次段階でも、generated URL は config-only を維持する。
+
+`demo=1` は public-safe display test flag であり、event payload や queue state を `c` へ入れる仕組みではない。
+
+URLへ入れないもの:
+
+- local intake payload。
+- normalized event payload。
+- queue state。
+- queue length / current index。
+- event `eventId`。
+- event `displayText`。
+- raw manual input text。
+- raw fixture JSON。
+- fixture event data。
+- transport payload。
+- raw `postMessage` payload。
+- `BroadcastChannel` payload。
+- `localStorage` transport state。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- secret-like values。
+
+overlay runtime が `demo=1` を local intake helper と queue helper 経由へ寄せる場合も、URL契約を広げない。manual / fixture runtime connection、transport、fixture linkage は後続PRへ分ける。
 
 ## Config Helper実装範囲
 

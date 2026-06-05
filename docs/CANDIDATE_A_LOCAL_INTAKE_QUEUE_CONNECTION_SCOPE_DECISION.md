@@ -4,7 +4,7 @@
 
 この文書は Candidate A: keyword reaction overlay の local intake to queue connection 方針を固定する docs-only 記録です。
 
-これは implementation planning evidence です。local intake to queue helper、overlay runtime connection、transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、toast queue runtime、ticker、badge、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
+これは implementation planning evidence です。PR #56 の local intake to queue helper 実装を記録しますが、overlay runtime connection、transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、toast queue runtime、ticker、badge、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
 
 関連:
 
@@ -13,6 +13,7 @@
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -31,6 +32,23 @@ PR #48 で normalized event shape helper、PR #50 で queue helper、PR #54 で 
 - queue state、event payload、manual input text、fixture event data、transport payload を generated URL へ入れない方針を維持する。
 - helper を DOM、timer、storage、network、transport から独立させる。
 - overlay runtime connection、transport、fixture linkage、YouTube integration を後続に分ける。
+
+## Post-PR #56 Local Intake To Queue Status
+
+PR #56 で local intake to queue helper + tests は実装済みです。
+
+実装済みとして扱うもの:
+
+- raw local input を local intake helper で normalized event へ寄せてから queue helper へ渡す pure helper。
+- `manual` / `fixture` / `demo` の sourceType 境界。
+- unsupported sourceType の safe fallback / reject。
+- max 5 bounded queue と overflow policy。
+- local intake payload、event payload、queue state を generated URL へ入れない tests。
+- helper が DOM、timer、storage、network、transport に依存しないこと。
+
+これは pure helper の実装証跡であり、overlay runtime connection、transport、fixture linkage、toast queue runtime、YouTube integration の承認ではありません。
+
+次段階は [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。次の実装候補は `demo=1` fixed synthetic event だけを local intake helper -> queue helper -> existing overlay toast display へ通す小変更に限定する。
 
 ## Next Implementation PR Scope
 
@@ -267,8 +285,8 @@ local intake to queue helper PRでは次を確認する。
 1. local intake to queue connection scope decision。この文書。
 2. local intake to queue pure helper + tests。
 3. queue schedule adapter if needed。
-4. overlay runtime connection scope decision for local queued events。
-5. overlay runtime connection implementation for local queued events。
+4. local intake overlay runtime connection scope decision。
+5. `demo=1` fixed synthetic event local intake -> queue -> overlay runtime connection。
 6. same-window internal dispatch design if needed。
 7. same-origin `postMessage` design and prototype only after origin/source QA is fixed。
 8. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。

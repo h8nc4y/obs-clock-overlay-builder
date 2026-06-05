@@ -19,6 +19,7 @@
 - Overlay queue connection scope decision: [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - Transport scope decision: [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - Local intake queue connection scope decision: [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- Local intake overlay runtime scope decision: [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -92,10 +93,11 @@ Candidate A は次の順で小さく進める。
 10. Transport scope decision。
 11. Local event intake helper。
 12. Local intake to queue connection。
-13. Event source / fixture linkage。
-14. Ticker / badge。
-15. URL import/export refinement。
-16. YouTube integration design。
+13. Local intake to overlay runtime connection for `demo=1` only。
+14. Event source / fixture linkage。
+15. Ticker / badge。
+16. URL import/export refinement。
+17. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -351,6 +353,22 @@ transport scope decision と local event intake helper の後続では、raw loc
 - overlay runtime connection、transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md) に分ける。
+
+## Next Planning PR: Local Intake Overlay Runtime Connection Scope
+
+local intake to queue helper + tests の後続では、overlay runtime の `demo=1` 経路だけを local intake helper と queue helper 経由へ寄せる範囲を docs-only で固定する。
+
+このdocs-only方針で固定するもの:
+
+- 次の実装PRは `demo=1` fixed synthetic event の local intake -> queue -> overlay runtime表示に限定する。
+- manual input event、fixture event、external event は runtime connection しない。
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- generated URL へ local intake payload、event payload、queue state、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- timer cleanup は既存demo pathを維持し、`setInterval` と unbounded loop は使わない。
+- transport、fixture linkage、toast queue runtime複数source対応、ticker、badge、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 

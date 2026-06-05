@@ -13,6 +13,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Keep event transport, fixture linkage, toast queue runtime, ticker, badge, and YouTube integration separated from the overlay queue connection work.
 - Keep Candidate A transport scope explicit before any transport implementation.
 - Keep local intake to queue connection scope explicit before any overlay runtime connection, fixture linkage, or transport implementation.
+- Keep local intake to overlay runtime connection scope explicit before connecting `demo=1` through local intake and queue helpers.
 
 ## Medium Term
 
@@ -33,6 +34,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - After transport scope, consider a small event intake boundary helper before any cross-window transport or fixture linkage.
 - After local event intake helper, define local intake to queue connection scope before connecting local inputs to queue state.
 - Implement local intake to queue helper + tests only after that scope is fixed; keep overlay runtime connection, transport, and fixture linkage out of that PR.
+- Define local intake to overlay runtime connection scope before changing the overlay runtime demo path.
+- Connect only `demo=1` fixed synthetic event through local intake helper and queue helper before considering manual event runtime connection or fixture linkage.
 - Keep transport implementation, event source, built-in fixture linkage, toast queue runtime, ticker, badge, and real integration as separate follow-up PRs.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
@@ -61,6 +64,7 @@ Current planning docs:
 - [Candidate A overlay queue connection scope decision](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [Candidate A transport scope decision](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [Candidate A local intake queue connection scope decision](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [Candidate A local intake overlay runtime scope decision](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -87,8 +91,10 @@ Near-term sequence:
 15. Consider a small local event intake boundary helper before any `postMessage`, `BroadcastChannel`, event source, or fixture linkage implementation.
 16. Define local intake to queue connection scope before passing local intake output into queue state.
 17. Implement local intake to queue helper + tests; keep overlay runtime connection, transport, fixture linkage, and real integration out of that PR.
-18. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, and local intake queue connection are stable.
-19. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+18. Define local intake to overlay runtime connection scope; keep the next implementation limited to `demo=1` fixed synthetic event.
+19. Connect `demo=1` through local intake helper and queue helper; keep manual / fixture runtime connection, transport, fixture linkage, and real integration out of that PR.
+20. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, and local intake overlay runtime connection are stable.
+21. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 
