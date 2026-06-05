@@ -18,6 +18,7 @@
 - Queue / transport scope decision: [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - Overlay queue connection scope decision: [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - Transport scope decision: [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- Local intake queue connection scope decision: [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -89,10 +90,12 @@ Candidate A は次の順で小さく進める。
 8. Queue helper + tests。
 9. Overlay runtime queue connection。
 10. Transport scope decision。
-11. Event source / fixture linkage。
-12. Ticker / badge。
-13. URL import/export refinement。
-14. YouTube integration design。
+11. Local event intake helper。
+12. Local intake to queue connection。
+13. Event source / fixture linkage。
+14. Ticker / badge。
+15. URL import/export refinement。
+16. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -332,6 +335,22 @@ overlay runtime queue connection の後続では、eventをoverlayへ渡すtrans
 - YouTube integrationは別boundary reviewと人間承認後。
 
 詳細は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。transport実装、fixture linkage、toast queue runtime複数source対応、ticker、badge、YouTube integrationはまだ後続です。
+
+## Next Planning PR: Local Intake Queue Connection Scope
+
+transport scope decision と local event intake helper の後続では、raw local input を queue helper へどう渡すかを docs-only で固定する。
+
+このdocs-only方針で固定するもの:
+
+- 次の実装PRは local intake to queue pure helper + tests に限定する。
+- raw local input は local intake helper で normalized event へ寄せてから queue helper へ渡す。
+- `manual` / `fixture` / `demo` 以外の sourceType は queue に入れない。
+- queue は max 5 bounded queue と overflow policy を維持する。
+- generated URL へ local intake payload、event payload、queue state、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- helper は DOM、timer、storage、network、transport に依存しない。
+- overlay runtime connection、transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 

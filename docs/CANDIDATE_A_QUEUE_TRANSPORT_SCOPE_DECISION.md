@@ -13,6 +13,7 @@
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -312,6 +313,27 @@ PR #52 で overlay runtime queue connection は実装済みです。
 
 次段階は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。transport実装、fixture linkage、event source、toast queue runtime複数source対応、YouTube integration はまだ実装しない。
 
+## Post-PR #54 Local Intake Handoff
+
+PR #54 で local event intake helper + tests は実装済みです。
+
+次の実装候補は transport ではなく、[CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md) の方針に沿った local intake to queue pure helper + tests に限定する。
+
+この後続PRで扱うもの:
+
+- raw local input を local intake helper で normalized event へ寄せる。
+- normalized event だけを queue helper へ渡す。
+- `manual` / `fixture` / `demo` の sourceType 境界を維持する。
+- max 5 bounded queue と overflow policy を維持する。
+
+この後続PRで扱わないもの:
+
+- transport。
+- overlay runtime connection。
+- fixture linkage。
+- toast queue runtime。
+- YouTube API / OAuth / API key / scraping / real data。
+
 ## Follow-Up Split
 
 後続PRへ分けるもの:
@@ -319,13 +341,16 @@ PR #52 で overlay runtime queue connection は実装済みです。
 1. queue helper + tests。PR #50で完了。
 2. overlay runtime への queue 接続と timer cleanup。PR #52で完了。
 3. transport scope decision。[CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) で扱う。
-4. same-origin transport prototype if approved。
-5. built-in fixture linkage from safe artificial fixture to overlay runtime。
-6. toast queue runtime QA。
-7. ticker / badge runtime。
-8. paste JSON import design and validation。
-9. import/export UI。
-10. YouTube integration design after boundary review and human approval。
+4. local event intake helper + tests。PR #54で完了。
+5. local intake to queue connection scope decision。[CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md) で扱う。
+6. local intake to queue pure helper + tests。
+7. same-origin transport prototype if approved。
+8. built-in fixture linkage from safe artificial fixture to overlay runtime。
+9. toast queue runtime QA。
+10. ticker / badge runtime。
+11. paste JSON import design and validation。
+12. import/export UI。
+13. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

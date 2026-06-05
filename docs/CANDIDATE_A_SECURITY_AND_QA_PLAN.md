@@ -17,6 +17,7 @@
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -256,6 +257,34 @@ overlay runtime queue connection の後続では、transportを実装する前�
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 - transport実装を含めない。
 - `/clock/` と `/clock/?c=...` の既存契約を変えない。
+
+### Phase 10: Local Intake To Queue Connection
+
+local event intake helper の後続では、transportやoverlay runtime connectionではなく、local intake output を queue helper へ渡す pure helper + tests を先に固定する。
+
+この phase で確認すること:
+
+- raw local input は local intake helper で normalized event へ寄せてから queue helper へ渡す。
+- queue には normalized event だけを入れる。
+- `manual` / `fixture` / `demo` だけを sourceType として扱う。
+- unsupported sourceType は safe reject または safe fallback。
+- invalid local input は raw data を queue に残さない。
+- unknown fields、transport payload、queue state、secret-like values を event に残さない。
+- raw input object を破壊しない。
+- queue は max 5 bounded queue を維持する。
+- overflow時は古い未表示eventをdropし、最新eventを残す。
+- generated URL に local intake payload、event payload、queue state、manual input text、fixture event data、transport payload、raw JSON、`displayText` arrays を入れない。
+- helper は DOM、timer、storage、network、transport に依存しない。
+- no `postMessage` / no `BroadcastChannel`。
+- no `localStorage` transport。
+- no external network。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `displayText` は後続renderingでも `textContent` など safe DOM API を使う。
+- `innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
+
+この phase は local intake と queue helper の pure connection であり、overlay runtime connection、transport、fixture linkage、toast queue runtime、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

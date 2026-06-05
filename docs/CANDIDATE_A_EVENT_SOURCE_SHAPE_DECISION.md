@@ -15,6 +15,7 @@
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -137,6 +138,20 @@ event intake が受けないもの:
 - secret-like values。
 
 transport実装はまだ後続です。次段階の詳細は [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md) に分ける。
+
+## Local Intake To Queue Boundary
+
+PR #54 の local event intake helper 後も、raw local input を queue へ直接渡さない。
+
+次段階では [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md) に沿って、local intake helper が返す normalized event だけを queue helper へ渡す。
+
+維持する方針:
+
+- `manual` / `fixture` / `demo` だけを sourceType として扱う。
+- unsupported sourceType は safe reject または safe fallback。
+- queue に入る前に unknown fields、transport payload、queue state、secret-like values を落とす。
+- raw manual input text、raw fixture JSON、fixture event data、raw config、real viewer data を queue state や URL へ入れない。
+- overlay runtime connection、transport、fixture linkage は後続に分ける。
 
 ## Generated URL Config-Only Boundary
 

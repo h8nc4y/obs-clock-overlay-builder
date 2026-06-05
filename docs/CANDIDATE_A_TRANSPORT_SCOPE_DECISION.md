@@ -12,6 +12,7 @@
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -196,6 +197,33 @@ YouTube integration を検討する場合も、まず official documentation rev
 - postMessage / BroadcastChannel の origin/channel/lifetime 問題をまだ持ち込まなくてよい。
 
 初回 event intake は normalized event shape だけを受け付ける。raw transport payload、raw manual input text、raw fixture JSON、real YouTube data は受け付けない。
+
+## Post-PR #54 Local Intake Status
+
+PR #54 で local event intake helper + tests は実装済みです。
+
+実装済みとして扱うもの:
+
+- `manual` / `fixture` / `demo` だけを local intake `sourceType` として許可する。
+- raw local input を normalized event へ寄せる。
+- unsupported sourceType を safe fallback / reject する。
+- unknown fields、transport payload、queue state、secret-like values を normalized event に残さない。
+- helper が DOM、storage、network、transport に依存しない。
+
+これは local intake helper の実装証跡であり、transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、overlay runtime connection、queue connection、fixture linkage、YouTube integration の承認ではありません。
+
+## Next Local Intake To Queue Decision
+
+PR #54 の後続では、transport実装ではなく [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md) で local intake output を queue helper へ渡す境界を固定する。
+
+初期方針:
+
+- raw local input は local intake helper で normalized event へ寄せてから queue helper へ渡す。
+- `manual` / `fixture` / `demo` 以外の sourceType は queue へ入れない。
+- queue は max 5 bounded queue と overflow policy を維持する。
+- helper は DOM、timer、storage、network、transport 非依存にする。
+- generated URL は config-only のまま、local intake payload、event payload、queue state、transport payload、manual input text、fixture event data を入れない。
+- overlay runtime connection、transport、fixture linkage、toast queue runtime、YouTube integration は後続に分ける。
 
 ## Transport Boundary
 

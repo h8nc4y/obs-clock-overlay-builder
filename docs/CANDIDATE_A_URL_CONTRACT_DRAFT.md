@@ -15,6 +15,7 @@
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -204,6 +205,35 @@ URLへ入れないもの:
 - secret-like values。
 
 URL config は OBS再現性のための設定だけを持つ。event transportやqueue stateはURLの責務ではない。
+
+## Local Intake Queue URL Boundary
+
+local intake to queue connection の次段階でも、generated URL は config-only を維持する。
+
+URLへ入れないもの:
+
+- local intake payload。
+- normalized event payload。
+- queue state。
+- queue length / current index。
+- queue schedule state。
+- transport payload。
+- event `eventId`。
+- event `displayText`。
+- `displayText` arrays。
+- raw manual input text。
+- raw fixture JSON。
+- fixture event data。
+- raw user JSON。
+- unsupported sourceType input。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- private account data。
+- billing / payment info。
+- secret-like values。
+
+local intake to queue helper は URL契約を広げない。raw local input は helper内で normalized event へ寄せるが、その payload や queue state は OBS再現用URLの責務にしない。
 
 ## Config Helper実装範囲
 
