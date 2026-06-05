@@ -16,6 +16,7 @@
 - Single synthetic event scope decision: [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - Event source shape decision: [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - Queue / transport scope decision: [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
+- Overlay queue connection scope decision: [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -85,10 +86,12 @@ Candidate A は次の順で小さく進める。
 6. Event source shape helper。
 7. Queue / transport scope decision。
 8. Queue helper + tests。
-9. Event source / fixture linkage。
-10. Ticker / badge。
-11. URL import/export refinement。
-12. YouTube integration design。
+9. Overlay runtime queue connection。
+10. Transport scope decision。
+11. Event source / fixture linkage。
+12. Ticker / badge。
+13. URL import/export refinement。
+14. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -252,7 +255,7 @@ single synthetic event rendering の後続で、event transport や fixture link
 
 詳細は [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md) に分ける。
 
-## Next Planning PR: Queue / Transport Scope
+## Prior Planning PR: Queue / Transport Scope
 
 event shape helper + tests の後続では、event source や fixture linkage の前に queue と transport の境界を固定する。
 
@@ -260,13 +263,57 @@ event shape helper + tests の後続では、event source や fixture linkage �
 
 - queue は overlay runtime 内部で normalized event を順番表示するための仕組み。
 - transport は editor / manual / fixture / future integration から overlay へeventを渡す経路。
-- 次の実装PRは queue helper + tests に限定する。
+- 当時の次の実装PRは queue helper + tests に限定する。
 - 初回queueは bounded queue、最大5件、古い未表示eventをdropして最新eventを残す方針にする。
 - timer runtimeは後続接続PRに分け、`setTimeout` id管理と `clearTimeout` cleanup を必須にする。
 - generated URL へ queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
 - transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md) に分ける。
+
+## Prior Implementation PR: Queue Helper + Tests
+
+queue / transport scope decision の後続で、queue helper + tests を pure helper として実装した。
+
+このPRで入ったもの:
+
+- normalized event だけを queue に入れる helper。
+- max 5 bounded queue。
+- overflow時に古い未表示eventをdropし、最新eventを残す方針。
+- FIFO dequeue。
+- clear helper。
+- deterministic schedule helper。
+- generated URL へ queue state、event payload、`eventId`、event `displayText` を入れない tests。
+- DOM、timer id、network、localStorage に依存しない pure helper。
+
+このPRで入れていないもの:
+
+- overlay runtime queue接続。
+- transport。
+- event source。
+- fixture linkage。
+- toast queue runtime。
+- ticker / badge。
+- paste JSON import。
+- YouTube API / OAuth / API key / scraping / real data。
+
+## Next Planning PR: Overlay Queue Connection Scope
+
+queue helper + tests の後続では、overlay runtime が queue helper をどう使うかを docs-only で固定する。
+
+このdocs-only方針で固定するもの:
+
+- 次の実装PRは overlay runtime queue connection に限定する。
+- `demo=1` fixed synthetic event を queue helper 経由で表示する。
+- manual input event、fixture event、external event はまだ queue に入れない。
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- generated URL へ queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- timerは bounded `setTimeout` のみを使い、`setInterval` と unbounded loop は使わない。
+- play / clear / unmount / re-run で timer cleanup を確認する。
+- transport、fixture linkage、toast queue runtime、ticker、badge、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 

@@ -4,13 +4,14 @@
 
 この文書は Candidate A: keyword reaction overlay の queue / transport 境界を固定する docs-only 記録です。
 
-これは implementation planning evidence です。queue helper、transport、event source、fixture linkage、toast queue runtime、ticker、badge、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
+これは implementation planning evidence です。PR #50 の queue helper 実装を記録しますが、transport、event source、fixture linkage、toast queue runtime、ticker、badge、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
 
 関連:
 
 - [CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -25,9 +26,26 @@ PR #48 で `normalizeKeywordReactionEvent` と `buildDemoKeywordReactionEvent` �
 
 - queue を overlay runtime 内部の順番表示機構として扱う。
 - transport を editor / manual / fixture / future integration から overlay へeventを渡す経路として扱う。
-- 次の実装PRを queue helper + tests に限定する。
+- PR #50 で入った queue helper + tests を、transport や event source とは別の pure helper として扱う。
+- 次段階を overlay runtime queue connection に限定し、`demo=1` fixed synthetic event を queue helper 経由にする。
 - transport、fixture linkage、event source、YouTube integration を後続に分ける。
 - generated URL config-only 境界と text-not-HTML 境界を維持する。
+
+## Post-PR #50 Queue Helper Status
+
+PR #50 で queue helper + tests は実装済みです。
+
+実装済みとして扱うもの:
+
+- max 5 bounded queue。
+- overflow時に古い未表示eventをdropし、最新eventを残す方針。
+- FIFO dequeue。
+- clear helper。
+- deterministic schedule helper。
+- queue helper が DOM、timer id、network、localStorage に依存しないこと。
+- generated URL へ queue state、event payload、`eventId`、event `displayText` を入れない tests。
+
+これは queue helper の実装証跡であり、transport、event source、fixture linkage、overlay runtime queue connection、toast queue runtime、YouTube integration の承認ではありません。
 
 ## Why Separate Queue And Transport
 
@@ -65,20 +83,20 @@ transport が将来扱う責務:
 
 transport は今回も次PRも実装しない。future YouTube integration は、official documentation review、credential/data handling設計、人間承認の後で別途検討する。
 
-## Next Implementation PR Scope
+## Completed Queue Helper Scope
 
-次の小実装PRは queue helper + tests に限定する。
+PR #50 の実装PRは queue helper + tests に限定した。
 
-入れてよい候補:
+入ったもの:
 
-- `normalizeKeywordReactionEventQueue`
+- `createKeywordReactionQueue`
 - `enqueueKeywordReactionEvent`
 - `dequeueKeywordReactionEvent`
 - `applyKeywordReactionQueueLimit`
-- `buildKeywordReactionPlaybackSchedule`
+- `buildKeywordReactionQueueSchedule`
 - `clearKeywordReactionQueue`
 
-tests で確認したいこと:
+tests で確認したこと:
 
 - normalized event だけを queue に入れる。
 - unknown fields が残らない。
@@ -89,7 +107,7 @@ tests で確認したいこと:
 - helper が raw payload、manual input text、fixture event data、secret-like value を返さない。
 - helper が DOM、timer id、network、localStorage に依存しない。
 
-次PRで入れないもの:
+PR #50 で入れなかったもの:
 
 - transport。
 - event source runtime。
@@ -101,6 +119,21 @@ tests で確認したいこと:
 - paste JSON import。
 - import/export UI。
 - YouTube API / OAuth / API key / scraping / real data。
+
+## Next Overlay Queue Connection Scope
+
+次の小実装PR候補は [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md) に分ける。
+
+初期方針:
+
+- `/overlay/keyword-reaction/` runtime 内で queue helper を使う。
+- `demo=1` の fixed synthetic event だけを queue に入れる。
+- manual input event、fixture event、external event はまだ queue に入れない。
+- transport、event source、fixture linkage は後続に分ける。
+- generated URL は config-only のまま維持する。
+- queue state、event payload、transport payload、manual input text、fixture event data を URL へ入れない。
+- timer は bounded `setTimeout` のみとし、`setInterval` と unbounded loop は使わない。
+- play / clear / unmount / re-run で `clearTimeout` cleanup を必須にする。
 
 ## Queue Limit
 
@@ -172,7 +205,7 @@ generated URL は config-only を維持する。
 - private account data。
 - secret-like values。
 
-将来、public-safe event reference、fixture id、queue id を URL へ入れるかは未確定です。初回 queue helper PRでは URL contract を広げない。
+将来、public-safe event reference、fixture id、queue id を URL へ入れるかは未確定です。overlay runtime queue connection PRでも URL contract は広げない。
 
 ## Transport Candidates
 
@@ -209,7 +242,7 @@ queue helper と後続runtimeは text-not-HTML を維持する。
 
 ## Non-Goals
 
-- queue helper実装。
+- queue helperの再設計。
 - toast queue runtime実装。
 - overlay DOM runtime へのqueue接続。
 - transport実装。
@@ -233,7 +266,7 @@ queue helper と後続runtimeは text-not-HTML を維持する。
 - deploy。
 - Codex for OSS application submission。
 
-## Done Criteria For The Next Implementation PR
+## Done Criteria For PR #50 Queue Helper
 
 - queue helper + tests に限定されている。
 - queue は max 5 件の bounded queue として扱われる。
@@ -249,11 +282,27 @@ queue helper と後続runtimeは text-not-HTML を維持する。
 - `/clock/` と `/clock/?c=...` に回帰がない。
 - validation が通る。
 
+## Done Criteria For The Next Overlay Queue Connection PR
+
+- overlay runtime queue connection に限定されている。
+- `demo=1` fixed synthetic event が queue helper 経由で表示される。
+- queue helper の max 5 bounded queue と overflow policy を使う。
+- timer cleanup が repeated `demo=1` / re-run / unmount で確認される。
+- generated URL は config-only のまま。
+- queue state、event payload、transport payload、manual input text、fixture event data を URL へ入れない。
+- event source、fixture linkage、transport、toast queue runtime は入っていない。
+- no `innerHTML` / no unsafe sink。
+- no localStorage transport / no external network。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `/clock/` と `/clock/?c=...` に回帰がない。
+- `/overlay/keyword-reaction/` の idle / debug / demo 挙動に回帰がない。
+- validation が通る。
+
 ## Follow-Up Split
 
 後続PRへ分けるもの:
 
-1. queue helper + tests。
+1. queue helper + tests。PR #50で完了。
 2. overlay runtime への queue 接続と timer cleanup。
 3. transport scope decision。
 4. same-origin transport prototype if approved。
@@ -272,4 +321,4 @@ queue helper と後続runtimeは text-not-HTML を維持する。
 - 表示中eventがある状態で overflow した場合、表示中eventを守るか、次回PRで明示するか。
 - public-safe `fixtureId`、event reference、queue reference を URL へ入れる時期。
 - 最初の transport は `postMessage`、`BroadcastChannel`、または別の local-only channel のどれを候補にするか。
-- queue helper を event helper と同じ module に置くか、別moduleへ分けるか。
+- queue helper は PR #50 で別moduleになった。将来event helperへ統合する必要が出た場合は別PRで再検討する。

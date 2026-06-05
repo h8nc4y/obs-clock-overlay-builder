@@ -15,6 +15,7 @@
 - [CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md](CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -202,6 +203,37 @@ event shape helper の後続では、transport ではなく queue helper + tests
 - `/clock/` と `/clock/?c=...` の既存契約を変えない。
 
 この phase は queue helper と transport境界の固定であり、cross-window transport、BroadcastChannel、postMessage、fixture linkage、YouTube integrationを実装済みにしない。
+
+### Phase 8: Overlay Runtime Queue Connection
+
+queue helper + tests の後続では、overlay runtime queue connection を小さく実装する。
+
+この phase で確認すること:
+
+- overlay runtime queue connection に限定する。
+- `demo=1` fixed synthetic event だけを queue helper 経由で表示する。
+- manual input event、fixture event、external event は queue に入れない。
+- queue は max 5 bounded queue として helper contract を使う。
+- overflow時は古い未表示eventをdropし、最新eventを残す方針を維持する。
+- repeated enqueue / repeated `demo=1` / re-run でも順序とscheduleが deterministic である。
+- timer runtime は bounded `setTimeout` のみを使う。
+- `setInterval`、unbounded loop、watch-like polling は使わない。
+- play / clear / unmount / re-run / new demo sequence で `clearTimeout` cleanup を確認する。
+- old timer が hidden overlay に古いeventを再表示しない。
+- generated URL に queue state、event payload、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- debug/status に raw `c`、keyword実値、manual input text、fixture event data、secret-like value を出さない。
+- event `displayText` は `textContent` など safe DOM API で表示する。
+- `innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- transport、event source、fixture linkage、toast queue runtimeを実装しない。
+- no localStorage transport。
+- no external network。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- `/overlay/keyword-reaction/` の通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- `demo=1` は public-safe display test flag のまま。
+
+この phase は `demo=1` の fixed synthetic event を queue helper 経由にする接続確認であり、transport、fixture linkage、manual input event injection、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 
