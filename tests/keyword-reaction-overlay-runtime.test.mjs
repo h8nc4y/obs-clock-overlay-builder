@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import * as overlayRuntime from "../assets/js/keyword-reaction-overlay.js";
 import { encodeKeywordReactionConfig } from "../assets/js/keyword-reaction-config.js";
@@ -70,6 +71,34 @@ test("keyword reaction overlay demo flag builds one fixed public-safe synthetic 
   assert.doesNotMatch(eventText, /secret meeting topic/);
   assert.doesNotMatch(eventText, new RegExp(encoded));
   assert.doesNotMatch(eventText, /keyword:/);
+});
+
+test("keyword reaction overlay routes demo events through queue helper before rendering", () => {
+  const source = readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8");
+  const encoded = encodeKeywordReactionConfig(
+    { keyword: "secret meeting topic", displayPattern: "toast", reactionStyle: "pulse", intensity: 3 },
+    { compact: true }
+  );
+  const state = getKeywordReactionOverlayRuntimeState(new URLSearchParams(`c=${encoded}&demo=1`));
+  const event = buildKeywordReactionDemoEvent(state);
+  const eventText = JSON.stringify(event);
+
+  assert.match(source, /from "\.\/keyword-reaction-queue\.js"/);
+  assert.match(source, /\benqueueKeywordReactionEvent\b/);
+  assert.match(source, /\bdequeueKeywordReactionEvent\b/);
+  assert.deepEqual(event, {
+    text: KEYWORD_REACTION_DEMO_EVENT_TEXT,
+    displayPattern: "toast",
+    reactionStyle: "pulse",
+    intensity: 3,
+    durationMs: 2400
+  });
+  assert.equal(Object.hasOwn(event, "queue"), false);
+  assert.equal(Object.hasOwn(event, "eventPayload"), false);
+  assert.equal(Object.hasOwn(event, "eventId"), false);
+  assert.equal(Object.hasOwn(event, "displayText"), false);
+  assert.doesNotMatch(eventText, /secret meeting topic/);
+  assert.doesNotMatch(eventText, new RegExp(encoded));
 });
 
 test("keyword reaction overlay demo flag falls back safely for invalid config", () => {
@@ -154,6 +183,40 @@ test("keyword reaction overlay mount cleans old demo timer when returning to idl
   assert.deepEqual(clearedTimers, [timers[0]]);
   assert.equal(demoElement.hidden, true);
   assert.equal(demoElement.textContent, "");
+});
+
+test("keyword reaction overlay mount cleans old demo timer before rerunning queued demo", () => {
+  const statusElement = createFakeElement();
+  const demoElement = createFakeElement();
+  const timers = [];
+  const clearedTimers = [];
+  const fakeDocument = {
+    defaultView: {
+      setTimeout(callback, durationMs) {
+        const timer = { callback, durationMs };
+        timers.push(timer);
+        return timer;
+      },
+      clearTimeout(timer) {
+        clearedTimers.push(timer);
+      }
+    },
+    getElementById(id) {
+      return {
+        keywordReactionOverlayStatus: statusElement,
+        keywordReactionOverlayDemo: demoElement
+      }[id];
+    }
+  };
+
+  mountKeywordReactionOverlayRuntime(fakeDocument, { search: "?demo=1" });
+  mountKeywordReactionOverlayRuntime(fakeDocument, { search: "?demo=1" });
+
+  assert.deepEqual(clearedTimers, [timers[0]]);
+  assert.equal(timers.length, 2);
+  assert.equal(timers[1].durationMs, 2400);
+  assert.equal(demoElement.hidden, false);
+  assert.equal(demoElement.textContent, KEYWORD_REACTION_DEMO_EVENT_TEXT);
 });
 
 test("keyword reaction overlay runtime falls back for invalid config without echoing raw c", () => {
