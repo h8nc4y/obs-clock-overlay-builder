@@ -14,6 +14,7 @@
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -287,15 +288,16 @@ local intake to queue helper PRでは次を確認する。
 3. queue schedule adapter if needed。
 4. local intake overlay runtime connection scope decision。
 5. `demo=1` fixed synthetic event local intake -> queue -> overlay runtime connection。
-6. same-window internal dispatch design if needed。
-7. same-origin `postMessage` design and prototype only after origin/source QA is fixed。
-8. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。
-9. built-in fixture linkage from safe artificial fixture to overlay runtime。
-10. toast queue runtime for multiple public-safe sources。
-11. ticker / badge runtime。
-12. paste JSON import design and validation。
-13. import/export UI。
-14. YouTube integration design after boundary review and human approval。
+6. first transport decision before any cross-window transport。
+7. same-window internal dispatch helper + tests if the first transport decision remains narrow。
+8. same-origin `postMessage` design and prototype only after origin/source QA is fixed。
+9. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。
+10. built-in fixture linkage from safe artificial fixture to overlay runtime。
+11. toast queue runtime for multiple public-safe sources。
+12. ticker / badge runtime。
+13. paste JSON import design and validation。
+14. import/export UI。
+15. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

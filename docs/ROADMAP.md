@@ -14,6 +14,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Keep Candidate A transport scope explicit before any transport implementation.
 - Keep local intake to queue connection scope explicit before any overlay runtime connection, fixture linkage, or transport implementation.
 - Keep local intake to overlay runtime connection scope explicit before connecting `demo=1` through local intake and queue helpers.
+- Keep first transport implementation decision explicit before any `postMessage`, `BroadcastChannel`, `localStorage` transport, external network transport, or fixture linkage work.
 
 ## Medium Term
 
@@ -36,6 +37,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Implement local intake to queue helper + tests only after that scope is fixed; keep overlay runtime connection, transport, and fixture linkage out of that PR.
 - Define local intake to overlay runtime connection scope before changing the overlay runtime demo path.
 - Connect only `demo=1` fixed synthetic event through local intake helper and queue helper before considering manual event runtime connection or fixture linkage.
+- Define first transport implementation decision before choosing any cross-window transport.
+- Prefer the next small Candidate A PR as same-window internal dispatch helper + tests, not `postMessage`, `BroadcastChannel`, or `localStorage` transport.
 - Keep transport implementation, event source, built-in fixture linkage, toast queue runtime, ticker, badge, and real integration as separate follow-up PRs.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
@@ -65,6 +68,7 @@ Current planning docs:
 - [Candidate A transport scope decision](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [Candidate A local intake queue connection scope decision](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [Candidate A local intake overlay runtime scope decision](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [Candidate A first transport decision](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -93,8 +97,10 @@ Near-term sequence:
 17. Implement local intake to queue helper + tests; keep overlay runtime connection, transport, fixture linkage, and real integration out of that PR.
 18. Define local intake to overlay runtime connection scope; keep the next implementation limited to `demo=1` fixed synthetic event.
 19. Connect `demo=1` through local intake helper and queue helper; keep manual / fixture runtime connection, transport, fixture linkage, and real integration out of that PR.
-20. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, and local intake overlay runtime connection are stable.
-21. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+20. Define first transport implementation decision; keep `postMessage`, `BroadcastChannel`, `localStorage` transport, external network, and YouTube integration out of the first transport step.
+21. Consider same-window internal dispatch helper + tests before any cross-window transport or fixture linkage.
+22. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, and first transport decision are stable.
+23. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 

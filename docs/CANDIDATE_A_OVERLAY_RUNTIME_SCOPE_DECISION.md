@@ -18,6 +18,7 @@
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -95,6 +96,14 @@ PR #54 で local event intake helper、PR #56 で local intake to queue helper �
 - local intake payload、event payload、queue state、transport payload、manual input text、fixture event data、raw JSON、`displayText` arrays、secret-like values を URL、debug/status、DOMへ出さない。
 - transport、fixture linkage、toast queue runtime複数source対応、ticker、badge、paste JSON import、YouTube integration は後続。
 - no external network / no localStorage transport / no YouTube API / no OAuth / no API key / no real data。
+
+## Post-PR #58 First Transport Decision Handoff
+
+PR #58 で、既存の `demo=1` fixed synthetic event は local intake helper -> queue helper -> overlay runtime表示へ通った。
+
+次段階は [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md) に分ける。判断は、まだ cross-window transport へ進まず、次PR候補を same-window internal dispatch helper + tests に限定することです。
+
+この段階でも、manual / fixture runtime connection、`postMessage`、`BroadcastChannel`、`localStorage` transport、external network、YouTube integration は後続扱いです。
 
 ## Historical Config-Aware Skeleton Implementation Scope
 
@@ -302,12 +311,14 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 5. transport scope decision before any cross-window channel, scoped by [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)。
 6. local intake to queue pure helper + tests, scoped by [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)。
 7. local intake overlay runtime connection for `demo=1` only, scoped by [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)。
-8. built-in fixture linkage from safe artificial fixture to overlay runtime。
-9. paste JSON import design and validation。
-10. ticker / badge runtime。
-11. import/export UI。
-12. same-origin local event channel design。
-13. YouTube integration design after boundary review and human approval。
+8. first transport decision, scoped by [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)。
+9. same-window internal dispatch helper + tests。
+10. built-in fixture linkage from safe artificial fixture to overlay runtime。
+11. paste JSON import design and validation。
+12. ticker / badge runtime。
+13. import/export UI。
+14. same-origin local event channel design。
+15. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

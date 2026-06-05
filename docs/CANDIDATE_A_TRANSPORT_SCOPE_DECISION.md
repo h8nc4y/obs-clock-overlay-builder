@@ -14,6 +14,7 @@
 - [CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -94,6 +95,14 @@ same-origin `postMessage` は、将来 editor preview window や iframe から o
 - event payload を広げると secret-like values やraw data保持リスクが増える。
 
 初回では実装しない。採用する場合は、channel名、origin、lifetime、cleanup、payload最小化を別PRで固定する。
+
+## Post-PR #58 First Transport Decision Handoff
+
+PR #58 で `demo=1` fixed synthetic event は local intake helper -> queue helper -> overlay runtime表示へ通った。
+
+次段階は [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md) で扱う。判断は、まだ `postMessage` / `BroadcastChannel` / `localStorage` transport 実装へ進まず、次PR候補を same-window internal dispatch helper + tests に限定することです。
+
+この判断は transport実装の承認ではありません。manual / fixture runtime connection、fixture linkage、external network、YouTube integration は引き続き後続に分ける。
 
 ## URL Config
 
@@ -182,12 +191,7 @@ YouTube integration を検討する場合も、まず official documentation rev
 
 初回は transport実装に入らない。
 
-次の小PR候補は transport そのものではなく、次のどちらかにする:
-
-1. overlay runtime の local event intake helper + tests。
-2. same-window internal dispatch の設計docs。
-
-推奨は 1 です。
+PR #58 後の次の小PR候補は transport そのものではなく、same-window internal dispatch helper + tests に限定する。
 
 理由:
 
@@ -307,7 +311,7 @@ transportを実装するPRでは次をQA対象にする。
 
 - transport候補が比較されている。
 - 初回は transport実装に入らない方針が明確である。
-- 次PR候補が local event intake helper + tests または same-window internal dispatch設計docsとして整理されている。
+- PR #58 後の次PR候補が same-window internal dispatch helper + tests として整理されている。
 - event intakeは normalized event shape だけを受ける方針である。
 - postMessage / BroadcastChannel は未実装の後続候補として扱われている。
 - `localStorage` transport は初期非推奨である。
@@ -323,21 +327,23 @@ transportを実装するPRでは次をQA対象にする。
 後続PRへ分けるもの:
 
 1. transport scope decision docs。この文書。
-2. overlay runtime local event intake helper + tests。
-3. same-window internal dispatch design docs if needed。
-4. same-origin `postMessage` design and prototype only after origin/source QA is fixed。
-5. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。
-6. built-in fixture linkage from safe artificial fixture to overlay runtime。
-7. toast queue runtime for multiple public-safe sources。
-8. ticker / badge runtime。
-9. paste JSON import design and validation。
-10. import/export UI。
-11. YouTube integration design after boundary review and human approval。
+2. local event intake helper + tests。PR #54で完了。
+3. local intake to queue helper + tests。PR #56で完了。
+4. local intake to overlay runtime connection for `demo=1` only。PR #58で完了。
+5. first transport decision, scoped by [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)。
+6. same-window internal dispatch helper + tests。
+7. same-origin `postMessage` design and prototype only after origin/source QA is fixed。
+8. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。
+9. built-in fixture linkage from safe artificial fixture to overlay runtime。
+10. toast queue runtime for multiple public-safe sources。
+11. ticker / badge runtime。
+12. paste JSON import design and validation。
+13. import/export UI。
+14. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 
-- 次PRを local event intake helper + tests にするか、same-window internal dispatch docsにするか。
-- local event intake helper は overlay runtime module内に置くか、event helper moduleへ分けるか。
+- same-window internal dispatch helper は overlay runtime module内に置くか、local intake helper moduleへ分けるか。
 - `postMessage` を採用する場合の message type 名、origin allowlist、source確認の最小仕様。
 - `BroadcastChannel` を採用する場合の channel名、multi-tab behavior、OBS Browser Source互換性。
 - public-safe `eventId` を transport payloadに必須とするか。
