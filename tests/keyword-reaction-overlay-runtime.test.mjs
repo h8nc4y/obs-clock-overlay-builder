@@ -73,7 +73,7 @@ test("keyword reaction overlay demo flag builds one fixed public-safe synthetic 
   assert.doesNotMatch(eventText, /keyword:/);
 });
 
-test("keyword reaction overlay routes demo events through queue helper before rendering", () => {
+test("keyword reaction overlay routes demo events through local intake queue helper before rendering", () => {
   const source = readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8");
   const encoded = encodeKeywordReactionConfig(
     { keyword: "secret meeting topic", displayPattern: "toast", reactionStyle: "pulse", intensity: 3 },
@@ -83,8 +83,9 @@ test("keyword reaction overlay routes demo events through queue helper before re
   const event = buildKeywordReactionDemoEvent(state);
   const eventText = JSON.stringify(event);
 
-  assert.match(source, /from "\.\/keyword-reaction-queue\.js"/);
-  assert.match(source, /\benqueueKeywordReactionEvent\b/);
+  assert.match(source, /from "\.\/keyword-reaction-intake-queue\.js"/);
+  assert.match(source, /\benqueueKeywordReactionLocalInput\b/);
+  assert.doesNotMatch(source, /\benqueueKeywordReactionEvent\b/);
   assert.match(source, /\bdequeueKeywordReactionEvent\b/);
   assert.deepEqual(event, {
     text: KEYWORD_REACTION_DEMO_EVENT_TEXT,
