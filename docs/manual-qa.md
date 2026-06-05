@@ -82,6 +82,7 @@
 - `/overlay/keyword-reaction/?demo=1` を再読み込みまたは再実行しても旧timerが残らず、古いtoastが後から再表示されない。
 - `/overlay/keyword-reaction/?demo=1&debug=1` では、public-safe statusと固定人工toastだけが表示され、raw `c`、keyword実値、manual input text、fixture event data、secret-like値は表示されない。
 - event shape helper 導入後も、`demo=1` の表示文言は固定人工textのままで、event payload、eventId、displayText、manual input text、fixture event data は生成URLに含まれない。
+- local event intake helper導入後も、manual / fixture / demo のraw local input、event payload、transport payload、queue stateは生成URL、debug表示、画面には出ない。
 - validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。
