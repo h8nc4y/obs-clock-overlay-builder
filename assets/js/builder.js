@@ -23,6 +23,10 @@ import {
   getBuiltinKeywordReactionFixture,
   validateKeywordReactionFixture
 } from "./keyword-reaction-fixture.js";
+import {
+  dispatchKeywordReactionInternalEvent,
+  subscribeKeywordReactionInternalEvents
+} from "./keyword-reaction-internal-dispatch.js";
 import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
 
@@ -477,11 +481,30 @@ function testKeywordReactionPreview() {
     return;
   }
 
-  elements.keywordReactionToastText.textContent = manualText;
-  elements.keywordReactionToast.hidden = false;
-  elements.keywordReactionStatus.textContent = keywordUsedSafeFallback
-    ? `${KEYWORD_REACTION_FALLBACK_STATUS} ライブプレビュー内にtoastを表示しています。`
-    : "一致しました。ライブプレビュー内にtoastを表示しています。";
+  const dispatchTarget = createKeywordReactionManualPreviewTarget();
+  let previewEvent = null;
+  const unsubscribe = subscribeKeywordReactionInternalEvents(dispatchTarget, (event) => {
+    previewEvent = event;
+  });
+  const dispatchResult = dispatchKeywordReactionInternalEvent(dispatchTarget, {
+    sourceType: "manual",
+    eventId: "editor-manual-preview",
+    displayText: manualText,
+    keyword: config.keyword,
+    displayPattern: config.displayPattern,
+    reactionStyle: config.reactionStyle,
+    intensity: config.intensity
+  });
+  unsubscribe();
+
+  if (!dispatchResult.ok || !previewEvent) {
+    hideKeywordReactionToast();
+    elements.keywordReactionStatus.textContent =
+      "toast previewを表示できませんでした。ブラウザを更新してもう一度試してください。";
+    return;
+  }
+
+  showKeywordReactionManualPreviewEvent(previewEvent, keywordUsedSafeFallback);
 }
 
 function playKeywordReactionFixture() {
@@ -526,6 +549,15 @@ function showKeywordReactionFixtureEvent(event, index, total) {
   elements.keywordReactionFixtureStatus.textContent = `人工fixture ${index}/${total}: preview内にtoastを表示しています。`;
 }
 
+function showKeywordReactionManualPreviewEvent(event, keywordUsedSafeFallback) {
+  applyKeywordReactionToastConfig(event);
+  elements.keywordReactionToastText.textContent = event.displayText;
+  elements.keywordReactionToast.hidden = false;
+  elements.keywordReactionStatus.textContent = keywordUsedSafeFallback
+    ? `${KEYWORD_REACTION_FALLBACK_STATUS} ライブプレビュー内にtoastを表示しています。`
+    : "一致しました。ライブプレビュー内にtoastを表示しています。";
+}
+
 function stopKeywordReactionFixturePlayback(statusMessage = "") {
   if (keywordReactionFixtureTimers.length > 0) {
     for (const timerId of keywordReactionFixtureTimers) {
@@ -551,6 +583,11 @@ function applyKeywordReactionToastConfig(config) {
 function keywordReactionKeywordUsedSafeFallback(config) {
   const rawKeyword = elements.keywordReactionKeyword.value.trim();
   return config.keyword === DEFAULT_KEYWORD_REACTION_CONFIG.keyword && rawKeyword !== DEFAULT_KEYWORD_REACTION_CONFIG.keyword;
+}
+
+function createKeywordReactionManualPreviewTarget() {
+  const EventTargetConstructor = globalThis.EventTarget;
+  return typeof EventTargetConstructor === "function" ? new EventTargetConstructor() : null;
 }
 
 function hideKeywordReactionToast() {

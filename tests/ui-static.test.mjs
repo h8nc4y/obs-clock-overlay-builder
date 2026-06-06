@@ -221,6 +221,29 @@ test("editor keyword reaction preview uses normalized config as source of truth"
   assert.doesNotMatch(previewBody, /keywordReactionStatus\.textContent\s*=\s*elements\.keywordReactionKeyword/);
 });
 
+test("editor manual keyword reaction preview routes matched input through internal dispatch", () => {
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+  const previewBody =
+    builder.match(/function testKeywordReactionPreview\(\) \{(?<body>[\s\S]*?)\n\}\n\nfunction playKeywordReactionFixture/)?.groups
+      ?.body ?? "";
+
+  assert.match(builder, /from "\.\/keyword-reaction-internal-dispatch\.js"/);
+  assert.match(builder, /\bdispatchKeywordReactionInternalEvent\b/);
+  assert.match(builder, /\bsubscribeKeywordReactionInternalEvents\b/);
+  assert.match(builder, /\bcreateKeywordReactionManualPreviewTarget\b/);
+  assert.match(previewBody, /const dispatchTarget = createKeywordReactionManualPreviewTarget\(\);/);
+  assert.match(previewBody, /\bsubscribeKeywordReactionInternalEvents\(dispatchTarget,\s*\(event\) =>/);
+  assert.match(previewBody, /\bdispatchKeywordReactionInternalEvent\(dispatchTarget,\s*\{/);
+  assert.match(previewBody, /sourceType:\s*"manual"/);
+  assert.match(previewBody, /displayText:\s*manualText/);
+  assert.match(previewBody, /keyword:\s*config\.keyword/);
+  assert.match(previewBody, /reactionStyle:\s*config\.reactionStyle/);
+  assert.match(previewBody, /intensity:\s*config\.intensity/);
+  assert.match(previewBody, /\bunsubscribe\(\);/);
+  assert.doesNotMatch(previewBody, /keywordReactionToastText\.textContent\s*=\s*manualText/);
+  assert.doesNotMatch(previewBody, /postMessage|BroadcastChannel|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest/);
+});
+
 test("editor includes built-in artificial fixture playback controls", () => {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
