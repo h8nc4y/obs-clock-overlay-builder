@@ -316,6 +316,21 @@ test("keyword reaction transport primitives are absent before BroadcastChannel i
   );
 });
 
+test("OBS BroadcastChannel QA scope remains docs-only and synthetic-data-only", () => {
+  const qaScope = readFileSync(new URL("../docs/CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md", import.meta.url), "utf8");
+
+  assert.match(qaScope, /OBS Browser Source BroadcastChannel QA Scope/);
+  assert.match(qaScope, /`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、overlay本体fixture transport/);
+  assert.match(qaScope, /OBS操作/);
+  assert.match(qaScope, /availability \/ reload \/ lifecycle \/ multi-source behavior/);
+  assert.match(qaScope, /built-in artificial fixture event[\s\S]*fixed synthetic event/);
+  assert.match(qaScope, /generated URL は config-only/);
+  assert.match(qaScope, /fixture event data、event payload、queue state、transport payload を\s*URLへ入れない/);
+  assert.match(qaScope, /textContent/);
+  assert.doesNotMatch(qaScope, /実装済み/);
+  assert.doesNotMatch(qaScope, /real YouTube dataを使う|OAuth loginを行う|deployを行う/);
+});
+
 test("editor live preview reserves visual safe inset around clock widget", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";

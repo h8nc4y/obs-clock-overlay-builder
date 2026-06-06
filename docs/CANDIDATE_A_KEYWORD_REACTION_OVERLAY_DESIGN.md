@@ -25,6 +25,7 @@
 - Manual input dispatch scope decision: [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - Overlay fixture transport scope decision: [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - BroadcastChannel feasibility: [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
+- OBS BroadcastChannel QA scope: [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -109,7 +110,8 @@ Candidate A は次の順で小さく進める。
 21. Fixture linkage readiness helper + tests。
 22. Overlay fixture transport scope decision。
 23. BroadcastChannel feasibility docs/static QA。
-24. Overlay fixture transport readiness helper + tests、または BroadcastChannel design scope / static QA。
+24. OBS Browser Source BroadcastChannel QA scope docs。
+25. Overlay fixture transport readiness helper + tests、または BroadcastChannel design scope / static QA。
 25. Event source / fixture linkage only after transport boundary review。
 26. Ticker / badge。
 27. URL import/export refinement。
