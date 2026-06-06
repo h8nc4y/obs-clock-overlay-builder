@@ -19,6 +19,7 @@
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -138,6 +139,19 @@ fixture-specific transport decision でも次を維持する。
 - `localStorage` transport は初期非推奨。
 - external network transport は禁止。
 - paste JSON import と YouTube integration は後続。
+
+## Post-PR #69 BroadcastChannel Feasibility Handoff
+
+PR #69 で overlay本体fixture transport scope decision は merge 済みです。
+
+次段階は [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md) で扱う。`BroadcastChannel` は same-origin contexts 間 transport 候補だが、この段階では実装しない。
+
+feasibilityでは次を固定する。
+
+- WHATWG HTML Standard / MDN / OBS Browser Source KB で確認できた情報と未確認事項を分ける。
+- OBS Browser Source固有の `BroadcastChannel` support / lifetime / storage key / reload behavior は未確認として扱う。
+- runtime / helper modules に `BroadcastChannel` / `postMessage` / `localStorage` transport が混入していないことを static QA で確認する。
+- generated URL は config-only のまま、fixture event data、event payload、queue state、transport payload を入れない。
 
 ## URL Config
 
@@ -375,13 +389,14 @@ transportを実装するPRでは次をQA対象にする。
 12. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。
 13. built-in fixture linkage readiness helper + tests。PR #68で完了。
 14. overlay fixture transport scope decision。
-15. `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
-16. built-in fixture linkage from safe artificial fixture to overlay runtime only after transport boundary review。
-17. toast queue runtime for multiple public-safe sources。
-18. ticker / badge runtime。
-19. paste JSON import design and validation。
-20. import/export UI。
-21. YouTube integration design after boundary review and human approval。
+15. `BroadcastChannel` feasibility docs/static QA。
+16. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA。
+17. built-in fixture linkage from safe artificial fixture to overlay runtime only after transport boundary review。
+18. toast queue runtime for multiple public-safe sources。
+19. ticker / badge runtime。
+20. paste JSON import design and validation。
+21. import/export UI。
+22. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

@@ -13,6 +13,7 @@
 - [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
@@ -133,6 +134,17 @@ overlay本体 `/overlay/keyword-reaction/` は OBS Browser Source で別context�
 - no YouTube API / no OAuth / no API key / no real data。
 
 この文書では `BroadcastChannel` を実装しない。
+
+## BroadcastChannel Feasibility Handoff
+
+[CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md) では、WHATWG HTML Standard、MDN、OBS Browser Source KB を確認したうえで、`BroadcastChannel` を有力候補だがまだ未実装と判断する。
+
+feasibility後も維持する判断:
+
+- `BroadcastChannel` runtime はまだ実装しない。
+- OBS Browser Source固有の `BroadcastChannel` 対応、lifetime、storage key、reload / visibility挙動は未確認として扱う。
+- 次PR候補は overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA に限定する。
+- generated URL config-only、no raw fixture data、no secret-like value、no YouTube API / OAuth / API key / real data を維持する。
 
 ## postMessage Requirements Before Adoption
 
@@ -278,15 +290,16 @@ fixture playback / overlay rendering で timer を使う場合も、transportと
 後続PRへ分けるもの:
 
 1. overlay fixture transport scope decision。この文書。
-2. `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
-3. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-4. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-5. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
-6. paste JSON import design and validation。
-7. toast queue runtime for multiple public-safe sources。
-8. ticker / badge runtime。
-9. import/export UI。
-10. YouTube integration design after official docs review, data boundary review, and human approval。
+2. `BroadcastChannel` feasibility docs/static QA。
+3. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA。
+4. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+5. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+6. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
+7. paste JSON import design and validation。
+8. toast queue runtime for multiple public-safe sources。
+9. ticker / badge runtime。
+10. import/export UI。
+11. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

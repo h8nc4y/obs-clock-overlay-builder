@@ -24,6 +24,7 @@
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 
 ## Security Principles
 
@@ -430,6 +431,24 @@ fixture linkage readiness helper + tests の後続では、overlay本体fixture 
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 この phase は docs-only の判断であり、overlay本体fixture transport、`BroadcastChannel`、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
+
+### Phase 17: BroadcastChannel Feasibility
+
+overlay fixture transport scope decision の後続では、`BroadcastChannel` を最初の overlay fixture transport 候補にできるかを docs / static QA で整理する。
+
+この phase で確認すること:
+
+- WHATWG HTML Standard / MDN / OBS Browser Source KB で確認できた情報と未確認事項を分ける。
+- OBS Browser Source固有の `BroadcastChannel` support / lifetime / storage key / reload / visibility behavior は未確認として扱う。
+- `BroadcastChannel` は有力候補だが、まだ実装しない。
+- runtime / helper modules に `BroadcastChannel` / `postMessage` / `localStorage` transport が混入していないことを static QA で確認する。
+- channel名に user input、keyword実値、fixture id、event id、manual input text、secret-like value を混ぜない方針を維持する。
+- generated URL に fixture event data、event payload、queue state、transport payload、raw JSON、`displayText` arrays を入れない。
+- raw fixture data、manual input text、secret-like values を debug/status/DOM/console へ出さない。
+- text-not-HTML 方針を維持する。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs / static tests の判断であり、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

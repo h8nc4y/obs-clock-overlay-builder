@@ -24,6 +24,7 @@
 - Internal dispatch overlay runtime scope decision: [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - Manual input dispatch scope decision: [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - Overlay fixture transport scope decision: [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
+- BroadcastChannel feasibility: [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -107,11 +108,12 @@ Candidate A は次の順で小さく進める。
 20. Editor preview built-in fixture playback event path through same-window internal dispatch helper。
 21. Fixture linkage readiness helper + tests。
 22. Overlay fixture transport scope decision。
-23. BroadcastChannel feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
-24. Event source / fixture linkage only after transport boundary review。
-25. Ticker / badge。
-26. URL import/export refinement。
-27. YouTube integration design。
+23. BroadcastChannel feasibility docs/static QA。
+24. Overlay fixture transport readiness helper + tests、または BroadcastChannel design scope / static QA。
+25. Event source / fixture linkage only after transport boundary review。
+26. Ticker / badge。
+27. URL import/export refinement。
+28. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 

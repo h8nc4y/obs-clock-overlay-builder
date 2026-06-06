@@ -293,6 +293,29 @@ test("editor fixture playback keeps event data out of generated URLs and cleans 
   assert.match(fixtureHelper, /fixture event data/);
 });
 
+test("keyword reaction transport primitives are absent before BroadcastChannel implementation", () => {
+  const runtimeAndHelperSources = [
+    readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-event-intake.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-fixture-linkage.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
+  ].join("\n");
+
+  assert.doesNotMatch(
+    runtimeAndHelperSources,
+    /\bBroadcastChannel\b|\bpostMessage\s*\(|\blocalStorage\b|\bsessionStorage\b|\bindexedDB\b|\bfetch\s*\(|\bXMLHttpRequest\b|\bnavigator\.sendBeacon\b|\bWebSocket\b|\bEventSource\b/
+  );
+  assert.doesNotMatch(
+    runtimeAndHelperSources,
+    /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
+});
+
 test("editor live preview reserves visual safe inset around clock widget", () => {
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
