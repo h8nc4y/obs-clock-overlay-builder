@@ -26,6 +26,7 @@
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
 
 ## Security Principles
 
@@ -470,6 +471,25 @@ BroadcastChannel feasibility の後続では、OBS Browser Sourceでの availabi
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 この phase は docs-only の判断であり、OBS操作、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
+
+### Phase 19: OBS BroadcastChannel Human QA Packet
+
+OBS BroadcastChannel QA scope の後続では、人間テスターが OBS Browser Source で確認結果を貼り戻せる checklist / result template を docs-only で固定する。
+
+この phase で確認すること:
+
+- 人間テスターが OBS version、OS、Browser Source settings、URL type、page URL を記録する。
+- QAでは built-in artificial fixture / fixed synthetic event のみを使う。
+- secret、token、OAuth、API key、real viewer data、raw comment data、private account data は使わない。
+- generated URL config-only を確認し、fixture event data、event payload、queue state、transport payload をURLへ入れない。
+- raw channel payload、raw fixture data、manual input text、keyword実値、secret-like values を debug/status/DOM/console へ出さない。
+- pass / fail / blocked / not run を public-safe result template で記録する。
+- PASS は即実装承認ではなく、限定prototype scope decision の入力に留める。
+- no `BroadcastChannel` runtime / no `postMessage` / no `localStorage` transport / no overlay本体fixture transport。
+- no Cloudflare deploy / no OBS operation in Codex。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs-only の human QA handoff であり、OBS操作、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 
