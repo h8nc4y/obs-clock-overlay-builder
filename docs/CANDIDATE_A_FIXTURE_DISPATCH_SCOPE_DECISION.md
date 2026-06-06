@@ -259,25 +259,50 @@ fixture event text は untrusted text として扱う。
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 - validation が通る。
 
+## Fixture Linkage Readiness Follow-Up
+
+PR #66 で editor preview 内の built-in fixture playback event path は same-window internal dispatch helper 経由へ寄った。これにより、manual / fixture / `demo=1` の internal handoff は同じ normalized event boundary を共有できる状態になった。
+
+この状態は **overlay本体fixture linkage 実装の承認ではない**。次段階で fixture linkage を検討する場合も、まずは overlay本体へ送る transport を選ばず、次のどちらかに限定する。
+
+- fixture linkage readiness helper + tests。
+- docs / static tests consolidation。
+
+readiness helper を作る場合の目的は、built-in artificial fixture event を overlay本体へ送る前提条件だけを pure helper と tests で整理することです。transport selection、`postMessage`、`BroadcastChannel`、`localStorage` transport、paste JSON import、overlay runtime fixture transport、YouTube integration は含めない。
+
+readiness helper / docs consolidation で確認する境界:
+
+- built-in artificial fixture only のまま扱う。
+- fixture event data、event payload、internal dispatch payload、queue state、transport payload を generated URL へ入れない。
+- generated URL は config-only を維持する。
+- raw fixture data、manual input text、secret-like values を debug/status/DOM/console へ出さない。
+- 表示に進む場合も `textContent` など safe DOM API だけを使い、`innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler は使わない。
+- timer cleanup / stop / reset / replay の既存QA観点を維持する。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この追記は PR #65 の fixture dispatch scope を fixture linkage readiness へ拡張して読むための整理であり、新しい重複docsを作るものではない。
+
 ## Follow-Up Split
 
 後続PRへ分けるもの:
 
 1. fixture dispatch scope decision。この文書。
 2. editor preview built-in fixture playback event path through same-window internal dispatch helper。
-3. overlay本体 fixture transport design after transport boundary review。
-4. paste JSON import design and validation。
-5. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-6. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-7. toast queue runtime for multiple public-safe sources。
-8. ticker / badge runtime。
-9. import/export UI。
-10. YouTube integration design after official docs review, data boundary review, and human approval。
+3. fixture linkage readiness helper + tests、または docs / static tests consolidation。
+4. overlay本体 fixture transport design after transport boundary review。
+5. paste JSON import design and validation。
+6. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+7. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+8. toast queue runtime for multiple public-safe sources。
+9. ticker / badge runtime。
+10. import/export UI。
+11. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 
 - fixture preview の internal dispatch target を manual preview と共通にするか、fixture playback 専用に閉じるか。
 - fixture dispatch 後の subscription cleanup を eventごとに行うか、playback lifecycleへ集約するか。
 - fixture event の `eventId` を existing fixture id から維持するか、preview用に固定prefixを付けるか。
+- overlay本体への fixture transport を検討する前に、fixture linkage readiness helper + tests を挟むか、docs / static tests consolidation に留めるか。
 - overlay本体への fixture transport を検討する前に、paste JSON import のscopeを先に固定するか。
 - `postMessage` と `BroadcastChannel` のどちらを先に設計レビューするか。

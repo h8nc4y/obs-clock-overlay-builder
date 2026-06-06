@@ -48,6 +48,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Keep the next manual input dispatch implementation limited to editor preview internal handoff; keep overlay transport, fixture linkage, `postMessage`, `BroadcastChannel`, and `localStorage` transport out of that PR.
 - After manual input dispatch implementation, define built-in fixture dispatch scope before changing the editor preview fixture playback event path.
 - Keep the next fixture dispatch implementation limited to editor preview internal handoff; keep overlay fixture transport, paste JSON import, `postMessage`, `BroadcastChannel`, and `localStorage` transport out of that PR.
+- After fixture dispatch implementation, consider fixture linkage readiness helper + tests or docs / static tests consolidation before any overlay fixture transport.
 - Keep transport implementation, event source, built-in fixture linkage, toast queue runtime, ticker, badge, and real integration as separate follow-up PRs.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization only after feedback, fixture QA, or concrete matching cases justify it.
 
@@ -117,8 +118,9 @@ Near-term sequence:
 25. Consider an implementation PR that routes editor preview manual input through same-window internal dispatch helper; keep generated URLs config-only and keep overlay本体transport out.
 26. Define built-in fixture dispatch scope before changing the editor preview fixture playback event path.
 27. Consider an implementation PR that routes editor preview built-in fixture playback through same-window internal dispatch helper; keep generated URLs config-only and keep overlay本体fixture transport, paste JSON import, `postMessage`, `BroadcastChannel`, and `localStorage` transport out.
-28. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, first transport decision, internal dispatch runtime connection, manual input dispatch scope, and fixture dispatch scope are stable.
-27. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+28. Consider fixture linkage readiness helper + tests or docs / static tests consolidation after the editor preview fixture dispatch path is stable; keep overlay本体fixture transport, paste JSON import, `postMessage`, `BroadcastChannel`, and `localStorage` transport out.
+29. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, first transport decision, internal dispatch runtime connection, manual input dispatch scope, fixture dispatch scope, and fixture linkage readiness are stable.
+30. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 
