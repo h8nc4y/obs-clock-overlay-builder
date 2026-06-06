@@ -123,6 +123,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.match(overlayEventIntakeHelper, /normalizeKeywordReactionEvent/);
   assert.match(overlayRuntime, /from "\.\/keyword-reaction-intake-queue\.js"/);
   assert.match(overlayRuntime, /\benqueueKeywordReactionLocalInput\b/);
+  assert.match(overlayRuntime, /from "\.\/keyword-reaction-internal-dispatch\.js"/);
+  assert.match(overlayRuntime, /\bdispatchKeywordReactionInternalEvent\b/);
+  assert.match(overlayRuntime, /\bsubscribeKeywordReactionInternalEvents\b/);
+  assert.match(overlayRuntime, /new EventTargetConstructor\(\)/);
   assert.match(overlayRuntime, /from "\.\/keyword-reaction-queue\.js"/);
   assert.doesNotMatch(overlayRuntime, /\benqueueKeywordReactionEvent\b/);
   assert.match(overlayRuntime, /\bdequeueKeywordReactionEvent\b/);
@@ -137,7 +141,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.doesNotMatch(overlayHtml, /Keyword reaction overlay ready/);
   assert.doesNotMatch(overlayHtml, /キーワード反応デモ/);
   assert.doesNotMatch(overlayRuntime, /setInterval|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/);
-  assert.doesNotMatch(overlayRuntime, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
+  assert.doesNotMatch(
+    overlayRuntime,
+    /postMessage|BroadcastChannel|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
+  );
   assert.doesNotMatch(overlayRuntime, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
   assert.doesNotMatch(overlayEventHelper, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
   assert.doesNotMatch(overlayEventHelper, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
