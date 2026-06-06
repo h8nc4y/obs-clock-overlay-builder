@@ -265,13 +265,29 @@ test("editor includes built-in artificial fixture playback controls", () => {
 test("editor fixture playback keeps event data out of generated URLs and cleans timers", () => {
   const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
   const fixtureHelper = readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8");
+  const fixtureBody =
+    builder.match(/function showKeywordReactionFixtureEvent\(event, index, total\) \{(?<body>[\s\S]*?)\n\}\n\nfunction showKeywordReactionFixturePreviewEvent/)
+      ?.groups?.body ?? "";
+  const fixturePreviewBody =
+    builder.match(/function showKeywordReactionFixturePreviewEvent\(event, index, total\) \{(?<body>[\s\S]*?)\n\}\n\nfunction showKeywordReactionManualPreviewEvent/)
+      ?.groups?.body ?? "";
 
   assert.match(builder, /keywordReactionFixtureTimers/);
   assert.match(builder, /setTimeout/);
   assert.match(builder, /clearTimeout/);
   assert.match(builder, /function stopKeywordReactionFixturePlayback/);
   assert.match(builder, /function resetKeywordReactionFixturePlayback/);
-  assert.match(builder, /keywordReactionToastText\.textContent\s*=\s*event\.displayText/);
+  assert.match(builder, /\bcreateKeywordReactionFixturePreviewTarget\b/);
+  assert.match(builder, /\bshowKeywordReactionFixturePreviewEvent\b/);
+  assert.match(fixtureBody, /const dispatchTarget = createKeywordReactionFixturePreviewTarget\(\);/);
+  assert.match(fixtureBody, /\bsubscribeKeywordReactionInternalEvents\(dispatchTarget,\s*\(fixtureEvent\) =>/);
+  assert.match(fixtureBody, /\bdispatchKeywordReactionInternalEvent\(dispatchTarget,\s*\{/);
+  assert.match(fixtureBody, /sourceType:\s*"fixture"/);
+  assert.match(fixtureBody, /eventId:\s*event\.id/);
+  assert.match(fixtureBody, /displayText:\s*event\.displayText/);
+  assert.match(fixtureBody, /\bunsubscribe\(\);/);
+  assert.doesNotMatch(fixtureBody, /keywordReactionToastText\.textContent\s*=\s*event\.displayText/);
+  assert.match(fixturePreviewBody, /keywordReactionToastText\.textContent\s*=\s*event\.displayText/);
   assert.doesNotMatch(builder, /keywordReactionConfigToUrl\([^)]*fixture/);
   assert.doesNotMatch(builder, /keywordReactionGeneratedUrl\.value\s*=.*displayText/);
   assert.match(fixtureHelper, /fixture event data/);

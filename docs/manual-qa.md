@@ -35,6 +35,7 @@
 - `停止` と `リセット` で古いtimerが残らず、後からtoastが再表示されない。
 - fixture再生中または再生後も、`生成オーバーレイURL` はconfig-onlyのままで、`配信開始`、`888`、fixture event payload、raw JSON、manual input textを含まない。
 - manual input preview経路をinternal dispatch helperへ寄せた後も、`テスト表示` は同じ見た目でtoast表示され、manual input text、internal dispatch payload、event payload、queue stateは生成オーバーレイURLへ入らない。
+- built-in fixture preview経路をinternal dispatch helperへ寄せた後も、`人工fixtureを再生` は同じ見た目でtoast表示され、停止 / リセット後に古いtimerが残らず、fixture event data、internal dispatch payload、event payload、queue stateは生成オーバーレイURLへ入らない。
 - `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLはconfig-onlyで、通常idleでは無表示、`demo=1` を明示した時だけ固定の人工eventを表示する。
 - 390px前後、768px前後、1280px以上で、toast preview、設定欄、生成URL欄に横スクロールが出ない。
 - Browser Console error/warning がなく、外部network request が発生しない。
