@@ -10,6 +10,8 @@
 
 - [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md)
+- [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -34,6 +36,26 @@ PR #70 で `BroadcastChannel` は overlay本体fixture transport の有力候補
 この文書は「何を確認するか」を固定する scope record であり、[CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md) は人間が OBS Browser Source で実施して結果を貼り戻すための checklist / result template である。
 
 人間QA packet は OBS QA 実施済み evidence ではない。Codex は OBS を起動・操作しない。packet の PASS は即実装承認ではなく、限定prototype scope decision へ進むための入力に留める。
+
+## Human QA Result
+
+[CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md) で、人間OBS Browser Source QA は public-safe に PASS と記録された。
+
+確認された範囲:
+
+- OBS 32.1.2 / Windows / local server `http://127.0.0.1:8789`。
+- `BroadcastChannel` availability。
+- single receiver delivery。
+- sender remove / restore。
+- receiver recreate。
+- two receiver same-channel。
+- different-channel isolation。
+- scene switch。
+- duplicate delivery なし。
+- stale listener なし。
+- secret / token / OAuth / API key / real data 未使用。
+
+このPASSはruntime実装完了を意味しない。`BroadcastChannel` runtime、overlay本体fixture transport、`postMessage`、`localStorage` transport は未実装のまま。次は [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md) の範囲に限定する。
 
 ## Why This Is Not Implementation
 
@@ -252,17 +274,17 @@ fail時の最小手順:
 
 1. OBS BroadcastChannel QA scope。この文書。
 2. OBS BroadcastChannel human QA packet。
-3. OBS Browser Source human QA result docs、または local browser prototype scope decision。
-4. `BroadcastChannel` design / prototype only after OBS QA result is recorded。
-5. overlay本体fixture transport implementation only after transport candidate and QA pass criteria are fixed。
-6. `postMessage` feasibility if `BroadcastChannel` fails or remains ambiguous。
-7. paste JSON import design and validation。
-8. YouTube integration design after official docs review, data boundary review, and human approval。
+3. OBS Browser Source human QA result docs。
+4. limited BroadcastChannel prototype scope decision。
+5. `BroadcastChannel` prototype only after scope decision is fixed。
+6. overlay本体fixture transport implementation only after prototype result, transport candidate, and QA pass criteria are fixed。
+7. `postMessage` feasibility if `BroadcastChannel` fails or remains ambiguous。
+8. paste JSON import design and validation。
+9. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 
-- OBS Browser Source と通常ブラウザtabが同じ origin / storage key として扱われるか。
-- scene visibility / source shutdown時に channel close が必ず呼べるか。
+- production URL 上でも同じ結果になるか。
+- limited prototype で channel cleanup / duplicate suppression をどう固定するか。
 - 複数Browser Sourceへ同じ fixture event を同報してよいか。
 - channel name に public-safe routing key が必要か。
-- local browser prototype を先に作るか、人間OBS QA結果docsを先に作るか。
