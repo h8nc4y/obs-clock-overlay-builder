@@ -10,6 +10,7 @@
 
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
@@ -56,9 +57,10 @@
 このため、次の実装PRへは進まない。次PR候補は次のどちらかに限定する。
 
 1. OBS Browser Source `BroadcastChannel` QA scope docs。
-2. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA の追加整理。
+2. OBS BroadcastChannel human QA packet。
+3. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA の追加整理。
 
-`BroadcastChannel` runtime prototype は、OBS Browser Source manual QA plan と static safety checks が揃った後に別PRで判断する。
+`BroadcastChannel` runtime prototype は、OBS Browser Source manual QA plan、human result packet、static safety checks が揃った後に別PRで判断する。OBS実測は人間QA結果がdocsへ記録されるまで未確認のまま扱う。
 
 ## Candidate Position
 
@@ -255,14 +257,15 @@ URLは OBS Browser Source 再現用 config の source of truth であり、event
 
 1. BroadcastChannel feasibility docs/static QA。この文書。
 2. OBS BroadcastChannel QA scope docs。
-3. overlay fixture transport readiness helper + tests、または BroadcastChannel design scope。
-4. BroadcastChannel prototype only after OBS Browser Source QA plan is fixed。
-5. postMessage design only after window relationship / origin / source QA is fixed。
-6. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
-7. paste JSON import design and validation。
-8. toast queue runtime for multiple public-safe sources。
-9. ticker / badge runtime。
-10. YouTube integration design after official docs review, data boundary review, and human approval。
+3. OBS BroadcastChannel human QA packet。
+4. overlay fixture transport readiness helper + tests、または BroadcastChannel design scope。
+5. BroadcastChannel prototype only after OBS Browser Source QA plan and human QA result are fixed。
+6. postMessage design only after window relationship / origin / source QA is fixed。
+7. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
+8. paste JSON import design and validation。
+9. toast queue runtime for multiple public-safe sources。
+10. ticker / badge runtime。
+11. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

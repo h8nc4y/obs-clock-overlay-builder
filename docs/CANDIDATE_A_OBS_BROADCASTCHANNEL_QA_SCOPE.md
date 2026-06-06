@@ -9,6 +9,7 @@
 関連:
 
 - [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -27,6 +28,12 @@ PR #70 で `BroadcastChannel` は overlay本体fixture transport の有力候補
 - generated URL config-only 境界を維持する。
 - fixture event data、event payload、queue state、transport payload を URLへ入れない方針を維持する。
 - synthetic fixture / demo event のみでQAし、real YouTube data、real viewer data、raw comment data を扱わない。
+
+## Human QA Packet Handoff
+
+この文書は「何を確認するか」を固定する scope record であり、[CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md) は人間が OBS Browser Source で実施して結果を貼り戻すための checklist / result template である。
+
+人間QA packet は OBS QA 実施済み evidence ではない。Codex は OBS を起動・操作しない。packet の PASS は即実装承認ではなく、限定prototype scope decision へ進むための入力に留める。
 
 ## Why This Is Not Implementation
 
@@ -244,12 +251,13 @@ fail時の最小手順:
 後続PRへ分けるもの:
 
 1. OBS BroadcastChannel QA scope。この文書。
-2. OBS Browser Source human QA result docs、または local browser prototype scope decision。
-3. `BroadcastChannel` design / prototype only after OBS QA result is recorded。
-4. overlay本体fixture transport implementation only after transport candidate and QA pass criteria are fixed。
-5. `postMessage` feasibility if `BroadcastChannel` fails or remains ambiguous。
-6. paste JSON import design and validation。
-7. YouTube integration design after official docs review, data boundary review, and human approval。
+2. OBS BroadcastChannel human QA packet。
+3. OBS Browser Source human QA result docs、または local browser prototype scope decision。
+4. `BroadcastChannel` design / prototype only after OBS QA result is recorded。
+5. overlay本体fixture transport implementation only after transport candidate and QA pass criteria are fixed。
+6. `postMessage` feasibility if `BroadcastChannel` fails or remains ambiguous。
+7. paste JSON import design and validation。
+8. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

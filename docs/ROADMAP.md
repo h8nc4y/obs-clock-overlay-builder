@@ -22,6 +22,7 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 - Keep overlay fixture transport scope explicit before choosing `BroadcastChannel`, `postMessage`, URL event transport, or `localStorage` transport for fixture delivery.
 - Keep `BroadcastChannel` feasibility as docs/static QA before any `BroadcastChannel` runtime or overlay本体fixture transport implementation.
 - Keep OBS Browser Source `BroadcastChannel` QA scope explicit before any `BroadcastChannel` runtime, OBS operation, or overlay本体fixture transport implementation.
+- Keep an OBS BroadcastChannel human QA packet available before asking a human tester to record OBS Browser Source availability, lifecycle, and multi-source results.
 
 ## Medium Term
 
@@ -93,6 +94,7 @@ Current planning docs:
 - [Candidate A overlay fixture transport scope decision](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [Candidate A BroadcastChannel feasibility](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - [Candidate A OBS BroadcastChannel QA scope](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
+- [Candidate A OBS BroadcastChannel human QA packet](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -133,8 +135,9 @@ Near-term sequence:
 29. Define overlay fixture transport scope before choosing `BroadcastChannel`, `postMessage`, URL event transport, or `localStorage` transport for overlay本体fixture delivery.
 30. Assess `BroadcastChannel` feasibility with docs/static QA before any `BroadcastChannel` runtime or overlay本体fixture transport implementation.
 31. Define OBS Browser Source `BroadcastChannel` QA scope before any `BroadcastChannel` runtime, OBS operation, or overlay本体fixture transport implementation.
-32. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, first transport decision, internal dispatch runtime connection, manual input dispatch scope, fixture dispatch scope, fixture linkage readiness, overlay fixture transport scope, BroadcastChannel feasibility, and OBS BroadcastChannel QA scope are stable.
-32. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+32. Add an OBS BroadcastChannel human QA packet before collecting human OBS Browser Source results.
+33. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, first transport decision, internal dispatch runtime connection, manual input dispatch scope, fixture dispatch scope, fixture linkage readiness, overlay fixture transport scope, BroadcastChannel feasibility, OBS BroadcastChannel QA scope, and OBS BroadcastChannel human QA packet are stable.
+34. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 
