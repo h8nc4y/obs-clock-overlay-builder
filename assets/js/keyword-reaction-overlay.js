@@ -8,6 +8,10 @@ import {
   buildDemoKeywordReactionEvent as buildNormalizedDemoKeywordReactionEvent
 } from "./keyword-reaction-event.js";
 import { enqueueKeywordReactionLocalInput } from "./keyword-reaction-intake-queue.js";
+import {
+  dispatchKeywordReactionInternalEvent,
+  subscribeKeywordReactionInternalEvents
+} from "./keyword-reaction-internal-dispatch.js";
 import { dequeueKeywordReactionEvent } from "./keyword-reaction-queue.js";
 
 const DEBUG_STATUS_ELEMENT_ID = "keywordReactionOverlayStatus";
@@ -54,7 +58,7 @@ export function buildKeywordReactionDebugStatus(state) {
   ];
 }
 
-export function buildKeywordReactionDemoEvent(state) {
+export function buildKeywordReactionDemoEvent(state, options = {}) {
   if (!state?.demo) {
     return null;
   }
@@ -63,18 +67,40 @@ export function buildKeywordReactionDemoEvent(state) {
     reactionStyle: state.reactionStyle,
     intensity: state.intensity
   });
-  const queue = enqueueKeywordReactionLocalInput([], demoEvent);
-  const { event } = dequeueKeywordReactionEvent(queue);
-  if (!event) {
+  const dispatchTarget = options.internalDispatchTarget ?? createKeywordReactionOverlayInternalDispatchTarget(options);
+  let renderedEvent = null;
+  const unsubscribe = subscribeKeywordReactionInternalEvents(dispatchTarget, (event) => {
+    renderedEvent = buildKeywordReactionRenderableDemoEvent(event);
+  });
+  try {
+    dispatchKeywordReactionInternalEvent(dispatchTarget, demoEvent, options.dispatchOptions ?? {});
+  } finally {
+    unsubscribe();
+  }
+  return renderedEvent;
+}
+
+function buildKeywordReactionRenderableDemoEvent(event) {
+  const queue = enqueueKeywordReactionLocalInput([], event);
+  const { event: queuedEvent } = dequeueKeywordReactionEvent(queue);
+  if (!queuedEvent) {
     return null;
   }
   return {
-    text: event.displayText,
-    displayPattern: event.displayPattern,
-    reactionStyle: event.reactionStyle,
-    intensity: normalizeDemoIntensity(event.intensity),
-    durationMs: event.durationMs
+    text: queuedEvent.displayText,
+    displayPattern: queuedEvent.displayPattern,
+    reactionStyle: queuedEvent.reactionStyle,
+    intensity: normalizeDemoIntensity(queuedEvent.intensity),
+    durationMs: queuedEvent.durationMs
   };
+}
+
+function createKeywordReactionOverlayInternalDispatchTarget(options = {}) {
+  const EventTargetConstructor = options.EventTargetConstructor ?? globalThis.EventTarget;
+  if (typeof EventTargetConstructor !== "function") {
+    return null;
+  }
+  return new EventTargetConstructor();
 }
 
 export function renderKeywordReactionDemoEvent(element, event) {

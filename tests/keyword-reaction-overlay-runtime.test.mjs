@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import * as overlayRuntime from "../assets/js/keyword-reaction-overlay.js";
 import { encodeKeywordReactionConfig } from "../assets/js/keyword-reaction-config.js";
+import { KEYWORD_REACTION_INTERNAL_EVENT_NAME } from "../assets/js/keyword-reaction-internal-dispatch.js";
 
 const {
   KEYWORD_REACTION_DEMO_EVENT_TEXT,
@@ -94,6 +95,35 @@ test("keyword reaction overlay routes demo events through local intake queue hel
     intensity: 3,
     durationMs: 2400
   });
+  assert.equal(Object.hasOwn(event, "queue"), false);
+  assert.equal(Object.hasOwn(event, "eventPayload"), false);
+  assert.equal(Object.hasOwn(event, "eventId"), false);
+  assert.equal(Object.hasOwn(event, "displayText"), false);
+  assert.doesNotMatch(eventText, /secret meeting topic/);
+  assert.doesNotMatch(eventText, new RegExp(encoded));
+});
+
+test("keyword reaction overlay routes demo events through same-window internal dispatch with cleanup", () => {
+  const target = createRecordingEventTarget();
+  const encoded = encodeKeywordReactionConfig(
+    { keyword: "secret meeting topic", displayPattern: "toast", reactionStyle: "soft", intensity: 2 },
+    { compact: true }
+  );
+  const state = getKeywordReactionOverlayRuntimeState(new URLSearchParams(`c=${encoded}&demo=1`));
+  const event = buildKeywordReactionDemoEvent(state, { internalDispatchTarget: target });
+  const eventText = JSON.stringify(event);
+
+  assert.deepEqual(event, {
+    text: KEYWORD_REACTION_DEMO_EVENT_TEXT,
+    displayPattern: "toast",
+    reactionStyle: "soft",
+    intensity: 2,
+    durationMs: 2400
+  });
+  assert.equal(target.addCount, 1);
+  assert.equal(target.removeCount, 1);
+  assert.deepEqual(target.dispatchedTypes, [KEYWORD_REACTION_INTERNAL_EVENT_NAME]);
+  assert.equal(target.listenerCount(KEYWORD_REACTION_INTERNAL_EVENT_NAME), 0);
   assert.equal(Object.hasOwn(event, "queue"), false);
   assert.equal(Object.hasOwn(event, "eventPayload"), false);
   assert.equal(Object.hasOwn(event, "eventId"), false);
@@ -277,6 +307,35 @@ function createFakeElement() {
     },
     removeAttribute(name) {
       this.attributes.delete(name);
+    }
+  };
+}
+
+function createRecordingEventTarget() {
+  const listeners = new Map();
+  return {
+    addCount: 0,
+    removeCount: 0,
+    dispatchedTypes: [],
+    addEventListener(type, listener) {
+      this.addCount += 1;
+      const typeListeners = listeners.get(type) ?? new Set();
+      typeListeners.add(listener);
+      listeners.set(type, typeListeners);
+    },
+    removeEventListener(type, listener) {
+      this.removeCount += 1;
+      listeners.get(type)?.delete(listener);
+    },
+    dispatchEvent(event) {
+      this.dispatchedTypes.push(event.type);
+      for (const listener of listeners.get(event.type) ?? []) {
+        listener(event);
+      }
+      return true;
+    },
+    listenerCount(type) {
+      return listeners.get(type)?.size ?? 0;
     }
   };
 }
