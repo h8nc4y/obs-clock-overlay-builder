@@ -543,6 +543,34 @@ function playKeywordReactionFixture() {
 }
 
 function showKeywordReactionFixtureEvent(event, index, total) {
+  const dispatchTarget = createKeywordReactionFixturePreviewTarget();
+  let previewEvent = null;
+  const unsubscribe = subscribeKeywordReactionInternalEvents(dispatchTarget, (fixtureEvent) => {
+    previewEvent = fixtureEvent;
+  });
+  const dispatchResult = dispatchKeywordReactionInternalEvent(dispatchTarget, {
+    sourceType: "fixture",
+    eventId: event.id,
+    displayText: event.displayText,
+    keyword: event.keyword,
+    displayPattern: "toast",
+    reactionStyle: event.reactionStyle,
+    intensity: event.intensity,
+    offsetMs: event.offsetMs
+  });
+  unsubscribe();
+
+  if (!dispatchResult.ok || !previewEvent) {
+    hideKeywordReactionToast();
+    elements.keywordReactionFixtureStatus.textContent =
+      "fixture previewを表示できませんでした。ブラウザを更新してもう一度試してください。";
+    return;
+  }
+
+  showKeywordReactionFixturePreviewEvent(previewEvent, index, total);
+}
+
+function showKeywordReactionFixturePreviewEvent(event, index, total) {
   applyKeywordReactionToastConfig(event);
   elements.keywordReactionToastText.textContent = event.displayText;
   elements.keywordReactionToast.hidden = false;
@@ -586,6 +614,11 @@ function keywordReactionKeywordUsedSafeFallback(config) {
 }
 
 function createKeywordReactionManualPreviewTarget() {
+  const EventTargetConstructor = globalThis.EventTarget;
+  return typeof EventTargetConstructor === "function" ? new EventTargetConstructor() : null;
+}
+
+function createKeywordReactionFixturePreviewTarget() {
   const EventTargetConstructor = globalThis.EventTarget;
   return typeof EventTargetConstructor === "function" ? new EventTargetConstructor() : null;
 }
