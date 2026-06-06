@@ -21,6 +21,7 @@
 - Local intake queue connection scope decision: [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - Local intake overlay runtime scope decision: [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - First transport decision: [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
+- Internal dispatch overlay runtime scope decision: [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -97,10 +98,11 @@ Candidate A は次の順で小さく進める。
 13. Local intake to overlay runtime connection for `demo=1` only。
 14. First transport decision。
 15. Same-window internal dispatch helper + tests。
-16. Event source / fixture linkage。
-17. Ticker / badge。
-18. URL import/export refinement。
-19. YouTube integration design。
+16. Internal dispatch overlay runtime connection for `demo=1` only。
+17. Event source / fixture linkage。
+18. Ticker / badge。
+19. URL import/export refinement。
+20. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -389,6 +391,25 @@ local intake to overlay runtime connection の後続では、最初の transport
 - YouTube integrationは別boundary reviewと人間承認後。
 
 詳細は [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md) に分ける。transport実装、event source、fixture linkage、YouTube integrationはまだ後続です。
+
+## Next Planning PR: Internal Dispatch Overlay Runtime Connection
+
+same-window internal dispatch helper + tests の後続では、overlay runtime の `demo=1` 経路だけを internal dispatch helper 経由へ寄せる範囲を docs-only で固定する。
+
+このdocs-only方針で固定するもの:
+
+- 次の実装PRは `demo=1` fixed synthetic event の internal dispatch -> overlay runtime connection に限定する。
+- same-window internal dispatch は transportではない。
+- `EventTarget` は overlay runtime 内に閉じる。
+- dispatch detail は normalized event のみ。
+- 既存の local intake -> queue -> toast display path を維持する。
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- generated URL へ internal dispatch payload、event payload、queue state、manual input text、fixture event data、raw JSON、`displayText` arrays を入れない。
+- subscribe cleanup と timer cleanup を runtime lifecycle で確認する。
+- `postMessage`、`BroadcastChannel`、`localStorage` transport、editor UI connection、manual input runtime connection、fixture linkage、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 
