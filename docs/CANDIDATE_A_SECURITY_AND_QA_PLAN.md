@@ -27,6 +27,8 @@
 - [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md)
+- [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -490,6 +492,45 @@ OBS BroadcastChannel QA scope の後続では、人間テスターが OBS Browse
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 この phase は docs-only の human QA handoff であり、OBS操作、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
+
+### Phase 20: OBS BroadcastChannel Human QA Result
+
+OBS BroadcastChannel human QA packet の後続では、人間OBS Browser Source QAの public-safe PASS結果をdocsへ記録する。
+
+この phase で確認すること:
+
+- OBS 32.1.2 / Windows / local server のQA結果として記録する。
+- `BroadcastChannel` availability、single receiver、sender remove / restore、receiver recreate、two receiver same-channel、different-channel isolation、scene switch がPASSしたことを記録する。
+- duplicate delivery なし、stale listener なしを記録する。
+- secret、token、OAuth、API key、real viewer data、raw comment data、private account data は未使用として記録する。
+- PASSは即実装承認ではなく、limited BroadcastChannel prototype scope decision の入力に留める。
+- generated URL に fixture event data、event payload、queue state、transport payload、raw JSON、`displayText` arrays を入れない。
+- raw channel payload、raw fixture data、manual input text、keyword実値、secret-like values を debug/status/DOM/console へ出さない。
+- no `BroadcastChannel` runtime / no `postMessage` / no `localStorage` transport / no overlay本体fixture transport。
+- no Cloudflare deploy / no OBS operation in Codex。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs-only の result record であり、OBS操作、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
+
+### Phase 21: Limited BroadcastChannel Prototype Scope Decision
+
+OBS BroadcastChannel human QA PASS の後続では、production transportではなく limited prototype の範囲をdocs-onlyで固定する。
+
+この phase で確認すること:
+
+- 次実装候補は limited BroadcastChannel prototype に限定する。
+- prototype は synthetic fixture/demo candidate のみを扱う。
+- fixed public-safe channel name から始め、user input、keyword実値、fixture id、event id、manual input text、secret-like value を channel名へ混ぜない。
+- payload は normalized event または local intake input candidate へ寄せる。
+- generated URL は config-only を維持する。
+- fixture event data、event payload、queue state、transport payload をURLへ入れない。
+- raw payload、raw fixture data、manual input text、keyword実値、secret-like values を debug/status/DOM/consoleへ出さない。
+- setup / cleanup、`BroadcastChannel.close()`、duplicate delivery、stale listener suppression をfuture prototype QA対象にする。
+- no `postMessage` / no `localStorage` transport / no external network。
+- no overlay本体fixture transport。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs-only の scope decision であり、limited prototype、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

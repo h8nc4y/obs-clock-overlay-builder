@@ -11,6 +11,8 @@
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md)
+- [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
@@ -44,7 +46,7 @@
 
 ## Feasibility Judgment
 
-判断: **`BroadcastChannel` は overlay本体fixture transport の有力候補だが、まだ実装しない**。
+判断: **`BroadcastChannel` は overlay本体fixture transport の有力候補で、OBS Browser Source human QA はPASSしたが、まだruntime transportは実装しない**。
 
 理由:
 
@@ -54,13 +56,18 @@
 - ただし、OBS Browser Source固有の lifetime、storage key、reload、visibility/shutdown 挙動は未確認。
 - channel名とpayload設計を誤ると、fixture event data、secret-like値、raw transport payload が URL / debug / console / storage 相当に漏れるリスクがある。
 
-このため、次の実装PRへは進まない。次PR候補は次のどちらかに限定する。
+このため、いきなり overlay本体fixture transport 実装PRへは進まない。次PR候補は limited BroadcastChannel prototype scope decision / limited prototype に限定する。
 
-1. OBS Browser Source `BroadcastChannel` QA scope docs。
-2. OBS BroadcastChannel human QA packet。
-3. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA の追加整理。
+人間OBS QAで public-safe に確認済み:
 
-`BroadcastChannel` runtime prototype は、OBS Browser Source manual QA plan、human result packet、static safety checks が揃った後に別PRで判断する。OBS実測は人間QA結果がdocsへ記録されるまで未確認のまま扱う。
+- OBS 32.1.2 / Windows / local server。
+- availability PASS。
+- single receiver、sender remove / restore、receiver recreate、two receiver same-channel、different-channel isolation、scene switch がPASS。
+- duplicate delivery なし。
+- stale listener なし。
+- secret / token / OAuth / API key / real data 未使用。
+
+`BroadcastChannel` runtime prototype は、[CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md) の範囲で判断する。PASSは即実装承認ではなく、prototype scope decision への入力に留める。
 
 ## Candidate Position
 
@@ -258,19 +265,21 @@ URLは OBS Browser Source 再現用 config の source of truth であり、event
 1. BroadcastChannel feasibility docs/static QA。この文書。
 2. OBS BroadcastChannel QA scope docs。
 3. OBS BroadcastChannel human QA packet。
-4. overlay fixture transport readiness helper + tests、または BroadcastChannel design scope。
-5. BroadcastChannel prototype only after OBS Browser Source QA plan and human QA result are fixed。
-6. postMessage design only after window relationship / origin / source QA is fixed。
-7. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
-8. paste JSON import design and validation。
-9. toast queue runtime for multiple public-safe sources。
-10. ticker / badge runtime。
-11. YouTube integration design after official docs review, data boundary review, and human approval。
+4. OBS BroadcastChannel human QA result docs。
+5. limited BroadcastChannel prototype scope decision。
+6. BroadcastChannel limited prototype only after scope decision is fixed。
+7. postMessage design only after window relationship / origin / source QA is fixed。
+8. overlay本体fixture transport implementation only after prototype result, transport candidate, and QA are fixed。
+9. paste JSON import design and validation。
+10. toast queue runtime for multiple public-safe sources。
+11. ticker / badge runtime。
+12. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 
 - `BroadcastChannel` channel name に public-safe routing key が必要か。
 - 複数overlayを同時に開いた場合、全overlayへ同じfixture eventを表示してよいか。
 - fixture payload は normalized event と local intake input candidate のどちらで transport boundary に渡すか。
-- OBS Browser Source の source visibility / refresh setting で channel close と stale event suppression をどう確認するか。
-- `BroadcastChannel` prototype の前に postMessage feasibility も並行して比較するか。
+- limited prototype の payload を normalized event と local intake input candidate のどちらに寄せるか。
+- production URL上での追加QAを limited prototype 前後のどちらに置くか。
+- `BroadcastChannel` prototype が失敗した場合に postMessage feasibility を並行比較するか。
