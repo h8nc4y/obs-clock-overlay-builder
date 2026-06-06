@@ -20,6 +20,7 @@
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
+- [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -333,6 +334,32 @@ local intake to overlay runtime connection の後続では、transport実装へ�
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 この phase は docs-only の判断であり、transport、event source、fixture linkage、overlay runtime追加実装を実装済みにしない。
+
+### Phase 13: Internal Dispatch Overlay Runtime Connection
+
+same-window internal dispatch helper + tests の後続では、overlay runtime の `demo=1` 経路だけを internal dispatch helper 経由へ寄せる。
+
+この phase で確認すること:
+
+- `demo=1` fixed synthetic event だけを same-window internal dispatch helper で dispatch する。
+- `EventTarget` は overlay runtime 内に閉じる。
+- subscribe listener は normalized event だけを受け取る。
+- 既存の local intake -> queue -> toast display path を維持する。
+- manual input event、fixture event、external event は runtime connection しない。
+- transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、external network は実装しない。
+- generated URL に internal dispatch payload、event payload、queue state、manual input text、fixture event data、transport payload、raw JSON、`displayText` arrays を入れない。
+- debug/status に raw `c`、keyword実値、manual input text、fixture event data、queue state、internal dispatch payload、secret-like value を出さない。
+- 通常 idle は transparent / no visible text のまま。
+- `debug=1` は public-safe status のみ。
+- `demo=1` は public-safe fixed synthetic event のみ。
+- subscription cleanup と timer cleanup を repeated mount / rerun で確認する。
+- event `displayText` は `textContent` など safe DOM API で表示する。
+- `innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
+
+この phase は `demo=1` の internal handoff 確認であり、manual / fixture runtime connection、transport、fixture linkage、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 
