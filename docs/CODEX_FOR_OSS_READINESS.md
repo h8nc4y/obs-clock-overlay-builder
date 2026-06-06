@@ -22,9 +22,9 @@ Facts confirmed from the public repository and local `master`:
 - Forks at inspection time: 0
 - `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
-- Recent merged PR evidence includes PR #19 through PR #64.
-- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs including manual input + toast scope, matching normalization policy, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape decision, queue / transport scope decision, overlay queue connection scope decision, transport scope decision, local intake connection decisions, first transport decision, internal dispatch overlay runtime scope decision, manual input dispatch scope decision, fixture dispatch scope decision, and production demo are present.
-- Local intake connection decisions, first transport decision, internal dispatch overlay runtime scope decision, manual input dispatch scope decision, and fixture dispatch scope decision docs are implementation planning evidence only; they are not adoption evidence.
+- Recent merged PR evidence includes PR #19 through PR #68.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs including manual input + toast scope, matching normalization policy, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape decision, queue / transport scope decision, overlay queue connection scope decision, transport scope decision, local intake connection decisions, first transport decision, internal dispatch overlay runtime scope decision, manual input dispatch scope decision, fixture dispatch scope decision, overlay fixture transport scope decision, and production demo are present.
+- Local intake connection decisions, first transport decision, internal dispatch overlay runtime scope decision, manual input dispatch scope decision, fixture dispatch scope decision, and overlay fixture transport scope decision docs are implementation planning evidence only; they are not adoption evidence.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -41,7 +41,7 @@ The project is public and maintained, but public traction is still early. Do not
 | Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
 | Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
 | Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
-| Future product direction | Partial | Public roadmap, YouTube Live overlay suite planning docs, and Candidate A design/scope docs describe a candidate headline direction. Matching normalization, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape docs, queue / transport scope docs, overlay queue connection scope docs, transport scope decision docs, local intake docs, first transport decision docs, internal dispatch docs, manual input dispatch scope docs, and fixture dispatch scope docs are implementation planning evidence, not user adoption evidence. |
+| Future product direction | Partial | Public roadmap, YouTube Live overlay suite planning docs, and Candidate A design/scope docs describe a candidate headline direction. Matching normalization, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape docs, queue / transport scope docs, overlay queue connection scope docs, transport scope decision docs, local intake docs, first transport decision docs, internal dispatch docs, manual input dispatch scope docs, fixture dispatch scope docs, and overlay fixture transport scope docs are implementation planning evidence, not user adoption evidence. |
 
 ## Strengths
 
@@ -71,6 +71,7 @@ The project is public and maintained, but public traction is still early. Do not
 - Candidate A internal dispatch overlay runtime scope decision records how the next small implementation should use same-window internal dispatch helper for `demo=1` only before editor UI connection, manual event sending, fixture linkage, transport, or YouTube integration. This is implementation planning evidence, not transport implementation or adoption evidence.
 - Candidate A manual input dispatch scope decision records how the next small implementation should keep manual input dispatch inside editor preview and avoid overlay本体transport, `postMessage`, `BroadcastChannel`, `localStorage` transport, fixture linkage, or YouTube integration. This is implementation planning evidence, not adoption evidence.
 - Candidate A fixture dispatch scope decision records how the next small implementation should keep built-in fixture dispatch inside editor preview and avoid overlay本体fixture transport, paste JSON import, `postMessage`, `BroadcastChannel`, `localStorage` transport, fixture linkage, or YouTube integration. This is implementation planning evidence, not adoption evidence.
+- Candidate A overlay fixture transport scope decision records why overlay本体fixture transport remains unimplemented while BroadcastChannel / `postMessage` readiness requirements are clarified. This is implementation planning evidence, not transport implementation or adoption evidence.
 - Cloudflare cost and deploy boundaries are documented.
 
 ## Weaknesses
@@ -109,6 +110,7 @@ Prioritize evidence that can be linked from a public application without exposin
 - Planning evidence that fixes internal dispatch to overlay runtime connection before changing the overlay runtime demo path, while clearly separating it from adoption evidence.
 - Planning evidence that fixes manual input dispatch scope before changing the editor preview manual input event path, while clearly separating it from adoption evidence.
 - Planning evidence that fixes built-in fixture dispatch scope before changing the editor preview fixture playback event path, while clearly separating it from adoption evidence.
+- Planning evidence that fixes overlay fixture transport scope before choosing `BroadcastChannel`, `postMessage`, URL event transport, or `localStorage` transport, while clearly separating it from implementation and adoption evidence.
 - Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.

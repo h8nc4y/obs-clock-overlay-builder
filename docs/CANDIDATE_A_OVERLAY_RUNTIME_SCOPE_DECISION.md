@@ -20,6 +20,7 @@
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -323,12 +324,14 @@ invalid `c` は safe default へ fallback する。fallback時も入力実値や
 8. first transport decision, scoped by [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)。
 9. same-window internal dispatch helper + tests。
 10. internal dispatch overlay runtime connection, scoped by [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)。
-11. built-in fixture linkage from safe artificial fixture to overlay runtime。
-12. paste JSON import design and validation。
-13. ticker / badge runtime。
-14. import/export UI。
-15. same-origin local event channel design。
-16. YouTube integration design after boundary review and human approval。
+11. fixture linkage readiness helper + tests。
+12. overlay fixture transport scope decision, scoped by [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)。
+13. built-in fixture linkage from safe artificial fixture to overlay runtime only after transport boundary review。
+14. paste JSON import design and validation。
+15. ticker / badge runtime。
+16. import/export UI。
+17. same-origin local event channel design。
+18. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

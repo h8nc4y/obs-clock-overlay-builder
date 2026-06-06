@@ -15,6 +15,7 @@
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -203,6 +204,8 @@ URLへ入れないもの:
 
 - built-in fixture dispatch scope decision。
 - editor preview built-in fixture playback event path through same-window internal dispatch helper。
+- fixture linkage readiness helper + tests。
+- overlay fixture transport scope decision before any overlay本体fixture transport。
 - paste JSON import。
 - fixture files under repository。
 - overlay 本体 runtime の event rendering。

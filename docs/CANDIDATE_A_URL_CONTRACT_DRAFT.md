@@ -20,6 +20,8 @@
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -385,6 +387,39 @@ built-in fixture preview dispatch scope 後も、generated URL は config-only �
 - secret-like values。
 
 built-in fixture preview dispatch は editor preview 内の internal handoff であり、overlay本体への fixture transport や URL encode helper ではない。fixture event text は preview表示に使えても、OBS再現用URLには入れない。
+
+## Overlay Fixture Transport URL Boundary
+
+overlay fixture transport scope decision 後も、generated URL は config-only を維持する。
+
+将来 overlay本体へ fixture event を送る場合でも、URLはevent payload transportにしない。
+
+URLへ入れないもの:
+
+- overlay fixture transport payload。
+- fixture linkage payload。
+- fixture event data。
+- fixture event payload。
+- local intake payload。
+- normalized event payload。
+- queue state。
+- queue length / current index。
+- event `eventId`。
+- event `displayText`。
+- raw fixture JSON。
+- pasted fixture JSON。
+- `displayText` arrays。
+- raw `BroadcastChannel` payload。
+- raw `postMessage` payload。
+- `localStorage` transport state。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- private account data。
+- billing / payment info。
+- secret-like values。
+
+`BroadcastChannel` や `postMessage` を将来検討する場合も、URLはvisual configとkeyword rulesの再現性契約に留める。fixture event dataをURLへ入れる案は不採用を継続する。
 
 ## Config Helper実装範囲
 

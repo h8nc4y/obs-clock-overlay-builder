@@ -17,6 +17,8 @@
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -121,6 +123,21 @@ PR #62 で overlay runtime の `demo=1` fixed synthetic event は same-window in
 次段階は [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md) で扱う。次の候補は transport ではなく、editor preview 内の manual input event path を same-window internal dispatch helper へ寄せる小変更です。
 
 manual input text は local intake payload として扱い、generated URL へ入れない。overlay本体への manual input transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、external network、YouTube integration は後続扱いです。
+
+## Post-PR #68 Overlay Fixture Transport Handoff
+
+PR #66 で editor preview built-in fixture playback path は same-window internal dispatch helper 経由へ寄り、PR #68 で fixture linkage readiness helper + tests は実装済みです。
+
+次段階は [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md) に分ける。fixture event を overlay本体へ届ける transport はまだ実装しない。
+
+fixture-specific transport decision でも次を維持する。
+
+- same-window internal dispatch は別page transportではない。
+- URL config を fixture event payload transport に使わない。
+- `BroadcastChannel` / `postMessage` は origin / source / channel lifetime / cleanup QA 固定後の後続候補。
+- `localStorage` transport は初期非推奨。
+- external network transport は禁止。
+- paste JSON import と YouTube integration は後続。
 
 ## URL Config
 
@@ -356,12 +373,15 @@ transportを実装するPRでは次をQA対象にする。
 10. editor preview manual input event path through same-window internal dispatch helper。
 11. same-origin `postMessage` design and prototype only after origin/source QA is fixed。
 12. `BroadcastChannel` design and prototype only after channel lifecycle QA is fixed。
-13. built-in fixture linkage from safe artificial fixture to overlay runtime。
-14. toast queue runtime for multiple public-safe sources。
-15. ticker / badge runtime。
-16. paste JSON import design and validation。
-17. import/export UI。
-18. YouTube integration design after boundary review and human approval。
+13. built-in fixture linkage readiness helper + tests。PR #68で完了。
+14. overlay fixture transport scope decision。
+15. `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
+16. built-in fixture linkage from safe artificial fixture to overlay runtime only after transport boundary review。
+17. toast queue runtime for multiple public-safe sources。
+18. ticker / badge runtime。
+19. paste JSON import design and validation。
+20. import/export UI。
+21. YouTube integration design after boundary review and human approval。
 
 ## Open Questions
 

@@ -22,6 +22,8 @@
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 
 ## Security Principles
 
@@ -407,6 +409,27 @@ manual input dispatch の後続では、editor preview 内の built-in fixture p
 - `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
 
 この phase は docs-only の判断であり、fixture dispatch実装、overlay本体fixture transport、paste JSON import、YouTube integrationを実装済みにしない。
+
+### Phase 16: Overlay Fixture Transport Scope
+
+fixture linkage readiness helper + tests の後続では、overlay本体fixture transportを実装する前に docs-only で候補比較とQA gateを固定する。
+
+この phase で確認すること:
+
+- same-window internal dispatch は別page transportではない。
+- まだ overlay本体fixture transport 実装には入らない。
+- 次PR候補は `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests に限定する。
+- `BroadcastChannel` は channel名、same-origin、OBS Browser Source互換、lifetime、cleanup、stale event suppression をQA対象にしてから後続候補にする。
+- `postMessage` は origin / source / window relationship / listener cleanup をQA対象にしてから後続候補にする。
+- URL config は event payload transport に使わない。
+- `localStorage` transport は初期非推奨を維持する。
+- generated URL に fixture event data、event payload、queue state、transport payload、raw JSON、`displayText` arrays を入れない。
+- raw fixture data、manual input text、secret-like values を debug/status/DOM/console へ出さない。
+- text-not-HTML 方針を維持する。
+- no external network。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs-only の判断であり、overlay本体fixture transport、`BroadcastChannel`、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 
