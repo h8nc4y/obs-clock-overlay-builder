@@ -14,6 +14,7 @@
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -234,21 +235,31 @@ manual input text は untrusted text として扱う。
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 - validation が通る。
 
+## Post-PR #64 Fixture Preview Handoff
+
+PR #64 で editor preview 内の manual input event path は same-window internal dispatch helper 経由へ寄った。
+
+次段階は [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md) に分ける。次の実装PR候補は、editor preview 内の built-in fixture playback event path を同じ internal dispatch helper へ寄せる小変更に限定する。
+
+この handoff でも same-window internal dispatch は transport ではありません。fixture event data、manual input text、internal dispatch payload、event payload、queue state、transport payload は generated URL へ含めず、overlay本体transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、paste JSON import、YouTube integration は後続扱いです。
+
 ## Follow-Up Split
 
 後続PRへ分けるもの:
 
 1. manual input dispatch scope decision。この文書。
 2. editor preview manual input event path through same-window internal dispatch helper。
-3. fixture linkage scope decision。
-4. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-5. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-6. overlay本体 manual input transport design after transport boundary review。
-7. toast queue runtime for multiple public-safe sources。
-8. ticker / badge runtime。
-9. paste JSON import design and validation。
-10. import/export UI。
-11. YouTube integration design after official docs review, data boundary review, and human approval。
+3. built-in fixture dispatch scope decision。
+4. editor preview built-in fixture playback event path through same-window internal dispatch helper。
+5. fixture linkage scope decision。
+6. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+7. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+8. overlay本体 manual input transport design after transport boundary review。
+9. toast queue runtime for multiple public-safe sources。
+10. ticker / badge runtime。
+11. paste JSON import design and validation。
+12. import/export UI。
+13. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

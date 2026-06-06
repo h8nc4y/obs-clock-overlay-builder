@@ -15,6 +15,7 @@
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -115,6 +116,14 @@ PR #62 で、この文書の `demo=1` internal dispatch overlay runtime connecti
 次段階は [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md) に分ける。次の実装PR候補は editor preview 内の manual input event path を same-window internal dispatch helper へ寄せる小変更に限定する。
 
 この後続は overlay本体transport ではありません。manual input text は generated URL へ含めず、raw manual input、event payload、queue state、transport payload、secret-like values を debug/status/URL へ出さない。
+
+## Post-PR #64 Fixture Preview Handoff
+
+PR #64 で editor preview 内の manual input event path は same-window internal dispatch helper 経由へ寄った。
+
+次段階は [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md) に分ける。次の実装PR候補は editor preview 内の built-in fixture playback event path を same-window internal dispatch helper へ寄せる小変更に限定する。
+
+この後続も overlay本体transport ではありません。fixture event data は generated URL へ含めず、raw fixture data、internal dispatch payload、event payload、queue state、transport payload、secret-like values を debug/status/URL へ出さない。`postMessage`、`BroadcastChannel`、`localStorage` transport、paste JSON import、fixture linkage、YouTube integration は後続扱いです。
 
 ## Queue Path Policy
 
@@ -240,14 +249,16 @@ URLへ入れないもの:
 2. `demo=1` fixed synthetic event を same-window internal dispatch helper 経由で overlay runtimeへ渡す実装PR。
 3. manual input dispatch scope decision。
 4. editor preview manual input event path through same-window internal dispatch helper。
-5. fixture linkage scope decision。
-6. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-7. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-8. toast queue runtime for multiple public-safe sources。
-9. ticker / badge runtime。
-10. paste JSON import design and validation。
-11. import/export UI。
-12. YouTube integration design after official docs review, data boundary review, and human approval。
+5. built-in fixture dispatch scope decision。
+6. editor preview built-in fixture playback event path through same-window internal dispatch helper。
+7. fixture linkage scope decision。
+8. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+9. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+10. toast queue runtime for multiple public-safe sources。
+11. ticker / badge runtime。
+12. paste JSON import design and validation。
+13. import/export UI。
+14. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

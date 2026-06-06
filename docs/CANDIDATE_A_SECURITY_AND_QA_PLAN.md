@@ -384,6 +384,30 @@ internal dispatch overlay runtime connection の後続では、editor preview �
 
 この phase は docs-only の判断であり、manual input dispatch実装、overlay本体transport、fixture linkage、YouTube integrationを実装済みにしない。
 
+### Phase 15: Built-In Fixture Preview Dispatch Scope
+
+manual input dispatch の後続では、editor preview 内の built-in fixture playback event path を same-window internal dispatch helper へ寄せる前に docs-only で範囲を固定する。
+
+この phase で確認すること:
+
+- fixture dispatch は editor preview 内の同一ページ経路に限定する。
+- overlay本体 `/overlay/keyword-reaction/` への fixture transport は実装しない。
+- built-in artificial fixture only の境界を維持する。
+- fixture event data は local intake payload として扱い、generated URL へ入れない。
+- internal dispatch detail は normalized event のみにする。
+- raw fixture data、event payload、queue state、transport payload、secret-like values を debug/status/URL へ出さない。
+- existing fixture playback のUI、見た目、再生 / 停止 / リセットを基本維持する。
+- stop / reset / replay 後に古い timer と listener が残らないことをQA対象にする。
+- 表示は `textContent` など safe DOM API を使う。
+- `innerHTML`、`insertAdjacentHTML`、`eval`、`new Function`、`document.write`、inline event handler を使わない。
+- `postMessage`、`BroadcastChannel`、`localStorage` transport、external network は実装しない。
+- paste JSON import は後続に分ける。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+- `/clock/` と `/clock/?c=...` の既存契約を変えない。
+- `/overlay/keyword-reaction/` の idle / debug / demo 境界に回帰がない。
+
+この phase は docs-only の判断であり、fixture dispatch実装、overlay本体fixture transport、paste JSON import、YouTube integrationを実装済みにしない。
+
 ## Input Surfaces
 
 Candidate A の planned input surfaces:

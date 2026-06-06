@@ -102,10 +102,12 @@ Candidate A は次の順で小さく進める。
 16. Internal dispatch overlay runtime connection for `demo=1` only。
 17. Manual input dispatch scope decision。
 18. Editor preview manual input event path through same-window internal dispatch helper。
-19. Event source / fixture linkage。
-20. Ticker / badge。
-21. URL import/export refinement。
-22. YouTube integration design。
+19. Built-in fixture dispatch scope decision。
+20. Editor preview built-in fixture playback event path through same-window internal dispatch helper。
+21. Event source / fixture linkage。
+22. Ticker / badge。
+23. URL import/export refinement。
+24. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -429,6 +431,23 @@ internal dispatch overlay runtime connection の後続では、manual input disp
 - `postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md) に分ける。
+
+## Next Planning PR: Built-In Fixture Preview Dispatch Scope
+
+manual input dispatch の後続では、built-in fixture playback を editor preview 内に限定したまま same-window internal dispatch helper へ寄せる範囲を docs-only で固定する。
+
+このdocs-only方針で固定するもの:
+
+- 次の実装PRは editor preview 内の built-in fixture playback event path を same-window internal dispatch helper へ寄せる小変更に限定する。
+- existing fixture playback UI、見た目、再生 / 停止 / リセットは基本維持する。
+- built-in fixture event data は local intake payload として扱い、generated URL には含めない。
+- internal dispatch detail は normalized event のみ。
+- raw fixture data、event payload、queue state、transport payload、secret-like values を debug/status/URL へ出さない。
+- stop / reset / replay 後の timer cleanup と listener cleanup を確認する。
+- overlay本体 `/overlay/keyword-reaction/` へfixture eventを送るtransportはまだ作らない。
+- `postMessage`、`BroadcastChannel`、`localStorage` transport、paste JSON import、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 
