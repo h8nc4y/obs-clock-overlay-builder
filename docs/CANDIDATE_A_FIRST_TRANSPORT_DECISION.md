@@ -15,6 +15,7 @@
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -109,6 +110,14 @@ PR #60 で same-window internal dispatch helper + tests は実装済みです。
 次段階は [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。次の実装PR候補は、`demo=1` fixed synthetic event を same-window internal dispatch helper 経由で overlay runtime の既存 local intake / queue / toast path へ渡す小変更に限定する。
 
 この handoff は transport実装の承認ではありません。`postMessage`、`BroadcastChannel`、`localStorage` transport、editor UI connection、manual input runtime connection、fixture linkage、external network、YouTube integration は引き続き後続に分ける。
+
+## Post-PR #62 Manual Input Dispatch Handoff
+
+PR #62 で `demo=1` fixed synthetic event は same-window internal dispatch helper 経由で overlay runtime へ渡るようになった。
+
+次段階は [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md) に分ける。次の実装PR候補は、editor preview 内の manual input event path を same-window internal dispatch helper へ寄せる小変更に限定する。
+
+この handoff は overlay本体transport の承認ではありません。`postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、external network、YouTube integration は後続扱いです。
 
 ## Same-Window Internal Dispatch Boundary
 
@@ -272,15 +281,16 @@ transport候補に関係なく、表示は text-not-HTML を維持する。
 2. same-window internal dispatch helper + tests。
 3. internal dispatch overlay runtime connection scope decision。
 4. `demo=1` fixed synthetic event through internal dispatch helper。
-5. manual event runtime connection scope decision。
-6. built-in fixture linkage scope decision。
-7. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-8. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-9. toast queue runtime for multiple public-safe sources。
-10. ticker / badge runtime。
-11. paste JSON import design and validation。
-12. import/export UI。
-13. YouTube integration design after official docs review, data boundary review, and human approval。
+5. manual input dispatch scope decision。
+6. editor preview manual input event path through same-window internal dispatch helper。
+7. built-in fixture linkage scope decision。
+8. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+9. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+10. toast queue runtime for multiple public-safe sources。
+11. ticker / badge runtime。
+12. paste JSON import design and validation。
+13. import/export UI。
+14. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

@@ -22,6 +22,7 @@
 - Local intake overlay runtime scope decision: [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - First transport decision: [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - Internal dispatch overlay runtime scope decision: [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- Manual input dispatch scope decision: [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - URL contract draft: [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - Fixture schema draft: [CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
 - Security and QA plan: [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -99,10 +100,12 @@ Candidate A は次の順で小さく進める。
 14. First transport decision。
 15. Same-window internal dispatch helper + tests。
 16. Internal dispatch overlay runtime connection for `demo=1` only。
-17. Event source / fixture linkage。
-18. Ticker / badge。
-19. URL import/export refinement。
-20. YouTube integration design。
+17. Manual input dispatch scope decision。
+18. Editor preview manual input event path through same-window internal dispatch helper。
+19. Event source / fixture linkage。
+20. Ticker / badge。
+21. URL import/export refinement。
+22. YouTube integration design。
 
 この順序は、OBS向け surface、transparent background、安全境界、URL再現性を段階的に確認するためのもの。
 
@@ -410,6 +413,22 @@ same-window internal dispatch helper + tests の後続では、overlay runtime �
 - `postMessage`、`BroadcastChannel`、`localStorage` transport、editor UI connection、manual input runtime connection、fixture linkage、YouTube integration は後続に分ける。
 
 詳細は [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md) に分ける。
+
+## Next Planning PR: Manual Input Dispatch Scope
+
+internal dispatch overlay runtime connection の後続では、manual input dispatch を editor preview 内に限定するか、overlay本体transportへ進むかを docs-only で固定する。
+
+このdocs-only方針で固定するもの:
+
+- 次の実装PRは editor preview 内の manual input event path を same-window internal dispatch helper へ寄せる小変更に限定する。
+- existing manual toast preview のUIと見た目は基本維持する。
+- manual input text は local intake payload として扱い、generated URL には含めない。
+- internal dispatch detail は normalized event のみ。
+- raw manual input text、event payload、queue state、transport payload、secret-like values を debug/status/URL へ出さない。
+- overlay本体 `/overlay/keyword-reaction/` へ送るmanual input transportはまだ作らない。
+- `postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、YouTube integration は後続に分ける。
+
+詳細は [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md) に分ける。
 
 ## 表示パターン案
 
