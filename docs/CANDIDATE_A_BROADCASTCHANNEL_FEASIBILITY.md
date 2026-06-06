@@ -9,6 +9,7 @@
 関連:
 
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md)
@@ -54,8 +55,8 @@
 
 このため、次の実装PRへは進まない。次PR候補は次のどちらかに限定する。
 
-1. overlay fixture transport readiness helper + tests。
-2. `BroadcastChannel` design scope / static QA の追加整理。
+1. OBS Browser Source `BroadcastChannel` QA scope docs。
+2. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA の追加整理。
 
 `BroadcastChannel` runtime prototype は、OBS Browser Source manual QA plan と static safety checks が揃った後に別PRで判断する。
 
@@ -253,14 +254,15 @@ URLは OBS Browser Source 再現用 config の source of truth であり、event
 後続PRへ分けるもの:
 
 1. BroadcastChannel feasibility docs/static QA。この文書。
-2. overlay fixture transport readiness helper + tests、または BroadcastChannel design scope。
-3. BroadcastChannel prototype only after OBS Browser Source QA plan is fixed。
-4. postMessage design only after window relationship / origin / source QA is fixed。
-5. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
-6. paste JSON import design and validation。
-7. toast queue runtime for multiple public-safe sources。
-8. ticker / badge runtime。
-9. YouTube integration design after official docs review, data boundary review, and human approval。
+2. OBS BroadcastChannel QA scope docs。
+3. overlay fixture transport readiness helper + tests、または BroadcastChannel design scope。
+4. BroadcastChannel prototype only after OBS Browser Source QA plan is fixed。
+5. postMessage design only after window relationship / origin / source QA is fixed。
+6. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
+7. paste JSON import design and validation。
+8. toast queue runtime for multiple public-safe sources。
+9. ticker / badge runtime。
+10. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

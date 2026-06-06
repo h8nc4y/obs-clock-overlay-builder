@@ -25,6 +25,7 @@
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 
 ## Security Principles
 
@@ -449,6 +450,26 @@ overlay fixture transport scope decision の後続では、`BroadcastChannel` �
 - no YouTube API / no OAuth / no API key / no scraping / no real data。
 
 この phase は docs / static tests の判断であり、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
+
+### Phase 18: OBS BroadcastChannel QA Scope
+
+BroadcastChannel feasibility の後続では、OBS Browser Sourceでの availability / reload / lifecycle / multi-source behavior を実装前にどう確認するかを docs-only で固定する。
+
+この phase で確認すること:
+
+- OBS Browser Sourceでの `BroadcastChannel` 動作は未確認として扱う。
+- 人間OBS QAとCodexが確認できるlocal/static範囲を分ける。
+- OBS QAでは built-in artificial fixture / fixed synthetic event のみを使う。
+- real YouTube data、real viewer data、raw comment data、secret-like values は使わない。
+- generated URL に fixture event data、event payload、queue state、transport payload、raw JSON、`displayText` arrays を入れない。
+- raw channel payload、raw fixture data、manual input text、secret-like values を debug/status/DOM/console へ出さない。
+- `BroadcastChannel` は availability、channel open / close、reload後cleanup、scene切替、source再読み込み、複数Browser Source、通常ブラウザtabとの通信、page hidden / visible、stale listener / duplicate delivery をQA対象にする。
+- fail時は `BroadcastChannel` 実装へ進まず、結果をdocsへ追記して止める。
+- no `BroadcastChannel` runtime / no `postMessage` / no `localStorage` transport / no overlay本体fixture transport。
+- no Cloudflare deploy / no OBS operation in Codex。
+- no YouTube API / no OAuth / no API key / no scraping / no real data。
+
+この phase は docs-only の判断であり、OBS操作、overlay本体fixture transport、`BroadcastChannel` runtime、`postMessage`、`localStorage` transport、paste JSON import、YouTube integrationを実装済みにしない。
 
 ## Input Surfaces
 

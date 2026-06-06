@@ -14,6 +14,7 @@
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md)
+- [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
@@ -143,8 +144,19 @@ feasibility後も維持する判断:
 
 - `BroadcastChannel` runtime はまだ実装しない。
 - OBS Browser Source固有の `BroadcastChannel` 対応、lifetime、storage key、reload / visibility挙動は未確認として扱う。
-- 次PR候補は overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA に限定する。
+- 次PR候補は OBS Browser Source `BroadcastChannel` QA scope docs、overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA に限定する。
 - generated URL config-only、no raw fixture data、no secret-like value、no YouTube API / OAuth / API key / real data を維持する。
+
+## OBS BroadcastChannel QA Handoff
+
+[CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md) では、OBS Browser Source上での `BroadcastChannel` availability、reload、lifecycle、multi-source behavior を、実装前に人間OBS QAとして確認する範囲へ分ける。
+
+このhandoff後も維持する判断:
+
+- このdocs段階ではOBS操作を行わない。
+- `BroadcastChannel`、`postMessage`、`localStorage` transport、overlay本体fixture transportはまだ実装しない。
+- OBS Browser Sourceの実測結果は未確認として扱い、pass / fail基準だけを固定する。
+- QAは built-in artificial fixture / fixed synthetic event のみで行い、real YouTube data、real viewer data、raw comment data を使わない。
 
 ## postMessage Requirements Before Adoption
 
@@ -291,15 +303,16 @@ fixture playback / overlay rendering で timer を使う場合も、transportと
 
 1. overlay fixture transport scope decision。この文書。
 2. `BroadcastChannel` feasibility docs/static QA。
-3. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA。
-4. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-5. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-6. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
-7. paste JSON import design and validation。
-8. toast queue runtime for multiple public-safe sources。
-9. ticker / badge runtime。
-10. import/export UI。
-11. YouTube integration design after official docs review, data boundary review, and human approval。
+3. OBS Browser Source `BroadcastChannel` QA scope docs。
+4. overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA。
+5. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+6. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+7. overlay本体fixture transport implementation only after transport candidate and QA are fixed。
+8. paste JSON import design and validation。
+9. toast queue runtime for multiple public-safe sources。
+10. ticker / badge runtime。
+11. import/export UI。
+12. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 
