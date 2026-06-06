@@ -16,6 +16,8 @@
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
@@ -126,6 +128,14 @@ PR #64 で editor preview 内の manual input event path は same-window interna
 次段階は [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md) に分ける。次の実装PR候補は、editor preview 内の built-in fixture playback event path を same-window internal dispatch helper へ寄せる小変更に限定する。
 
 この handoff も transport実装の承認ではありません。overlay本体fixture transport、`postMessage`、`BroadcastChannel`、`localStorage` transport、paste JSON import、external network、YouTube integration は後続扱いです。
+
+## Post-PR #68 Overlay Fixture Transport Handoff
+
+PR #66 で editor preview built-in fixture playback path は same-window internal dispatch helper 経由へ寄り、PR #68 で fixture linkage readiness helper + tests は実装済みです。
+
+次段階は [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md) に分ける。判断は、まだ overlay本体fixture transport 実装へ進まず、`BroadcastChannel` feasibility docs/static QA または overlay fixture transport readiness helper + tests に限定することです。
+
+URL config は event payload transport には使わない。`localStorage` transport は初期非推奨を維持し、`BroadcastChannel` / `postMessage` は origin / source / channel lifetime / cleanup QA を固定してから後続候補にする。
 
 ## Same-Window Internal Dispatch Boundary
 
@@ -294,13 +304,16 @@ transport候補に関係なく、表示は text-not-HTML を維持する。
 7. built-in fixture dispatch scope decision。
 8. editor preview built-in fixture playback event path through same-window internal dispatch helper。
 9. built-in fixture linkage scope decision。
-10. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-11. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-12. toast queue runtime for multiple public-safe sources。
-13. ticker / badge runtime。
-14. paste JSON import design and validation。
-15. import/export UI。
-16. YouTube integration design after official docs review, data boundary review, and human approval。
+10. fixture linkage readiness helper + tests。
+11. overlay fixture transport scope decision。
+12. `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
+13. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+14. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+15. toast queue runtime for multiple public-safe sources。
+16. ticker / badge runtime。
+17. paste JSON import design and validation。
+18. import/export UI。
+19. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

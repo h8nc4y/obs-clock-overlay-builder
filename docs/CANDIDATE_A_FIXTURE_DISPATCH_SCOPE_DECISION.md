@@ -14,6 +14,7 @@
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -282,6 +283,14 @@ readiness helper / docs consolidation で確認する境界:
 
 この追記は PR #65 の fixture dispatch scope を fixture linkage readiness へ拡張して読むための整理であり、新しい重複docsを作るものではない。
 
+## Overlay Fixture Transport Follow-Up
+
+PR #68 で fixture linkage readiness helper + tests は実装済みです。
+
+次段階は [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md) に分ける。判断は、まだ overlay本体fixture transport 実装へ入らず、`BroadcastChannel` feasibility docs/static QA または overlay fixture transport readiness helper + tests に限定することです。
+
+この後続は overlay本体fixture transport、`BroadcastChannel`、`postMessage`、`localStorage` transport、URL event transport、paste JSON import、YouTube integration の承認ではありません。fixture event data は引き続き generated URL へ入れない。
+
 ## Follow-Up Split
 
 後続PRへ分けるもの:
@@ -289,14 +298,16 @@ readiness helper / docs consolidation で確認する境界:
 1. fixture dispatch scope decision。この文書。
 2. editor preview built-in fixture playback event path through same-window internal dispatch helper。
 3. fixture linkage readiness helper + tests、または docs / static tests consolidation。
-4. overlay本体 fixture transport design after transport boundary review。
-5. paste JSON import design and validation。
-6. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-7. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-8. toast queue runtime for multiple public-safe sources。
-9. ticker / badge runtime。
-10. import/export UI。
-11. YouTube integration design after official docs review, data boundary review, and human approval。
+4. overlay fixture transport scope decision。
+5. `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
+6. overlay本体 fixture transport design after transport boundary review。
+7. paste JSON import design and validation。
+8. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+9. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+10. toast queue runtime for multiple public-safe sources。
+11. ticker / badge runtime。
+12. import/export UI。
+13. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

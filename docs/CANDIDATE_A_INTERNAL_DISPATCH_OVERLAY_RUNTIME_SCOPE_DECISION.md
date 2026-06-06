@@ -16,6 +16,7 @@
 - [CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md)
 - [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
+- [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md)
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
@@ -252,13 +253,16 @@ URLへ入れないもの:
 5. built-in fixture dispatch scope decision。
 6. editor preview built-in fixture playback event path through same-window internal dispatch helper。
 7. fixture linkage scope decision。
-8. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-9. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
-10. toast queue runtime for multiple public-safe sources。
-11. ticker / badge runtime。
-12. paste JSON import design and validation。
-13. import/export UI。
-14. YouTube integration design after official docs review, data boundary review, and human approval。
+8. fixture linkage readiness helper + tests。
+9. overlay fixture transport scope decision。
+10. `BroadcastChannel` feasibility docs/static QA、または overlay fixture transport readiness helper + tests。
+11. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+12. `BroadcastChannel` design / prototype only after channel lifecycle QA is fixed。
+13. toast queue runtime for multiple public-safe sources。
+14. ticker / badge runtime。
+15. paste JSON import design and validation。
+16. import/export UI。
+17. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 
