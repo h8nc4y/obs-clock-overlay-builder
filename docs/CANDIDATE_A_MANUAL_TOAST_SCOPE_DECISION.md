@@ -15,6 +15,7 @@
 - [CANDIDATE_A_URL_CONTRACT_DRAFT.md](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -180,6 +181,16 @@ manual input の preview event は、将来 [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECI
 - raw manual form state を overlay render layer へ直接渡さない。
 - manual input text、raw JSON、`displayText` arrays、secret-like values を generated URL へ入れない。
 - overlay本体へmanual eventを送る transport は後続PRへ分ける。
+
+## Manual Input Dispatch Follow-Up
+
+PR #62 で `demo=1` fixed synthetic event は same-window internal dispatch helper 経由で overlay runtime へ渡るようになった。
+
+次段階の manual input dispatch は [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md) に分ける。
+
+次PR候補は、editor preview 内の manual input event path を same-window internal dispatch helper へ寄せる小実装に限定する。既存の manual toast preview のUI、見た目、generated URL config-only 方針は維持する。
+
+この follow-up は overlay本体への manual input transport ではありません。`postMessage`、`BroadcastChannel`、`localStorage` transport、fixture linkage、YouTube API / OAuth / API key / real data は引き続き後続に分ける。
 
 ## Text-Not-HTML Boundary
 

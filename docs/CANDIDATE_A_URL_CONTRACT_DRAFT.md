@@ -19,6 +19,7 @@
 - [CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_FIRST_TRANSPORT_DECISION.md](CANDIDATE_A_FIRST_TRANSPORT_DECISION.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
+- [CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md)
 
 ## 契約の目的
 
@@ -321,6 +322,37 @@ internal dispatch overlay runtime connection 後も、generated URL は config-o
 - secret-like values。
 
 `demo=1` は public-safe display test flag のままです。same-window internal dispatch helper は event payload を `c` へ encode する helper ではない。
+
+## Manual Input Dispatch URL Boundary
+
+manual input dispatch scope 後も、generated URL は config-only を維持する。
+
+次PR候補の editor preview manual input dispatch でも、URLへ入れないもの:
+
+- manual input text。
+- manual input event payload。
+- internal dispatch payload。
+- normalized event payload。
+- queue state。
+- queue length / current index。
+- event `eventId`。
+- event `displayText`。
+- fixture event data。
+- raw fixture JSON。
+- raw user JSON。
+- `displayText` arrays。
+- transport payload。
+- raw `postMessage` payload。
+- `BroadcastChannel` payload。
+- `localStorage` transport state。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- private account data。
+- billing / payment info。
+- secret-like values。
+
+manual input dispatch は editor preview 内の internal handoff であり、overlay本体への transport や URL encode helper ではない。manual input text は preview表示に使えても、OBS再現用URLには入れない。
 
 ## Config Helper実装範囲
 
