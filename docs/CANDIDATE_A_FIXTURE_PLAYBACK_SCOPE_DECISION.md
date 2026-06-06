@@ -14,6 +14,7 @@
 - [CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md](CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
+- [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
 - [CANDIDATE_A_SECURITY_AND_QA_PLAN.md](CANDIDATE_A_SECURITY_AND_QA_PLAN.md)
 - [YOUTUBE_DATA_POLICY_BOUNDARY.md](YOUTUBE_DATA_POLICY_BOUNDARY.md)
 
@@ -72,6 +73,14 @@ PR #42 時点の built-in fixture playback は editor preview 内の artificial 
 - YouTube API / OAuth / API key / scraping / real data。
 
 次の overlay runtime PR は config-aware skeleton に限定し、fixture event linkage は後続PRへ分ける。
+
+## Post-PR #64 Fixture Dispatch Handoff
+
+PR #64 で editor preview 内の manual input match path は same-window internal dispatch helper 経由へ寄った。
+
+次段階は [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md) に分ける。次の実装PR候補は、editor preview 内の built-in fixture playback event path を same-window internal dispatch helper へ寄せる小変更に限定する。
+
+この handoff は overlay本体fixture transport の承認ではありません。built-in artificial fixture only の境界を維持し、fixture event data、internal dispatch payload、event payload、queue state、transport payload は generated URL へ含めない。`postMessage`、`BroadcastChannel`、`localStorage` transport、paste JSON import、YouTube integration は引き続き後続に分ける。
 
 ## Fixture Schema Policy
 
@@ -192,6 +201,8 @@ URLへ入れないもの:
 
 後続PRへ分けるもの:
 
+- built-in fixture dispatch scope decision。
+- editor preview built-in fixture playback event path through same-window internal dispatch helper。
 - paste JSON import。
 - fixture files under repository。
 - overlay 本体 runtime の event rendering。

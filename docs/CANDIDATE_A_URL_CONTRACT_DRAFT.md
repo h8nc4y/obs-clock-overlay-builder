@@ -354,6 +354,38 @@ manual input dispatch scope 後も、generated URL は config-only を維持す�
 
 manual input dispatch は editor preview 内の internal handoff であり、overlay本体への transport や URL encode helper ではない。manual input text は preview表示に使えても、OBS再現用URLには入れない。
 
+## Built-In Fixture Preview Dispatch URL Boundary
+
+built-in fixture preview dispatch scope 後も、generated URL は config-only を維持する。
+
+次PR候補の editor preview built-in fixture playback dispatch でも、URLへ入れないもの:
+
+- fixture event data。
+- fixture event payload。
+- internal dispatch payload。
+- normalized event payload。
+- queue state。
+- queue length / current index。
+- event `eventId`。
+- event `displayText`。
+- raw fixture JSON。
+- pasted fixture JSON。
+- manual input text。
+- raw user JSON。
+- `displayText` arrays。
+- transport payload。
+- raw `postMessage` payload。
+- `BroadcastChannel` payload。
+- `localStorage` transport state。
+- API key / OAuth token / access token / refresh token / client secret / private key。
+- real viewer identifier。
+- raw YouTube comment / live chat content。
+- private account data。
+- billing / payment info。
+- secret-like values。
+
+built-in fixture preview dispatch は editor preview 内の internal handoff であり、overlay本体への fixture transport や URL encode helper ではない。fixture event text は preview表示に使えても、OBS再現用URLには入れない。
+
 ## Config Helper実装範囲
 
 `assets/js/keyword-reaction-config.js` に、URL config の土台として次の helper を追加する。
