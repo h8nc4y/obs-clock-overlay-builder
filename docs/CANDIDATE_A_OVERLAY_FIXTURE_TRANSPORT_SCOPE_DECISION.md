@@ -6,6 +6,8 @@
 
 これは implementation planning evidence です。overlay本体fixture transport、`BroadcastChannel`、`postMessage`、`localStorage` transport、paste JSON import、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Codex for OSS 申請を実装または承認するものではありません。
 
+2026/06/12追記: limited `BroadcastChannel` prototype はローカル検証で PASS と記録された。結果は [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md) を参照する。この追記後も、この文書単体は production transport 実装を承認しない。
+
 関連:
 
 - [CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md](CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md)
@@ -17,6 +19,7 @@
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md)
 - [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md)
 - [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md)
+- [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md)
 - [CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md)
 - [CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md](CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md)
 - [CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md)
@@ -53,13 +56,14 @@ PR #68 で fixture linkage readiness helper + tests が入り、built-in artific
 - fixture linkage readiness helper + tests。
 - fixture event -> local intake input candidate。
 - fixture event -> queue candidate / schedule candidate。
+- limited `BroadcastChannel` prototype implementation and local result docs。
 - generated URL config-only boundary。
 
 まだ実装していないもの:
 
 - overlay本体 `/overlay/keyword-reaction/` への fixture transport。
 - fixture event を OBS Browser Source の overlay page へ送る仕組み。
-- `BroadcastChannel`。
+- production overlay fixture `BroadcastChannel` transport。
 - `postMessage`。
 - `localStorage` transport。
 - external network transport。
@@ -84,9 +88,9 @@ overlay本体 `/overlay/keyword-reaction/` は OBS Browser Source で別context�
 
 | Candidate | Candidate use | Risk / QA need | Decision |
 |---|---|---|---|
-| No transport yet | overlay は config-only URL と `demo=1` だけで完結する。 | fixture event は overlay本体へ届かないが、境界が最も安全。 | 採用。次PRではまだ transport 実装に入らない。 |
+| No transport yet | overlay は config-only URL と `demo=1` だけで完結する。 | fixture event は overlay本体へ届かないが、境界が最も安全。 | 安全なfallback判断として維持。post-prototype の第一候補ではない。 |
 | Same-window internal dispatch | editor preview 内の helper整理。overlay runtime 内の `demo=1` handoff。 | 別page / OBS Browser Source へは届かない。 | overlay本体fixture transport としては不採用。preview/internal 用に限定。 |
-| `BroadcastChannel` | same-origin contexts 間で fixture event を流す候補。 | OBS Browser Source互換、channel名、multi-tab、reload、cleanup、stale event、payload最小化のQAが必要。 | 後続候補。実装前に feasibility docs/static QA を挟む。 |
+| `BroadcastChannel` | same-origin contexts 間で fixture event を流す候補。 | channel名、multi-tab、reload、cleanup、stale event、payload最小化のQAが必要。 | post-prototype の第一候補。narrow fixture transport implementation は別PRへ分ける。 |
 | `postMessage` | iframe / child window / opener 関係がある場合の候補。 | `event.origin` / `event.source` / window relationship / listener cleanup が必須。OBS Browser Source単体では送信元設計が必要。 | 後続候補。実装前に origin/source QA を固定する。 |
 | URL config | OBS再現用 config の source of truth。 | event payload transportに使うと URL長大化、private data混入、raw value露出のリスクが高い。 | event transportには使わない。config-onlyを維持。 |
 | `localStorage` transport | same-origin storage共有に見える案。 | OBS Browser Sourceとの共有が不透明。secret-like valueやfixture event dataの永続化リスクがある。 | 初期非推奨。transportには採用しない。 |
@@ -95,16 +99,14 @@ overlay本体 `/overlay/keyword-reaction/` は OBS Browser Source で別context�
 
 ## Decision
 
-判断: **まだ overlay本体fixture transport 実装には入らない**。
+判断: **overlay本体fixture transport の最初の実装候補は、狭い `BroadcastChannel` fixture transport に限定する。ただし、この文書ではまだ実装しない**。
 
-次PR候補は limited BroadcastChannel prototype scope decision / limited prototype に限定する。
-
-OBS Browser Source human QA は PASS と記録されたが、overlay本体fixture transport 実装にはまだ入らない。
+OBS Browser Source human QA と limited prototype local verification は PASS と記録された。これにより、次の implementation planning では `BroadcastChannel` を第一候補として扱える。ただし production transport ではなく、built-in artificial fixture を overlay本体へ渡す最小実装に限定する。
 
 この段階で採用しないもの:
 
 - overlay本体fixture transport実装。
-- `BroadcastChannel` 実装。
+- production transport としての広い `BroadcastChannel` 実装。
 - `postMessage` 実装。
 - `localStorage` transport。
 - URL event transport。
@@ -115,13 +117,38 @@ OBS Browser Source human QA は PASS と記録されたが、overlay本体fixtur
 
 - overlay本体は別page / OBS Browser Source context になり得る。
 - same-window internal dispatch は別page transportではない。
-- `BroadcastChannel` と `postMessage` は origin / source / lifetime / cleanup QA が必要。
+- `BroadcastChannel` は第一候補になったが、fixture transport 本実装では channel / payload / cleanup / generated URL boundary を改めて守る必要がある。
+- `postMessage` は origin / source / lifetime / cleanup QA が未固定。
 - generated URL に fixture data を入れない制約がある。
 - localStorage transport は secret-like value と raw fixture data を残しやすい。
 
-## BroadcastChannel Requirements Before Adoption
+## Post-Prototype First Transport Scope
 
-`BroadcastChannel` を実装候補にする前に、少なくとも次を docs / static tests / manual QA で固定する。
+将来の overlay本体fixture transport implementation PR で許可する候補:
+
+- built-in artificial fixture event のみを送る。
+- `BroadcastChannel` を使う。
+- sender / receiver は明示queryまたは明示UI操作でのみ開始する。
+- channel name は public-safe fixed namespace に限定する。
+- payload は normalized event または local intake candidate に寄せる。
+- receiver は invalid payload を safe reject し、raw payloadを表示しない。
+- sender / receiver は cleanup で `BroadcastChannel.close()` と listener解除を行う。
+- generated URL は config-only を維持し、event payload、fixture data、queue state、transport payloadを含めない。
+- focused node tests、static tests、local browser checksで channel / payload / cleanup / URL boundaryを確認する。
+
+将来の implementation PR でも禁止するもの:
+
+- real viewer data、real comment data、raw YouTube data。
+- YouTube API / OAuth / API key / scraping。
+- paste JSON import。
+- `postMessage`、`localStorage` transport、external network transport。
+- fixture event data、queue state、transport payload を generated URL に入れること。
+- raw channel payload、manual input text、keyword実値、secret-like values を status / DOM / console に出すこと。
+- production deploy、Cloudflare操作、Codex for OSS申請。
+
+## BroadcastChannel Requirements Before First Fixture Transport Implementation
+
+`BroadcastChannel` は limited prototype 結果を受けて第一候補にする。ただし overlay本体fixture transport implementation PR へ進む前に、少なくとも次を docs / tests / browser QA で維持する。
 
 - channel名。
 - channel名に private value、keyword実値、fixture id、event id を混ぜない方針。
@@ -129,23 +156,23 @@ OBS Browser Source human QA は PASS と記録されたが、overlay本体fixtur
 - 複数tab / 複数overlay / reload時の挙動。
 - stale event を再表示しない方針。
 - channel open / close cleanup。
-- OBS Browser Sourceでの互換確認。
+- OBS Browser Sourceでの互換確認、または未確認範囲の明示。
 - invalid payload の safe reject / fallback。
 - raw channel message を DOM、status、console、URLへ出さないこと。
 - payload は normalized event または local intake candidate へ寄せること。
 - no YouTube API / no OAuth / no API key / no real data。
 
-この文書では `BroadcastChannel` を実装しない。
+この文書では overlay本体fixture transport を実装しない。
 
 ## BroadcastChannel Feasibility Handoff
 
 [CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md](CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md) では、WHATWG HTML Standard、MDN、OBS Browser Source KB を確認したうえで、`BroadcastChannel` を有力候補だがまだ未実装と判断する。
 
-feasibility後も維持する判断:
+feasibilityとprototype後も維持する判断:
 
-- `BroadcastChannel` runtime はまだ実装しない。
-- OBS Browser Source固有の `BroadcastChannel` 対応、lifetime、storage key、reload / visibility挙動は未確認として扱う。
-- 次PR候補は OBS Browser Source `BroadcastChannel` QA scope docs、overlay fixture transport readiness helper + tests、または `BroadcastChannel` design scope / static QA に限定する。
+- limited prototype 以外の production transport はまだ実装しない。
+- OBS Browser Source human QA は PASS だが、repository runtime のOBS実機確認とproduction URL確認は未確認として扱う。
+- 次の実装候補は、built-in artificial fixture の narrow `BroadcastChannel` fixture transport に限定する。
 - generated URL config-only、no raw fixture data、no secret-like value、no YouTube API / OAuth / API key / real data を維持する。
 
 ## OBS BroadcastChannel QA Handoff
@@ -169,8 +196,8 @@ feasibility後も維持する判断:
 
 このhandoff後も維持する判断:
 
-- `BroadcastChannel`、`postMessage`、`localStorage` transport、overlay本体fixture transportはまだ実装しない。
-- PASSは即実装承認ではなく、[CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md) の入力に留める。
+- production `BroadcastChannel` transport、`postMessage`、`localStorage` transport、広い overlay本体fixture transport はまだ実装しない。
+- PASSは広い実装承認ではなく、narrow `BroadcastChannel` fixture transport scope の入力に留める。
 - QAは built-in artificial fixture / fixed synthetic event のみで行い、real YouTube data、real viewer data、raw comment data を使わない。
 
 ## postMessage Requirements Before Adoption
@@ -277,8 +304,8 @@ fixture playback / overlay rendering で timer を使う場合も、transportと
 
 ## Non-Goals
 
-- overlay本体fixture transport実装。
-- `BroadcastChannel` 実装。
+- この文書内での overlay本体fixture transport実装。
+- production transport としての広い `BroadcastChannel` 実装。
 - `postMessage` 実装。
 - `localStorage` transport。
 - external network transport。
@@ -301,8 +328,8 @@ fixture playback / overlay rendering で timer を使う場合も、transportと
 
 - overlay本体fixture transport候補を比較している。
 - same-window internal dispatch が別page transportではないと明記している。
-- 判断は no transport yet である。
-- 次PR候補が limited BroadcastChannel prototype scope decision / limited prototype に限定されている。
+- limited prototype 結果後の第一候補を narrow `BroadcastChannel` fixture transport に固定している。
+- この文書では implementation PR 自体を承認しない境界を明記している。
 - URL config を event transport に使わない方針である。
 - `localStorage` transport は初期非推奨である。
 - generated URL は config-only のまま。
@@ -323,13 +350,14 @@ fixture playback / overlay rendering で timer を使う場合も、transportと
 5. OBS BroadcastChannel human QA result docs。
 6. limited BroadcastChannel prototype scope decision。
 7. limited BroadcastChannel prototype。
-8. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
-9. overlay本体fixture transport implementation only after prototype result, transport candidate, and QA are fixed。
-10. paste JSON import design and validation。
-11. toast queue runtime for multiple public-safe sources。
-12. ticker / badge runtime。
-13. import/export UI。
-14. YouTube integration design after official docs review, data boundary review, and human approval。
+8. limited BroadcastChannel prototype result docs。
+9. narrow `BroadcastChannel` fixture transport implementation only after this post-prototype scope decision。
+10. same-origin `postMessage` design / prototype only after origin/source QA is fixed。
+11. paste JSON import design and validation。
+12. toast queue runtime for multiple public-safe sources。
+13. ticker / badge runtime。
+14. import/export UI。
+15. YouTube integration design after official docs review, data boundary review, and human approval。
 
 ## Open Questions
 

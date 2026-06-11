@@ -70,4 +70,4 @@ Console / network:
 
 ## Next Step
 
-Define the overlay本体fixture transport scope after this prototype result, before any production transport implementation.
+Define the overlay本体fixture transport scope after this prototype result, before any production transport implementation. The post-prototype scope is recorded in [CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md](CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md).

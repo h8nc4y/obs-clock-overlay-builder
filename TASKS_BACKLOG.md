@@ -16,7 +16,7 @@
 |---|---|---|---|---|---|
 | TB-001 | limited BroadcastChannel prototype のWIPを完成させる | `git status`; `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md`; `docs/ROADMAP.md` | 高 | M | done |
 | TB-002 | limited BroadcastChannel prototype の結果docs / QA notesを記録する | `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md` Follow-Up Split | 高 | S | done |
-| TB-003 | overlay本体fixture transportのscope decisionをprototype結果後に固定する | `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md`; `docs/ROADMAP.md` | 中 | S | todo |
+| TB-003 | overlay本体fixture transportのscope decisionをprototype結果後に固定する | `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md`; `docs/ROADMAP.md` | 中 | S | done |
 | TB-004 | PC内フォント読み込みの説明を非プログラマー向けに強化する | `docs/v0.1.1-backlog.md`; GitHub issue #10 | 中 | S | todo |
 | TB-005 | 編集画面の小さな操作性を改善する | `docs/v0.1.1-backlog.md`; GitHub issue #10 | 中 | M | todo |
 | TB-006 | manual QAとrelease手順を最新化する | `docs/v0.1.1-backlog.md`; GitHub issue #10 / #12 reference | 中 | S | todo |
