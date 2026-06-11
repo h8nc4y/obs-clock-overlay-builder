@@ -7,15 +7,15 @@
 - Existing task sources checked: `docs/CODEX_TASKS.md`, `docs/v0.1.1-backlog.md`, `docs/ROADMAP.md`, `docs/CHATGPT_HANDOFF.md`, `docs/PR19_REVIEW_READINESS.md`
 - TODO/FIXME search: no literal source-code `TODO` / `FIXME` tasks found; `未確認` / `pending` entries are reflected below where actionable.
 - GitHub open issues checked with `gh issue list`: #10, #28, #29, #30.
-- Baseline checks already confirmed in this run: `npm run lint`, `npm run typecheck`.
-- Baseline checks pending due approval-review timeout: `npm run format:check`, `npm test`, `npm run build`.
+- Baseline checks confirmed in this run: `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm test`, `npm run build`.
+- Browser checks confirmed in this run: limited BroadcastChannel prototype receiver/sender on local server at 390px, 768px, and 1280px.
 
 ## Backlog
 
 | ID | タスク名 | 出典 | 優先度 | 規模 | 状態 |
 |---|---|---|---|---|---|
 | TB-001 | limited BroadcastChannel prototype のWIPを完成させる | `git status`; `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md`; `docs/ROADMAP.md` | 高 | M | done |
-| TB-002 | limited BroadcastChannel prototype の結果docs / QA notesを記録する | `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md` Follow-Up Split | 高 | S | todo |
+| TB-002 | limited BroadcastChannel prototype の結果docs / QA notesを記録する | `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md` Follow-Up Split | 高 | S | done |
 | TB-003 | overlay本体fixture transportのscope decisionをprototype結果後に固定する | `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md`; `docs/ROADMAP.md` | 中 | S | todo |
 | TB-004 | PC内フォント読み込みの説明を非プログラマー向けに強化する | `docs/v0.1.1-backlog.md`; GitHub issue #10 | 中 | S | todo |
 | TB-005 | 編集画面の小さな操作性を改善する | `docs/v0.1.1-backlog.md`; GitHub issue #10 | 中 | M | todo |
