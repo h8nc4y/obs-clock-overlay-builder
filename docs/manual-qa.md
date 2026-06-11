@@ -90,6 +90,9 @@
 - same-window internal dispatch helper導入後も、同一ページ内のnormalized event handoffだけを扱い、overlay runtime接続、editor UI接続、postMessage、BroadcastChannel、localStorage transport、fixture linkageは追加されない。
 - internal dispatch payload、event payload、queue state、eventId、displayText、manual input text、fixture event dataは生成URLに含まれない。
 - internal dispatch overlay runtime接続後も、`demo=1` の固定人工eventだけを same-window internal dispatch helper 経由で扱い、editor UI接続、manual input送信、fixture linkage、postMessage、BroadcastChannel、localStorage transportは追加されない。
+- limited BroadcastChannel prototype導入後も、通常の `/overlay/keyword-reaction/` と `/overlay/keyword-reaction/?demo=1` は既存挙動のままで、BroadcastChannelは明示queryなしでは開始されない。
+- `/overlay/keyword-reaction/?bcPrototype=1&bcRole=receiver&bcChannel=obs-bc-qa-001` は prototype receiver の public-safe statusだけを表示し、raw channel payload、fixture event data、queue state、secret-like値は表示しない。
+- `/overlay/keyword-reaction/?bcPrototype=1&bcRole=sender&bcChannel=obs-bc-qa-001` は synthetic-only sender の public-safe statusだけを表示し、generated URLへpayloadを入れない。
 - validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。

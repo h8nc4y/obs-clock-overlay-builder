@@ -7,6 +7,10 @@ import {
   DEFAULT_KEYWORD_REACTION_EVENT,
   buildDemoKeywordReactionEvent as buildNormalizedDemoKeywordReactionEvent
 } from "./keyword-reaction-event.js";
+import {
+  getKeywordReactionBroadcastChannelPrototypeState,
+  startKeywordReactionBroadcastChannelPrototype
+} from "./keyword-reaction-broadcastchannel-prototype.js";
 import { enqueueKeywordReactionLocalInput } from "./keyword-reaction-intake-queue.js";
 import {
   dispatchKeywordReactionInternalEvent,
@@ -25,6 +29,7 @@ export const KEYWORD_REACTION_DEMO_DURATION_MS = DEFAULT_KEYWORD_REACTION_EVENT.
 
 let demoHideTimer = null;
 let demoTimerHost = null;
+let broadcastChannelPrototypeCleanup = null;
 
 export function shouldShowKeywordReactionDebug(input) {
   return searchParamsFromUnknown(input).get("debug") === "1";
@@ -40,6 +45,7 @@ export function getKeywordReactionOverlayRuntimeState(input) {
   return {
     debug: shouldShowKeywordReactionDebug(params),
     demo: shouldShowKeywordReactionDemo(params),
+    broadcastChannelPrototype: getKeywordReactionBroadcastChannelPrototypeState(params),
     configState: configParameterLooksValid(params.get("c")) ? "valid" : "fallback",
     displayPattern: config.displayPattern,
     reactionStyle: config.reactionStyle,
@@ -55,6 +61,19 @@ export function buildKeywordReactionDebugStatus(state) {
     "Keyword reaction overlay ready",
     `config: ${state.configState === "valid" ? "valid" : "fallback"}`,
     `pattern: ${state.displayPattern || "toast"}`
+  ];
+}
+
+export function buildKeywordReactionBroadcastChannelPrototypeStatus(state, runtimeState = {}) {
+  const prototypeState = state?.broadcastChannelPrototype;
+  if (!prototypeState?.enabled) {
+    return [];
+  }
+  const role = prototypeState.role === "sender" ? "sender" : "receiver";
+  return [
+    `BroadcastChannel prototype ${role} ready`,
+    `channel: ${prototypeState.channelState === "valid" ? "valid" : "fallback"}`,
+    `status: ${runtimeState.status || "ready"}`
   ];
 }
 
@@ -116,7 +135,11 @@ export function renderKeywordReactionDemoEvent(element, event) {
   element.dataset.intensity = String(event.intensity);
 }
 
-export function mountKeywordReactionOverlayRuntime(rootDocument = globalThis.document, runtimeLocation = globalThis.location) {
+export function mountKeywordReactionOverlayRuntime(
+  rootDocument = globalThis.document,
+  runtimeLocation = globalThis.location,
+  runtimeOptions = {}
+) {
   if (!rootDocument) {
     return null;
   }
@@ -127,7 +150,25 @@ export function mountKeywordReactionOverlayRuntime(rootDocument = globalThis.doc
   }
 
   const state = getKeywordReactionOverlayRuntimeState(runtimeLocation?.search || "");
-  const lines = buildKeywordReactionDebugStatus(state);
+  clearKeywordReactionBroadcastChannelPrototype();
+  let broadcastChannelPrototypeRuntime = null;
+  if (state.broadcastChannelPrototype.enabled) {
+    broadcastChannelPrototypeRuntime = startKeywordReactionBroadcastChannelPrototype(state.broadcastChannelPrototype, {
+      BroadcastChannelConstructor: runtimeOptions.BroadcastChannelConstructor,
+      onEvent(event) {
+        const renderableEvent = buildKeywordReactionRenderableDemoEvent(event);
+        if (renderableEvent) {
+          showKeywordReactionOverlayEvent(rootDocument, demoElement, renderableEvent);
+        }
+      }
+    });
+    broadcastChannelPrototypeCleanup = broadcastChannelPrototypeRuntime.cleanup;
+  }
+
+  const lines = [
+    ...buildKeywordReactionDebugStatus(state),
+    ...buildKeywordReactionBroadcastChannelPrototypeStatus(state, broadcastChannelPrototypeRuntime)
+  ];
   if (statusElement && lines.length === 0) {
     statusElement.textContent = "";
     statusElement.hidden = true;
@@ -147,15 +188,23 @@ export function mountKeywordReactionOverlayRuntime(rootDocument = globalThis.doc
     return state;
   }
 
-  renderKeywordReactionDemoEvent(demoElement, demoEvent);
+  showKeywordReactionOverlayEvent(rootDocument, demoElement, demoEvent);
+  return state;
+}
+
+function showKeywordReactionOverlayEvent(rootDocument, demoElement, event) {
+  if (!demoElement || !event) {
+    return;
+  }
+  clearKeywordReactionDemoTimer();
+  renderKeywordReactionDemoEvent(demoElement, event);
   const timerHost = rootDocument.defaultView ?? globalThis;
   demoHideTimer = timerHost.setTimeout(() => {
     hideKeywordReactionOverlayElement(demoElement);
     demoHideTimer = null;
     demoTimerHost = null;
-  }, demoEvent.durationMs);
+  }, event.durationMs);
   demoTimerHost = timerHost;
-  return state;
 }
 
 function clearKeywordReactionDemoTimer() {
@@ -169,6 +218,13 @@ function clearKeywordReactionDemoTimer() {
     demoHideTimer = null;
     demoTimerHost = null;
   }
+}
+
+function clearKeywordReactionBroadcastChannelPrototype() {
+  if (typeof broadcastChannelPrototypeCleanup === "function") {
+    broadcastChannelPrototypeCleanup();
+  }
+  broadcastChannelPrototypeCleanup = null;
 }
 
 function hideKeywordReactionOverlayElement(element) {

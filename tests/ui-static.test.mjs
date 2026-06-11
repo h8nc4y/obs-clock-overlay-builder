@@ -86,6 +86,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
     new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url),
     "utf8"
   );
+  const overlayBroadcastChannelPrototype = readFileSync(
+    new URL("../assets/js/keyword-reaction-broadcastchannel-prototype.js", import.meta.url),
+    "utf8"
+  );
   const overlayQueueHelper = readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8");
   const redirects = readFileSync(new URL("../_redirects", import.meta.url), "utf8");
   const overlayPageBlock = css.match(/\.keyword-reaction-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -127,6 +131,8 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.match(overlayRuntime, /\bdispatchKeywordReactionInternalEvent\b/);
   assert.match(overlayRuntime, /\bsubscribeKeywordReactionInternalEvents\b/);
   assert.match(overlayRuntime, /new EventTargetConstructor\(\)/);
+  assert.match(overlayRuntime, /from "\.\/keyword-reaction-broadcastchannel-prototype\.js"/);
+  assert.match(overlayRuntime, /broadcastChannelPrototype/);
   assert.match(overlayRuntime, /from "\.\/keyword-reaction-queue\.js"/);
   assert.doesNotMatch(overlayRuntime, /\benqueueKeywordReactionEvent\b/);
   assert.match(overlayRuntime, /\bdequeueKeywordReactionEvent\b/);
@@ -143,8 +149,9 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.doesNotMatch(overlayRuntime, /setInterval|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/);
   assert.doesNotMatch(
     overlayRuntime,
-    /postMessage|BroadcastChannel|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
+    /postMessage|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
   );
+  assert.doesNotMatch(overlayRuntime, /new\s+BroadcastChannel|BroadcastChannel\s*\(/);
   assert.doesNotMatch(overlayRuntime, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
   assert.doesNotMatch(overlayEventHelper, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
   assert.doesNotMatch(overlayEventHelper, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
@@ -165,6 +172,15 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
     /document|window|innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
   );
   assert.doesNotMatch(overlayInternalDispatchHelper, /setTimeout|setInterval|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/);
+  assert.match(overlayBroadcastChannelPrototype, /\bBroadcastChannel\b/);
+  assert.doesNotMatch(
+    overlayBroadcastChannelPrototype,
+    /(?<!\.)\bpostMessage\s*\(|globalThis\.postMessage|window\.postMessage|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
+  );
+  assert.doesNotMatch(
+    overlayBroadcastChannelPrototype,
+    /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
 });
 
 test("editor includes separated manual keyword reaction toast controls", () => {
@@ -293,7 +309,7 @@ test("editor fixture playback keeps event data out of generated URLs and cleans 
   assert.match(fixtureHelper, /fixture event data/);
 });
 
-test("keyword reaction transport primitives are absent before BroadcastChannel implementation", () => {
+test("keyword reaction transport primitives are limited to the BroadcastChannel prototype module", () => {
   const runtimeAndHelperSources = [
     readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8"),
@@ -302,9 +318,13 @@ test("keyword reaction transport primitives are absent before BroadcastChannel i
     readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture-linkage.js", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
+    readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8")
   ].join("\n");
+  const overlayRuntime = readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8");
+  const prototypeModule = readFileSync(
+    new URL("../assets/js/keyword-reaction-broadcastchannel-prototype.js", import.meta.url),
+    "utf8"
+  );
 
   assert.doesNotMatch(
     runtimeAndHelperSources,
@@ -313,6 +333,12 @@ test("keyword reaction transport primitives are absent before BroadcastChannel i
   assert.doesNotMatch(
     runtimeAndHelperSources,
     /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
+  assert.match(prototypeModule, /\bBroadcastChannel\b/);
+  assert.doesNotMatch(overlayRuntime, /new\s+BroadcastChannel|BroadcastChannel\s*\(/);
+  assert.doesNotMatch(
+    [runtimeAndHelperSources, overlayRuntime, prototypeModule].join("\n"),
+    /(?<!\.)\bpostMessage\s*\(|globalThis\.postMessage|window\.postMessage|\blocalStorage\b|\bsessionStorage\b|\bindexedDB\b|\bfetch\s*\(|\bXMLHttpRequest\b|\bnavigator\.sendBeacon\b|\bWebSocket\b|\bEventSource\b/
   );
 });
 
@@ -395,6 +421,7 @@ test("editor refresh does not add risky HTML sinks", () => {
     readFileSync(new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture-linkage.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-broadcastchannel-prototype.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
   ].join("\n");
 
