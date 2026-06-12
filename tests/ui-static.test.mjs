@@ -19,11 +19,16 @@ test("font helper explains OBS-side fallback plainly", () => {
   assert.match(html, /フォントファイルは同梱しないため、OBSを動かすPCに同じフォントが必要です。/);
   assert.match(html, /OBS側PCに無い名前は標準フォントへ置き換わります。/);
   assert.match(html, /別PCでは同じフォントが必要です。/);
+  assert.match(html, /ブラウザから許可を求められたら、PC内フォント名を読むことを許可してください。/);
+  assert.match(html, /一覧が空でも、手入力フォント名にOBSを動かすPCで使える正式なフォント名を入れられます。/);
+  assert.match(html, /URLには表示名ではなく、OBSで実際に参照するフォント名を保存します。/);
   assert.match(html, /コピーしてOBSのブラウザソースへ貼ります。/);
   assert.match(html, /背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。/);
   assert.match(builder, /PC内フォント名を確認中\.\.\./);
+  assert.match(builder, /許可後でも一覧が空になる場合があります。/);
   assert.match(builder, /読み込めるフォント名が見つかりませんでした。/);
   assert.match(builder, /OBS側PCで使えるフォント名を入れてください。/);
+  assert.match(builder, /表示名ではなく、OBSで参照する実フォント名をURLに保存します。/);
 });
 
 test("pages use embedded favicon to avoid browser 404 noise", () => {
