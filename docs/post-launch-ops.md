@@ -52,6 +52,10 @@ Current project posture:
 
 Before production deploys or settings changes, manually confirm Cloudflare usage, spend limits, alerts, and paid binding state in the dashboard. Do not record account identifiers, usage numbers, payment details, or private dashboard values here.
 
+## Manual Dashboard Evidence
+
+Issue #12 records the historical human confirmation that GitHub Actions cost posture and Cloudflare Workers & Pages cost posture were checked. For future release or operations work, dashboard確認結果は公開safeな要約だけをIssue #12または個別確認コメントへ残す。数値、支払い詳細、account識別子、個人情報はこのrepositoryへ記録しない。
+
 ## Rollback Runbook
 
 Do not run production rollback as a drill while production is healthy.
@@ -91,6 +95,8 @@ For public demo or production checks:
 - `/clock` reaches the clock surface.
 - `/api/defaults` returns static fallback JSON with no-store caching.
 - 390px, 768px, and 1280px+ widths have no unexpected horizontal scroll.
+- Preview background controls have 44px or larger label targets with visible hover and focus states.
+- Local font loading explains permission prompts, empty-list fallback, and actual font-name storage for OBS.
 - Browser console has no relevant errors or warnings.
 - Network requests have no relevant failures.
 

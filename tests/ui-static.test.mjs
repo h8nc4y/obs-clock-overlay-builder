@@ -51,6 +51,22 @@ test("v0.1.1 backlog keeps release candidates separate from manual checks", () =
   assert.match(backlog, /数値、支払い詳細、account識別子、個人情報はrepo docsへ記録しません。/);
 });
 
+test("manual QA and ops docs cover current post-launch checks", () => {
+  const manualQa = readFileSync(new URL("../docs/manual-qa.md", import.meta.url), "utf8");
+  const postLaunchOps = readFileSync(new URL("../docs/post-launch-ops.md", import.meta.url), "utf8");
+  const preReleaseQa = readFileSync(new URL("../docs/pre-release-qa.md", import.meta.url), "utf8");
+
+  assert.match(manualQa, /プレビュー背景.*44px以上/);
+  assert.match(manualQa, /hover.*focus-within/);
+  assert.match(manualQa, /ブラウザから許可を求められたら/);
+  assert.match(manualQa, /一覧が空/);
+  assert.match(manualQa, /表示名ではなく、OBSで実際に参照するフォント名/);
+  assert.match(postLaunchOps, /Issue #12/);
+  assert.match(postLaunchOps, /dashboard確認結果は公開safeな要約だけ/);
+  assert.match(postLaunchOps, /数値、支払い詳細、account識別子、個人情報/);
+  assert.match(preReleaseQa, /PC内フォント読み込みの許可案内、空状態、実フォント名保存/);
+});
+
 test("copy fallback does not always select the generated URL field", () => {
   const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
   const copyTextBody = builder.match(/async function copyText\([^)]*\) \{(?<body>[\s\S]*?)\n\}/)?.groups?.body ?? "";

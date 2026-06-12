@@ -95,6 +95,8 @@ For editor and clock checks:
 - Check desktop width 1280px or wider.
 - Confirm no unexpected horizontal scroll.
 - Confirm primary controls are usable.
+- Confirm PC内フォント読み込みの許可案内、空状態、実フォント名保存の説明が分かる。
+- Confirm preview background labels are large enough to tap and show hover/focus states.
 - Confirm console and network have no relevant errors.
 - Confirm `/clock/` has no editor UI and does not depend on editor `localStorage`.
 
