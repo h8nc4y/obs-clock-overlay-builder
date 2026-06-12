@@ -6,6 +6,8 @@
 
 OBS Browser Source human QA は [CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md) で PASS と記録された。ただし、この文書は `BroadcastChannel` runtime、`postMessage`、`localStorage` transport、overlay本体fixture transport、paste JSON import、YouTube API integration、OAuth、API key、scraping、実データ取得、deploy、Cloudflare操作、Codex for OSS 申請を実装または承認するものではありません。
 
+Limited prototype の実装結果は [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md) に記録した。この結果も production transport や外部データ連携を承認しない。
+
 ## Decision
 
 判断: **次の実装候補は limited BroadcastChannel prototype に限定する**。
@@ -160,7 +162,7 @@ prototype では少なくとも次を確認対象にする:
 後続PRへ分けるもの:
 
 1. limited BroadcastChannel prototype implementation, if scoped as above。
-2. prototype result docs / QA notes。
+2. prototype result docs / QA notes。記録先: [CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md)
 3. overlay本体fixture transport scope decision after prototype result。
 4. overlay本体fixture transport implementation only after prototype result and transport scope are stable。
 5. `postMessage` comparison only if `BroadcastChannel` prototype fails or remains ambiguous。

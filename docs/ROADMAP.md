@@ -99,6 +99,7 @@ Current planning docs:
 - [Candidate A OBS BroadcastChannel human QA packet](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md)
 - [Candidate A OBS BroadcastChannel human QA result](CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md)
 - [Candidate A limited BroadcastChannel prototype scope decision](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md)
+- [Candidate A limited BroadcastChannel prototype result](CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_RESULT.md)
 - [Candidate A keyword reaction overlay design](CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md)
 - [Candidate A URL contract draft](CANDIDATE_A_URL_CONTRACT_DRAFT.md)
 - [Candidate A fixture schema draft](CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md)
@@ -142,8 +143,9 @@ Near-term sequence:
 32. Add an OBS BroadcastChannel human QA packet before collecting human OBS Browser Source results.
 33. Record public-safe OBS BroadcastChannel human QA PASS results.
 34. Define limited BroadcastChannel prototype scope before any `BroadcastChannel` runtime, overlay本体fixture transport, `postMessage`, or `localStorage` transport implementation.
-35. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, first transport decision, internal dispatch runtime connection, manual input dispatch scope, fixture dispatch scope, fixture linkage readiness, overlay fixture transport scope, BroadcastChannel feasibility, OBS BroadcastChannel QA scope, OBS BroadcastChannel human QA packet, human QA result, and limited BroadcastChannel prototype scope decision are stable.
-36. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
+35. Record limited BroadcastChannel prototype result docs / QA notes before any overlay本体fixture transport scope decision.
+36. Consider event source and fixture linkage only after the normalized event shape, queue helper, overlay queue connection, transport boundary, local intake helper, local intake queue connection, local intake overlay runtime connection, first transport decision, internal dispatch runtime connection, manual input dispatch scope, fixture dispatch scope, fixture linkage readiness, overlay fixture transport scope, BroadcastChannel feasibility, OBS BroadcastChannel QA scope, OBS BroadcastChannel human QA packet, human QA result, limited BroadcastChannel prototype scope decision, and limited BroadcastChannel prototype result are stable.
+37. Review YouTube API/OAuth/data policy boundaries before any real YouTube integration.
 
 These items are exploratory. They are not committed release scope and are not evidence of broad adoption.
 

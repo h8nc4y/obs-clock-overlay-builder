@@ -704,7 +704,7 @@ async function loadLocalFonts() {
     if (options.length === 0) {
       elements.localFontSelectWrap.classList.add("is-hidden");
       elements.localFontStatus.textContent =
-        "読み込めるフォント名が見つかりませんでした。手入力フォント名を使ってください。";
+        "読み込めるフォント名が見つかりませんでした。許可後でも一覧が空になる場合があります。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
       return;
     }
     elements.localFontSelect.textContent = "";
@@ -718,7 +718,7 @@ async function loadLocalFonts() {
       elements.localFontSelect.append(option);
     }
     elements.localFontSelectWrap.classList.remove("is-hidden");
-    elements.localFontStatus.textContent = `${options.length}件のフォント名を読み込みました。表示名が日本語でも、URLにはOBSで使う実際のフォント名を保存します。`;
+    elements.localFontStatus.textContent = `${options.length}件のフォント名を読み込みました。表示名ではなく、OBSで参照する実フォント名をURLに保存します。`;
     bindLocalFontSelect();
   } catch {
     elements.localFontStatus.textContent =

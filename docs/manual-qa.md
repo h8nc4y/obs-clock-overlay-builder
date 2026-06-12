@@ -13,6 +13,8 @@
 
 - 8テンプレートをすべてクリックし、ライブプレビューへ即時反映される。
 - 背景確認を `透過チェッカー`、`明るい背景`、`暗い背景`、`任意色` へ切り替えられる。
+- プレビュー背景の各選択肢は44px以上の押しやすい領域になり、ラベル全体を押して切り替えられる。
+- プレビュー背景のラベルはhoverとfocus-withinで反応が見え、キーボード操作中の位置が分かる。
 - 文字色、背景色、不透明度、角丸、余白、文字サイズ、文字間隔、行間、太さ、影、縁取り、枠線が反映される。
 - コントラストが低い設定で警告が表示される。
 - 生成URLが `/clock/?c=...` 形式で、コピーできる。
@@ -90,6 +92,9 @@
 - same-window internal dispatch helper導入後も、同一ページ内のnormalized event handoffだけを扱い、overlay runtime接続、editor UI接続、postMessage、BroadcastChannel、localStorage transport、fixture linkageは追加されない。
 - internal dispatch payload、event payload、queue state、eventId、displayText、manual input text、fixture event dataは生成URLに含まれない。
 - internal dispatch overlay runtime接続後も、`demo=1` の固定人工eventだけを same-window internal dispatch helper 経由で扱い、editor UI接続、manual input送信、fixture linkage、postMessage、BroadcastChannel、localStorage transportは追加されない。
+- limited BroadcastChannel prototype導入後も、通常の `/overlay/keyword-reaction/` と `/overlay/keyword-reaction/?demo=1` は既存挙動のままで、BroadcastChannelは明示queryなしでは開始されない。
+- `/overlay/keyword-reaction/?bcPrototype=1&bcRole=receiver&bcChannel=obs-bc-qa-001` は prototype receiver の public-safe statusだけを表示し、raw channel payload、fixture event data、queue state、secret-like値は表示しない。
+- `/overlay/keyword-reaction/?bcPrototype=1&bcRole=sender&bcChannel=obs-bc-qa-001` は synthetic-only sender の public-safe statusだけを表示し、generated URLへpayloadを入れない。
 - validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
 - `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。
@@ -110,7 +115,7 @@ OBS実機では、編集画面ではなく生成URLそのものをブラウザ�
 1. `npm run dev` を起動する。
 2. 編集画面 `http://localhost:4173/` を開く。
 3. 任意のテンプレートを選び、`OBS用URL` の生成URLをコピーする。
-4. `別タブで確認` で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認する。
+4. `時計だけを確認` で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認する。
 5. 推奨幅と推奨高さをメモする。
 
 ### OBS設定
@@ -166,10 +171,13 @@ URL再貼り付け再現: OK / NG
 ## Fonts
 
 - `PC内フォントを読み込む` はユーザー操作後だけ実行される。
+- ブラウザから許可を求められたら、PC内フォント名を読むことを許可してください、という案内が表示される。
+- 許可後に一覧が空でも、手入力フォント名へOBSを動かすPCで使える正式なフォント名を入れられることが分かる。
 - `queryLocalFonts` 非対応環境では、手入力案内が表示される。
 - 権限拒否時も編集画面が壊れない。
 - フォント欄の説明で、フォントファイルは同梱されず、OBSを動かすPCに同じフォントが必要なことが分かる。
 - `LightNovelPopV2 V2` は `ラノベPOP v2（LightNovelPopV2 V2）` のように、日本語名を先にした表示になる。
+- フォント一覧の日本語表示名は補助で、表示名ではなく、OBSで実際に参照するフォント名がURLへ保存されることが分かる。
 - 日本語表示名を選んでも、手入力フォント名、生成URL、`/clock/` のCSSには実際のフォント名が入る。
 - OBSを動かすPCに無いフォント名を指定した場合、system fallbackで表示される。
 - 同じ生成URLでも、OBSを動かすPCに対象フォントが無い場合は別の書体に見える。配信に使うPCで最後に確認する。
@@ -209,6 +217,7 @@ Cloudflare staging/production deployは、次を確認してから実行する�
 
 - Cloudflare Freeまたは既存契約内で実行できる。
 - 支出上限または課金アラートを確認済み。
+- dashboard確認結果はIssue #12または個別確認コメントへ公開safeな要約だけ残し、repo docsには数値、支払い詳細、account識別子、個人情報を記録しない。
 - paid plan変更、Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveを使わない。
 - secret、token、OAuth credential、実ユーザーデータをdeploy操作で外部送信しない。
 - `npm run cf:dry-run` が成功している。

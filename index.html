@@ -238,7 +238,7 @@
           </div>
           <div class="info-note">
             <strong>フォントの考え方</strong>
-            <p>この画面で選んだフォント名をURLに保存します。OBS側PCにそのフォントが無い場合は、近い標準フォントで表示され、見た目が変わることがあります。</p>
+            <p>この画面で選んだフォント名をURLに保存します。OBS側PCにそのフォントが無い場合は、近い標準フォントで表示され、見た目が変わることがあります。URLには表示名ではなく、OBSで実際に参照するフォント名を保存します。</p>
           </div>
           <div class="form-grid">
             <label class="field" for="fontPreset">
@@ -252,7 +252,7 @@
             </label>
             <div class="field inline-actions">
               <span>PC内フォント</span>
-              <p id="localFontStatus" class="muted">対応ブラウザだけ、ボタンを押したあとにPC内フォント名を読み込みます。読み込めない場合も手入力で使えます。</p>
+              <p id="localFontStatus" class="muted">対応ブラウザだけ、ボタンを押したあとにPC内フォント名を読み込みます。ブラウザから許可を求められたら、PC内フォント名を読むことを許可してください。一覧が空でも、手入力フォント名にOBSを動かすPCで使える正式なフォント名を入れられます。</p>
               <button id="loadLocalFonts" type="button">PC内フォントを読み込む</button>
             </div>
             <label class="field is-hidden" id="localFontSelectWrap" for="localFontSelect">

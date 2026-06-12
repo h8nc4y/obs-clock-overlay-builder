@@ -29,6 +29,21 @@ test("keyword reaction overlay runtime stays silent without explicit debug or de
   assert.equal(shouldShowKeywordReactionDemo(new URLSearchParams(`c=${encoded}`)), false);
 });
 
+test("keyword reaction overlay runtime does not enable BroadcastChannel prototype by default", () => {
+  const channels = createRecordingBroadcastChannelConstructor();
+  const state = getKeywordReactionOverlayRuntimeState(new URLSearchParams(""));
+  const statusElement = createFakeElement();
+  const demoElement = createFakeElement();
+  const fakeDocument = createFakeOverlayDocument(statusElement, demoElement);
+
+  mountKeywordReactionOverlayRuntime(fakeDocument, { search: "" }, { BroadcastChannelConstructor: channels.BroadcastChannel });
+
+  assert.equal(state.broadcastChannelPrototype.enabled, false);
+  assert.equal(channels.instances.length, 0);
+  assert.equal(statusElement.hidden, true);
+  assert.equal(demoElement.hidden, true);
+});
+
 test("keyword reaction overlay runtime exposes only public-safe debug status for valid config", () => {
   const encoded = encodeKeywordReactionConfig(
     { keyword: "secret meeting topic", displayPattern: "toast", reactionStyle: "soft" },
@@ -130,6 +145,79 @@ test("keyword reaction overlay routes demo events through same-window internal d
   assert.equal(Object.hasOwn(event, "displayText"), false);
   assert.doesNotMatch(eventText, /secret meeting topic/);
   assert.doesNotMatch(eventText, new RegExp(encoded));
+});
+
+test("keyword reaction overlay starts query-gated BroadcastChannel prototype sender safely", () => {
+  const channels = createRecordingBroadcastChannelConstructor();
+  const statusElement = createFakeElement();
+  const demoElement = createFakeElement();
+  const fakeDocument = createFakeOverlayDocument(statusElement, demoElement);
+
+  const state = mountKeywordReactionOverlayRuntime(
+    fakeDocument,
+    { search: "?bcPrototype=1&bcRole=sender&bcChannel=obs-bc-qa-001" },
+    { BroadcastChannelConstructor: channels.BroadcastChannel }
+  );
+  const statusText = statusElement.textContent;
+
+  assert.equal(state.broadcastChannelPrototype.enabled, true);
+  assert.equal(state.broadcastChannelPrototype.role, "sender");
+  assert.equal(channels.instances.length, 1);
+  assert.equal(channels.instances[0].postedMessages.length, 1);
+  assert.equal(statusElement.hidden, false);
+  assert.match(statusText, /BroadcastChannel prototype sender ready/);
+  assert.doesNotMatch(statusText, /obs-bc-qa-001/);
+  assert.doesNotMatch(statusText, /payload|displayText|queue|eventId/i);
+  assert.equal(demoElement.hidden, true);
+});
+
+test("keyword reaction overlay receives query-gated BroadcastChannel prototype events through render path", () => {
+  const channels = createRecordingBroadcastChannelConstructor();
+  const statusElement = createFakeElement();
+  const demoElement = createFakeElement();
+  const timers = [];
+  const fakeDocument = createFakeOverlayDocument(statusElement, demoElement, {
+    setTimeout(callback, durationMs) {
+      const timer = { callback, durationMs };
+      timers.push(timer);
+      return timer;
+    },
+    clearTimeout() {}
+  });
+
+  mountKeywordReactionOverlayRuntime(
+    fakeDocument,
+    { search: "?bcPrototype=1&bcRole=receiver&bcChannel=obs-bc-qa-001" },
+    { BroadcastChannelConstructor: channels.BroadcastChannel }
+  );
+  channels.instances[0].emitDefaultPrototypePayload();
+
+  assert.equal(statusElement.hidden, false);
+  assert.match(statusElement.textContent, /BroadcastChannel prototype receiver ready/);
+  assert.equal(demoElement.hidden, false);
+  assert.equal(demoElement.textContent, KEYWORD_REACTION_DEMO_EVENT_TEXT);
+  assert.equal(timers.length, 1);
+  assert.equal(timers[0].durationMs, 2400);
+});
+
+test("keyword reaction overlay cleans old BroadcastChannel prototype before remount", () => {
+  const channels = createRecordingBroadcastChannelConstructor();
+  const statusElement = createFakeElement();
+  const demoElement = createFakeElement();
+  const fakeDocument = createFakeOverlayDocument(statusElement, demoElement);
+
+  mountKeywordReactionOverlayRuntime(
+    fakeDocument,
+    { search: "?bcPrototype=1&bcRole=receiver&bcChannel=obs-bc-qa-001" },
+    { BroadcastChannelConstructor: channels.BroadcastChannel }
+  );
+  mountKeywordReactionOverlayRuntime(fakeDocument, { search: "" }, { BroadcastChannelConstructor: channels.BroadcastChannel });
+
+  assert.equal(channels.instances.length, 1);
+  assert.equal(channels.instances[0].closed, true);
+  assert.equal(channels.instances[0].listenerCount(), 0);
+  assert.equal(statusElement.hidden, true);
+  assert.equal(demoElement.hidden, true);
 });
 
 test("keyword reaction overlay demo flag falls back safely for invalid config", () => {
@@ -311,6 +399,18 @@ function createFakeElement() {
   };
 }
 
+function createFakeOverlayDocument(statusElement, demoElement, defaultView = {}) {
+  return {
+    defaultView,
+    getElementById(id) {
+      return {
+        keywordReactionOverlayStatus: statusElement,
+        keywordReactionOverlayDemo: demoElement
+      }[id];
+    }
+  };
+}
+
 function createRecordingEventTarget() {
   const listeners = new Map();
   return {
@@ -338,4 +438,69 @@ function createRecordingEventTarget() {
       return listeners.get(type)?.size ?? 0;
     }
   };
+}
+
+function createRecordingBroadcastChannelConstructor() {
+  const instances = [];
+  class RecordingBroadcastChannel {
+    constructor(name) {
+      this.name = name;
+      this.closed = false;
+      this.listeners = new Set();
+      this.postedMessages = [];
+      instances.push(this);
+    }
+
+    addEventListener(type, listener) {
+      if (type === "message") {
+        this.listeners.add(listener);
+      }
+    }
+
+    removeEventListener(type, listener) {
+      if (type === "message") {
+        this.listeners.delete(listener);
+      }
+    }
+
+    postMessage(message) {
+      this.postedMessages.push(message);
+    }
+
+    close() {
+      this.closed = true;
+    }
+
+    emit(data) {
+      for (const listener of this.listeners) {
+        listener({ data });
+      }
+    }
+
+    emitDefaultPrototypePayload() {
+      this.emit({
+        schemaVersion: 1,
+        messageType: "keyword-reaction-broadcastchannel-prototype-event",
+        event: {
+          schemaVersion: 1,
+          eventType: "keyword-reaction-event",
+          sourceType: "demo",
+          eventId: "demo-keyword-reaction",
+          displayText: KEYWORD_REACTION_DEMO_EVENT_TEXT,
+          keyword: "demo",
+          displayPattern: "toast",
+          reactionStyle: "spark",
+          intensity: 1,
+          durationMs: 2400,
+          offsetMs: 0
+        }
+      });
+    }
+
+    listenerCount() {
+      return this.listeners.size;
+    }
+  }
+
+  return { BroadcastChannel: RecordingBroadcastChannel, instances };
 }

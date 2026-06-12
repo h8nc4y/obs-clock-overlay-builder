@@ -19,11 +19,16 @@ test("font helper explains OBS-side fallback plainly", () => {
   assert.match(html, /フォントファイルは同梱しないため、OBSを動かすPCに同じフォントが必要です。/);
   assert.match(html, /OBS側PCに無い名前は標準フォントへ置き換わります。/);
   assert.match(html, /別PCでは同じフォントが必要です。/);
+  assert.match(html, /ブラウザから許可を求められたら、PC内フォント名を読むことを許可してください。/);
+  assert.match(html, /一覧が空でも、手入力フォント名にOBSを動かすPCで使える正式なフォント名を入れられます。/);
+  assert.match(html, /URLには表示名ではなく、OBSで実際に参照するフォント名を保存します。/);
   assert.match(html, /コピーしてOBSのブラウザソースへ貼ります。/);
   assert.match(html, /背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。/);
   assert.match(builder, /PC内フォント名を確認中\.\.\./);
+  assert.match(builder, /許可後でも一覧が空になる場合があります。/);
   assert.match(builder, /読み込めるフォント名が見つかりませんでした。/);
   assert.match(builder, /OBS側PCで使えるフォント名を入れてください。/);
+  assert.match(builder, /表示名ではなく、OBSで参照する実フォント名をURLに保存します。/);
 });
 
 test("pages use embedded favicon to avoid browser 404 noise", () => {
@@ -44,6 +49,22 @@ test("v0.1.1 backlog keeps release candidates separate from manual checks", () =
   assert.match(backlog, /## 人間確認待ち/);
   assert.match(backlog, /2026\/05\/26にIssue #12の人間確認コメントで完了扱いになりました。/);
   assert.match(backlog, /数値、支払い詳細、account識別子、個人情報はrepo docsへ記録しません。/);
+});
+
+test("manual QA and ops docs cover current post-launch checks", () => {
+  const manualQa = readFileSync(new URL("../docs/manual-qa.md", import.meta.url), "utf8");
+  const postLaunchOps = readFileSync(new URL("../docs/post-launch-ops.md", import.meta.url), "utf8");
+  const preReleaseQa = readFileSync(new URL("../docs/pre-release-qa.md", import.meta.url), "utf8");
+
+  assert.match(manualQa, /プレビュー背景.*44px以上/);
+  assert.match(manualQa, /hover.*focus-within/);
+  assert.match(manualQa, /ブラウザから許可を求められたら/);
+  assert.match(manualQa, /一覧が空/);
+  assert.match(manualQa, /表示名ではなく、OBSで実際に参照するフォント名/);
+  assert.match(postLaunchOps, /Issue #12/);
+  assert.match(postLaunchOps, /dashboard確認結果は公開safeな要約だけ/);
+  assert.match(postLaunchOps, /数値、支払い詳細、account識別子、個人情報/);
+  assert.match(preReleaseQa, /PC内フォント読み込みの許可案内、空状態、実フォント名保存/);
 });
 
 test("copy fallback does not always select the generated URL field", () => {
@@ -84,6 +105,10 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   );
   const overlayInternalDispatchHelper = readFileSync(
     new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url),
+    "utf8"
+  );
+  const overlayBroadcastChannelPrototype = readFileSync(
+    new URL("../assets/js/keyword-reaction-broadcastchannel-prototype.js", import.meta.url),
     "utf8"
   );
   const overlayQueueHelper = readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8");
@@ -127,6 +152,8 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.match(overlayRuntime, /\bdispatchKeywordReactionInternalEvent\b/);
   assert.match(overlayRuntime, /\bsubscribeKeywordReactionInternalEvents\b/);
   assert.match(overlayRuntime, /new EventTargetConstructor\(\)/);
+  assert.match(overlayRuntime, /from "\.\/keyword-reaction-broadcastchannel-prototype\.js"/);
+  assert.match(overlayRuntime, /broadcastChannelPrototype/);
   assert.match(overlayRuntime, /from "\.\/keyword-reaction-queue\.js"/);
   assert.doesNotMatch(overlayRuntime, /\benqueueKeywordReactionEvent\b/);
   assert.match(overlayRuntime, /\bdequeueKeywordReactionEvent\b/);
@@ -143,8 +170,9 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
   assert.doesNotMatch(overlayRuntime, /setInterval|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/);
   assert.doesNotMatch(
     overlayRuntime,
-    /postMessage|BroadcastChannel|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
+    /postMessage|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
   );
+  assert.doesNotMatch(overlayRuntime, /new\s+BroadcastChannel|BroadcastChannel\s*\(/);
   assert.doesNotMatch(overlayRuntime, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
   assert.doesNotMatch(overlayEventHelper, /localStorage|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/);
   assert.doesNotMatch(overlayEventHelper, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
@@ -165,6 +193,15 @@ test("keyword reaction overlay runtime skeleton is transparent and config-aware"
     /document|window|innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
   );
   assert.doesNotMatch(overlayInternalDispatchHelper, /setTimeout|setInterval|while\s*\(\s*true\s*\)|for\s*\(\s*;\s*;\s*\)/);
+  assert.match(overlayBroadcastChannelPrototype, /\bBroadcastChannel\b/);
+  assert.doesNotMatch(
+    overlayBroadcastChannelPrototype,
+    /(?<!\.)\bpostMessage\s*\(|globalThis\.postMessage|window\.postMessage|localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest|navigator\.sendBeacon|WebSocket|EventSource/
+  );
+  assert.doesNotMatch(
+    overlayBroadcastChannelPrototype,
+    /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
 });
 
 test("editor includes separated manual keyword reaction toast controls", () => {
@@ -293,7 +330,7 @@ test("editor fixture playback keeps event data out of generated URLs and cleans 
   assert.match(fixtureHelper, /fixture event data/);
 });
 
-test("keyword reaction transport primitives are absent before BroadcastChannel implementation", () => {
+test("keyword reaction transport primitives are limited to the BroadcastChannel prototype module", () => {
   const runtimeAndHelperSources = [
     readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8"),
@@ -302,9 +339,13 @@ test("keyword reaction transport primitives are absent before BroadcastChannel i
     readFileSync(new URL("../assets/js/keyword-reaction-queue.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture-linkage.js", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
+    readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8")
   ].join("\n");
+  const overlayRuntime = readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8");
+  const prototypeModule = readFileSync(
+    new URL("../assets/js/keyword-reaction-broadcastchannel-prototype.js", import.meta.url),
+    "utf8"
+  );
 
   assert.doesNotMatch(
     runtimeAndHelperSources,
@@ -313,6 +354,12 @@ test("keyword reaction transport primitives are absent before BroadcastChannel i
   assert.doesNotMatch(
     runtimeAndHelperSources,
     /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/
+  );
+  assert.match(prototypeModule, /\bBroadcastChannel\b/);
+  assert.doesNotMatch(overlayRuntime, /new\s+BroadcastChannel|BroadcastChannel\s*\(/);
+  assert.doesNotMatch(
+    [runtimeAndHelperSources, overlayRuntime, prototypeModule].join("\n"),
+    /(?<!\.)\bpostMessage\s*\(|globalThis\.postMessage|window\.postMessage|\blocalStorage\b|\bsessionStorage\b|\bindexedDB\b|\bfetch\s*\(|\bXMLHttpRequest\b|\bnavigator\.sendBeacon\b|\bWebSocket\b|\bEventSource\b/
   );
 });
 
@@ -374,11 +421,16 @@ test("editor refresh keeps preview and OBS URL first in the task flow", () => {
 test("editor refresh has keyboard and responsive layout safeguards", () => {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const previewToolbarLabelBlock =
+    css.match(/\.preview-toolbar label\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
   assert.match(html, /class="skip-link"/);
   assert.match(html, /<main id="builderMain" class="builder-layout" tabindex="-1">/);
   assert.match(css, /button,\s*\n\.button-like\s*\{[\s\S]*?min-height:\s*44px;/);
   assert.match(css, /@media \(pointer:\s*coarse\)\s*\{[\s\S]*?min-height:\s*48px;/);
+  assert.match(previewToolbarLabelBlock, /min-height:\s*44px;/);
+  assert.match(previewToolbarLabelBlock, /padding:\s*0 10px;/);
+  assert.match(css, /\.preview-toolbar label:focus-within\s*\{[\s\S]*?outline:\s*3px solid var\(--focus\);/);
   assert.match(css, /@media \(max-width:\s*820px\)\s*\{[\s\S]*?\.form-grid/);
   assert.match(css, /@media \(max-width:\s*520px\)\s*\{[\s\S]*?flex:\s*0 0 auto;/);
 });
@@ -395,6 +447,7 @@ test("editor refresh does not add risky HTML sinks", () => {
     readFileSync(new URL("../assets/js/keyword-reaction-intake-queue.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture-linkage.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-internal-dispatch.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/keyword-reaction-broadcastchannel-prototype.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8")
   ].join("\n");
 
