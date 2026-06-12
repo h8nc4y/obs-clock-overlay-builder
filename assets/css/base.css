@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--page-bg);
+}
+
+html.clock-page-root {
+  background: transparent;
+}
+
+html.keyword-reaction-page-root {
+  background: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, "Noto Sans JP", var(--fallback-fonts);
+  color: var(--ink);
+  background: var(--page-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
