@@ -1039,3 +1039,61 @@ button.adjust-tab[aria-pressed="true"]:hover {
 .labs-panel .candidate-experiment-panel {
   margin-top: 8px;
 }
+
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+button.category-tab {
+  min-height: 44px;
+  padding: 0 16px;
+  background: #ffffff;
+  color: var(--muted);
+  border-color: var(--line-strong);
+  border-radius: 999px;
+  font-size: 0.88rem;
+}
+
+button.category-tab:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-bright);
+}
+
+button.category-tab[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+button.category-tab[aria-pressed="true"]:hover {
+  background: var(--accent-hover);
+}
+
+.template-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 76px;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(45deg, #e3e3e3 25%, transparent 25%),
+    linear-gradient(-45deg, #e3e3e3 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e3e3e3 75%),
+    linear-gradient(-45deg, transparent 75%, #e3e3e3 75%);
+  background-color: #f4f4f4;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  background-size: 12px 12px;
+}
+
+.template-mini-clock {
+  flex: 0 0 auto;
+  transform: scale(0.42);
+  transform-origin: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
