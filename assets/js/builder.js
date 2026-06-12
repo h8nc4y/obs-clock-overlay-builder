@@ -31,6 +31,8 @@ import { mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
 
 const STORAGE_KEY = "obs-clock-builder:v1";
+const THEME_STORAGE_KEY = "obs-clock-builder:theme";
+const UI_THEMES = new Set(["white", "booth", "fanbox"]);
 const LONG_URL_WARNING = 1800;
 const TOO_LONG_URL_WARNING = 4000;
 const KEYWORD_REACTION_FALLBACK_STATUS =
@@ -38,6 +40,11 @@ const KEYWORD_REACTION_FALLBACK_STATUS =
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
 
 const elements = {
+  uiTheme: byId("uiTheme"),
+  adjustTabEasy: byId("adjustTabEasy"),
+  adjustTabAdvanced: byId("adjustTabAdvanced"),
+  easyControls: byId("easyControls"),
+  advancedControls: byId("advancedControls"),
   templateGrid: byId("templateGrid"),
   timezone: byId("timezone"),
   localTimezone: byId("localTimezone"),
@@ -155,6 +162,8 @@ const previewClock = mountClock(elements.clockPreview, state);
 init();
 
 function init() {
+  initUiTheme();
+  initAdjustTabs();
   renderTemplateButtons();
   renderFontOptions();
   renderSwatches();
@@ -164,6 +173,51 @@ function init() {
   bindPreviewBackground();
   syncFormFromState();
   updateEverything();
+}
+
+function readSavedUiTheme() {
+  try {
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return UI_THEMES.has(saved) ? saved : "white";
+  } catch {
+    return "white";
+  }
+}
+
+function applyUiTheme(theme) {
+  const safeTheme = UI_THEMES.has(theme) ? theme : "white";
+  if (safeTheme === "white") {
+    delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = safeTheme;
+  }
+  return safeTheme;
+}
+
+function initUiTheme() {
+  const theme = applyUiTheme(readSavedUiTheme());
+  elements.uiTheme.value = theme;
+  elements.uiTheme.addEventListener("change", () => {
+    const applied = applyUiTheme(elements.uiTheme.value);
+    elements.uiTheme.value = applied;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, applied);
+    } catch {
+      // 保存できない環境でも、この画面内の切り替えはそのまま使える。
+    }
+  });
+}
+
+function initAdjustTabs() {
+  const setMode = (advanced) => {
+    elements.easyControls.hidden = advanced;
+    elements.advancedControls.hidden = !advanced;
+    elements.adjustTabEasy.setAttribute("aria-pressed", String(!advanced));
+    elements.adjustTabAdvanced.setAttribute("aria-pressed", String(advanced));
+  };
+  elements.adjustTabEasy.addEventListener("click", () => setMode(false));
+  elements.adjustTabAdvanced.addEventListener("click", () => setMode(true));
+  setMode(false);
 }
 
 function loadInitialConfig() {

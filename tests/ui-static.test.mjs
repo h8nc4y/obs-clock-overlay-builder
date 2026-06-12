@@ -430,7 +430,7 @@ test("editor refresh keeps preview and OBS URL first in the task flow", () => {
   assert.ok(html.indexOf('id="copyUrl"') < html.indexOf('id="previewShell"'));
   assert.match(html, /<label class="field url-field" for="generatedUrl">/);
   assert.match(html, /<span>生成URL<\/span>/);
-  assert.match(html, /<button id="copyUrl" type="button">OBS URLをコピー<\/button>/);
+  assert.match(html, /<button id="copyUrl" type="button">OBS用URLをコピー<\/button>/);
   assert.match(css, /grid-template-areas:\s*"preview controls";/);
 });
 
@@ -449,6 +449,43 @@ test("editor refresh has keyboard and responsive layout safeguards", () => {
   assert.match(css, /\.preview-toolbar label:focus-within\s*\{[\s\S]*?outline:\s*3px solid var\(--focus\);/);
   assert.match(css, /@media \(max-width:\s*820px\)\s*\{[\s\S]*?\.form-grid/);
   assert.match(css, /@media \(max-width:\s*520px\)\s*\{[\s\S]*?flex:\s*0 0 auto;/);
+});
+
+test("editor step flow exposes easy and advanced adjustment layers", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.match(html, /テンプレートを選ぶ/);
+  assert.match(html, /自分好みに調整する/);
+  assert.match(html, /OBSに貼る/);
+  assert.match(html, /id="adjustTabEasy"[^>]*aria-pressed="true"/);
+  assert.match(html, /id="adjustTabAdvanced"[^>]*aria-pressed="false"/);
+  assert.match(html, /id="easyControls"/);
+  assert.match(html, /<div id="advancedControls" hidden>/);
+  assert.match(html, /<details class="labs-panel">/);
+  assert.match(html, /実験室\(キーワード反応オーバーレイ\)/);
+  assert.ok(html.indexOf('id="templateGrid"') < html.indexOf('id="easyControls"'));
+  assert.ok(html.indexOf("OBSに貼る") < html.indexOf('id="keywordReactionExperiment"'));
+});
+
+test("builder theme switcher stays editor-only and does not touch the clock surface", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+  const clockJs = readFileSync(new URL("../assets/js/clock.js", import.meta.url), "utf8");
+  const clockHtml = readFileSync(new URL("../clock/index.html", import.meta.url), "utf8");
+  const builderCss = readFileSync(new URL("../assets/css/builder.css", import.meta.url), "utf8");
+  const clockCss = readFileSync(new URL("../assets/css/clock.css", import.meta.url), "utf8");
+
+  assert.match(html, /id="uiTheme"/);
+  assert.match(html, /value="white"/);
+  assert.match(html, /value="booth"/);
+  assert.match(html, /value="fanbox"/);
+  assert.match(builder, /obs-clock-builder:theme/);
+  assert.match(builder, /dataset\.theme/);
+  assert.match(builderCss, /:root\[data-theme="booth"\]/);
+  assert.match(builderCss, /:root\[data-theme="fanbox"\]/);
+  assert.doesNotMatch(clockJs, /localStorage|dataset\.theme|data-theme/);
+  assert.doesNotMatch(clockHtml, /builder\.css|uiTheme|data-theme/);
+  assert.doesNotMatch(clockCss, /data-theme/);
 });
 
 test("editor refresh does not add risky HTML sinks", () => {
