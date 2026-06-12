@@ -1,0 +1,134 @@
+/* /clock/?c=... の再現性契約に直結する凍結領域。
+   既存URLの見た目を変えるため、値の変更は互換ガード(tests/template-compat.test.mjs)と
+   オーナー承認なしに行わないこと。 */
+
+.clock-page {
+  --clock-visual-safe-inset: 18px;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.clock-page #clockRoot {
+  display: inline-grid;
+  place-items: start;
+  width: max-content;
+  height: max-content;
+  margin: 0;
+  padding: var(--clock-visual-safe-inset);
+  overflow: visible;
+}
+
+.clock-widget {
+  --clock-font: "Noto Sans JP";
+  --clock-text: #ffffff;
+  --clock-bg: rgba(31, 41, 55, 0.72);
+  --clock-border: rgba(255, 255, 255, 0.35);
+  --clock-border-width: 1px;
+  --clock-radius: 18px;
+  --clock-padding-x: 24px;
+  --clock-padding-y: 14px;
+  --clock-font-size: 44px;
+  --clock-date-size: 16px;
+  --clock-label-size: 14px;
+  --clock-letter-spacing: 0.5px;
+  --clock-line-height: 1.08;
+  --clock-font-weight: 700;
+  --clock-gap: 6px;
+  --clock-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --clock-stroke-color: #000000;
+  --clock-stroke-width: 0px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--clock-gap);
+  width: max-content;
+  max-width: 100%;
+  padding: var(--clock-padding-y) var(--clock-padding-x);
+  border: var(--clock-border-width) solid var(--clock-border);
+  border-radius: var(--clock-radius);
+  background: var(--clock-bg);
+  color: var(--clock-text);
+  font-family: var(--clock-font), var(--fallback-fonts);
+  font-weight: var(--clock-font-weight);
+  letter-spacing: var(--clock-letter-spacing);
+  line-height: var(--clock-line-height);
+  text-shadow: var(--clock-shadow);
+  white-space: nowrap;
+}
+
+.clock-widget[data-label-position="top"],
+.clock-widget[data-label-position="bottom"],
+.clock-widget[data-label-position="hidden"] {
+  flex-direction: column;
+}
+
+.clock-widget[data-label-position="bottom"] .clock-label {
+  order: 2;
+}
+
+.clock-widget[data-label-position="left"] {
+  flex-direction: row;
+}
+
+.clock-widget[data-label-position="right"] {
+  flex-direction: row;
+}
+
+.clock-widget[data-label-position="right"] .clock-label {
+  order: 2;
+}
+
+.clock-label {
+  font-size: var(--clock-label-size);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.35) var(--clock-stroke-color);
+  paint-order: stroke fill;
+}
+
+.clock-main {
+  display: grid;
+  justify-items: center;
+  gap: calc(var(--clock-gap) * 0.55);
+  min-width: 0;
+}
+
+.clock-widget[data-label-position="left"] .clock-main,
+.clock-widget[data-label-position="right"] .clock-main {
+  justify-items: start;
+}
+
+.clock-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+  font-size: var(--clock-date-size);
+  font-weight: 700;
+  -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.45) var(--clock-stroke-color);
+  paint-order: stroke fill;
+}
+
+.clock-time {
+  display: inline-block;
+  font-size: var(--clock-font-size);
+  font-variant-numeric: tabular-nums;
+  -webkit-text-stroke: var(--clock-stroke-width) var(--clock-stroke-color);
+  paint-order: stroke fill;
+}
+
+.clock-date-row[hidden],
+.clock-label[hidden] {
+  display: none;
+}
+
+.template-minimal-clear {
+  backdrop-filter: none;
+}
+
+.template-neon-hud {
+  text-transform: uppercase;
+}

@@ -11,6 +11,11 @@ const requiredArtifacts = [
   "api/defaults",
   "favicon.ico",
   "assets/css/styles.css",
+  "assets/css/tokens.css",
+  "assets/css/base.css",
+  "assets/css/clock.css",
+  "assets/css/overlay.css",
+  "assets/css/builder.css",
   "assets/js/config.js",
   "assets/js/clock.js"
 ];

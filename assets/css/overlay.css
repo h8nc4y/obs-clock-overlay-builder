@@ -1,0 +1,93 @@
+/* /overlay/keyword-reaction/ 実験面のスタイル。
+   idle透明・public-safe status・demo toastの値は tests/ui-static.test.mjs が固定している。
+   .keyword-reaction-demo-toast の色/影は builder.css の .keyword-reaction-preview-toast と
+   意図的に同期しているため、変更時は両方を揃えること。 */
+
+.keyword-reaction-page {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.keyword-reaction-surface {
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  display: grid;
+  place-items: start;
+  pointer-events: none;
+}
+
+.keyword-reaction-status {
+  max-width: min(360px, calc(100vw - 36px));
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.68);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+  white-space: pre-line;
+}
+
+.keyword-reaction-status[hidden] {
+  display: none;
+}
+
+.keyword-reaction-demo-toast {
+  align-self: end;
+  justify-self: end;
+  width: min(320px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.86);
+  color: #f8fafc;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.32);
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: clamp(18px, 4vw, 34px);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-align: left;
+  pointer-events: none;
+}
+
+.keyword-reaction-demo-toast[hidden] {
+  display: none;
+}
+
+.keyword-reaction-demo-toast[data-style="pulse"] {
+  background: rgba(14, 116, 144, 0.88);
+}
+
+.keyword-reaction-demo-toast[data-style="soft"] {
+  background: rgba(248, 250, 252, 0.92);
+  color: #1f2724;
+}
+
+.keyword-reaction-demo-toast[data-style="none"] {
+  background: rgba(31, 39, 36, 0.78);
+  box-shadow: none;
+}
+
+.keyword-reaction-demo-toast[data-intensity="0"] {
+  opacity: 0.82;
+}
+
+.keyword-reaction-demo-toast[data-intensity="2"] {
+  border-width: 2px;
+}
+
+.keyword-reaction-demo-toast[data-intensity="3"] {
+  border-width: 2px;
+  box-shadow: 0 16px 42px rgba(15, 118, 110, 0.44);
+}

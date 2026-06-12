@@ -2,8 +2,24 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+const CSS_BUNDLE_FILES = ["tokens.css", "base.css", "clock.css", "overlay.css", "builder.css"];
+
+function readBundledCss() {
+  return CSS_BUNDLE_FILES.map((name) =>
+    readFileSync(new URL(`../assets/css/${name}`, import.meta.url), "utf8")
+  ).join("\n");
+}
+
+test("legacy styles.css shim keeps importing every split css file", () => {
+  const shim = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+
+  for (const name of CSS_BUNDLE_FILES) {
+    assert.match(shim, new RegExp(`@import url\\("\\./${name.replace(".", "\\.")}"\\);`));
+  }
+});
+
 test("color swatches keep touch-friendly dimensions", () => {
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
   const swatchBlock = css.match(/\.swatch\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
   assert.match(swatchBlock, /width:\s*40px;/);
@@ -77,7 +93,7 @@ test("copy fallback does not always select the generated URL field", () => {
 });
 
 test("clock page reserves visual safe inset for glow-heavy templates", () => {
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
   const clockHtml = readFileSync(new URL("../clock/index.html", import.meta.url), "utf8");
   const clockPageBlock = css.match(/\.clock-page\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
   const clockRootBlock = css.match(/\.clock-page #clockRoot\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -91,7 +107,7 @@ test("clock page reserves visual safe inset for glow-heavy templates", () => {
 });
 
 test("keyword reaction overlay runtime skeleton is transparent and config-aware", () => {
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
   const overlayHtml = readFileSync(new URL("../overlay/keyword-reaction/index.html", import.meta.url), "utf8");
   const overlayRuntime = readFileSync(new URL("../assets/js/keyword-reaction-overlay.js", import.meta.url), "utf8");
   const overlayEventHelper = readFileSync(new URL("../assets/js/keyword-reaction-event.js", import.meta.url), "utf8");
@@ -379,7 +395,7 @@ test("OBS BroadcastChannel QA scope remains docs-only and synthetic-data-only", 
 });
 
 test("editor live preview reserves visual safe inset around clock widget", () => {
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
   const previewStageBlock = css.match(/\.preview-stage\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
   assert.match(previewStageBlock, /padding:\s*var\(--clock-visual-safe-inset,\s*18px\);/);
@@ -388,7 +404,7 @@ test("editor live preview reserves visual safe inset around clock widget", () =>
 });
 
 test("editor live preview contains oversized clock inside the preview column", () => {
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
   const previewPanelBlock =
     css.match(/\.preview-panel\s*\{\s*background:\s*var\(--panel-strong\);(?<body>[^}]+)\}/)?.groups?.body ?? "";
   const previewShellBlock = css.match(/\.preview-shell\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
@@ -408,7 +424,7 @@ test("editor live preview contains oversized clock inside the preview column", (
 
 test("editor refresh keeps preview and OBS URL first in the task flow", () => {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
 
   assert.ok(html.indexOf('class="preview-column"') < html.indexOf('class="control-surface"'));
   assert.ok(html.indexOf('id="copyUrl"') < html.indexOf('id="previewShell"'));
@@ -420,7 +436,7 @@ test("editor refresh keeps preview and OBS URL first in the task flow", () => {
 
 test("editor refresh has keyboard and responsive layout safeguards", () => {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
-  const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const css = readBundledCss();
   const previewToolbarLabelBlock =
     css.match(/\.preview-toolbar label\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
@@ -438,7 +454,7 @@ test("editor refresh has keyboard and responsive layout safeguards", () => {
 test("editor refresh does not add risky HTML sinks", () => {
   const changedSources = [
     readFileSync(new URL("../index.html", import.meta.url), "utf8"),
-    readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8"),
+    readBundledCss(),
     readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-config.js", import.meta.url), "utf8"),
     readFileSync(new URL("../assets/js/keyword-reaction-fixture.js", import.meta.url), "utf8"),
