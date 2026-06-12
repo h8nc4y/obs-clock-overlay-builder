@@ -27,7 +27,7 @@ import {
   dispatchKeywordReactionInternalEvent,
   subscribeKeywordReactionInternalEvents
 } from "./keyword-reaction-internal-dispatch.js";
-import { mountClock, recommendedObsSize } from "./render.js";
+import { applyClockStyles, mountClock, recommendedObsSize } from "./render.js";
 import { createFormatters, formatClock } from "./time.js";
 
 const STORAGE_KEY = "obs-clock-builder:v1";
@@ -38,9 +38,18 @@ const TOO_LONG_URL_WARNING = 4000;
 const KEYWORD_REACTION_FALLBACK_STATUS =
   "キーワードは安全な既定値に戻しました。生成URLには入力テキストは含まれません。";
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
+const TEMPLATE_CATEGORIES = [
+  { id: "all", label: "すべて" },
+  { id: "cute", label: "かわいい" },
+  { id: "game", label: "ゲーム" },
+  { id: "chic", label: "シック" },
+  { id: "japanese", label: "和風" }
+];
+let templateCategory = "all";
 
 const elements = {
   uiTheme: byId("uiTheme"),
+  templateCategoryTabs: byId("templateCategoryTabs"),
   adjustTabEasy: byId("adjustTabEasy"),
   adjustTabAdvanced: byId("adjustTabAdvanced"),
   easyControls: byId("easyControls"),
@@ -164,6 +173,7 @@ init();
 function init() {
   initUiTheme();
   initAdjustTabs();
+  renderTemplateCategoryTabs();
   renderTemplateButtons();
   renderFontOptions();
   renderSwatches();
@@ -228,22 +238,51 @@ function loadInitialConfig() {
   });
 }
 
+function renderTemplateCategoryTabs() {
+  elements.templateCategoryTabs.textContent = "";
+  for (const category of TEMPLATE_CATEGORIES) {
+    const tab = document.createElement("button");
+    tab.type = "button";
+    tab.className = "category-tab";
+    tab.textContent = category.label;
+    tab.setAttribute("aria-pressed", String(category.id === templateCategory));
+    tab.addEventListener("click", () => {
+      templateCategory = category.id;
+      renderTemplateCategoryTabs();
+      renderTemplateButtons();
+      updateTemplatePressed();
+    });
+    elements.templateCategoryTabs.append(tab);
+  }
+}
+
+function buildTemplateMiniPreview(template) {
+  const mini = document.createElement("span");
+  mini.className = "template-mini";
+
+  const widget = document.createElement("span");
+  applyClockStyles(widget, applyTemplate(cloneDefaultConfig(), template.id));
+  widget.classList.add("template-mini-clock");
+
+  const timeText = document.createElement("span");
+  timeText.className = "clock-time";
+  timeText.textContent = template.sampleText;
+  widget.append(timeText);
+  mini.append(widget);
+  return mini;
+}
+
 function renderTemplateButtons() {
   elements.templateGrid.textContent = "";
   for (const template of TEMPLATES) {
+    if (templateCategory !== "all" && template.category !== templateCategory) {
+      continue;
+    }
     const button = document.createElement("button");
     button.type = "button";
     button.className = "template-button";
     button.dataset.template = template.id;
     button.setAttribute("aria-pressed", "false");
-
-    const sample = document.createElement("span");
-    sample.className = "template-sample";
-    sample.textContent = template.sampleText;
-    sample.style.color = template.config.textColor;
-    sample.style.background = hexToRgba(template.config.backgroundColor, template.config.backgroundOpacity);
-    sample.style.borderColor = hexToRgba(template.config.borderColor, template.config.borderOpacity);
-    sample.style.borderRadius = `${Math.min(template.config.radius, 16)}px`;
 
     const name = document.createElement("span");
     name.className = "template-name";
@@ -253,7 +292,7 @@ function renderTemplateButtons() {
     note.className = "template-note";
     note.textContent = template.note;
 
-    button.append(sample, name, note);
+    button.append(buildTemplateMiniPreview(template), name, note);
     button.addEventListener("click", () => {
       state = applyTemplate(state, template.id);
       syncFormFromState();
