@@ -564,17 +564,43 @@ output {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: 32px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #25302c;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.preview-toolbar label:hover {
+  border-color: var(--accent);
+  background: #f8fbf7;
+}
+
+.preview-toolbar label:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-color: var(--focus);
 }
 
 .preview-toolbar input[type="radio"] {
+  flex: 0 0 auto;
+  width: 19px;
+  height: 19px;
   accent-color: var(--accent);
 }
 
 .preview-toolbar input[type="color"] {
+  box-sizing: border-box;
   width: 44px;
   height: 34px;
+  min-height: 44px;
   padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .preview-shell {

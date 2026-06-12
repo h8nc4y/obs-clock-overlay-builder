@@ -405,11 +405,16 @@ test("editor refresh keeps preview and OBS URL first in the task flow", () => {
 test("editor refresh has keyboard and responsive layout safeguards", () => {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../assets/css/styles.css", import.meta.url), "utf8");
+  const previewToolbarLabelBlock =
+    css.match(/\.preview-toolbar label\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
 
   assert.match(html, /class="skip-link"/);
   assert.match(html, /<main id="builderMain" class="builder-layout" tabindex="-1">/);
   assert.match(css, /button,\s*\n\.button-like\s*\{[\s\S]*?min-height:\s*44px;/);
   assert.match(css, /@media \(pointer:\s*coarse\)\s*\{[\s\S]*?min-height:\s*48px;/);
+  assert.match(previewToolbarLabelBlock, /min-height:\s*44px;/);
+  assert.match(previewToolbarLabelBlock, /padding:\s*0 10px;/);
+  assert.match(css, /\.preview-toolbar label:focus-within\s*\{[\s\S]*?outline:\s*3px solid var\(--focus\);/);
   assert.match(css, /@media \(max-width:\s*820px\)\s*\{[\s\S]*?\.form-grid/);
   assert.match(css, /@media \(max-width:\s*520px\)\s*\{[\s\S]*?flex:\s*0 0 auto;/);
 });
