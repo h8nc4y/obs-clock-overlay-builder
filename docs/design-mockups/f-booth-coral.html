@@ -1,0 +1,1213 @@
+<!--
+  デザインモックアップ(build対象外・本番に出ない)
+  案F: BOOTH Coral(BOOTH風)
+  2026-06-13
+-->
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>時計オーバーレイURLビルダー - 案F BOOTH Coral(モックアップ)</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --band: #f6f6f5;
+    --panel: #ffffff;
+    --ink: #1e1e1e;
+    --muted: #767675;
+    --muted-deep: #666665;
+    --accent: #fc4d50;
+    --accent-deep: #d83538;
+    --accent-pale: #feeced;
+    --accent-ink: #ffffff;
+    --line: #e5e5e4;
+    --line-strong: #d6d6d5;
+    --radius: 6px;
+    --radius-sm: 4px;
+    --radius-lg: 8px;
+    --shadow: 0 1px 3px rgba(30, 30, 30, 0.08);
+    --shadow-hover: 0 6px 16px rgba(30, 30, 30, 0.12);
+    --space-1: 8px;
+    --space-2: 12px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  a {
+    color: var(--accent-deep);
+  }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: var(--space-4) var(--space-3) var(--space-5);
+  }
+
+  /* ===== ヘッダー ===== */
+  .site-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding: var(--space-2) 0 var(--space-4);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: var(--space-4);
+    background: var(--panel);
+  }
+
+  .kicker {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--accent-deep);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .site-header h1 {
+    display: inline-block;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 4px 14px;
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .site-header .tagline {
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 20px;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--panel);
+    color: var(--accent-deep);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+  }
+
+  /* ===== 2カラムレイアウト ===== */
+  .layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: var(--space-4);
+  }
+
+  /* BOOTHの「注目のリンク」帯風に、偶数セクションへ淡いグレー帯 */
+  .steps > .panel:nth-child(even) {
+    background: var(--band);
+  }
+
+  .steps > .panel:nth-child(even) .kicker {
+    color: #c5292c;
+  }
+
+  .steps > .panel:nth-child(even) .step-head p {
+    color: var(--muted-deep);
+  }
+
+  /* ===== 左列: ライブプレビュー ===== */
+  .preview-col {
+    position: sticky;
+    top: var(--space-3);
+  }
+
+  .panel-head {
+    margin-bottom: var(--space-3);
+  }
+
+  .panel-head h2 {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .stage {
+    position: relative;
+    height: 230px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line-strong);
+    overflow: hidden;
+    background: linear-gradient(165deg, #2c3245 0%, #1e2334 48%, #141826 100%);
+  }
+
+  .stage-glow {
+    position: absolute;
+    left: 18%;
+    top: 30%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(244, 162, 97, 0.35) 0%, rgba(244, 162, 97, 0) 70%);
+  }
+
+  .stage-hill-a,
+  .stage-hill-b {
+    position: absolute;
+    bottom: -40px;
+    width: 70%;
+    height: 120px;
+    border-radius: 50% 50% 0 0;
+  }
+
+  .stage-hill-a {
+    left: -15%;
+    background: #232a3e;
+  }
+
+  .stage-hill-b {
+    right: -20%;
+    height: 96px;
+    background: #1a2032;
+  }
+
+  .stage-cam {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    width: 92px;
+    height: 64px;
+    border-radius: var(--radius-sm);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: linear-gradient(180deg, #3a4158, #262c40);
+    overflow: hidden;
+  }
+
+  .stage-cam::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: #aeb6cc;
+  }
+
+  .stage-cam::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -16px;
+    width: 48px;
+    height: 34px;
+    border-radius: 50% 50% 0 0;
+    transform: translateX(-50%);
+    background: #aeb6cc;
+  }
+
+  .stage-bar {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 120px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .stage-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 62%;
+    border-radius: 999px;
+    background: #f4a261;
+  }
+
+  /* サンプル時計ウィジェット */
+  .clock-widget {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(14, 16, 24, 0.62);
+    color: #ffffff;
+    text-align: right;
+  }
+
+  .clock-widget .clock-label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--accent-deep);
+    color: var(--accent-ink);
+    margin-bottom: 4px;
+  }
+
+  .clock-widget .clock-time {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  .clock-widget .clock-date {
+    font-size: 12px;
+    opacity: 0.92;
+  }
+
+  /* 背景切替チップ */
+  .bg-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .chip .dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(30, 30, 30, 0.25);
+  }
+
+  .chip .dot-checker {
+    background-color: #ffffff;
+    background-image:
+      linear-gradient(45deg, #d9d9d8 25%, transparent 25%, transparent 75%, #d9d9d8 75%),
+      linear-gradient(45deg, #d9d9d8 25%, transparent 25%, transparent 75%, #d9d9d8 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+  }
+
+  .chip .dot-light {
+    background: #f3f4f6;
+  }
+
+  .chip .dot-dark {
+    background: #1f242f;
+  }
+
+  .chip .dot-stream {
+    background: linear-gradient(160deg, #2c3245, #141826);
+  }
+
+  .chip[aria-pressed="true"] {
+    border-color: var(--accent);
+    background: var(--accent-pale);
+  }
+
+  /* 推奨サイズ */
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+  }
+
+  .metrics div {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    background: var(--band);
+  }
+
+  .metrics span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted-deep);
+  }
+
+  .metrics strong {
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ボタン */
+  .btn-primary {
+    display: block;
+    width: 100%;
+    min-height: 58px;
+    margin-top: var(--space-3);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    box-shadow: var(--shadow);
+  }
+
+  .btn-primary:hover {
+    background: #e93c3f;
+    border-color: #e93c3f;
+  }
+
+  .btn-secondary {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin-top: var(--space-1);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--panel);
+    color: var(--accent-deep);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+  }
+
+  .btn-secondary:hover {
+    background: var(--accent-pale);
+  }
+
+  /* URL表示欄 */
+  .url-box {
+    margin-top: var(--space-3);
+  }
+
+  .url-box .url-caption {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .url-box code {
+    display: block;
+    margin-top: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--band);
+    font-size: 12px;
+    word-break: break-all;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .check-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent);
+  }
+
+  /* ===== 右列: STEP ===== */
+  .steps {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .step-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .step-num {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: 800;
+    box-shadow: var(--shadow);
+  }
+
+  .step-num.n1 {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .step-num.n2 {
+    background: var(--accent-deep);
+    color: var(--accent-ink);
+  }
+
+  .step-num.n3 {
+    background: var(--accent-pale);
+    color: #c5292c;
+  }
+
+  .step-head h2 {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .step-head p {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* カテゴリタブ(BOOTHのジャンルボタン風の丸ピル) */
+  .cat-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+  }
+
+  .cat-tab {
+    min-height: 44px;
+    padding: 6px 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .cat-tab:hover {
+    border-color: var(--accent);
+  }
+
+  .cat-tab[aria-pressed="true"] {
+    background: var(--accent-deep);
+    border-color: var(--accent-deep);
+    color: #ffffff;
+  }
+
+  /* テンプレートカード(BOOTHの商品カード風) */
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+  }
+
+  .tpl-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--panel);
+    padding: 8px;
+    box-shadow: none;
+    text-align: left;
+    position: relative;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .tpl-card:hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .tpl-card.is-selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-pale);
+  }
+
+  .tpl-card .badge {
+    position: absolute;
+    top: -10px;
+    right: -6px;
+    padding: 2px 10px;
+    border-radius: 4px;
+    border: 0;
+    background: var(--accent-deep);
+    color: var(--accent-ink);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    box-shadow: var(--shadow);
+  }
+
+  .mini {
+    height: 76px;
+    border-radius: var(--radius);
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tpl-name {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  /* テンプレ8種の個性(UIテーマから独立) */
+  .mini-minimal {
+    background-color: #2f3440;
+    background-image:
+      linear-gradient(45deg, #3b4150 25%, transparent 25%, transparent 75%, #3b4150 75%),
+      linear-gradient(45deg, #3b4150 25%, transparent 25%, transparent 75%, #3b4150 75%);
+    background-size: 14px 14px;
+    background-position: 0 0, 7px 7px;
+    color: #ffffff;
+  }
+
+  .mini-milktea {
+    background: linear-gradient(170deg, #f1e0c8, #ddbf9c);
+    color: #6b4c34;
+  }
+
+  .mini-pastel {
+    background: linear-gradient(135deg, #ffd9e8 0%, #d9f3e4 52%, #dbe4ff 100%);
+    color: #8a4e9e;
+  }
+
+  .mini-soda {
+    background: linear-gradient(180deg, #e6f7ff, #bfe9fb);
+    color: #136f9f;
+  }
+
+  .mini-sakura {
+    background: linear-gradient(160deg, #fff0f5, #ffd6e4);
+    color: #b04a70;
+  }
+
+  .mini-night {
+    background: #16171c;
+    color: #f5f6f8;
+  }
+
+  .mini-neon {
+    background: #080e14;
+    color: #54f1ff;
+    text-shadow: 0 0 10px rgba(84, 241, 255, 0.9);
+    letter-spacing: 0.1em;
+  }
+
+  .mini-mono {
+    background: #ffffff;
+    color: #16171c;
+    box-shadow: inset 0 0 0 1px #d2d2d2;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+
+  /* STEP 2: 調整タブ */
+  .adjust-tabs {
+    display: flex;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+  }
+
+  .adjust-tab {
+    min-height: 44px;
+    padding: 6px 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom-width: 0;
+    background: var(--panel);
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .adjust-tab[aria-pressed="true"] {
+    background: var(--panel);
+    border-color: var(--accent);
+    color: var(--accent-deep);
+    box-shadow: inset 0 3px 0 var(--accent);
+  }
+
+  .adjust-body {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .field > span {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .color-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .color-chip {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--line-strong);
+    padding: 0;
+  }
+
+  .color-chip.is-selected {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(252, 77, 80, 0.35);
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .slider-row input[type="range"] {
+    flex: 1;
+    min-height: 44px;
+    accent-color: var(--accent);
+  }
+
+  .slider-row output {
+    flex: none;
+    min-width: 56px;
+    text-align: center;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    background: var(--panel);
+  }
+
+  .swatch-inline {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius);
+    border: 2px solid var(--line-strong);
+    background: #101218;
+    flex: none;
+  }
+
+  input[type="text"] {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    font: inherit;
+    background: var(--panel);
+    color: var(--ink);
+  }
+
+  /* トグル */
+  .toggles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-1);
+  }
+
+  .switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .switch .track {
+    flex: none;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: #cfcfce;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  .switch .track::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(30, 30, 30, 0.3);
+    transition: left 0.15s;
+  }
+
+  .switch input:checked + .track {
+    background: var(--accent);
+  }
+
+  .switch input:checked + .track::after {
+    left: 21px;
+  }
+
+  .switch input:focus-visible + .track {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* STEP 3: OBSに貼る */
+  .obs-steps {
+    display: grid;
+    gap: var(--space-2);
+    list-style: none;
+    counter-reset: obs;
+  }
+
+  .obs-steps li {
+    counter-increment: obs;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    background: var(--band);
+    font-weight: 700;
+  }
+
+  .obs-steps li::before {
+    content: counter(obs);
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--accent-deep);
+    color: var(--accent-ink);
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .faq {
+    margin-top: var(--space-3);
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .faq details {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+  }
+
+  .faq summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style-position: inside;
+  }
+
+  .faq details p {
+    padding: 0 14px 12px 14px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* 実験室 */
+  .lab {
+    margin-top: var(--space-4);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-lg);
+    background: transparent;
+  }
+
+  .lab summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    list-style-position: inside;
+  }
+
+  .lab p {
+    padding: 0 16px 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* フッター */
+  .site-footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .footer-link {
+    font-weight: 700;
+    color: var(--accent-deep);
+    text-decoration: underline;
+  }
+
+  /* ===== レスポンシブ ===== */
+  @media (max-width: 1100px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .preview-col {
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .template-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toggles {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 390px) {
+    .wrap {
+      padding-left: var(--space-2);
+      padding-right: var(--space-2);
+    }
+
+    .site-header h1 {
+      font-size: 22px;
+    }
+
+    .stage {
+      height: 200px;
+    }
+
+    .clock-widget .clock-time {
+      font-size: 22px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-header">
+    <div>
+      <span class="kicker">OBS BROWSER SOURCE</span>
+      <h1>時計オーバーレイURLビルダー</h1>
+      <p class="tagline">配信画面に置く透明な時計を、URLひとつで作れます。</p>
+    </div>
+    <a class="btn-ghost" href="#">時計画面を開く</a>
+  </header>
+
+  <div class="layout">
+
+    <!-- 左列: ライブプレビュー -->
+    <aside class="preview-col">
+      <section class="panel" aria-label="ライブプレビュー">
+        <div class="panel-head">
+          <span class="kicker">PREVIEW</span>
+          <h2>ライブプレビュー</h2>
+        </div>
+
+        <div class="stage" role="img" aria-label="配信画面風の背景に時計を重ねたプレビュー">
+          <span class="stage-glow"></span>
+          <span class="stage-hill-a"></span>
+          <span class="stage-hill-b"></span>
+          <span class="stage-cam"></span>
+          <span class="stage-bar"></span>
+          <div class="clock-widget">
+            <span class="clock-label">LIVE</span>
+            <div class="clock-time">19:24:36</div>
+            <div class="clock-date">6月13日(土)</div>
+          </div>
+        </div>
+
+        <div class="bg-chips" aria-label="プレビュー背景の切り替え">
+          <button type="button" class="chip" aria-pressed="false"><span class="dot dot-checker"></span>透過</button>
+          <button type="button" class="chip" aria-pressed="false"><span class="dot dot-light"></span>明るい</button>
+          <button type="button" class="chip" aria-pressed="false"><span class="dot dot-dark"></span>暗い</button>
+          <button type="button" class="chip" aria-pressed="true"><span class="dot dot-stream"></span>配信画面風</button>
+        </div>
+
+        <div class="metrics" aria-label="OBS推奨サイズ">
+          <div>
+            <span>推奨幅</span>
+            <strong>229px</strong>
+          </div>
+          <div>
+            <span>推奨高さ</span>
+            <strong>58px</strong>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary">OBS用URLをコピー</button>
+        <button type="button" class="btn-secondary">時計だけを確認</button>
+
+        <div class="url-box">
+          <span class="url-caption">OBSに貼るURL</span>
+          <code>https://example.workers.dev/clock/?c=eyJ2IjoxLCJ0ZW1...</code>
+          <label class="check-row">
+            <input type="checkbox">
+            短いURLにする
+          </label>
+        </div>
+      </section>
+    </aside>
+
+    <!-- 右列: STEP -->
+    <main class="steps">
+
+      <!-- STEP 1 -->
+      <section class="panel" aria-labelledby="step1-h">
+        <div class="step-head">
+          <span class="step-num n1" aria-hidden="true">1</span>
+          <div>
+            <span class="kicker">TEMPLATE</span>
+            <h2 id="step1-h">テンプレートを選ぶ</h2>
+            <p>まずは近い雰囲気を選ぶだけでOK。あとから全部変えられます。</p>
+          </div>
+        </div>
+
+        <div class="cat-tabs" aria-label="テンプレートのカテゴリ">
+          <button type="button" class="cat-tab" aria-pressed="true">すべて</button>
+          <button type="button" class="cat-tab" aria-pressed="false">かわいい</button>
+          <button type="button" class="cat-tab" aria-pressed="false">ゲーム</button>
+          <button type="button" class="cat-tab" aria-pressed="false">シック</button>
+          <button type="button" class="cat-tab" aria-pressed="false">和風</button>
+        </div>
+
+        <div class="template-grid">
+          <button type="button" class="tpl-card is-selected">
+            <span class="badge">使用中</span>
+            <span class="mini mini-minimal">12:34</span>
+            <span class="tpl-name">Minimal Clear</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-milktea">12:34</span>
+            <span class="tpl-name">Milk Tea</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-pastel">12:34</span>
+            <span class="tpl-name">Pastel Pop</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-soda">12:34</span>
+            <span class="tpl-name">Soda</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-sakura">12:34</span>
+            <span class="tpl-name">Sakura</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-night">12:34</span>
+            <span class="tpl-name">Night Studio</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-neon">12:34</span>
+            <span class="tpl-name">Neon HUD</span>
+          </button>
+          <button type="button" class="tpl-card">
+            <span class="mini mini-mono">12:34</span>
+            <span class="tpl-name">Mono Compact</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="panel" aria-labelledby="step2-h">
+        <div class="step-head">
+          <span class="step-num n2" aria-hidden="true">2</span>
+          <div>
+            <span class="kicker">CUSTOMIZE</span>
+            <h2 id="step2-h">自分好みに調整する</h2>
+            <p>「かんたん」だけでも十分きれいに仕上がります。</p>
+          </div>
+        </div>
+
+        <div class="adjust-tabs" aria-label="調整モード">
+          <button type="button" class="adjust-tab" aria-pressed="true">かんたん</button>
+          <button type="button" class="adjust-tab" aria-pressed="false">こだわり</button>
+        </div>
+
+        <div class="adjust-body">
+          <div class="field">
+            <span>文字色</span>
+            <div class="color-chips" aria-label="文字色の候補">
+              <button type="button" class="color-chip is-selected" style="background:#ffffff" aria-label="白(選択中)"></button>
+              <button type="button" class="color-chip" style="background:#29302c" aria-label="黒"></button>
+              <button type="button" class="color-chip" style="background:#f0635c" aria-label="コーラル"></button>
+              <button type="button" class="color-chip" style="background:#2a9d8f" aria-label="ティール"></button>
+              <button type="button" class="color-chip" style="background:#f4a261" aria-label="アンバー"></button>
+              <button type="button" class="color-chip" style="background:#f7b8cd" aria-label="ピンク"></button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span>背景色と不透明度</span>
+            <div class="slider-row">
+              <span class="swatch-inline" aria-label="背景色(濃紺)"></span>
+              <input type="range" min="0" max="100" value="55" aria-label="背景の不透明度">
+              <output>55%</output>
+            </div>
+          </div>
+
+          <div class="field">
+            <span>文字サイズ</span>
+            <div class="slider-row">
+              <input type="range" min="18" max="120" value="32" aria-label="文字サイズ">
+              <output>32px</output>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>ラベル文字</span>
+            <input type="text" value="LIVE" maxlength="40">
+          </label>
+
+          <div class="toggles">
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="track" aria-hidden="true"></span>
+              秒を表示
+            </label>
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="track" aria-hidden="true"></span>
+              日付を表示
+            </label>
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="track" aria-hidden="true"></span>
+              曜日を表示
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="panel" aria-labelledby="step3-h">
+        <div class="step-head">
+          <span class="step-num n3" aria-hidden="true">3</span>
+          <div>
+            <span class="kicker">OBS SETUP</span>
+            <h2 id="step3-h">OBSに貼る</h2>
+            <p>コピーしたURLをブラウザソースに入れるだけです。</p>
+          </div>
+        </div>
+
+        <ol class="obs-steps">
+          <li>「OBS用URLをコピー」を押す</li>
+          <li>OBSでブラウザソースを追加してURL欄に貼り付け</li>
+          <li>幅と高さを推奨値(229 / 58)にする</li>
+        </ol>
+
+        <div class="faq">
+          <details>
+            <summary>背景が白くなる</summary>
+            <p>時計の画面はもともと透明です。OBSのブラウザソース設定やカスタムCSS、プレビュー背景の設定を確認してください。</p>
+          </details>
+          <details>
+            <summary>フォントが反映されない</summary>
+            <p>OBSを動かすPCにそのフォントが入っていない可能性があります。無い場合は標準フォントに置き換わって表示されます。</p>
+          </details>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 実験室 -->
+  <details class="lab">
+    <summary>実験室(キーワード反応オーバーレイ)</summary>
+    <p>コメントのキーワードに反応する実験的なオーバーレイを試せます。時計URLには影響しません。</p>
+  </details>
+
+  <footer class="site-footer">
+    <p>フォントファイルは同梱していません。フォント名だけをURLに保存します。</p>
+    <a class="footer-link" href="https://github.com/h8nc4y/obs-clock-overlay-builder">GitHub: obs-clock-overlay-builder</a>
+  </footer>
+
+</div>
+</body>
+</html>

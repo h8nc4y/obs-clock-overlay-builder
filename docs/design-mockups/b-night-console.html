@@ -1,0 +1,1022 @@
+<!--
+  デザインモックアップ(build対象外・本番に出ない)
+  案B Night Console(ナイトコンソール)
+  2026-06-13
+-->
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>時計オーバーレイURLビルダー(案B Night Console モックアップ)</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #14161d;
+    --panel: #1d2029;
+    --panel-2: #232734;
+    --ink: #e8eaf0;
+    --muted: #9aa1b0;
+    --accent: #4fd1c5;
+    --accent-ink: #0b2724;
+    --accent-2: #b794f4;
+    --line: #2e3340;
+    --radius: 8px;
+    --radius-lg: 10px;
+    --shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    --glow: 0 0 0 4px rgba(79, 209, 197, 0.22);
+    --mono: Consolas, "Roboto Mono", monospace;
+    --space-1: 8px;
+    --space-2: 12px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  a {
+    color: var(--accent);
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: var(--glow);
+    border-radius: var(--radius);
+  }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-4);
+  }
+
+  /* ヘッダー */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: var(--space-4);
+  }
+
+  .topbar h1 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+  }
+
+  .topbar .tagline {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .brand-mark {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    margin: 0 0 2px;
+  }
+
+  .open-clock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--ink);
+    text-decoration: none;
+    background: var(--panel);
+    font-size: 14px;
+  }
+
+  .open-clock:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 2カラムレイアウト */
+  .layout {
+    display: grid;
+    grid-template-columns: 380px minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: var(--space-4);
+  }
+
+  /* 左列: ライブプレビュー */
+  .preview-col {
+    position: sticky;
+    top: var(--space-4);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .panel-title {
+    margin: 0 0 var(--space-2);
+    font-size: 16px;
+  }
+
+  .panel-title .mono-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-right: 8px;
+  }
+
+  .stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 75% 18%, rgba(183, 148, 244, 0.16), transparent 50%),
+      radial-gradient(circle at 18% 30%, rgba(79, 209, 197, 0.10), transparent 45%),
+      linear-gradient(160deg, #2a3346 0%, #1a2030 55%, #12161f 100%);
+  }
+
+  .scene-hill {
+    position: absolute;
+    bottom: -22%;
+    border-radius: 50%;
+    background: rgba(8, 10, 16, 0.7);
+  }
+
+  .hill-1 {
+    left: -12%;
+    width: 70%;
+    height: 55%;
+  }
+
+  .hill-2 {
+    right: -16%;
+    width: 64%;
+    height: 46%;
+    background: rgba(8, 10, 16, 0.55);
+  }
+
+  .scene-figure {
+    position: absolute;
+    left: 22%;
+    bottom: 12%;
+    width: 36px;
+    height: 64px;
+    border-radius: 16px 16px 8px 8px;
+    background: rgba(5, 7, 12, 0.85);
+  }
+
+  .scene-figure::before {
+    content: "";
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(5, 7, 12, 0.85);
+  }
+
+  .scene-hud {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 6%;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(to right, rgba(79, 209, 197, 0.55) 0 38%, rgba(255, 255, 255, 0.12) 38% 100%);
+  }
+
+  .clock-widget {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(10, 12, 18, 0.66);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    text-align: right;
+  }
+
+  .clock-widget .clock-label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 0 6px;
+    margin-bottom: 2px;
+  }
+
+  .clock-widget .clock-time {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  }
+
+  .clock-widget .clock-date {
+    font-size: 11px;
+    color: #d6dae3;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  .chip {
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel-2);
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .chip[aria-pressed="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(79, 209, 197, 0.10);
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  .metrics div {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .metrics span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .metrics strong {
+    font-family: var(--mono);
+    font-size: 17px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    width: 100%;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    margin-top: var(--space-3);
+    font-size: 16px;
+    min-height: 52px;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.08);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line);
+    margin-top: var(--space-1);
+    min-height: 44px;
+    font-weight: 600;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .url-box {
+    margin-top: var(--space-2);
+    background: #11141b;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--space-2);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    word-break: break-all;
+  }
+
+  .check-line {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 44px;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .check-line input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    margin: 0;
+  }
+
+  /* 右列: STEP */
+  .steps-col {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+  }
+
+  .step-badge {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: rgba(79, 209, 197, 0.08);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .step-head h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .step-sub {
+    margin: 0 0 var(--space-3);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* STEP1 テンプレート */
+  .tab-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+  }
+
+  .tab {
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .tab[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 700;
+  }
+
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-2);
+  }
+
+  .tpl-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel-2);
+    padding: var(--space-1);
+    text-align: left;
+    cursor: pointer;
+    color: var(--ink);
+    font: inherit;
+  }
+
+  .tpl-card[aria-pressed="true"] {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+  }
+
+  .tpl-card:hover {
+    border-color: var(--accent-2);
+  }
+
+  .tpl-preview {
+    height: 64px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .tpl-name {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 0 2px 2px;
+  }
+
+  .tpl-minimal {
+    background: repeating-conic-gradient(#444a57 0% 25%, #383d49 0% 50%) 0 0 / 16px 16px;
+    color: #ffffff;
+  }
+
+  .tpl-milktea {
+    background: #e8d3bb;
+    color: #6b4a32;
+  }
+
+  .tpl-pastel {
+    background: linear-gradient(135deg, #ffd6e8 0%, #fff3c4 50%, #c9f2e4 100%);
+    color: #7a4a68;
+  }
+
+  .tpl-soda {
+    background: linear-gradient(160deg, #d9f3fd, #aee3f8);
+    color: #185f86;
+  }
+
+  .tpl-sakura {
+    background: #fbe3ec;
+    color: #8e3f5c;
+  }
+
+  .tpl-night {
+    background: #101014;
+    color: #ffffff;
+  }
+
+  .tpl-neon {
+    background: #05080d;
+    border: 1px solid rgba(79, 240, 224, 0.5);
+    color: #4ff0e0;
+    text-shadow: 0 0 8px rgba(79, 240, 224, 0.8);
+  }
+
+  .tpl-mono {
+    background: #0d0d0d;
+    border: 1px solid #e8e8e8;
+    color: #f2f2f2;
+    letter-spacing: 0.12em;
+  }
+
+  /* STEP2 調整 */
+  .mode-tabs {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: var(--space-3);
+  }
+
+  .mode-tab {
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .mode-tab[aria-pressed="true"] {
+    background: var(--panel-2);
+    color: var(--accent);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .control-row {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr) auto;
+    gap: var(--space-2);
+    align-items: center;
+    min-height: 44px;
+    padding: 6px 0;
+  }
+
+  .control-row > span:first-child {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .control-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .swatch[aria-pressed="true"] {
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    min-height: 28px;
+    margin: 0;
+  }
+
+  .bg-color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .bg-color-chip i {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: #000000;
+    border: 1px solid var(--line);
+  }
+
+  .text-input {
+    width: 100%;
+    min-height: 44px;
+    background: #11141b;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--ink);
+    padding: 0 var(--space-2);
+    font: inherit;
+  }
+
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .switch input {
+    appearance: none;
+    width: 46px;
+    height: 26px;
+    border-radius: 999px;
+    background: #2a2f3c;
+    border: 1px solid var(--line);
+    position: relative;
+    margin: 0;
+    flex: none;
+    cursor: pointer;
+  }
+
+  .switch input::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.15s;
+  }
+
+  .switch input:checked {
+    background: rgba(79, 209, 197, 0.25);
+    border-color: var(--accent);
+  }
+
+  .switch input:checked::before {
+    transform: translateX(20px);
+    background: var(--accent);
+  }
+
+  .switch-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin-top: var(--space-1);
+  }
+
+  /* STEP3 OBSに貼る */
+  .paste-steps {
+    list-style: none;
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .paste-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .paste-steps .step-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  details {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel-2);
+    margin-top: var(--space-1);
+  }
+
+  summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-2);
+    cursor: pointer;
+    font-size: 14px;
+    list-style-position: inside;
+  }
+
+  details p {
+    margin: 0;
+    padding: 0 var(--space-3) var(--space-2);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* 実験室 */
+  .lab {
+    margin-top: var(--space-4);
+    border-style: dashed;
+    background: transparent;
+  }
+
+  .lab summary {
+    color: var(--muted);
+  }
+
+  .lab summary .mono-tag {
+    font-family: var(--mono);
+    color: var(--accent-2);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    margin-right: 8px;
+  }
+
+  /* フッター */
+  footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* レスポンシブ */
+  @media (max-width: 1100px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .preview-col {
+      position: static;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wrap {
+      padding: var(--space-3);
+    }
+
+    .panel {
+      padding: var(--space-3);
+    }
+
+    .control-row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    .control-value {
+      text-align: left;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div>
+      <p class="brand-mark">NIGHT CONSOLE // OBS OVERLAY</p>
+      <h1>時計オーバーレイURLビルダー</h1>
+      <p class="tagline">配信画面にのせる透明な時計を作って、URLひとつでOBSに貼れます。</p>
+    </div>
+    <a class="open-clock" href="#">時計画面を開く</a>
+  </header>
+
+  <main class="layout">
+
+    <!-- 左列: ライブプレビュー -->
+    <aside class="preview-col" aria-label="ライブプレビュー">
+      <section class="panel">
+        <h2 class="panel-title"><span class="mono-tag">PREVIEW</span>ライブプレビュー</h2>
+
+        <div class="stage" role="img" aria-label="配信画面風のプレビュー。右上に時計オーバーレイが重なっています">
+          <span class="scene-hill hill-1" aria-hidden="true"></span>
+          <span class="scene-hill hill-2" aria-hidden="true"></span>
+          <span class="scene-figure" aria-hidden="true"></span>
+          <span class="scene-hud" aria-hidden="true"></span>
+          <div class="clock-widget">
+            <span class="clock-label">LIVE</span>
+            <div class="clock-time">19:24:36</div>
+            <div class="clock-date">6月13日(土)</div>
+          </div>
+        </div>
+
+        <div class="chip-row" role="group" aria-label="プレビュー背景の切り替え">
+          <button type="button" class="chip" aria-pressed="false">透過</button>
+          <button type="button" class="chip" aria-pressed="false">明るい</button>
+          <button type="button" class="chip" aria-pressed="false">暗い</button>
+          <button type="button" class="chip" aria-pressed="true">配信画面風</button>
+        </div>
+
+        <div class="metrics" aria-label="OBS推奨サイズ">
+          <div>
+            <span>推奨幅</span>
+            <strong>229px</strong>
+          </div>
+          <div>
+            <span>推奨高さ</span>
+            <strong>58px</strong>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary">OBS用URLをコピー</button>
+        <button type="button" class="btn btn-secondary">時計だけを確認</button>
+
+        <p class="url-box">https://example.workers.dev/clock/?c=eyJ2IjoxLCJ0ZW1...</p>
+        <label class="check-line">
+          <input type="checkbox">
+          <span>短いURLにする</span>
+        </label>
+      </section>
+    </aside>
+
+    <!-- 右列: STEP -->
+    <div class="steps-col">
+
+      <!-- STEP 1 -->
+      <section class="panel">
+        <div class="step-head">
+          <span class="step-badge">01</span>
+          <h2>テンプレートを選ぶ</h2>
+        </div>
+        <p class="step-sub">まずは近い雰囲気を選ぶだけでOK。あとからいつでも変えられます。</p>
+
+        <div class="tab-row" role="group" aria-label="テンプレートのカテゴリ">
+          <button type="button" class="tab" aria-pressed="true">すべて</button>
+          <button type="button" class="tab" aria-pressed="false">かわいい</button>
+          <button type="button" class="tab" aria-pressed="false">ゲーム</button>
+          <button type="button" class="tab" aria-pressed="false">シック</button>
+          <button type="button" class="tab" aria-pressed="false">和風</button>
+        </div>
+
+        <div class="template-grid" role="group" aria-label="テンプレート一覧">
+          <button type="button" class="tpl-card" aria-pressed="true">
+            <span class="tpl-preview tpl-minimal">12:34</span>
+            <span class="tpl-name">Minimal Clear</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-milktea">12:34</span>
+            <span class="tpl-name">Milk Tea</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-pastel">12:34</span>
+            <span class="tpl-name">Pastel Pop</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-soda">12:34</span>
+            <span class="tpl-name">Soda</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-sakura">12:34</span>
+            <span class="tpl-name">Sakura</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-night">12:34</span>
+            <span class="tpl-name">Night Studio</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-neon">12:34</span>
+            <span class="tpl-name">Neon HUD</span>
+          </button>
+          <button type="button" class="tpl-card" aria-pressed="false">
+            <span class="tpl-preview tpl-mono">12:34</span>
+            <span class="tpl-name">Mono Compact</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="panel">
+        <div class="step-head">
+          <span class="step-badge">02</span>
+          <h2>自分好みに調整する</h2>
+        </div>
+        <p class="step-sub">「かんたん」だけで十分きれいに仕上がります。細かく詰めたい人は「こだわり」へ。</p>
+
+        <div class="mode-tabs" role="group" aria-label="調整モード">
+          <button type="button" class="mode-tab" aria-pressed="true">かんたん</button>
+          <button type="button" class="mode-tab" aria-pressed="false">こだわり</button>
+        </div>
+
+        <div class="control-row">
+          <span>文字色</span>
+          <div class="swatch-row" role="group" aria-label="文字色の候補">
+            <button type="button" class="swatch" aria-pressed="true" aria-label="白" style="background: #ffffff;"></button>
+            <button type="button" class="swatch" aria-pressed="false" aria-label="黒" style="background: #16181d;"></button>
+            <button type="button" class="swatch" aria-pressed="false" aria-label="クリーム" style="background: #f6e7c1;"></button>
+            <button type="button" class="swatch" aria-pressed="false" aria-label="水色" style="background: #9adcf0;"></button>
+            <button type="button" class="swatch" aria-pressed="false" aria-label="ピンク" style="background: #f6b7cd;"></button>
+            <button type="button" class="swatch" aria-pressed="false" aria-label="ミント" style="background: #a9e8c8;"></button>
+          </div>
+          <span class="control-value">#FFFFFF</span>
+        </div>
+
+        <div class="control-row">
+          <span>背景色</span>
+          <span class="bg-color-chip"><i aria-hidden="true"></i>#000000</span>
+          <span></span>
+        </div>
+
+        <div class="control-row">
+          <span>背景の不透明度</span>
+          <input type="range" min="0" max="100" value="40" aria-label="背景の不透明度">
+          <span class="control-value">40%</span>
+        </div>
+
+        <div class="control-row">
+          <span>文字サイズ</span>
+          <input type="range" min="18" max="120" value="42" aria-label="文字サイズ">
+          <span class="control-value">42px</span>
+        </div>
+
+        <div class="control-row">
+          <span>ラベル文字</span>
+          <input type="text" class="text-input" value="LIVE" aria-label="ラベル文字">
+          <span></span>
+        </div>
+
+        <div class="switch-grid">
+          <label class="switch">
+            <input type="checkbox" checked>
+            <span>秒を表示</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" checked>
+            <span>日付を表示</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" checked>
+            <span>曜日を表示</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="panel">
+        <div class="step-head">
+          <span class="step-badge">03</span>
+          <h2>OBSに貼る</h2>
+        </div>
+        <p class="step-sub">コピーしたURLをOBSのブラウザソースに貼るだけで完成です。</p>
+
+        <ol class="paste-steps">
+          <li>
+            <span class="step-badge">1</span>
+            <span>「OBS用URLをコピー」を押してURLをコピーします。</span>
+          </li>
+          <li>
+            <span class="step-badge">2</span>
+            <span>OBSで「ソース追加 → ブラウザ」を選び、URL欄に貼り付けます。</span>
+          </li>
+          <li>
+            <span class="step-badge">3</span>
+            <span>幅と高さを推奨値(幅229 / 高さ58)に合わせます。</span>
+          </li>
+        </ol>
+
+        <details>
+          <summary>背景が白くなる</summary>
+          <p>時計の画面はもともと透明です。OBSのブラウザソース設定やカスタムCSSを確認してください。</p>
+        </details>
+        <details>
+          <summary>フォントが反映されない</summary>
+          <p>OBSを動かすPCに同じフォントが入っていない可能性があります。無い場合は標準フォントで表示されます。</p>
+        </details>
+      </section>
+
+    </div>
+  </main>
+
+  <details class="lab">
+    <summary><span class="mono-tag">LAB</span>実験室(キーワード反応オーバーレイ)</summary>
+    <p>コメントのキーワードに反応するオーバーレイを試験中です。時計のURLには影響しません。</p>
+  </details>
+
+  <footer>
+    <span>フォントファイルは同梱していません。フォント名だけをURLに保存します。</span>
+    <a href="#">GitHubでソースを見る</a>
+  </footer>
+
+</div>
+</body>
+</html>
