@@ -6,6 +6,13 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-13
+
+### Added
+
+- Analog clock as a new clock type. In the builder, switch between デジタル and アナログ; for analog you can set the face color (背景色), number/hand color (文字色), rim color (枠線色), second-hand color (縁取り色), size, marks (numbers / ticks / both / none), and second-hand motion (sweep / tick / off). Two analog templates: Navy Round and Mono Round.
+- The analog clock is drawn as scalable SVG (no bundled images) and is fully reproducible from the same config-only `/clock/?c=...` URL. Hands advance via requestAnimationFrame when visible, with a per-second fallback.
+
 ## [0.4.0] - 2026-06-13
 
 ### Added

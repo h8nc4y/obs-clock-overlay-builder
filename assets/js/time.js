@@ -80,6 +80,32 @@ export function formatDate(formatters, date = new Date()) {
   }
 }
 
+// アナログ時計の針角度に使う、タイムゾーン補正済みの時・分・秒を取り出す。
+// formatterを1つ作って使い回し、フレームごとのIntl生成コストを避ける。
+export function createAnalogFormatter(timezone) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: sanitizeTimezone(timezone),
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  });
+}
+
+export function analogParts(formatter, date = new Date()) {
+  const result = { hours: 0, minutes: 0, seconds: 0, milliseconds: date.getMilliseconds() };
+  for (const part of formatter.formatToParts(date)) {
+    if (part.type === "hour") {
+      result.hours = Number(part.value) % 24;
+    } else if (part.type === "minute") {
+      result.minutes = Number(part.value);
+    } else if (part.type === "second") {
+      result.seconds = Number(part.value);
+    }
+  }
+  return result;
+}
+
 export function nextSecondDelay(now = new Date(), correctionMs = 16) {
   const ms = now.getMilliseconds();
   return Math.max(50, 1000 - ms + correctionMs);

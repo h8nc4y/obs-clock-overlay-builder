@@ -109,6 +109,11 @@
               <p>「かんたん」だけで十分きれいに仕上がります。細かく詰めたい人は「こだわり」へ。</p>
             </div>
           </div>
+          <div class="clock-type-row" role="group" aria-label="時計の種類">
+            <span>時計の種類</span>
+            <button id="clockTypeDigital" type="button" class="adjust-tab" aria-pressed="true">デジタル</button>
+            <button id="clockTypeAnalog" type="button" class="adjust-tab" aria-pressed="false">アナログ</button>
+          </div>
           <div class="adjust-tabs" role="group" aria-label="調整モード切り替え">
             <button id="adjustTabEasy" type="button" class="adjust-tab" aria-pressed="true">かんたん</button>
             <button id="adjustTabAdvanced" type="button" class="adjust-tab" aria-pressed="false">こだわり</button>
@@ -130,18 +135,18 @@
                 <input id="backgroundOpacity" type="range" min="0" max="1" step="0.01">
                 <output id="backgroundOpacityValue"></output>
               </label>
-              <label class="field" for="fontSize">
+              <label class="field" data-clock-mode="digital" for="fontSize">
                 <span>文字サイズ</span>
                 <input id="fontSize" type="range" min="18" max="120" step="1">
                 <output id="fontSizeValue"></output>
               </label>
-              <label class="field" for="labelText">
+              <label class="field" data-clock-mode="digital" for="labelText">
                 <span>ラベル</span>
                 <input id="labelText" type="text" maxlength="40" placeholder="LIVE / JST / 配信中" aria-describedby="labelTextHelp">
                 <small id="labelTextHelp">入力した文字は、そのまま画面用の命令として実行されない形で表示します。</small>
               </label>
             </div>
-            <div class="toggle-row">
+            <div class="toggle-row" data-clock-mode="digital">
               <label class="toggle" for="showSeconds">
                 <input id="showSeconds" type="checkbox">
                 <span>秒を表示する</span>
@@ -154,6 +159,33 @@
                 <input id="showWeekday" type="checkbox">
                 <span>曜日を表示する</span>
               </label>
+            </div>
+            <div class="analog-controls is-hidden" data-clock-mode="analog">
+              <p class="group-hint">アナログでは「背景色＝文字盤」「文字色＝数字と針」「枠線色＝ふち」「縁取り色＝秒針」になります。</p>
+              <div class="form-grid dense-grid">
+                <label class="field" for="analogSize">
+                  <span>大きさ</span>
+                  <input id="analogSize" type="range" min="120" max="480" step="2">
+                  <output id="analogSizeValue"></output>
+                </label>
+                <label class="field" for="analogMarks">
+                  <span>目盛り</span>
+                  <select id="analogMarks">
+                    <option value="numbers">数字</option>
+                    <option value="ticks">目盛り</option>
+                    <option value="both">数字＋目盛り</option>
+                    <option value="none">なし</option>
+                  </select>
+                </label>
+                <label class="field" for="analogSecondHand">
+                  <span>秒針</span>
+                  <select id="analogSecondHand">
+                    <option value="sweep">なめらか</option>
+                    <option value="tick">カチカチ</option>
+                    <option value="off">なし</option>
+                  </select>
+                </label>
+              </div>
             </div>
           </div>
           <div id="advancedControls" hidden>

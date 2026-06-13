@@ -139,6 +139,16 @@
   display: none;
 }
 
+/* アナログ時計(SVG)。width/height は SVG 属性で指定されるため、
+   ブロック要素として中身を縮めずに表示する。針の回転は SVG の transform 属性で行う。 */
+.clock-analog {
+  display: block;
+}
+
+.clock-analog text {
+  user-select: none;
+}
+
 .template-minimal-clear {
   backdrop-filter: none;
 }

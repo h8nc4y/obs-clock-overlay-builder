@@ -17,6 +17,7 @@ export const FONT_CANDIDATES = [
 export const DEFAULT_CONFIG = Object.freeze({
   version: CONFIG_VERSION,
   template: "mono-compact",
+  clockType: "digital",
   timezone: "Asia/Tokyo",
   hour12: false,
   showSeconds: true,
@@ -49,7 +50,10 @@ export const DEFAULT_CONFIG = Object.freeze({
   strokeWidth: 0,
   borderColor: "#d9d7cf",
   borderOpacity: 1,
-  borderWidth: 1
+  borderWidth: 1,
+  analogSize: 220,
+  analogMarks: "numbers",
+  analogSecondHand: "sweep"
 });
 
 export const TEMPLATES = Object.freeze([
@@ -400,12 +404,57 @@ export const TEMPLATES = Object.freeze([
       borderOpacity: 0.85,
       borderWidth: 2
     }
+  },
+  {
+    id: "analog-navy",
+    name: "Navy Round",
+    note: "アナログ・落ち着いた紺",
+    sampleText: "10:08",
+    category: "analog",
+    config: {
+      clockType: "analog",
+      fontFamily: "Poppins",
+      textColor: "#e7d3b5",
+      backgroundColor: "#163a4a",
+      backgroundOpacity: 1,
+      borderColor: "#d8b48c",
+      borderOpacity: 1,
+      borderWidth: 5,
+      strokeColor: "#e07a5f",
+      analogSize: 240,
+      analogMarks: "numbers",
+      analogSecondHand: "sweep"
+    }
+  },
+  {
+    id: "analog-mono",
+    name: "Mono Round",
+    note: "アナログ・白文字盤",
+    sampleText: "10:08",
+    category: "analog",
+    config: {
+      clockType: "analog",
+      fontFamily: "Poppins",
+      textColor: "#1f2430",
+      backgroundColor: "#ffffff",
+      backgroundOpacity: 0.95,
+      borderColor: "#d9d7cf",
+      borderOpacity: 1,
+      borderWidth: 2,
+      strokeColor: "#e23b3b",
+      analogSize: 220,
+      analogMarks: "both",
+      analogSecondHand: "sweep"
+    }
   }
 ]);
 
 const DATE_FORMATS = new Set(["slash", "dash", "monthDay", "jp"]);
 const WEEKDAY_FORMATS = new Set(["ja-short", "ja-long", "en-short", "en-long"]);
 const LABEL_POSITIONS = new Set(["top", "bottom", "left", "right", "hidden"]);
+const CLOCK_TYPES = new Set(["digital", "analog"]);
+const ANALOG_MARKS = new Set(["numbers", "ticks", "both", "none"]);
+const ANALOG_SECOND_HANDS = new Set(["sweep", "tick", "off"]);
 const TEMPLATE_IDS = new Set(TEMPLATES.map((template) => template.id));
 
 export const NUMBER_LIMITS = {
@@ -426,7 +475,8 @@ export const NUMBER_LIMITS = {
   shadowY: [-20, 20],
   strokeWidth: [0, 8],
   borderOpacity: [0, 1],
-  borderWidth: [0, 8]
+  borderWidth: [0, 8],
+  analogSize: [120, 480]
 };
 
 export function cloneDefaultConfig() {
@@ -444,6 +494,7 @@ export function applyTemplate(config, templateId) {
     ...current,
     ...template.config,
     template: template.id,
+    clockType: template.config.clockType ?? "digital",
     timezone: current.timezone,
     hour12: current.hour12,
     showSeconds: current.showSeconds,
@@ -466,6 +517,9 @@ export function normalizeConfig(input = {}) {
   const config = { ...DEFAULT_CONFIG };
   config.version = CONFIG_VERSION;
   config.template = enumValue(raw.template, TEMPLATE_IDS, DEFAULT_CONFIG.template);
+  config.clockType = enumValue(raw.clockType, CLOCK_TYPES, DEFAULT_CONFIG.clockType);
+  config.analogMarks = enumValue(raw.analogMarks, ANALOG_MARKS, DEFAULT_CONFIG.analogMarks);
+  config.analogSecondHand = enumValue(raw.analogSecondHand, ANALOG_SECOND_HANDS, DEFAULT_CONFIG.analogSecondHand);
   config.timezone = sanitizeTimezone(raw.timezone ?? raw.tz, DEFAULT_CONFIG.timezone);
   config.hour12 = coerceBool(raw.hour12, DEFAULT_CONFIG.hour12);
   config.showSeconds = coerceBool(raw.showSeconds ?? raw.seconds, DEFAULT_CONFIG.showSeconds);

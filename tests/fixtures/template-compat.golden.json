@@ -3,6 +3,7 @@
   "defaultConfig": {
     "version": 1,
     "template": "mono-compact",
+    "clockType": "digital",
     "timezone": "Asia/Tokyo",
     "hour12": false,
     "showSeconds": true,
@@ -35,7 +36,10 @@
     "strokeWidth": 0,
     "borderColor": "#d9d7cf",
     "borderOpacity": 1,
-    "borderWidth": 1
+    "borderWidth": 1,
+    "analogSize": 220,
+    "analogMarks": "numbers",
+    "analogSecondHand": "sweep"
   },
   "templates": [
     {
@@ -385,6 +389,48 @@
         "borderOpacity": 0.85,
         "borderWidth": 2
       }
+    },
+    {
+      "id": "analog-navy",
+      "name": "Navy Round",
+      "note": "アナログ・落ち着いた紺",
+      "sampleText": "10:08",
+      "category": "analog",
+      "config": {
+        "clockType": "analog",
+        "fontFamily": "Poppins",
+        "textColor": "#e7d3b5",
+        "backgroundColor": "#163a4a",
+        "backgroundOpacity": 1,
+        "borderColor": "#d8b48c",
+        "borderOpacity": 1,
+        "borderWidth": 5,
+        "strokeColor": "#e07a5f",
+        "analogSize": 240,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "id": "analog-mono",
+      "name": "Mono Round",
+      "note": "アナログ・白文字盤",
+      "sampleText": "10:08",
+      "category": "analog",
+      "config": {
+        "clockType": "analog",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#ffffff",
+        "backgroundOpacity": 0.95,
+        "borderColor": "#d9d7cf",
+        "borderOpacity": 1,
+        "borderWidth": 2,
+        "strokeColor": "#e23b3b",
+        "analogSize": 220,
+        "analogMarks": "both",
+        "analogSecondHand": "sweep"
+      }
     }
   ],
   "goldens": [
@@ -394,6 +440,7 @@
       "expected": {
         "version": 1,
         "template": "mono-compact",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -426,15 +473,19 @@
         "strokeWidth": 0,
         "borderColor": "#d9d7cf",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "default-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJKU1QiLCJsYWJlbFBvc2l0aW9uIjoiaGlkZGVuIiwiZm9udEZhbWlseSI6IlJvYm90byBNb25vIiwidGV4dENvbG9yIjoiIzFhMWExYSIsImJhY2tncm91bmRDb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45LCJyYWRpdXMiOjEwLCJwYWRkaW5nWCI6MTgsInBhZGRpbmdZIjoxMCwiZm9udFNpemUiOjQyLCJkYXRlU2l6ZSI6MTQsImxhYmVsU2l6ZSI6MTIsImxldHRlclNwYWNpbmciOjAuNiwibGluZUhlaWdodCI6MSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjQsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMTgsInNoYWRvd0JsdXIiOjYsInNoYWRvd1giOjAsInNoYWRvd1kiOjIsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNkOWQ3Y2YiLCJib3JkZXJPcGFjaXR5IjoxLCJib3JkZXJXaWR0aCI6MX0",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJSb2JvdG8gTW9ubyIsInRleHRDb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkN2NmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIn0",
       "expected": {
         "version": 1,
         "template": "mono-compact",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -467,7 +518,10 @@
         "strokeWidth": 0,
         "borderColor": "#d9d7cf",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -476,6 +530,7 @@
       "expected": {
         "version": 1,
         "template": "mono-compact",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -508,15 +563,19 @@
         "strokeWidth": 0,
         "borderColor": "#d9d7cf",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-mono-compact-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJKU1QiLCJsYWJlbFBvc2l0aW9uIjoiaGlkZGVuIiwiZm9udEZhbWlseSI6IlJvYm90byBNb25vIiwidGV4dENvbG9yIjoiIzFhMWExYSIsImJhY2tncm91bmRDb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45LCJyYWRpdXMiOjEwLCJwYWRkaW5nWCI6MTgsInBhZGRpbmdZIjoxMCwiZm9udFNpemUiOjQyLCJkYXRlU2l6ZSI6MTQsImxhYmVsU2l6ZSI6MTIsImxldHRlclNwYWNpbmciOjAuNiwibGluZUhlaWdodCI6MSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjQsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMTgsInNoYWRvd0JsdXIiOjYsInNoYWRvd1giOjAsInNoYWRvd1kiOjIsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNkOWQ3Y2YiLCJib3JkZXJPcGFjaXR5IjoxLCJib3JkZXJXaWR0aCI6MX0",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJSb2JvdG8gTW9ubyIsInRleHRDb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkN2NmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIn0",
       "expected": {
         "version": 1,
         "template": "mono-compact",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -549,7 +608,10 @@
         "strokeWidth": 0,
         "borderColor": "#d9d7cf",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -558,6 +620,7 @@
       "expected": {
         "version": 1,
         "template": "minimal-clear",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -590,15 +653,19 @@
         "strokeWidth": 0,
         "borderColor": "#e2e2e2",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-minimal-clear-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbmltYWwtY2xlYXIiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiIzFmMjQzMCIsImJhY2tncm91bmRDb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC44MiwicmFkaXVzIjoxNCwicGFkZGluZ1giOjIyLCJwYWRkaW5nWSI6MTIsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE1LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjQsImxpbmVIZWlnaHQiOjEuMDUsImZvbnRXZWlnaHQiOjgwMCwiZ2FwIjo1LCJzaGFkb3dDb2xvciI6IiMxZjI0MzAiLCJzaGFkb3dPcGFjaXR5IjowLjEyLCJzaGFkb3dCbHVyIjo4LCJzaGFkb3dYIjowLCJzaGFkb3dZIjozLCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZTJlMmUyIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjF9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbmltYWwtY2xlYXIiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuODIsInJhZGl1cyI6MTQsInBhZGRpbmdYIjoyMiwicGFkZGluZ1kiOjEyLCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC40LCJsaW5lSGVpZ2h0IjoxLjA1LCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6NSwic2hhZG93Q29sb3IiOiIjMWYyNDMwIiwic2hhZG93T3BhY2l0eSI6MC4xMiwic2hhZG93Qmx1ciI6OCwic2hhZG93WCI6MCwic2hhZG93WSI6Mywic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2UyZTJlMiIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "minimal-clear",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -631,7 +698,10 @@
         "strokeWidth": 0,
         "borderColor": "#e2e2e2",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -640,6 +710,7 @@
       "expected": {
         "version": 1,
         "template": "studio-live",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -672,15 +743,19 @@
         "strokeWidth": 0,
         "borderColor": "#e6e6e6",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-studio-live-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InN0dWRpby1saXZlIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoidG9wIiwiZm9udEZhbWlseSI6IlBvcHBpbnMiLCJ0ZXh0Q29sb3IiOiIjMTYxODFkIiwiYmFja2dyb3VuZENvbG9yIjoiI2ZmZmZmZiIsImJhY2tncm91bmRPcGFjaXR5IjowLjg2LCJyYWRpdXMiOjE2LCJwYWRkaW5nWCI6MjIsInBhZGRpbmdZIjoxMiwiZm9udFNpemUiOjQ2LCJkYXRlU2l6ZSI6MTgsImxhYmVsU2l6ZSI6MTYsImxldHRlclNwYWNpbmciOjAuNSwibGluZUhlaWdodCI6MS4xLCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6Niwic2hhZG93Q29sb3IiOiIjMTYxODFkIiwic2hhZG93T3BhY2l0eSI6MC4xNCwic2hhZG93Qmx1ciI6MTAsInNoYWRvd1giOjAsInNoYWRvd1kiOjQsInN0cm9rZUNvbG9yIjoiI2ZmZmZmZiIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNlNmU2ZTYiLCJib3JkZXJPcGFjaXR5IjoxLCJib3JkZXJXaWR0aCI6MX0",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InN0dWRpby1saXZlIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiIzE2MTgxZCIsImJhY2tncm91bmRDb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC44NiwicmFkaXVzIjoxNiwicGFkZGluZ1giOjIyLCJwYWRkaW5nWSI6MTIsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE4LCJsYWJlbFNpemUiOjE2LCJsZXR0ZXJTcGFjaW5nIjowLjUsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzE2MTgxZCIsInNoYWRvd09wYWNpdHkiOjAuMTQsInNoYWRvd0JsdXIiOjEwLCJzaGFkb3dYIjowLCJzaGFkb3dZIjo0LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZTZlNmU2IiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIn0",
       "expected": {
         "version": 1,
         "template": "studio-live",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -713,7 +788,10 @@
         "strokeWidth": 0,
         "borderColor": "#e6e6e6",
         "borderOpacity": 1,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -722,6 +800,7 @@
       "expected": {
         "version": 1,
         "template": "milk-tea",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -754,15 +833,19 @@
         "strokeWidth": 0,
         "borderColor": "#e8c9a8",
         "borderOpacity": 0.85,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-milk-tea-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbGstdGVhIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJib3R0b20iLCJmb250RmFtaWx5IjoiWmVuIE1hcnUgR290aGljIiwidGV4dENvbG9yIjoiIzZiNGEzNSIsImJhY2tncm91bmRDb2xvciI6IiNmZmY3ZWYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45NSwicmFkaXVzIjoyNCwicGFkZGluZ1giOjI2LCJwYWRkaW5nWSI6MTYsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjEzLCJsZXR0ZXJTcGFjaW5nIjowLjMsImxpbmVIZWlnaHQiOjEuMTIsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo3LCJzaGFkb3dDb2xvciI6IiNjZGExN2UiLCJzaGFkb3dPcGFjaXR5IjowLjMyLCJzaGFkb3dCbHVyIjoxNCwic2hhZG93WCI6MCwic2hhZG93WSI6Niwic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2U4YzlhOCIsImJvcmRlck9wYWNpdHkiOjAuODUsImJvcmRlcldpZHRoIjoyfQ",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbGstdGVhIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJKU1QiLCJsYWJlbFBvc2l0aW9uIjoiYm90dG9tIiwiZm9udEZhbWlseSI6IlplbiBNYXJ1IEdvdGhpYyIsInRleHRDb2xvciI6IiM2YjRhMzUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmN2VmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MjQsInBhZGRpbmdYIjoyNiwicGFkZGluZ1kiOjE2LCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNiwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC4zLCJsaW5lSGVpZ2h0IjoxLjEyLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Nywic2hhZG93Q29sb3IiOiIjY2RhMTdlIiwic2hhZG93T3BhY2l0eSI6MC4zMiwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjYsInN0cm9rZUNvbG9yIjoiI2ZmZmZmZiIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNlOGM5YTgiLCJib3JkZXJPcGFjaXR5IjowLjg1LCJib3JkZXJXaWR0aCI6MiwiYW5hbG9nU2l6ZSI6MjIwLCJhbmFsb2dNYXJrcyI6Im51bWJlcnMiLCJhbmFsb2dTZWNvbmRIYW5kIjoic3dlZXAifQ",
       "expected": {
         "version": 1,
         "template": "milk-tea",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -795,7 +878,10 @@
         "strokeWidth": 0,
         "borderColor": "#e8c9a8",
         "borderOpacity": 0.85,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -804,6 +890,7 @@
       "expected": {
         "version": 1,
         "template": "sakura",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -836,15 +923,19 @@
         "strokeWidth": 0,
         "borderColor": "#ffb7cd",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-sakura-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiLphY3kv6HkuK0iLCJsYWJlbFBvc2l0aW9uIjoidG9wIiwiZm9udEZhbWlseSI6IkhhY2hpIE1hcnUgUG9wIiwidGV4dENvbG9yIjoiI2IyNGE2ZSIsImJhY2tncm91bmRDb2xvciI6IiNmZmY1ZjgiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45NSwicmFkaXVzIjoyNCwicGFkZGluZ1giOjI2LCJwYWRkaW5nWSI6MTQsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE1LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjIsImxpbmVIZWlnaHQiOjEuMTUsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo2LCJzaGFkb3dDb2xvciI6IiNmZmI3Y2QiLCJzaGFkb3dPcGFjaXR5IjowLjQ1LCJzaGFkb3dCbHVyIjoxNCwic2hhZG93WCI6MCwic2hhZG93WSI6Niwic3Ryb2tlQ29sb3IiOiIjZmZmYWZjIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2ZmYjdjZCIsImJvcmRlck9wYWNpdHkiOjAuOSwiYm9yZGVyV2lkdGgiOjJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoi6YWN5L-h5LitIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJIYWNoaSBNYXJ1IFBvcCIsInRleHRDb2xvciI6IiNiMjRhNmUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmNWY4IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MjQsInBhZGRpbmdYIjoyNiwicGFkZGluZ1kiOjE0LCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxNCwibGV0dGVyU3BhY2luZyI6MC4yLCJsaW5lSGVpZ2h0IjoxLjE1LCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Niwic2hhZG93Q29sb3IiOiIjZmZiN2NkIiwic2hhZG93T3BhY2l0eSI6MC40NSwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjYsInN0cm9rZUNvbG9yIjoiI2ZmZmFmYyIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNmZmI3Y2QiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "sakura",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -877,7 +968,10 @@
         "strokeWidth": 0,
         "borderColor": "#ffb7cd",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -886,6 +980,7 @@
       "expected": {
         "version": 1,
         "template": "pastel-pop",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -918,15 +1013,19 @@
         "strokeWidth": 0.4,
         "borderColor": "#ff9ed2",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-pastel-pop-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InBhc3RlbC1wb3AiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiTW9jaGl5IFBvcCBPbmUiLCJ0ZXh0Q29sb3IiOiIjYzI0NzdlIiwiYmFja2dyb3VuZENvbG9yIjoiI2ZmZjBmNyIsImJhY2tncm91bmRPcGFjaXR5IjowLjk2LCJyYWRpdXMiOjI4LCJwYWRkaW5nWCI6MjgsInBhZGRpbmdZIjoxNiwiZm9udFNpemUiOjQ0LCJkYXRlU2l6ZSI6MTYsImxhYmVsU2l6ZSI6MTQsImxldHRlclNwYWNpbmciOjAuNCwibGluZUhlaWdodCI6MS4xLCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6Nywic2hhZG93Q29sb3IiOiIjZmY5ZWQyIiwic2hhZG93T3BhY2l0eSI6MC40Miwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjUsInN0cm9rZUNvbG9yIjoiI2ZmZmZmZiIsInN0cm9rZVdpZHRoIjowLjQsImJvcmRlckNvbG9yIjoiI2ZmOWVkMiIsImJvcmRlck9wYWNpdHkiOjAuOSwiYm9yZGVyV2lkdGgiOjJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InBhc3RlbC1wb3AiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoidG9wIiwiZm9udEZhbWlseSI6Ik1vY2hpeSBQb3AgT25lIiwidGV4dENvbG9yIjoiI2MyNDc3ZSIsImJhY2tncm91bmRDb2xvciI6IiNmZmYwZjciLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45NiwicmFkaXVzIjoyOCwicGFkZGluZ1giOjI4LCJwYWRkaW5nWSI6MTYsImZvbnRTaXplIjo0NCwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjQsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjcsInNoYWRvd0NvbG9yIjoiI2ZmOWVkMiIsInNoYWRvd09wYWNpdHkiOjAuNDIsInNoYWRvd0JsdXIiOjE0LCJzaGFkb3dYIjowLCJzaGFkb3dZIjo1LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MC40LCJib3JkZXJDb2xvciI6IiNmZjllZDIiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "pastel-pop",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -959,7 +1058,10 @@
         "strokeWidth": 0.4,
         "borderColor": "#ff9ed2",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -968,6 +1070,7 @@
       "expected": {
         "version": 1,
         "template": "soda",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1000,15 +1103,19 @@
         "strokeWidth": 0.3,
         "borderColor": "#7fdfee",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-soda-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNvZGEiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJyaWdodCIsImZvbnRGYW1pbHkiOiJNIFBMVVMgUm91bmRlZCAxYyIsInRleHRDb2xvciI6IiMwZTc0OTAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZWFmY2ZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTYsInJhZGl1cyI6MjIsInBhZGRpbmdYIjoyNCwicGFkZGluZ1kiOjE0LCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC43LCJsaW5lSGVpZ2h0IjoxLjA1LCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6MTIsInNoYWRvd0NvbG9yIjoiIzdmZGZlZSIsInNoYWRvd09wYWNpdHkiOjAuNDIsInNoYWRvd0JsdXIiOjEyLCJzaGFkb3dYIjowLCJzaGFkb3dZIjo1LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MC4zLCJib3JkZXJDb2xvciI6IiM3ZmRmZWUiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyfQ",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNvZGEiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoicmlnaHQiLCJmb250RmFtaWx5IjoiTSBQTFVTIFJvdW5kZWQgMWMiLCJ0ZXh0Q29sb3IiOiIjMGU3NDkwIiwiYmFja2dyb3VuZENvbG9yIjoiI2VhZmNmZiIsImJhY2tncm91bmRPcGFjaXR5IjowLjk2LCJyYWRpdXMiOjIyLCJwYWRkaW5nWCI6MjQsInBhZGRpbmdZIjoxNCwiZm9udFNpemUiOjQ2LCJkYXRlU2l6ZSI6MTUsImxhYmVsU2l6ZSI6MTMsImxldHRlclNwYWNpbmciOjAuNywibGluZUhlaWdodCI6MS4wNSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjEyLCJzaGFkb3dDb2xvciI6IiM3ZmRmZWUiLCJzaGFkb3dPcGFjaXR5IjowLjQyLCJzaGFkb3dCbHVyIjoxMiwic2hhZG93WCI6MCwic2hhZG93WSI6NSwic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAuMywiYm9yZGVyQ29sb3IiOiIjN2ZkZmVlIiwiYm9yZGVyT3BhY2l0eSI6MC45LCJib3JkZXJXaWR0aCI6MiwiYW5hbG9nU2l6ZSI6MjIwLCJhbmFsb2dNYXJrcyI6Im51bWJlcnMiLCJhbmFsb2dTZWNvbmRIYW5kIjoic3dlZXAifQ",
       "expected": {
         "version": 1,
         "template": "soda",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1041,7 +1148,10 @@
         "strokeWidth": 0.3,
         "borderColor": "#7fdfee",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -1050,6 +1160,7 @@
       "expected": {
         "version": 1,
         "template": "night-studio",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1082,15 +1193,19 @@
         "strokeWidth": 0,
         "borderColor": "#3a4660",
         "borderOpacity": 0.9,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-night-studio-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5pZ2h0LXN0dWRpbyIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiI2YxZjVmYiIsImJhY2tncm91bmRDb2xvciI6IiMxNjFiMjYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45LCJyYWRpdXMiOjE0LCJwYWRkaW5nWCI6MjQsInBhZGRpbmdZIjoxMywiZm9udFNpemUiOjQ2LCJkYXRlU2l6ZSI6MTYsImxhYmVsU2l6ZSI6MTQsImxldHRlclNwYWNpbmciOjAuNSwibGluZUhlaWdodCI6MS4xLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Niwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC40LCJzaGFkb3dCbHVyIjoxNCwic2hhZG93WCI6MCwic2hhZG93WSI6NSwic3Ryb2tlQ29sb3IiOiIjMDAwMDAwIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiIzNhNDY2MCIsImJvcmRlck9wYWNpdHkiOjAuOSwiYm9yZGVyV2lkdGgiOjF9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5pZ2h0LXN0dWRpbyIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNmMWY1ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMTYxYjI2IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxNCwicGFkZGluZ1giOjI0LCJwYWRkaW5nWSI6MTMsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjUsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuNCwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjUsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiMzYTQ2NjAiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "night-studio",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1123,7 +1238,10 @@
         "strokeWidth": 0,
         "borderColor": "#3a4660",
         "borderOpacity": 0.9,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -1132,6 +1250,7 @@
       "expected": {
         "version": 1,
         "template": "neon-hud",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1164,15 +1283,19 @@
         "strokeWidth": 0.8,
         "borderColor": "#48ffe2",
         "borderOpacity": 0.9,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-neon-hud-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5lb24taHVkIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoicmlnaHQiLCJmb250RmFtaWx5IjoiUm9ib3RvIE1vbm8iLCJ0ZXh0Q29sb3IiOiIjYmFmZmY2IiwiYmFja2dyb3VuZENvbG9yIjoiIzA3MTMyMiIsImJhY2tncm91bmRPcGFjaXR5IjowLjMsInJhZGl1cyI6NiwicGFkZGluZ1giOjIwLCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0NCwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjoxLjEsImxpbmVIZWlnaHQiOjEuMDQsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjoxMiwic2hhZG93Q29sb3IiOiIjMmZmZmU2Iiwic2hhZG93T3BhY2l0eSI6MC41OCwic2hhZG93Qmx1ciI6MTgsInNoYWRvd1giOjAsInNoYWRvd1kiOjAsInN0cm9rZUNvbG9yIjoiIzAyMTMxZiIsInN0cm9rZVdpZHRoIjowLjgsImJvcmRlckNvbG9yIjoiIzQ4ZmZlMiIsImJvcmRlck9wYWNpdHkiOjAuOSwiYm9yZGVyV2lkdGgiOjF9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5lb24taHVkIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InJpZ2h0IiwiZm9udEZhbWlseSI6IlJvYm90byBNb25vIiwidGV4dENvbG9yIjoiI2JhZmZmNiIsImJhY2tncm91bmRDb2xvciI6IiMwNzEzMjIiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC4zLCJyYWRpdXMiOjYsInBhZGRpbmdYIjoyMCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDQsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MS4xLCJsaW5lSGVpZ2h0IjoxLjA0LCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6MTIsInNoYWRvd0NvbG9yIjoiIzJmZmZlNiIsInNoYWRvd09wYWNpdHkiOjAuNTgsInNoYWRvd0JsdXIiOjE4LCJzaGFkb3dYIjowLCJzaGFkb3dZIjowLCJzdHJva2VDb2xvciI6IiMwMjEzMWYiLCJzdHJva2VXaWR0aCI6MC44LCJib3JkZXJDb2xvciI6IiM0OGZmZTIiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "neon-hud",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1205,7 +1328,10 @@
         "strokeWidth": 0.8,
         "borderColor": "#48ffe2",
         "borderOpacity": 0.9,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -1214,6 +1340,7 @@
       "expected": {
         "version": 1,
         "template": "aqua-deck",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1246,15 +1373,19 @@
         "strokeWidth": 0,
         "borderColor": "#aedded",
         "borderOpacity": 0.85,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "template-aqua-deck-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFxdWEtZGVjayIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiI2U4ZjZmYiIsImJhY2tncm91bmRDb2xvciI6IiMyMjMwM2MiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45MiwicmFkaXVzIjoxMiwicGFkZGluZ1giOjIyLCJwYWRkaW5nWSI6MTIsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE1LCJsYWJlbFNpemUiOjEzLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMzUsInNoYWRvd0JsdXIiOjEyLCJzaGFkb3dYIjowLCJzaGFkb3dZIjo0LCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjYWVkZGVkIiwiYm9yZGVyT3BhY2l0eSI6MC44NSwiYm9yZGVyV2lkdGgiOjJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFxdWEtZGVjayIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNlOGY2ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMjIzMDNjIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTIsInJhZGl1cyI6MTIsInBhZGRpbmdYIjoyMiwicGFkZGluZ1kiOjEyLCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLjEsImZvbnRXZWlnaHQiOjgwMCwiZ2FwIjo2LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjM1LCJzaGFkb3dCbHVyIjoxMiwic2hhZG93WCI6MCwic2hhZG93WSI6NCwic3Ryb2tlQ29sb3IiOiIjMDAwMDAwIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2FlZGRlZCIsImJvcmRlck9wYWNpdHkiOjAuODUsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "aqua-deck",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1287,15 +1418,199 @@
         "strokeWidth": 0,
         "borderColor": "#aedded",
         "borderOpacity": 0.85,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "name": "template-analog-navy-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1uYXZ5IiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwiZm9udEZhbWlseSI6IlBvcHBpbnMiLCJ0ZXh0Q29sb3IiOiIjZTdkM2I1IiwiYmFja2dyb3VuZENvbG9yIjoiIzE2M2E0YSIsImJhY2tncm91bmRPcGFjaXR5IjoxLCJzdHJva2VDb2xvciI6IiNlMDdhNWYiLCJib3JkZXJDb2xvciI6IiNkOGI0OGMiLCJib3JkZXJXaWR0aCI6NSwiYW5hbG9nU2l6ZSI6MjQwfQ",
+      "expected": {
+        "version": 1,
+        "template": "analog-navy",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#e7d3b5",
+        "backgroundColor": "#163a4a",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#e07a5f",
+        "strokeWidth": 0,
+        "borderColor": "#d8b48c",
+        "borderOpacity": 1,
+        "borderWidth": 5,
+        "analogSize": 240,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "name": "template-analog-navy-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1uYXZ5IiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNlN2QzYjUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMTYzYTRhIiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjZTA3YTVmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q4YjQ4YyIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjo1LCJhbmFsb2dTaXplIjoyNDAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "expected": {
+        "version": 1,
+        "template": "analog-navy",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#e7d3b5",
+        "backgroundColor": "#163a4a",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#e07a5f",
+        "strokeWidth": 0,
+        "borderColor": "#d8b48c",
+        "borderOpacity": 1,
+        "borderWidth": 5,
+        "analogSize": 240,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "name": "template-analog-mono-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1tb25vIiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwiZm9udEZhbWlseSI6IlBvcHBpbnMiLCJ0ZXh0Q29sb3IiOiIjMWYyNDMwIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInN0cm9rZUNvbG9yIjoiI2UyM2IzYiIsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dNYXJrcyI6ImJvdGgifQ",
+      "expected": {
+        "version": 1,
+        "template": "analog-mono",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#ffffff",
+        "backgroundOpacity": 0.95,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#e23b3b",
+        "strokeWidth": 0,
+        "borderColor": "#d9d7cf",
+        "borderOpacity": 1,
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "both",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "name": "template-analog-mono-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1tb25vIiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjZTIzYjNiIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q5ZDdjZiIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoiYm90aCIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "expected": {
+        "version": 1,
+        "template": "analog-mono",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#ffffff",
+        "backgroundOpacity": 0.95,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#e23b3b",
+        "strokeWidth": 0,
+        "borderColor": "#d9d7cf",
+        "borderOpacity": 1,
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "both",
+        "analogSecondHand": "sweep"
       }
     },
     {
       "name": "custom-mixed-options-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6dHJ1ZSwic2hvd1NlY29uZHMiOmZhbHNlLCJzaG93RGF0ZSI6dHJ1ZSwiZGF0ZUZvcm1hdCI6ImpwIiwic2hvd1dlZWtkYXkiOnRydWUsIndlZWtkYXlGb3JtYXQiOiJqYS1sb25nIiwibGFiZWwiOiLjgonjgYTjgbYiLCJsYWJlbFBvc2l0aW9uIjoidG9wIiwiZm9udEZhbWlseSI6Iktpd2kgTWFydSIsInRleHRDb2xvciI6IiM1YTNhNDciLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmMWY1IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuODUsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NjQsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjMDAwMDAwIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q5ZDdjZiIsImJvcmRlck9wYWNpdHkiOjAuNCwiYm9yZGVyV2lkdGgiOjJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOnRydWUsInNob3dTZWNvbmRzIjpmYWxzZSwic2hvd0RhdGUiOnRydWUsImRhdGVGb3JtYXQiOiJqcCIsInNob3dXZWVrZGF5Ijp0cnVlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtbG9uZyIsImxhYmVsIjoi44KJ44GE44G2IiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJLaXdpIE1hcnUiLCJ0ZXh0Q29sb3IiOiIjNWEzYTQ3IiwiYmFja2dyb3VuZENvbG9yIjoiI2ZmZjFmNSIsImJhY2tncm91bmRPcGFjaXR5IjowLjg1LCJyYWRpdXMiOjEwLCJwYWRkaW5nWCI6MTgsInBhZGRpbmdZIjoxMCwiZm9udFNpemUiOjY0LCJkYXRlU2l6ZSI6MTQsImxhYmVsU2l6ZSI6MTIsImxldHRlclNwYWNpbmciOjAuNiwibGluZUhlaWdodCI6MSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjQsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMTgsInNoYWRvd0JsdXIiOjYsInNoYWRvd1giOjAsInNoYWRvd1kiOjIsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNkOWQ3Y2YiLCJib3JkZXJPcGFjaXR5IjowLjQsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
       "expected": {
         "version": 1,
         "template": "sakura",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": true,
         "showSeconds": false,
@@ -1328,7 +1643,10 @@
         "strokeWidth": 0,
         "borderColor": "#d9d7cf",
         "borderOpacity": 0.4,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     }
   ],
@@ -1338,6 +1656,7 @@
       "expected": {
         "version": 1,
         "template": "soda",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1370,7 +1689,10 @@
         "strokeWidth": 0.3,
         "borderColor": "#7fdfee",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -1378,6 +1700,7 @@
       "expected": {
         "version": 1,
         "template": "sakura",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": true,
@@ -1410,7 +1733,10 @@
         "strokeWidth": 0,
         "borderColor": "#ffb7cd",
         "borderOpacity": 0.9,
-        "borderWidth": 2
+        "borderWidth": 2,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     },
     {
@@ -1418,6 +1744,7 @@
       "expected": {
         "version": 1,
         "template": "neon-hud",
+        "clockType": "digital",
         "timezone": "Asia/Tokyo",
         "hour12": false,
         "showSeconds": false,
@@ -1450,7 +1777,10 @@
         "strokeWidth": 0.8,
         "borderColor": "#48ffe2",
         "borderOpacity": 0.9,
-        "borderWidth": 1
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep"
       }
     }
   ],
@@ -1722,6 +2052,60 @@
           "--clock-stroke-color": "#000000",
           "--clock-stroke-width": "0px",
           "--clock-shadow": "0px 4px 12px rgba(0, 0, 0, 0.35)"
+        }
+      }
+    },
+    {
+      "id": "analog-navy",
+      "snapshot": {
+        "className": "clock-widget template-analog-navy",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Poppins\"",
+          "--clock-text": "#e7d3b5",
+          "--clock-bg": "rgba(22, 58, 74, 1)",
+          "--clock-border": "rgba(216, 180, 140, 1)",
+          "--clock-border-width": "5px",
+          "--clock-radius": "10px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "42px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "700",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#e07a5f",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
+        }
+      }
+    },
+    {
+      "id": "analog-mono",
+      "snapshot": {
+        "className": "clock-widget template-analog-mono",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Poppins\"",
+          "--clock-text": "#1f2430",
+          "--clock-bg": "rgba(255, 255, 255, 0.95)",
+          "--clock-border": "rgba(217, 215, 207, 1)",
+          "--clock-border-width": "2px",
+          "--clock-radius": "10px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "42px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "700",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#e23b3b",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
         }
       }
     }
