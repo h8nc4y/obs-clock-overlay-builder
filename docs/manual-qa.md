@@ -21,28 +21,6 @@
 - `デフォルト値を省略して短くする` をオンにしても、時計画面で同じ表示になる。
 - 推奨幅・高さが表示され、テンプレートやサイズ変更後に更新される。
 
-## Candidate A Manual Toast Preview
-
-- 編集画面に `キーワード反応オーバーレイ実験` が、通常の時計設定とは別セクションとして表示される。
-- `人工テキスト入力` に `HELLO stream`、`キーワード` に `hello`、`一致方法` に `含む` を入れて `テスト表示` を押すと、ライブプレビュー内にtoastが表示される。
-- `一致方法` を `完全一致` にした状態で `HELLO stream` を試すと、no-matchのstatusになりtoastが消える。
-- `人工テキスト入力` に `配信開始です`、`キーワード` に `配信開始` を入れ、`含む` ではmatch、`完全一致` ではno-matchになる。
-- `人工テキスト入力` に `配信開始`、`キーワード` に `配信開始`、`完全一致` ではmatchになる。
-- `toastスタイル` と `反応の強さ` を変えると、生成オーバーレイURLの `c` 設定が更新される。
-- `生成オーバーレイURL` は `/overlay/keyword-reaction/?c=...` 形式で、人工テキストの内容を含まない。
-- secret風の人工テキストや個人情報風の文字列を入れても、生成オーバーレイURLには含まれない。
-- secret風または空欄のキーワードでは、安全な既定値へ戻したstatusが表示され、入力したキーワード実値はstatusや生成オーバーレイURLへ出ない。
-- `人工fixtureを再生` で内蔵の人工デモデータがライブプレビュー内に順番にtoast表示される。
-- `人工fixture再生` の説明で、人工デモデータでありYouTube連携ではないことが分かる。
-- `停止` と `リセット` で古いtimerが残らず、後からtoastが再表示されない。
-- fixture再生中または再生後も、`生成オーバーレイURL` はconfig-onlyのままで、`配信開始`、`888`、fixture event payload、raw JSON、manual input textを含まない。
-- manual input preview経路をinternal dispatch helperへ寄せた後も、`テスト表示` は同じ見た目でtoast表示され、manual input text、internal dispatch payload、event payload、queue stateは生成オーバーレイURLへ入らない。
-- built-in fixture preview経路をinternal dispatch helperへ寄せた後も、`人工fixtureを再生` は同じ見た目でtoast表示され、停止 / リセット後に古いtimerが残らず、fixture event data、internal dispatch payload、event payload、queue stateは生成オーバーレイURLへ入らない。
-- `生成オーバーレイURLをコピー` が動く。OBSへ貼る前提のURLはconfig-onlyで、通常idleでは無表示、`demo=1` を明示した時だけ固定の人工eventを表示する。
-- 390px前後、768px前後、1280px以上で、toast preview、設定欄、生成URL欄に横スクロールが出ない。
-- Browser Console error/warning がなく、外部network request が発生しない。
-- YouTube API、OAuth、API key、scraping、実視聴者データ、実コメントデータを使わない。
-
 ## Design Refresh Viewports
 
 - 390px前後のスマートフォン幅で、ライブプレビュー、OBS用URL、設定フォームの順に理解でき、横スクロールが出ない。
@@ -75,36 +53,6 @@
 - Neon HUDなど発光が強いテンプレートで、通常ブラウザとOBSの両方で上下左右の発光が切れないことを確認する。
 - OBSでブラウザソースに生成URLを貼り、推奨幅・高さを入力して表示される。
 - OBSで表示/非表示を切り替えても、再表示後の次tickで現在時刻になる。
-
-## Keyword Reaction Overlay Runtime Skeleton
-
-- `/overlay/keyword-reaction/` が開き、通常idle時は透明で何も表示されない。
-- `/overlay/keyword-reaction` でも同じoverlay runtimeへ到達する。
-- `/overlay/keyword-reaction/?debug=1` では `Keyword reaction overlay ready`、`config: fallback`、`pattern: toast` のようなpublic-safe statusだけが控えめに表示される。
-- `/overlay/keyword-reaction/?demo=1` では、固定の人工文言 `キーワード反応デモ` が1件toast表示され、短時間後に消える。
-- queue helper接続後も、`/overlay/keyword-reaction/?demo=1` の表示は同じ固定人工toastだけで、queue state、event payload、eventId、displayTextは画面やURLに出ない。
-- `/overlay/keyword-reaction/?demo=1` を再読み込みまたは再実行しても旧timerが残らず、古いtoastが後から再表示されない。
-- `/overlay/keyword-reaction/?demo=1&debug=1` では、public-safe statusと固定人工toastだけが表示され、raw `c`、keyword実値、manual input text、fixture event data、secret-like値は表示されない。
-- event shape helper 導入後も、`demo=1` の表示文言は固定人工textのままで、event payload、eventId、displayText、manual input text、fixture event data は生成URLに含まれない。
-- local event intake helper導入後も、manual / fixture / demo のraw local input、event payload、transport payload、queue stateは生成URL、debug表示、画面には出ない。
-- local intake to overlay runtime接続後も、overlay runtimeへ通すのは `demo=1` の固定人工eventだけで、manual / fixture runtime接続、transport、fixture linkage、queue state表示は追加されない。
-- local intake to queue helper導入後も、local intake payload、event payload、queue state、eventId、displayText、manual input text、fixture event dataは生成URLに含まれない。
-- same-window internal dispatch helper導入後も、同一ページ内のnormalized event handoffだけを扱い、overlay runtime接続、editor UI接続、postMessage、BroadcastChannel、localStorage transport、fixture linkageは追加されない。
-- internal dispatch payload、event payload、queue state、eventId、displayText、manual input text、fixture event dataは生成URLに含まれない。
-- internal dispatch overlay runtime接続後も、`demo=1` の固定人工eventだけを same-window internal dispatch helper 経由で扱い、editor UI接続、manual input送信、fixture linkage、postMessage、BroadcastChannel、localStorage transportは追加されない。
-- limited BroadcastChannel prototype導入後も、通常の `/overlay/keyword-reaction/` と `/overlay/keyword-reaction/?demo=1` は既存挙動のままで、BroadcastChannelは明示queryなしでは開始されない。
-- `/overlay/keyword-reaction/?bcPrototype=1&bcRole=receiver&bcChannel=obs-bc-qa-001` は prototype receiver の public-safe statusだけを表示し、raw channel payload、fixture event data、queue state、secret-like値は表示しない。
-- `/overlay/keyword-reaction/?bcPrototype=1&bcRole=sender&bcChannel=obs-bc-qa-001` は synthetic-only sender の public-safe statusだけを表示し、generated URLへpayloadを入れない。
-- validな `/overlay/keyword-reaction/?c=...&debug=1` では config が valid として扱われ、raw `c`、keyword実値、manual input text、fixture event data は表示されない。
-- `/overlay/keyword-reaction/?c=invalid&debug=1` では safe defaultへfallbackし、invalidな `c` の実値は表示されない。
-- `/overlay/keyword-reaction/?c=invalid&demo=1&debug=1` では safe defaultへfallbackし、固定人工toastだけが表示され、invalidな `c` の実値は表示されない。
-- ページ背景は透明で、`body` の余白がない。
-- 編集UI、設定フォーム、時計UI、manual input、toast trigger、fixture playback は表示されない。
-- localStorage に依存しない。
-- YouTube API、OAuth、API key、scraping、実視聴者データ、実コメントデータを使わない。
-- Browser Console error/warning がなく、外部network request が発生しない。
-- 390px前後、768px前後、1280px以上のいずれでも横スクロールが出ない。
-- `/clock/` と `/clock/?c=...` の時計専用画面に回帰がない。
 
 ## OBS実機確認
 
@@ -259,4 +207,3 @@ Cloudflare Freeまたは既存契約内で、obs-clock-overlay-builder の stagi
 - 秒が進んでも時計の外枠の幅とコロン「:」の位置が動かないこと(数字グリフだけが入れ替わる)。
 - 「時計の種類」をアナログに切り替えると、プレビューがアナログ時計になり、アナログ用の設定(大きさ/目盛り/秒針)が現れ、デジタル専用の設定が隠れること。
 - アナログのテンプレート(Navy Round / Mono Round)を選ぶと、文字盤・枠・数字・針の色が反映され、`/clock/?c=...` で同じアナログ時計が再現され、針が進むこと。
-- キーワード反応実験はページ最下部の「実験室」折りたたみ内にあり、開閉できること。

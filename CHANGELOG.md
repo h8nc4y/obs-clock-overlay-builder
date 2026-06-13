@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-06-13
+
+### Removed
+
+- Removed the experimental keyword reaction overlay so this project is clock-only. This deletes the bottom "実験室" (Candidate A) panel in the builder, the `/overlay/keyword-reaction/` surface and its redirect, every `keyword-reaction-*` module and test, the `assets/css/overlay.css` bundle (the `styles.css` shim no longer imports it), and the related planning docs. Chat/comment reaction work now lives in a separate project. Your `/clock/?c=...` clock URLs are unaffected, and no clock template, color, font, or size behavior changes.
+
 ## [0.6.1] - 2026-06-13
 
 ### Changed

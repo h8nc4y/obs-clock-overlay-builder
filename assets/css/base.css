@@ -11,10 +11,6 @@ html.clock-page-root {
   background: transparent;
 }
 
-html.keyword-reaction-page-root {
-  background: transparent;
-}
-
 body {
   margin: 0;
   font-family: Inter, "Noto Sans JP", var(--fallback-fonts);

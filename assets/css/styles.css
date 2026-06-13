@@ -1,7 +1,6 @@
 /* 後方互換シム: 旧HTMLキャッシュが styles.css を参照しても表示が壊れないようにする。
-   新しいHTMLは tokens/base/clock/overlay/builder を直接読み込む。 */
+   新しいHTMLは tokens/base/clock/builder を直接読み込む。 */
 @import url("./tokens.css");
 @import url("./base.css");
 @import url("./clock.css");
-@import url("./overlay.css");
 @import url("./builder.css");

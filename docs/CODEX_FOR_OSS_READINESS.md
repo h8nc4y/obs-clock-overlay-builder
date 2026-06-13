@@ -23,9 +23,8 @@ Facts confirmed from the public repository and local `master`:
 - `v0.1.0` GitHub Release exists: <https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v0.1.0>
 - `v0.1.0` tag exists and locally resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
 - Recent merged PR evidence includes PR #19 through at least PR #72.
-- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, headline feature planning docs, Candidate A design/scope docs including manual input + toast scope, matching normalization policy, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape decision, queue / transport scope decision, overlay queue connection scope decision, transport scope decision, local intake connection decisions, first transport decision, internal dispatch overlay runtime scope decision, manual input dispatch scope decision, fixture dispatch scope decision, overlay fixture transport scope decision, BroadcastChannel feasibility planning, OBS BroadcastChannel QA scope planning, OBS BroadcastChannel human QA packet planning, OBS BroadcastChannel human QA PASS result docs, limited BroadcastChannel prototype scope planning, and production demo are present.
-- Local intake connection decisions, first transport decision, internal dispatch overlay runtime scope decision, manual input dispatch scope decision, fixture dispatch scope decision, overlay fixture transport scope decision, BroadcastChannel feasibility docs, OBS BroadcastChannel QA scope docs, OBS BroadcastChannel human QA packet docs, and limited BroadcastChannel prototype scope docs are implementation planning evidence only; they are not adoption evidence.
-- OBS BroadcastChannel human QA PASS result docs are public-safe manual QA evidence, not broad adoption evidence and not production transport implementation evidence.
+- README, CONTRIBUTING, CODE_OF_CONDUCT, AI-assisted workflow docs, release docs, README screenshot, public feedback route, roadmap, changelog, and production demo are present.
+- The project focuses solely on the clock overlay. Chat/comment reaction planning (formerly "Candidate A") was moved to a separate project, and its experiment code and planning docs were removed from this repository.
 
 The project is public and maintained, but public traction is still early. Do not describe it as widely adopted, critical infrastructure, or broadly used unless future objective evidence supports that.
 
@@ -42,7 +41,7 @@ The project is public and maintained, but public traction is still early. Do not
 | Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
 | Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
 | Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
-| Future product direction | Partial | Public roadmap, YouTube Live overlay suite planning docs, and Candidate A design/scope docs describe a candidate headline direction. Matching normalization, fixture playback scope, overlay runtime scope, single synthetic event scope, event source shape docs, queue / transport scope docs, overlay queue connection scope docs, transport scope decision docs, local intake docs, first transport decision docs, internal dispatch docs, manual input dispatch scope docs, fixture dispatch scope docs, overlay fixture transport scope docs, BroadcastChannel feasibility docs, and OBS BroadcastChannel QA scope docs are implementation planning evidence, not user adoption evidence. |
+| Future product direction | Partial | Public roadmap describes clock-focused directions. Chat/comment reaction work was moved to a separate project and is out of scope here. |
 
 ## Strengths
 
@@ -55,29 +54,6 @@ The project is public and maintained, but public traction is still early. Do not
 - Japanese-first UX and docs support a specific user group.
 - AI-assisted maintenance process is explicitly documented.
 - Local validation and release checks are documented and repeatedly used.
-- Headline feature planning docs describe a possible YouTube Live OBS overlay suite while keeping API/OAuth/data policy boundaries explicit.
-- Candidate A design and scope decision docs define a safe route/static skeleton first step, followed by manual input + toast before fixture playback.
-- Candidate A manual input + toast scope decision records the next implementation boundary without claiming it is already implemented.
-- Candidate A matching normalization decision records a narrow follow-up policy for preview/config consistency without claiming advanced Unicode normalization or user adoption.
-- Candidate A fixture playback scope decision records artificial-data-only fixture playback and schema validation boundaries; PR #42 implements the editor preview version, but this is not user adoption evidence.
-- Candidate A overlay runtime scope decision records a config-aware skeleton boundary before event source, fixture linkage, or YouTube integration.
-- Candidate A single synthetic event scope decision records a public-safe `demo=1` display-test boundary before event source, fixture linkage, or YouTube integration. This is planning evidence, not implementation or adoption evidence.
-- Candidate A event source shape decision records normalized event payload boundaries before event transport, fixture linkage, toast queue, or YouTube integration. This is planning evidence, not implementation or adoption evidence.
-- Candidate A queue / transport scope decision records queue helper and transport boundaries before transport, fixture linkage, toast queue runtime, or YouTube integration. This is implementation planning evidence, not implementation or adoption evidence.
-- Candidate A overlay queue connection scope decision records the next runtime connection boundary before transport, fixture linkage, toast queue runtime, or YouTube integration. This is implementation planning evidence, not implementation or adoption evidence.
-- Candidate A transport scope decision records transport candidates and event intake boundaries before transport implementation, fixture linkage, external network, or YouTube integration. This is implementation planning evidence, not implementation or adoption evidence.
-- Candidate A local intake queue connection scope decision records how local intake output should be normalized before entering queue helper state. This is implementation planning evidence, not implementation or adoption evidence.
-- Candidate A local intake overlay runtime scope decision records a narrow `demo=1` connection boundary before manual / fixture runtime connection, transport, or YouTube integration. This is implementation planning evidence, not adoption evidence.
-- Candidate A first transport decision records why the next step should stay with same-window internal dispatch helper + tests before any `postMessage`, `BroadcastChannel`, `localStorage` transport, external network, or YouTube integration. This is implementation planning evidence, not transport implementation or adoption evidence.
-- Candidate A internal dispatch overlay runtime scope decision records how the next small implementation should use same-window internal dispatch helper for `demo=1` only before editor UI connection, manual event sending, fixture linkage, transport, or YouTube integration. This is implementation planning evidence, not transport implementation or adoption evidence.
-- Candidate A manual input dispatch scope decision records how the next small implementation should keep manual input dispatch inside editor preview and avoid overlay本体transport, `postMessage`, `BroadcastChannel`, `localStorage` transport, fixture linkage, or YouTube integration. This is implementation planning evidence, not adoption evidence.
-- Candidate A fixture dispatch scope decision records how the next small implementation should keep built-in fixture dispatch inside editor preview and avoid overlay本体fixture transport, paste JSON import, `postMessage`, `BroadcastChannel`, `localStorage` transport, fixture linkage, or YouTube integration. This is implementation planning evidence, not adoption evidence.
-- Candidate A overlay fixture transport scope decision records why overlay本体fixture transport remains unimplemented while BroadcastChannel / `postMessage` readiness requirements are clarified. This is implementation planning evidence, not transport implementation or adoption evidence.
-- Candidate A BroadcastChannel feasibility docs record official/spec-source checks and OBS Browser Source unknowns before any `BroadcastChannel` runtime. This is implementation planning evidence, not transport implementation or adoption evidence.
-- Candidate A OBS BroadcastChannel QA scope docs record human OBS QA boundaries before any OBS operation, `BroadcastChannel` runtime, or overlay本体fixture transport. This is implementation planning evidence, not transport implementation or adoption evidence.
-- Candidate A OBS BroadcastChannel human QA packet docs provide a public-safe checklist and result template for future human OBS Browser Source checks. This is implementation planning evidence, not OBS QA completion, transport implementation, or adoption evidence.
-- Candidate A OBS BroadcastChannel human QA result docs record a public-safe PASS result from OBS 32.1.2 on Windows with synthetic local-server data only. This is manual QA evidence, not production transport implementation or adoption evidence.
-- Candidate A limited BroadcastChannel prototype scope decision records the next safe prototype boundary after OBS QA PASS. This is implementation planning evidence, not prototype implementation, production transport implementation, or adoption evidence.
 - Cloudflare cost and deploy boundaries are documented.
 
 ## Weaknesses
@@ -85,8 +61,6 @@ The project is public and maintained, but public traction is still early. Do not
 - Public traction is currently weak: 0 GitHub stars and 0 forks at inspection time.
 - No monthly download metric applies because this is not an npm package or library distribution.
 - Public issue triage and user feedback evidence remain weak in the evidence gathered for this packet.
-- YouTube Live overlay suite work is still exploration and requirements planning, not an implemented feature.
-- Candidate A design docs are not implementation evidence and should not be described as user adoption.
 - No GitHub Actions workflow exists; this is intentional for cost control, but it weakens automation evidence.
 - OBS real-device evidence remains a known manual QA limitation in older review packets.
 - The project is useful but narrow; it may not yet meet the "critical open-source software" framing without stronger ecosystem evidence.
@@ -100,28 +74,6 @@ Prioritize evidence that can be linked from a public application without exposin
 - Release tags and concise release notes beyond the existing `v0.1.0` release.
 - A small public roadmap or good-first-issue list.
 - Public feedback guide and issue templates that invite OBS setup reports without requesting private data.
-- Public planning and feedback for the candidate YouTube Live overlay suite, including issue #30 and safe MVP requirements.
-- Candidate A implementation PR evidence after the route/static skeleton, manual input + toast, and later fixture playback are implemented and validated in small steps.
-- Planning evidence that fixes manual input + toast scope before implementation, while clearly separating it from adoption evidence.
-- Planning evidence that fixes matching normalization and preview/config consistency before the next implementation PR, while clearly separating it from adoption evidence.
-- Planning evidence and PR evidence for editor-preview fixture playback and schema validation, while clearly separating it from adoption evidence.
-- Planning evidence that fixes overlay runtime scope before implementation, while clearly separating it from adoption evidence.
-- Planning evidence that fixes single synthetic event rendering scope before implementation, while clearly separating it from adoption evidence.
-- Planning evidence that fixes event source shape before transport or fixture linkage implementation, while clearly separating it from adoption evidence.
-- Planning evidence that fixes queue / transport boundaries before queue helper, transport, or fixture linkage implementation, while clearly separating it from adoption evidence.
-- Planning evidence that fixes overlay queue connection before transport, fixture linkage, toast queue runtime, or YouTube integration, while clearly separating it from adoption evidence.
-- Planning evidence that fixes transport candidates and event intake boundaries before transport implementation, fixture linkage, or YouTube integration, while clearly separating it from adoption evidence.
-- Planning evidence that fixes local intake to queue connection before overlay runtime connection, transport, fixture linkage, or YouTube integration, while clearly separating it from adoption evidence.
-- Planning evidence that fixes first transport implementation decision before `postMessage`, `BroadcastChannel`, `localStorage` transport, external network, fixture linkage, or YouTube integration, while clearly separating it from adoption evidence.
-- Planning evidence that fixes internal dispatch to overlay runtime connection before changing the overlay runtime demo path, while clearly separating it from adoption evidence.
-- Planning evidence that fixes manual input dispatch scope before changing the editor preview manual input event path, while clearly separating it from adoption evidence.
-- Planning evidence that fixes built-in fixture dispatch scope before changing the editor preview fixture playback event path, while clearly separating it from adoption evidence.
-- Planning evidence that fixes overlay fixture transport scope before choosing `BroadcastChannel`, `postMessage`, URL event transport, or `localStorage` transport, while clearly separating it from implementation and adoption evidence.
-- Planning evidence that fixes BroadcastChannel feasibility and static QA before any `BroadcastChannel` runtime or overlay本体fixture transport implementation, while clearly separating it from implementation and adoption evidence.
-- Planning evidence that fixes OBS Browser Source BroadcastChannel QA scope before any OBS operation, `BroadcastChannel` runtime, or overlay本体fixture transport implementation, while clearly separating it from implementation and adoption evidence.
-- Planning evidence that provides a public-safe OBS BroadcastChannel human QA checklist and result template before asking a human tester to record OBS Browser Source results, while clearly separating it from completed QA and adoption evidence.
-- Public-safe manual QA evidence that OBS Browser Source BroadcastChannel checks passed with synthetic local-server data only, while clearly separating it from adoption evidence and production transport implementation.
-- Planning evidence that fixes limited BroadcastChannel prototype scope after human QA PASS, before any production transport implementation.
 - Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.
@@ -146,8 +98,6 @@ Prioritize evidence that can be linked from a public application without exposin
 - `package.json` scripts for validation and release checks.
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
 - `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.
-- `docs/YOUTUBE_LIVE_OVERLAY_SUITE_CONCEPT.md`, `docs/HEADLINE_FEATURE_MVP_REQUIREMENTS.md`, and `docs/YOUTUBE_DATA_POLICY_BOUNDARY.md` for candidate headline feature planning.
-- `docs/CANDIDATE_A_IMPLEMENTATION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MANUAL_TOAST_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MATCHING_NORMALIZATION_DECISION.md`, `docs/CANDIDATE_A_FIXTURE_PLAYBACK_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_SINGLE_SYNTHETIC_EVENT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_EVENT_SOURCE_SHAPE_DECISION.md`, `docs/CANDIDATE_A_QUEUE_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_QUEUE_CONNECTION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_LOCAL_INTAKE_QUEUE_CONNECTION_SCOPE_DECISION.md`, `docs/CANDIDATE_A_LOCAL_INTAKE_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_FIRST_TRANSPORT_DECISION.md`, `docs/CANDIDATE_A_INTERNAL_DISPATCH_OVERLAY_RUNTIME_SCOPE_DECISION.md`, `docs/CANDIDATE_A_MANUAL_INPUT_DISPATCH_SCOPE_DECISION.md`, `docs/CANDIDATE_A_FIXTURE_DISPATCH_SCOPE_DECISION.md`, `docs/CANDIDATE_A_OVERLAY_FIXTURE_TRANSPORT_SCOPE_DECISION.md`, `docs/CANDIDATE_A_BROADCASTCHANNEL_FEASIBILITY.md`, `docs/CANDIDATE_A_OBS_BROADCASTCHANNEL_QA_SCOPE.md`, `docs/CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_PACKET.md`, `docs/CANDIDATE_A_OBS_BROADCASTCHANNEL_HUMAN_QA_RESULT.md`, `docs/CANDIDATE_A_LIMITED_BROADCASTCHANNEL_PROTOTYPE_SCOPE_DECISION.md`, `docs/CANDIDATE_A_KEYWORD_REACTION_OVERLAY_DESIGN.md`, `docs/CANDIDATE_A_URL_CONTRACT_DRAFT.md`, `docs/CANDIDATE_A_FIXTURE_SCHEMA_DRAFT.md`, and `docs/CANDIDATE_A_SECURITY_AND_QA_PLAN.md` for Candidate A implementation planning evidence and public-safe QA evidence.
 - Issue #30 for public YouTube Live overlay suite exploration: <https://github.com/h8nc4y/obs-clock-overlay-builder/issues/30>
 
 ## Claims To Avoid

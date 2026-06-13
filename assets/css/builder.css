@@ -1,8 +1,6 @@
 /* ビルダー編集画面(index.html)専用スタイル。
-   .keyword-reaction-preview-toast の色/影は overlay.css の .keyword-reaction-demo-toast と
-   意図的に同期しているため、変更時は両方を揃えること。
    画面テーマ: 既定は「白(わんコメ風)」。html[data-theme="booth"] / [data-theme="fanbox"] で
-   トークンを差し替える。テーマはビルダー画面専用で、/clock/ と /overlay/ には適用されない。 */
+   トークンを差し替える。テーマはビルダー画面専用で、/clock/ には適用されない。 */
 
 :root {
   --page-bg: #ffffff;
@@ -262,8 +260,7 @@ code {
 }
 
 :root[data-theme="fanbox"] .panel,
-:root[data-theme="fanbox"] .preview-panel,
-:root[data-theme="fanbox"] .labs-panel {
+:root[data-theme="fanbox"] .preview-panel {
   border-color: transparent;
 }
 
@@ -280,10 +277,6 @@ code {
 .url-panel {
   border-color: var(--line-strong);
   background: var(--panel-strong);
-}
-
-.candidate-experiment-panel {
-  padding-top: 6px;
 }
 
 .section-heading {
@@ -327,16 +320,6 @@ small,
 
 .copy-hint {
   margin-top: 8px;
-}
-
-.candidate-boundary-note {
-  border-color: var(--line);
-  border-left-color: var(--accent-bright);
-  background: var(--warm-soft);
-}
-
-.keyword-reaction-fixture {
-  margin-top: 12px;
 }
 
 .template-grid {
@@ -678,78 +661,6 @@ output {
   max-width: none;
 }
 
-.keyword-reaction-preview-toast {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  z-index: 2;
-  display: grid;
-  gap: 4px;
-  width: min(320px, calc(100% - 32px));
-  max-height: calc(100% - 32px);
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.86);
-  color: #f8fafc;
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.32);
-  overflow: hidden;
-  overflow-wrap: anywhere;
-  pointer-events: none;
-}
-
-.keyword-reaction-preview-toast[hidden] {
-  display: none;
-}
-
-.keyword-reaction-preview-toast[data-style="pulse"] {
-  background: rgba(14, 116, 144, 0.88);
-}
-
-.keyword-reaction-preview-toast[data-style="soft"] {
-  background: rgba(248, 250, 252, 0.92);
-  color: #1f2724;
-}
-
-.keyword-reaction-preview-toast[data-style="none"] {
-  background: rgba(31, 39, 36, 0.78);
-  box-shadow: none;
-}
-
-.keyword-reaction-preview-toast[data-intensity="0"] {
-  opacity: 0.82;
-}
-
-.keyword-reaction-preview-toast[data-intensity="2"] {
-  border-width: 2px;
-}
-
-.keyword-reaction-preview-toast[data-intensity="3"] {
-  border-width: 2px;
-  box-shadow: 0 16px 42px rgba(15, 118, 110, 0.44);
-}
-
-.keyword-reaction-preview-label {
-  color: #a7f3d0;
-  font-size: 0.72rem;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.keyword-reaction-preview-toast[data-style="soft"] .keyword-reaction-preview-label {
-  color: #0f766e;
-}
-
-.keyword-reaction-preview-text {
-  display: -webkit-box;
-  max-height: 5.2em;
-  overflow: hidden;
-  font-weight: 800;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1057,28 +968,6 @@ button.adjust-tab[aria-pressed="true"]:hover {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.6;
-}
-
-.labs-panel {
-  border: 1px solid var(--line);
-  border-radius: var(--panel-radius);
-  background: var(--panel);
-  box-shadow: var(--shadow);
-  padding: 8px 18px;
-}
-
-.labs-panel > summary {
-  padding: 10px 0;
-  color: var(--muted);
-  font-weight: 800;
-}
-
-.labs-panel[open] {
-  padding-bottom: 18px;
-}
-
-.labs-panel .candidate-experiment-panel {
-  margin-top: 8px;
 }
 
 .category-tabs {
