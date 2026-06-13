@@ -600,6 +600,8 @@ function importConfig() {
   try {
     state = parseImportInput(elements.importInput.value);
     syncFormFromState();
+    // 直前の失敗メッセージを消す(成功確認は常時表示の builderStatus 側に出る)。
+    elements.importStatus.textContent = "";
     updateEverything("設定を読み込みました。");
   } catch (error) {
     elements.importStatus.textContent = error instanceof Error ? error.message : "設定を読み込めませんでした。";

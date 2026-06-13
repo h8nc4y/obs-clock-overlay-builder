@@ -6,6 +6,25 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-14
+
+First stable release. The builder is feature-complete for its scope — digital / analog / flip clocks, reproducible `/clock/?c=...` URLs, automatic server-time correction, and strict security headers. This release focuses on correctness, hardening, and documentation after a full multi-agent audit of every asset (with reproduced findings). The `/clock/?c=...` URL contract is unchanged, so existing generated URLs render identically.
+
+### Fixed
+
+- Pasting malformed JSON into the import box now shows the localized Japanese error instead of a raw English `SyntaxError`.
+- A failed import's error message is now cleared when a later import succeeds (it previously lingered).
+- The clock resumes ticking after a back/forward (bfcache) page restore, not only after a visibility change.
+- The local dev server no longer crashes on a malformed request target (e.g. `//`); it returns 400.
+
+### Changed
+
+- Hardened the server-time sync: it ignores non-2xx / header-less responses, swallows unexpected errors, and exposes a `stop()` handle — so the clock always degrades silently to local time and never emits a console error during a long OBS session.
+- The analog face now routes font names through the same CSS sanitizer as the digital and flip clocks.
+- Accessibility: the preview-background and recommended-size groups now expose their labels via `role="group"`.
+- Removed a dead `fontWeight` re-clamp.
+- Docs: added a Security section to the README, corrected a stale `npm test` note in CONTRIBUTING, and confirmed every internal Markdown link resolves. The test suite grew to 87.
+
 ## [0.9.0] - 2026-06-14
 
 ### Added

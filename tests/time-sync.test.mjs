@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { computeOffsetMs, correctedNow, syncOnce } from "../assets/js/time-sync.js";
+import { computeOffsetMs, correctedNow, startTimeSync, syncOnce } from "../assets/js/time-sync.js";
 
 // fetch を差し替えて syncOnce を1回だけ動かすヘルパー。後始末で元に戻す。
 async function withStubbedFetch(stub, run) {
@@ -16,6 +16,7 @@ async function withStubbedFetch(stub, run) {
 
 function responseWithDate(dateValue) {
   return {
+    ok: true,
     headers: {
       get(name) {
         return name.toLowerCase() === "date" ? dateValue : null;
@@ -64,6 +65,65 @@ test("syncOnce returns null when the response has no Date header", async () => {
     () => syncOnce("/api/defaults")
   );
   assert.equal(result, null);
+});
+
+test("syncOnce returns null for a non-2xx response (no offset applied)", async () => {
+  const result = await withStubbedFetch(
+    () => Promise.resolve({ ok: false, headers: { get: () => "Sat, 13 Jun 2026 14:00:00 GMT" } }),
+    () => syncOnce("/api/defaults")
+  );
+  assert.equal(result, null);
+});
+
+test("syncOnce returns null when the response has no headers object", async () => {
+  const result = await withStubbedFetch(
+    () => Promise.resolve({ ok: true }),
+    () => syncOnce("/api/defaults")
+  );
+  assert.equal(result, null);
+});
+
+test("startTimeSync registers a resync interval + visibilitychange listener and stop() clears both", async () => {
+  const listeners = [];
+  const original = {
+    document: globalThis.document,
+    fetch: globalThis.fetch,
+    setInterval: globalThis.setInterval,
+    clearInterval: globalThis.clearInterval
+  };
+  let intervals = 0;
+  let cleared = 0;
+  globalThis.document = {
+    hidden: false,
+    addEventListener(type, handler) {
+      listeners.push({ type, handler });
+    },
+    removeEventListener(type, handler) {
+      const i = listeners.findIndex((l) => l.type === type && l.handler === handler);
+      if (i >= 0) listeners.splice(i, 1);
+    }
+  };
+  globalThis.setInterval = (...args) => {
+    intervals += 1;
+    return original.setInterval(...args);
+  };
+  globalThis.clearInterval = (id) => {
+    cleared += 1;
+    return original.clearInterval(id);
+  };
+  globalThis.fetch = () => Promise.resolve(responseWithDate("Sat, 13 Jun 2026 14:00:00 GMT"));
+  try {
+    const stop = startTimeSync({ url: "/api/defaults", intervalMs: 9_999_999 });
+    await new Promise((r) => setTimeout(r, 20));
+    assert.equal(intervals, 1, "one resync interval registered");
+    assert.equal(listeners.filter((l) => l.type === "visibilitychange").length, 1, "one visibilitychange listener");
+    assert.equal(typeof stop, "function", "returns a stop handle");
+    stop();
+    assert.equal(cleared, 1, "interval cleared by stop()");
+    assert.equal(listeners.filter((l) => l.type === "visibilitychange").length, 0, "listener removed by stop()");
+  } finally {
+    Object.assign(globalThis, original);
+  }
 });
 
 test("syncOnce applies the server Date offset and correctedNow reflects it", async () => {

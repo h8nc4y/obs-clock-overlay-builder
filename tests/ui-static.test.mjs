@@ -203,3 +203,15 @@ test("editor refresh does not add risky HTML sinks", () => {
 
   assert.doesNotMatch(changedSources, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
 });
+
+test("labeled control groups expose an accessible name via role=group + aria-label", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  // aria-label on a bare <div> is ignored by assistive tech; each labeled group needs role="group".
+  for (const label of ["プレビュー背景", "OBS推奨サイズ", "時計の種類", "調整モード切り替え"]) {
+    assert.match(
+      html,
+      new RegExp(`role="group"[^>]*aria-label="${label}"|aria-label="${label}"[^>]*role="group"`),
+      `group "${label}" should expose role="group" + aria-label`
+    );
+  }
+});

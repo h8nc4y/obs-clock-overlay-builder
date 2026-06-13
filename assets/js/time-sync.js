@@ -39,6 +39,10 @@ export async function syncOnce(url) {
     return null; // オフライン等 → ローカル時刻のまま
   }
   const end = Date.now();
+  // 非2xx や headers を持たない異常応答では補正しない(ローカル時刻のまま)。
+  if (!response.ok || !response.headers || typeof response.headers.get !== "function") {
+    return null;
+  }
   const header = response.headers.get("date");
   const next = computeOffsetMs(header ? Date.parse(header) : NaN, start, end);
   if (next === null) {
@@ -52,23 +56,41 @@ export async function syncOnce(url) {
 // onUpdate は補正値が更新できたときに呼ばれ、即座に再描画させるのに使う。
 export function startTimeSync({ url = "/api/defaults", intervalMs = 300000, onUpdate } = {}) {
   const run = async () => {
-    const synced = await syncOnce(url);
-    if (synced !== null && typeof onUpdate === "function") {
-      onUpdate();
+    try {
+      const synced = await syncOnce(url);
+      if (synced !== null && typeof onUpdate === "function") {
+        onUpdate();
+      }
+    } catch {
+      // 何があってもローカル時刻で動き続ける(OBSでconsoleエラーを出さない)。
     }
   };
 
   run();
 
+  let intervalId = 0;
   if (typeof setInterval === "function") {
-    setInterval(run, intervalMs);
+    intervalId = setInterval(run, intervalMs);
   }
 
+  let visibilityHandler = null;
   if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
-    document.addEventListener("visibilitychange", () => {
+    visibilityHandler = () => {
       if (!document.hidden) {
         run();
       }
-    });
+    };
+    document.addEventListener("visibilitychange", visibilityHandler);
   }
+
+  // 明示的に停止できるハンドルを返す。本番の clock.js は1回だけ呼んで使い続けるので
+  // 戻り値は無視してよい(挙動は変わらない)。テストや再初期化で後始末できるようにする。
+  return () => {
+    if (intervalId && typeof clearInterval === "function") {
+      clearInterval(intervalId);
+    }
+    if (visibilityHandler && typeof document !== "undefined" && typeof document.removeEventListener === "function") {
+      document.removeEventListener("visibilitychange", visibilityHandler);
+    }
+  };
 }

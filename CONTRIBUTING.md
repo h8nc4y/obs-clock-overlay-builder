@@ -30,7 +30,8 @@ Notes:
 
 - `npm run lint` checks JavaScript syntax.
 - `npm run typecheck` runs module/import smoke checks.
-- `npm test` can generate ignored `dist/` output.
+- `npm test` runs the Node test suite; the build test builds into a temporary directory, so it does not touch your `dist/`.
+- `npm run build` is what writes `dist/` (used by deploy and the Wrangler dry-run).
 - `npm run release:check` includes a Wrangler dry-run, so use it only when that is safe for your environment.
 
 ## Pull Request Expectations

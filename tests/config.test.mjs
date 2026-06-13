@@ -123,6 +123,12 @@ test("empty import input reports a clear error", () => {
   assert.throws(() => parseImportInput("  \n\t  "), /入力が空です。/);
 });
 
+test("malformed brace-prefixed JSON paste surfaces the localized error, not a raw V8 message", () => {
+  for (const bad of ['{"label":}', '{"a":1,}', "{ ", '{"label":"JST"']) {
+    assert.throws(() => parseImportInput(bad), /設定を読み込めませんでした。/, `expected localized error for ${bad}`);
+  }
+});
+
 test("invalid values fall back to safe defaults", () => {
   const config = normalizeConfig({
     timezone: "No/Such_Zone",
