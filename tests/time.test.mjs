@@ -3,11 +3,18 @@ import test from "node:test";
 import { normalizeConfig } from "../assets/js/config.js";
 import { createFormatters, formatClock, nextSecondDelay, normalizeHour } from "../assets/js/time.js";
 
-test("formats Tokyo time as HH:MM:SS by default", () => {
-  const config = normalizeConfig({});
+test("formats Tokyo time as HH:MM:SS when seconds are on", () => {
+  const config = normalizeConfig({ showSeconds: true });
   const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05.200Z"));
 
   assert.equal(formatted.time, "00:04:05");
+});
+
+test("hides seconds by default", () => {
+  const config = normalizeConfig({});
+  const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05.200Z"));
+
+  assert.equal(formatted.time, "00:04");
 });
 
 test("can hide seconds", () => {
@@ -18,7 +25,7 @@ test("can hide seconds", () => {
 });
 
 test("formats 12-hour time with day period", () => {
-  const config = normalizeConfig({ hour12: true, timezone: "UTC" });
+  const config = normalizeConfig({ hour12: true, showSeconds: true, timezone: "UTC" });
   const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05Z"));
 
   assert.equal(formatted.time, "03:04:05 PM");

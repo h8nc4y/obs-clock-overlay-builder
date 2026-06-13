@@ -6,6 +6,13 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-06-13
+
+### Changed
+
+- The default clock now hides seconds (shows HH:MM), matching the template cards. Turn on 秒を表示する when you want seconds. Because `DEFAULT_CONFIG` changed, short (compact) `?c=` URLs created before this release may render without seconds for any omitted value; full `?c=` URLs are unaffected.
+- Slightly reduced the flip templates' font size and dropped seconds from the default so the flip clock fits inside the builder live preview without overflowing.
+
 ## [0.6.0] - 2026-06-13
 
 ### Added
