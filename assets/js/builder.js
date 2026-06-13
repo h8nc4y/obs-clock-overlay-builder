@@ -42,8 +42,7 @@ const TEMPLATE_CATEGORIES = [
   { id: "all", label: "すべて" },
   { id: "standard", label: "定番" },
   { id: "cute", label: "かわいい" },
-  { id: "cool", label: "クール" },
-  { id: "japanese", label: "和風" }
+  { id: "cool", label: "クール" }
 ];
 let templateCategory = "all";
 

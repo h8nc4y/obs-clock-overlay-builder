@@ -141,11 +141,6 @@
   padding-bottom: 3px;
 }
 
-.template-kurenai .clock-time {
-  border-bottom: 3px solid #c2412c;
-  padding-bottom: 3px;
-}
-
 .template-studio-live .clock-label,
 .template-night-studio .clock-label {
   padding: 1px 10px;
@@ -160,12 +155,4 @@
   background: #aedded;
   color: #1b3a45;
   letter-spacing: 0.16em;
-}
-
-.template-kurenai .clock-label {
-  padding: 2px 10px;
-  border-radius: 4px;
-  background: #c2412c;
-  color: #ffffff;
-  letter-spacing: 0.14em;
 }

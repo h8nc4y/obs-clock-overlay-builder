@@ -11,7 +11,6 @@ The editor lists these font names as candidates only:
 - Kiwi Maru
 - Mochiy Pop One
 - Hachi Maru Pop
-- Yusei Magic
 - Dela Gothic One
 - Poppins
 - Inter
