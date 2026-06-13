@@ -20,17 +20,13 @@ Codex is used to:
 
 Codex should not treat review suggestions as implementation approval by themselves. It should preserve the `/clock/?c=...` OBS reproducibility contract, avoid risky HTML sinks for untrusted values, and report skipped checks or unknowns directly.
 
-## Evidence Links
+## Evidence
 
-- [Decision log](DECISION_LOG.md)
-- [AI review triage](AI_REVIEW_TRIAGE.md)
-- [Codex task queue](CODEX_TASKS.md)
-- [Claude review](CLAUDE_REVIEW.md)
-- [PR 19 review readiness](PR19_REVIEW_READINESS.md)
+The durable, public record of this workflow is the repository itself — commit history, pull requests, release notes, and the validation scripts in `package.json`.
 
 ## Public Claims
 
-This document is evidence for a future Codex for OSS application, but it does not claim the project has been accepted, endorsed, or found eligible. Public claims should be backed by repository artifacts such as commits, pull requests, documentation, or validation logs.
+This document describes how AI tools assist maintenance; it does not claim the project has been endorsed, accepted, or found eligible for any program. Public claims should be backed by repository artifacts such as commits, pull requests, documentation, or validation logs.
 
 ## 日本語メモ
 
