@@ -6,6 +6,17 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-06-13
+
+### Fixed
+
+- The default `/clock/` overlay (opened with no parameters) and the "Clean White" template are now dark text on a light panel, making them readable on any stream background. The previous white-text-on-transparent default was hard to see over bright scenes.
+
+### Changed
+
+- The builder default is now the readable Mono Compact look (dark monospace text on a near-white panel). The former "Minimal Clear" is renamed "Clean White" and uses a readable light panel instead of a transparent background.
+- Because `DEFAULT_CONFIG` changed, short (compact) `?c=` URLs created before this release may render with the new readable default for any omitted values. Full `?c=` URLs are unaffected because they embed every value.
+
 ## [0.3.0] - 2026-06-13
 
 ### Changed
