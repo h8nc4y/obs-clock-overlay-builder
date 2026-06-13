@@ -6,6 +6,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-13
+
+### Added
+
+- Rebuilt the clock templates around real streamer-overlay craft (inspired by popular OBS clock assets): soft card depth, signature accents (a pulsing LIVE badge, a sakura petal, soda bubbles, pastel dots, neon corner brackets, an aqua accent bar), and signature shapes. 10 templates in 3 genres: 定番 (Mono Compact, Clean White, Studio Live), かわいい (Milk Tea, Sakura, Pastel Pop, Soda), クール (Night Studio, Neon HUD, Aqua Deck).
+
+### Fixed
+
+- Clearing the label field now hides the label instead of forcing the default "JST" to appear.
+- The clock frame width and the colon position no longer move while streaming. Each digit is drawn in a fixed-width slot, so the overall width stays constant as the time ticks (the digits themselves still change). The frame still auto-resizes while you edit settings in the builder.
+
+### Changed
+
+- Removed the previous 和風 genre and the weaker auto-generated templates; the lineup is now a tighter, more polished set. Generated `?c=` URLs keep working; flat `?template=` links for removed ids fall back to the default.
+
 ## [0.3.1] - 2026-06-13
 
 ### Fixed
