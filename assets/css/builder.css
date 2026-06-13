@@ -974,6 +974,36 @@ details p {
   border-radius: 50%;
 }
 
+.clock-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.clock-type-row > span {
+  margin-right: 4px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.analog-controls {
+  margin-top: 12px;
+}
+
+.template-mini-analog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.template-mini-analog svg {
+  width: 64px;
+  height: 64px;
+}
+
 .adjust-tabs {
   display: flex;
   flex-wrap: wrap;

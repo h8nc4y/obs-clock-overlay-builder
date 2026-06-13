@@ -42,7 +42,8 @@ const TEMPLATE_CATEGORIES = [
   { id: "all", label: "すべて" },
   { id: "standard", label: "定番" },
   { id: "cute", label: "かわいい" },
-  { id: "cool", label: "クール" }
+  { id: "cool", label: "クール" },
+  { id: "analog", label: "アナログ" }
 ];
 let templateCategory = "all";
 
@@ -134,7 +135,12 @@ const elements = {
   keywordReactionUrlStatus: byId("keywordReactionUrlStatus"),
   copyKeywordReactionUrl: byId("copyKeywordReactionUrl"),
   keywordReactionToast: byId("keywordReactionToast"),
-  keywordReactionToastText: byId("keywordReactionToastText")
+  keywordReactionToastText: byId("keywordReactionToastText"),
+  clockTypeDigital: byId("clockTypeDigital"),
+  clockTypeAnalog: byId("clockTypeAnalog"),
+  analogSize: byId("analogSize"),
+  analogMarks: byId("analogMarks"),
+  analogSecondHand: byId("analogSecondHand")
 };
 
 const rangeFields = [
@@ -154,11 +160,12 @@ const rangeFields = [
   "shadowBlur",
   "shadowX",
   "shadowY",
-  "strokeWidth"
+  "strokeWidth",
+  "analogSize"
 ];
 const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
 const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
-const selectFields = ["dateFormat", "weekdayFormat", "labelPosition"];
+const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand"];
 let state = loadInitialConfig();
 let shareBlob = null;
 let shareObjectUrl = "";
@@ -180,9 +187,28 @@ function init() {
   bindForm();
   bindKeywordReactionExperiment();
   bindPreviewBackground();
+  bindClockType();
   syncFormFromState();
   updateEverything();
   window.addEventListener("resize", () => window.requestAnimationFrame(fitTemplateMiniPreviews));
+}
+
+function bindClockType() {
+  elements.clockTypeDigital.addEventListener("click", () => updateState({ clockType: "digital" }, true));
+  elements.clockTypeAnalog.addEventListener("click", () => updateState({ clockType: "analog" }, true));
+}
+
+// 時計種別に応じて、デジタル用/アナログ用のコントロールを出し分ける。
+function updateClockTypeVisibility() {
+  const analog = state.clockType === "analog";
+  elements.clockTypeDigital.setAttribute("aria-pressed", String(!analog));
+  elements.clockTypeAnalog.setAttribute("aria-pressed", String(analog));
+  document.querySelectorAll('[data-clock-mode="digital"]').forEach((node) => {
+    node.classList.toggle("is-hidden", analog);
+  });
+  document.querySelectorAll('[data-clock-mode="analog"]').forEach((node) => {
+    node.classList.toggle("is-hidden", !analog);
+  });
 }
 
 function readSavedUiTheme() {
@@ -259,9 +285,20 @@ function renderTemplateCategoryTabs() {
 function buildTemplateMiniPreview(template) {
   const mini = document.createElement("span");
   mini.className = "template-mini";
+  const applied = applyTemplate(cloneDefaultConfig(), template.id);
+
+  if (applied.clockType === "analog") {
+    const holder = document.createElement("span");
+    holder.className = "template-mini-analog";
+    // "tick" にして rAF ループを立てず、固定ポーズの静止アナログだけ描く。
+    // 表示サイズは CSS(.template-mini-analog svg)で固定し、analogSize のクランプに左右されないようにする。
+    mountClock(holder, { ...applied, analogSecondHand: "tick" }, { now: () => new Date(2026, 0, 1, 10, 8, 36) });
+    mini.append(holder);
+    return mini;
+  }
 
   const widget = document.createElement("span");
-  applyClockStyles(widget, applyTemplate(cloneDefaultConfig(), template.id));
+  applyClockStyles(widget, applied);
   widget.classList.add("template-mini-clock");
 
   const timeText = document.createElement("span");
@@ -476,6 +513,8 @@ function syncFormFromState() {
   elements.weekdayFormat.value = state.weekdayFormat;
   elements.labelText.value = state.label;
   elements.labelPosition.value = state.labelPosition;
+  elements.analogMarks.value = state.analogMarks;
+  elements.analogSecondHand.value = state.analogSecondHand;
   elements.fontFamily.value = state.fontFamily;
   elements.fontPreset.value = FONT_CANDIDATES.includes(state.fontFamily) ? state.fontFamily : "";
   for (const field of colorFields) {
@@ -517,6 +556,7 @@ function updateEverything(status = "") {
   updateKeywordReactionExperiment();
   updateContrastWarning();
   updateTemplatePressed();
+  updateClockTypeVisibility();
   if (status) {
     elements.importStatus.textContent = status;
   }
