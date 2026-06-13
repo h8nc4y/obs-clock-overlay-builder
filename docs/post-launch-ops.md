@@ -6,7 +6,7 @@ This document keeps public-safe operational guidance for release checks, cost po
 
 - public demo URL: `https://obs-clock-overlay-builder.h8nc4y.workers.dev`
 - Cloudflare Worker name: `obs-clock-overlay-builder`
-- GitHub release: `v0.1.0`
+- GitHub release: `v0.2.0`(デザイン全面刷新。`v0.1.1` はデプロイなしの区切りタグ)
 - v0.1.1 backlog: [v0.1.1-backlog.md](v0.1.1-backlog.md)
 
 Exact Worker version identifiers, rollback candidate identifiers, and private issue or PR URLs are intentionally not recorded in this public-facing document. Before any rollback, re-check the current Cloudflare version and deployment list in the authorized environment.
