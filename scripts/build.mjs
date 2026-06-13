@@ -1,9 +1,11 @@
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-const dist = join(root, "dist");
+// 既定の出力先は dist。並列テストが共有 dist/ を奪い合わないよう、
+// DIST_DIR でビルド先を上書きできる(本番ビルドは未指定なので dist/ のまま)。
+const dist = process.env.DIST_DIR ? resolve(process.env.DIST_DIR) : join(root, "dist");
 const requiredDeployEntries = ["index.html", "clock", "assets", "api", "favicon.ico"];
 const optionalDeployEntries = ["_redirects", "_headers"];
 
