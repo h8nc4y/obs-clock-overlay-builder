@@ -142,7 +142,8 @@ const elements = {
   clockTypeFlip: byId("clockTypeFlip"),
   analogSize: byId("analogSize"),
   analogMarks: byId("analogMarks"),
-  analogSecondHand: byId("analogSecondHand")
+  analogSecondHand: byId("analogSecondHand"),
+  flipGroup: byId("flipGroup")
 };
 
 const rangeFields = [
@@ -167,7 +168,7 @@ const rangeFields = [
 ];
 const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
 const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
-const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand"];
+const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let shareBlob = null;
 let shareObjectUrl = "";
@@ -303,9 +304,10 @@ function buildTemplateMiniPreview(template) {
   if (applied.clockType === "flip") {
     const holder = document.createElement("span");
     holder.className = "template-mini-flip";
+    // 小さい表示なので角丸も小さくして、丸くなりすぎないようにする。
     mountClock(
       holder,
-      { ...applied, fontSize: 22, showSeconds: false },
+      { ...applied, fontSize: 22, showSeconds: false, radius: 4 },
       { now: () => new Date(2026, 0, 1, 12, 34, 0) }
     );
     mini.append(holder);
@@ -530,6 +532,7 @@ function syncFormFromState() {
   elements.labelPosition.value = state.labelPosition;
   elements.analogMarks.value = state.analogMarks;
   elements.analogSecondHand.value = state.analogSecondHand;
+  elements.flipGroup.value = state.flipGroup;
   elements.fontFamily.value = state.fontFamily;
   elements.fontPreset.value = FONT_CANDIDATES.includes(state.fontFamily) ? state.fontFamily : "";
   for (const field of colorFields) {

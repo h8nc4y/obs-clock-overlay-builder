@@ -10,13 +10,13 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
-- Flip (パタパタ) clock as a new clock type. Digits are drawn as cards with a split-flap seam and a short flip animation on change. This is an original implementation and is not derived from any third-party flip-clock code. Two flip templates: Flip Light and Flip Dark. It reuses the existing color / font / size / corner settings and is fully reproducible from `/clock/?c=...`.
+- Flip (パタパタ) clock as a new clock type. Each card is split into an upper and lower face; on change the upper face folds forward and the lower face swings up — a real split-flap motion. You can group the digits one-at-a-time or two-at-a-time (桁のまとめ方). This is an original implementation and is not derived from any third-party flip-clock code. Three flip templates: Flip Light, Flip Dark, and Flip Pair. It reuses the existing color / font / size / corner settings and is fully reproducible from `/clock/?c=...`.
 - Analog Roman numerals (目盛り = ローマ数字) and a date on the dial (the 日付を表示 toggle now applies to analog). Two new analog templates: Classic Roman and Cafe Brown.
 - The builder clock-type switch is now three-way: デジタル / アナログ / パタパタ.
 
 ### Changed
 
-- Template lineup grows to 16 across five genres (定番 / かわいい / クール / アナログ / パタパタ). Existing `/clock/?c=...` URLs keep working.
+- Template lineup grows to 17 across five genres (定番 / かわいい / クール / アナログ / パタパタ). Existing `/clock/?c=...` URLs keep working.
 
 ## [0.5.0] - 2026-06-13
 

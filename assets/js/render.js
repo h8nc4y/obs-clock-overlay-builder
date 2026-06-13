@@ -193,50 +193,106 @@ function mountFlipClock(container, config, options = {}) {
   let currentConfig = normalizeConfig(config);
   let formatters = createFormatters(currentConfig);
   let slots = [];
-  let lastText = "";
+  let layoutKey = "";
 
-  function build(text) {
-    root.textContent = "";
-    slots = [];
-    for (const char of text) {
-      if (char >= "0" && char <= "9") {
-        const card = document.createElement("span");
-        card.className = "flip-card";
-        const digit = document.createElement("span");
-        digit.className = "flip-digit";
-        digit.textContent = char;
-        card.append(digit);
-        root.append(card);
-        slots.push({ digit: true, card, value: char });
+  // flipGroup="pair" のときは連続した数字を1枚のカードにまとめる(2桁パネル)。
+  function tokenize(text, group) {
+    const tokens = [];
+    let i = 0;
+    while (i < text.length) {
+      const char = text[i];
+      const isDigit = char >= "0" && char <= "9";
+      if (isDigit && group === "pair") {
+        let value = "";
+        while (i < text.length && text[i] >= "0" && text[i] <= "9") {
+          value += text[i];
+          i += 1;
+        }
+        tokens.push({ digit: true, value });
       } else {
-        const sep = document.createElement("span");
-        sep.className = "flip-sep";
-        sep.textContent = char;
-        root.append(sep);
-        slots.push({ digit: false, card: sep });
+        tokens.push({ digit: isDigit, value: char });
+        i += 1;
       }
     }
-    lastText = text;
+    return tokens;
+  }
+
+  function makeHalf(extra, value) {
+    const half = document.createElement("span");
+    half.className = `flip-half ${extra}`;
+    const inner = document.createElement("b");
+    inner.textContent = value;
+    half.append(inner);
+    return half;
+  }
+
+  function makeCard(value) {
+    const card = document.createElement("span");
+    card.className = "flip-card";
+    card.style.width = `${(value.length * 0.66 + 0.2).toFixed(2)}em`;
+    const staticTop = makeHalf("flip-top", value);
+    const staticBottom = makeHalf("flip-bottom", value);
+    const flapTop = makeHalf("flip-top flip-flap-top", value);
+    const flapBottom = makeHalf("flip-bottom flip-flap-bottom", value);
+    card.append(staticTop, staticBottom, flapTop, flapBottom);
+    return { digit: true, card, staticTop, staticBottom, flapTop, flapBottom, value, timer: 0 };
+  }
+
+  function setHalf(half, value) {
+    half.firstChild.textContent = value;
+  }
+
+  function build(tokens) {
+    root.textContent = "";
+    slots = tokens.map((token) => {
+      if (token.digit) {
+        const slot = makeCard(token.value);
+        root.append(slot.card);
+        return slot;
+      }
+      const sep = document.createElement("span");
+      sep.className = "flip-sep";
+      sep.textContent = token.value;
+      root.append(sep);
+      return { digit: false, value: token.value };
+    });
+  }
+
+  // 上半分(古い値)が手前に折れ、続いて下半分(新しい値)が起き上がる本物のめくれ。
+  function flip(slot, nextValue) {
+    setHalf(slot.staticTop, nextValue); // 上半分が折れたあとに見える面(新)
+    setHalf(slot.flapBottom, nextValue); // 起き上がる下フラップの面(新)
+    // staticBottom と flapTop は古い値のまま、それぞれが「めくれ」の動く面になる
+    slot.value = nextValue;
+    slot.card.classList.remove("is-flipping");
+    void slot.card.offsetWidth;
+    slot.card.classList.add("is-flipping");
+    if (slot.timer && typeof clearTimeout === "function") {
+      clearTimeout(slot.timer);
+    }
+    const settle = () => {
+      setHalf(slot.staticBottom, nextValue);
+      setHalf(slot.flapTop, nextValue);
+      slot.card.classList.remove("is-flipping");
+      slot.timer = 0;
+    };
+    slot.timer = typeof setTimeout === "function" ? setTimeout(settle, 560) : (settle(), 0);
   }
 
   function update(text) {
-    if (text.length !== lastText.length) {
-      build(text);
+    const tokens = tokenize(text, currentConfig.flipGroup);
+    const key = `${currentConfig.flipGroup}:${tokens.map((t) => (t.digit ? `#${t.value.length}` : t.value)).join("|")}`;
+    if (key !== layoutKey) {
+      build(tokens);
+      layoutKey = key;
       return;
     }
-    let index = 0;
-    for (const char of text) {
+    tokens.forEach((token, index) => {
       const slot = slots[index];
-      index += 1;
-      if (!slot.digit || slot.value === char) {
-        continue;
+      if (slot.digit && slot.value !== token.value) {
+        flip(slot, token.value);
       }
-      slot.card.firstChild.textContent = char;
-      slot.value = char;
-      slot.card.classList.remove("is-flipping");
-      void slot.card.offsetWidth;
-      slot.card.classList.add("is-flipping");
-    }
+    });
   }
 
   const controller = {
@@ -245,6 +301,7 @@ function mountFlipClock(container, config, options = {}) {
       currentConfig = normalizeConfig(nextConfig);
       formatters = createFormatters(currentConfig);
       applyFlipStyles(root, currentConfig);
+      layoutKey = "";
       this.tick(options.now ? options.now() : new Date());
     },
     tick(now = new Date()) {
@@ -254,6 +311,11 @@ function mountFlipClock(container, config, options = {}) {
       return { ...currentConfig };
     },
     destroy() {
+      for (const slot of slots) {
+        if (slot.timer && typeof clearTimeout === "function") {
+          clearTimeout(slot.timer);
+        }
+      }
       root.remove();
     }
   };

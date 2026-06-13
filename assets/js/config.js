@@ -53,7 +53,8 @@ export const DEFAULT_CONFIG = Object.freeze({
   borderWidth: 1,
   analogSize: 220,
   analogMarks: "numbers",
-  analogSecondHand: "sweep"
+  analogSecondHand: "sweep",
+  flipGroup: "single"
 });
 
 export const TEMPLATES = Object.freeze([
@@ -528,6 +529,27 @@ export const TEMPLATES = Object.freeze([
       borderOpacity: 1,
       borderWidth: 1
     }
+  },
+  {
+    id: "flip-pair",
+    name: "Flip Pair",
+    note: "パタパタ・2桁パネル",
+    sampleText: "12 34",
+    category: "flip",
+    config: {
+      clockType: "flip",
+      flipGroup: "pair",
+      fontFamily: "Poppins",
+      textColor: "#1f2430",
+      backgroundColor: "#f4f5f7",
+      backgroundOpacity: 1,
+      radius: 10,
+      fontSize: 60,
+      fontWeight: 800,
+      borderColor: "#d9dde3",
+      borderOpacity: 1,
+      borderWidth: 1
+    }
   }
 ]);
 
@@ -537,6 +559,7 @@ const LABEL_POSITIONS = new Set(["top", "bottom", "left", "right", "hidden"]);
 const CLOCK_TYPES = new Set(["digital", "analog", "flip"]);
 const ANALOG_MARKS = new Set(["numbers", "roman", "ticks", "both", "none"]);
 const ANALOG_SECOND_HANDS = new Set(["sweep", "tick", "off"]);
+const FLIP_GROUPS = new Set(["single", "pair"]);
 const TEMPLATE_IDS = new Set(TEMPLATES.map((template) => template.id));
 
 export const NUMBER_LIMITS = {
@@ -602,6 +625,7 @@ export function normalizeConfig(input = {}) {
   config.clockType = enumValue(raw.clockType, CLOCK_TYPES, DEFAULT_CONFIG.clockType);
   config.analogMarks = enumValue(raw.analogMarks, ANALOG_MARKS, DEFAULT_CONFIG.analogMarks);
   config.analogSecondHand = enumValue(raw.analogSecondHand, ANALOG_SECOND_HANDS, DEFAULT_CONFIG.analogSecondHand);
+  config.flipGroup = enumValue(raw.flipGroup, FLIP_GROUPS, DEFAULT_CONFIG.flipGroup);
   config.timezone = sanitizeTimezone(raw.timezone ?? raw.tz, DEFAULT_CONFIG.timezone);
   config.hour12 = coerceBool(raw.hour12, DEFAULT_CONFIG.hour12);
   config.showSeconds = coerceBool(raw.showSeconds ?? raw.seconds, DEFAULT_CONFIG.showSeconds);

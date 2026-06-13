@@ -32,6 +32,13 @@ test("clockType normalizes across digital, analog, and flip", () => {
   assert.equal(applyTemplate(cloneDefaultConfig(), "mono-compact").clockType, "digital");
 });
 
+test("flipGroup normalizes and the pair template selects pair mode", () => {
+  assert.equal(DEFAULT_CONFIG.flipGroup, "single");
+  assert.equal(normalizeConfig({ flipGroup: "pair" }).flipGroup, "pair");
+  assert.equal(normalizeConfig({ flipGroup: "triple" }).flipGroup, "single");
+  assert.equal(applyTemplate(cloneDefaultConfig(), "flip-pair").flipGroup, "pair");
+});
+
 test("analog enum fields fall back safely and size is clamped", () => {
   assert.equal(normalizeConfig({ analogMarks: "roman" }).analogMarks, "roman");
   assert.equal(normalizeConfig({ analogMarks: "spirals" }).analogMarks, DEFAULT_CONFIG.analogMarks);

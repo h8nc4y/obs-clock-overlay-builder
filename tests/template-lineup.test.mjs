@@ -3,12 +3,12 @@ import test from "node:test";
 import { TEMPLATES, applyTemplate, cloneDefaultConfig, normalizeConfig } from "../assets/js/config.js";
 
 const KNOWN_CATEGORIES = new Set(["standard", "cute", "cool", "analog", "flip"]);
-const NEW_TEMPLATE_IDS = ["analog-roman", "analog-cafe", "flip-light", "flip-dark"];
+const NEW_TEMPLATE_IDS = ["analog-roman", "analog-cafe", "flip-light", "flip-dark", "flip-pair"];
 
 test("template lineup has unique ids and known categories", () => {
   const ids = TEMPLATES.map((template) => template.id);
   assert.equal(new Set(ids).size, ids.length, "template ids must be unique");
-  assert.equal(TEMPLATES.length, 16);
+  assert.equal(TEMPLATES.length, 17);
   for (const template of TEMPLATES) {
     assert.ok(KNOWN_CATEGORIES.has(template.category), `unknown category for ${template.id}`);
     assert.ok(template.name, `name required for ${template.id}`);
