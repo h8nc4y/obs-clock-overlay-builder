@@ -116,8 +116,22 @@
   display: inline-block;
   font-size: var(--clock-font-size);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
   -webkit-text-stroke: var(--clock-stroke-width) var(--clock-stroke-color);
   paint-order: stroke fill;
+}
+
+/* 各数字を等幅スロットにして、配信中に時刻が変わっても外枠とコロン位置を固定する。
+   1ch は数字「0」の送り幅。フォントが変わってもサイズ変更には連動する。 */
+.clock-digit {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}
+
+.clock-sep {
+  display: inline-block;
+  text-align: center;
 }
 
 .clock-date-row[hidden],

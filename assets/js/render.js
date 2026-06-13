@@ -46,7 +46,7 @@ export function mountClock(container, config, options = {}) {
       label.textContent = currentConfig.label;
       dateNode.textContent = formatted.date;
       weekdayNode.textContent = formatted.weekday;
-      timeNode.textContent = formatted.time;
+      setFixedWidthDigits(timeNode, formatted.time);
       updateVisibility();
     },
     getConfig() {
@@ -100,6 +100,19 @@ export function recommendedObsSize(element) {
     width: Math.max(160, Math.ceil(rect.width + shadowPad)),
     height: Math.max(80, Math.ceil(rect.height + shadowPad))
   };
+}
+
+// 各数字を等幅スロット(span.clock-digit)で描画する。
+// 数字グリフは可変でも1文字あたりの占有幅を固定し、配信中に時刻が変わっても
+// 時計全体の横幅(=外枠)とコロンの位置が動かないようにする。
+function setFixedWidthDigits(node, text) {
+  node.textContent = "";
+  for (const char of String(text)) {
+    const span = document.createElement("span");
+    span.className = char >= "0" && char <= "9" ? "clock-digit" : "clock-sep";
+    span.textContent = char;
+    node.append(span);
+  }
 }
 
 function shadowValue(config) {

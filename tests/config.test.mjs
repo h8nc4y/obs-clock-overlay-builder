@@ -224,6 +224,13 @@ test("broken c parameter and unknown versions fall back safely", () => {
   assert.equal(future.timezone, "UTC");
 });
 
+test("empty label clears instead of forcing the default label", () => {
+  assert.equal(normalizeConfig({ label: "" }).label, "");
+  assert.equal(normalizeConfig({ label: "   " }).label, "");
+  assert.equal(normalizeConfig({ label: "ON AIR" }).label, "ON AIR");
+  assert.equal(normalizeConfig({}).label, DEFAULT_CONFIG.label);
+});
+
 test("overly long text is truncated by code point", () => {
   const config = normalizeConfig({
     label: "😀".repeat(45),

@@ -473,7 +473,10 @@ export function normalizeConfig(input = {}) {
   config.dateFormat = enumValue(raw.dateFormat, DATE_FORMATS, DEFAULT_CONFIG.dateFormat);
   config.showWeekday = coerceBool(raw.showWeekday ?? raw.weekday, DEFAULT_CONFIG.showWeekday);
   config.weekdayFormat = enumValue(raw.weekdayFormat, WEEKDAY_FORMATS, DEFAULT_CONFIG.weekdayFormat);
-  config.label = safeText(raw.label, DEFAULT_CONFIG.label, 40);
+  config.label =
+    raw.label === undefined || raw.label === null
+      ? DEFAULT_CONFIG.label
+      : truncateCodePoints(stripControlText(raw.label).trim(), 40);
   config.labelPosition = enumValue(raw.labelPosition, LABEL_POSITIONS, DEFAULT_CONFIG.labelPosition);
   config.fontFamily = safeText(raw.fontFamily ?? raw.font, DEFAULT_CONFIG.fontFamily, 80);
   config.textColor = normalizeHex(raw.textColor, DEFAULT_CONFIG.textColor);
