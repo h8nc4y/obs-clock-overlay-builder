@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-14
+
+### Changed
+
+- Polished the builder's "こだわり" (advanced) tab so its columns line up. The timezone field and its "端末の地域を採用" button now share one aligned row (with the on-device region shown inline beneath it), the date / weekday / label-position selects align as one row, and the font group's "PC内フォント" loader and the loaded-font list are full-width — removing the ragged, uneven columns. Also tightened some Japanese helper wording for clarity. No change to the generated `/clock/?c=...` output.
+
 ## [1.0.0] - 2026-06-14
 
 First stable release. The builder is feature-complete for its scope — digital / analog / flip clocks, reproducible `/clock/?c=...` URLs, automatic server-time correction, and strict security headers. This release focuses on correctness, hardening, and documentation after a full multi-agent audit of every asset (with reproduced findings). The `/clock/?c=...` URL contract is unchanged, so existing generated URLs render identically.

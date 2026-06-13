@@ -372,6 +372,21 @@ small,
   grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
 }
 
+/* 高さの異なるセルを上端でそろえ、ヘルプ文の有無で生じるガタつきを防ぐ。 */
+.form-grid-top {
+  align-items: start;
+}
+
+/* control-group 内で複数の form-grid / field を縦に積むときの間隔。 */
+.control-group > .form-grid + .form-grid,
+.control-group > .form-grid + .field,
+.control-group > .field + .form-grid,
+.control-group > .field + .field,
+.control-group > .form-grid + .toggle,
+.control-group > .field + .toggle {
+  margin-top: 14px;
+}
+
 .design-groups {
   display: grid;
   gap: 14px;
@@ -480,6 +495,42 @@ output {
 .inline-actions p {
   grid-column: 1 / -1;
   margin: 0;
+}
+
+/* control-group の幅いっぱいに置くフィールド（タイムゾーン入力やフォント読み込みなど）。 */
+.field-wide {
+  width: 100%;
+}
+
+/* 入力欄や見出しと、その操作ボタンを横並びにする行。狭い画面では折り返す。 */
+.field-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.field-inline > input[type="text"],
+.field-inline > select {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.field-inline > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.field-inline > button {
+  flex: 0 0 auto;
+}
+
+/* フォント読み込みブロック: 見出し＋ボタンの行と説明文をひとまとまりに。 */
+.local-font p {
+  margin: 0;
+  font-size: 0.92rem;
 }
 
 .swatches {
