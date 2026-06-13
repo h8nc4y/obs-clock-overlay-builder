@@ -651,8 +651,8 @@ export function normalizeConfig(input = {}) {
     config[key] = clampNumber(raw[key], min, max, DEFAULT_CONFIG[key]);
   }
 
+  // NUMBER_LIMITS.fontWeight ([300,900]) で既にクランプ済みなので、100刻みへの丸めだけ行う。
   config.fontWeight = Math.round(config.fontWeight / 100) * 100;
-  config.fontWeight = clampNumber(config.fontWeight, 100, 1000, DEFAULT_CONFIG.fontWeight);
   return config;
 }
 
@@ -851,7 +851,13 @@ function paramsFromUnknown(input) {
 
 function parseJsonLikeConfig(text) {
   if (text.startsWith("{")) {
-    return normalizeConfig(JSON.parse(text));
+    // 壊れたJSONをそのまま投げると V8 の英語エラーが日本語UIへ漏れる。
+    // ここは null を返し、parseImportInput 側の日本語メッセージへ集約する。
+    try {
+      return normalizeConfig(JSON.parse(text));
+    } catch {
+      return null;
+    }
   }
   try {
     const decoded = decodeURIComponent(text);

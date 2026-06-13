@@ -27,6 +27,13 @@ window.addEventListener("pagehide", () => {
   window.clearTimeout(timerId);
 });
 
+// bfcache から復帰したとき(戻る/進む)は pagehide で止めた tick を再開する。
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    scheduleNextTick();
+  }
+});
+
 // PCの時計がずれていてもサーバー時刻へ自動補正する。補正できたら即再描画。
 // 取得失敗時は offset=0 のままなのでローカル時刻で動き続ける。
 startTimeSync({ onUpdate: scheduleNextTick });

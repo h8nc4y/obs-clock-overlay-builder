@@ -44,7 +44,7 @@
             <button id="openClock" type="button" class="secondary">時計だけを確認</button>
           </div>
           <p id="urlStatus" class="status-line preview-status" role="status" aria-live="polite"></p>
-          <div class="preview-toolbar" aria-label="プレビュー背景">
+          <div class="preview-toolbar" role="group" aria-label="プレビュー背景">
             <label><input type="radio" name="previewBg" value="checker" checked> 透過チェッカー</label>
             <label><input type="radio" name="previewBg" value="light"> 明るい背景</label>
             <label><input type="radio" name="previewBg" value="dark"> 暗い背景</label>
@@ -54,7 +54,7 @@
           <div id="previewShell" class="preview-shell preview-checker">
             <div id="clockPreview" class="preview-stage" aria-hidden="true"></div>
           </div>
-          <div class="metrics-grid" aria-label="OBS推奨サイズ">
+          <div class="metrics-grid" role="group" aria-label="OBS推奨サイズ">
             <div>
               <span>推奨幅</span>
               <strong id="recommendedWidth">未計測</strong>

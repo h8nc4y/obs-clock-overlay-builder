@@ -391,7 +391,7 @@ function buildAnalogFace(root, config) {
     });
     date.setAttribute("font-size", "6");
     date.setAttribute("font-weight", "600");
-    date.style.fontFamily = `${config.fontFamily}, sans-serif`;
+    date.style.fontFamily = `${cssStringLiteral(config.fontFamily)}, sans-serif`;
     root.append(date);
   }
 
@@ -436,7 +436,7 @@ function appendMarks(root, config, inkColor) {
       });
       text.setAttribute("font-size", showRoman ? "6.5" : "9");
       text.setAttribute("font-weight", "700");
-      text.style.fontFamily = `${config.fontFamily}, sans-serif`;
+      text.style.fontFamily = `${cssStringLiteral(config.fontFamily)}, sans-serif`;
       text.textContent = showRoman ? ROMAN_NUMERALS[i - 1] : String(i);
       root.append(text);
     }

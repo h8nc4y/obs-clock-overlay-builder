@@ -61,6 +61,12 @@ Older flat query parameters are still read for compatibility, for example:
 - Local font discovery and clipboard are optional browser features. Browser permission prompts and browser behavior depend on the user's environment.
 - The clock fetches the same-origin `/api/defaults` with `no-store` only to read the response `Date` header for time correction; no clock configuration or personal data is sent.
 
+## Security
+
+- A strict `Content-Security-Policy` is sent on every response (plus `X-Content-Type-Options: nosniff` and `Referrer-Policy: no-referrer`). It allows only same-origin scripts and styles and uses no inline scripts or styles. It intentionally does not restrict framing, so `/clock/` stays embeddable as an OBS browser source.
+- URL-provided labels and font names are rendered as text, never as HTML.
+- No backend, no database, no secrets, and no third-party network requests.
+
 ## Development
 
 Install dependencies once, then use the npm scripts:
@@ -92,7 +98,7 @@ Notes:
 
 - `npm run lint` is JavaScript syntax checking with `node --check`, not ESLint.
 - `npm run typecheck` is a module/import smoke check, not TypeScript checking.
-- `npm test` may rebuild ignored `dist/` output through the build tests.
+- `npm test` runs the Node test suite; the build test builds into a temporary directory, so it does not touch your `dist/` (`npm run build` is what writes `dist/`).
 - `npm run release:check` includes `cf:dry-run`; run it only when Wrangler dry-run is safe in your environment.
 
 ## Deployment
@@ -170,6 +176,7 @@ OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける�
 - 時計設定は URL とローカルブラウザ上で扱います。
 - このアプリは、ユーザーの時計設定を意図的にサーバーへ送信しません。
 - PC 内フォント読み込みとクリップボードは任意のブラウザ機能です。利用可否や許可画面はブラウザ環境に依存します。
+- 全レスポンスに厳格な CSP などのセキュリティヘッダを付与し、URL のラベルやフォント名は HTML ではなくテキストとして表示します。`/clock/` は OBS に埋め込めるよう、フレーム表示は制限していません。
 
 ### よくある問題
 

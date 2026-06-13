@@ -27,7 +27,15 @@ const securityHeaders = {
 };
 
 const server = createServer((request, response) => {
-  const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
+  let url;
+  try {
+    url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
+  } catch {
+    // 不正なリクエストターゲット(例: "//", "/\\")で new URL が throw してもサーバを落とさない。
+    response.writeHead(400, { "content-type": "text/plain; charset=utf-8", ...securityHeaders });
+    response.end("Bad request");
+    return;
+  }
   const filePath = resolvePath(url.pathname);
   if (!filePath) {
     response.writeHead(403);
