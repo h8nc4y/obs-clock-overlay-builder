@@ -149,6 +149,83 @@
   user-select: none;
 }
 
+/* パタパタ(フリップ)時計。各桁をカードで描き、中央の分割線と、値変更時の
+   短いフリップアニメで「めくれ」を表現する(独自実装)。 */
+.clock-flip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--flip-font), var(--fallback-fonts);
+  white-space: nowrap;
+}
+
+.flip-card {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0.74em;
+  padding: 0.14em 0.16em;
+  border: var(--flip-border-width) solid var(--flip-border);
+  border-radius: var(--flip-radius);
+  background: var(--flip-card-bg);
+  color: var(--flip-ink);
+  font-size: var(--flip-size);
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform-origin: center;
+  backface-visibility: hidden;
+}
+
+.flip-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 7%;
+  right: 7%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.26);
+  transform: translateY(-0.5px);
+}
+
+.flip-digit {
+  display: inline-block;
+  min-width: 0.62em;
+  text-align: center;
+}
+
+.flip-sep {
+  color: var(--flip-ink);
+  font-size: calc(var(--flip-size) * 0.7);
+  font-weight: 800;
+}
+
+.flip-card.is-flipping {
+  animation: flip-tick 0.32s ease;
+}
+
+@keyframes flip-tick {
+  0% {
+    transform: perspective(220px) rotateX(0deg);
+  }
+  48% {
+    transform: perspective(220px) rotateX(-84deg);
+  }
+  56% {
+    transform: perspective(220px) rotateX(-90deg);
+  }
+  100% {
+    transform: perspective(220px) rotateX(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-card.is-flipping {
+    animation: none;
+  }
+}
+
 .template-minimal-clear {
   backdrop-filter: none;
 }

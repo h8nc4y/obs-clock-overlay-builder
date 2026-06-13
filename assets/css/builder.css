@@ -1004,6 +1004,17 @@ details p {
   height: 64px;
 }
 
+.template-mini-flip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.template-mini-flip .clock-flip {
+  transform: scale(0.92);
+}
+
 .adjust-tabs {
   display: flex;
   flex-wrap: wrap;

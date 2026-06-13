@@ -113,6 +113,7 @@
             <span>時計の種類</span>
             <button id="clockTypeDigital" type="button" class="adjust-tab" aria-pressed="true">デジタル</button>
             <button id="clockTypeAnalog" type="button" class="adjust-tab" aria-pressed="false">アナログ</button>
+            <button id="clockTypeFlip" type="button" class="adjust-tab" aria-pressed="false">パタパタ</button>
           </div>
           <div class="adjust-tabs" role="group" aria-label="調整モード切り替え">
             <button id="adjustTabEasy" type="button" class="adjust-tab" aria-pressed="true">かんたん</button>
@@ -135,7 +136,7 @@
                 <input id="backgroundOpacity" type="range" min="0" max="1" step="0.01">
                 <output id="backgroundOpacityValue"></output>
               </label>
-              <label class="field" data-clock-mode="digital" for="fontSize">
+              <label class="field" data-clock-mode="digital flip" for="fontSize">
                 <span>文字サイズ</span>
                 <input id="fontSize" type="range" min="18" max="120" step="1">
                 <output id="fontSizeValue"></output>
@@ -146,16 +147,16 @@
                 <small id="labelTextHelp">入力した文字は、そのまま画面用の命令として実行されない形で表示します。</small>
               </label>
             </div>
-            <div class="toggle-row" data-clock-mode="digital">
-              <label class="toggle" for="showSeconds">
+            <div class="toggle-row">
+              <label class="toggle" data-clock-mode="digital flip" for="showSeconds">
                 <input id="showSeconds" type="checkbox">
                 <span>秒を表示する</span>
               </label>
-              <label class="toggle" for="showDate">
+              <label class="toggle" data-clock-mode="digital analog" for="showDate">
                 <input id="showDate" type="checkbox">
                 <span>日付を表示する</span>
               </label>
-              <label class="toggle" for="showWeekday">
+              <label class="toggle" data-clock-mode="digital" for="showWeekday">
                 <input id="showWeekday" type="checkbox">
                 <span>曜日を表示する</span>
               </label>
@@ -172,6 +173,7 @@
                   <span>目盛り</span>
                   <select id="analogMarks">
                     <option value="numbers">数字</option>
+                    <option value="roman">ローマ数字</option>
                     <option value="ticks">目盛り</option>
                     <option value="both">数字＋目盛り</option>
                     <option value="none">なし</option>

@@ -22,15 +22,18 @@ test("sweep blends milliseconds into the second hand, tick does not", () => {
   assert.equal(tick.secondDeg, 10 * 6);
 });
 
-test("clockType normalizes and analog templates switch the type", () => {
+test("clockType normalizes across digital, analog, and flip", () => {
   assert.equal(DEFAULT_CONFIG.clockType, "digital");
   assert.equal(normalizeConfig({ clockType: "analog" }).clockType, "analog");
+  assert.equal(normalizeConfig({ clockType: "flip" }).clockType, "flip");
   assert.equal(normalizeConfig({ clockType: "bogus" }).clockType, "digital");
   assert.equal(applyTemplate(cloneDefaultConfig(), "analog-navy").clockType, "analog");
+  assert.equal(applyTemplate(cloneDefaultConfig(), "flip-light").clockType, "flip");
   assert.equal(applyTemplate(cloneDefaultConfig(), "mono-compact").clockType, "digital");
 });
 
 test("analog enum fields fall back safely and size is clamped", () => {
+  assert.equal(normalizeConfig({ analogMarks: "roman" }).analogMarks, "roman");
   assert.equal(normalizeConfig({ analogMarks: "spirals" }).analogMarks, DEFAULT_CONFIG.analogMarks);
   assert.equal(normalizeConfig({ analogSecondHand: "warp" }).analogSecondHand, DEFAULT_CONFIG.analogSecondHand);
   assert.equal(normalizeConfig({ analogSize: 9000 }).analogSize, 480);

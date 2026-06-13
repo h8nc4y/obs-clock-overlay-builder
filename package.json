@@ -1,6 +1,6 @@
 {
   "name": "obs-clock-overlay-builder",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Static builder for reproducible transparent OBS clock overlay URLs.",
   "private": true,
   "license": "MIT",
