@@ -53,7 +53,8 @@ export const DEFAULT_CONFIG = Object.freeze({
   borderWidth: 1,
   analogSize: 220,
   analogMarks: "numbers",
-  analogSecondHand: "sweep"
+  analogSecondHand: "sweep",
+  flipGroup: "single"
 });
 
 export const TEMPLATES = Object.freeze([
@@ -446,15 +447,119 @@ export const TEMPLATES = Object.freeze([
       analogMarks: "both",
       analogSecondHand: "sweep"
     }
+  },
+  {
+    id: "analog-roman",
+    name: "Classic Roman",
+    note: "アナログ・ローマ数字",
+    sampleText: "10:08",
+    category: "analog",
+    config: {
+      clockType: "analog",
+      fontFamily: "Poppins",
+      textColor: "#2a2622",
+      backgroundColor: "#fbf7ee",
+      backgroundOpacity: 1,
+      borderColor: "#c9a86a",
+      borderOpacity: 1,
+      borderWidth: 4,
+      strokeColor: "#9a6b4a",
+      analogSize: 240,
+      analogMarks: "roman",
+      analogSecondHand: "sweep"
+    }
+  },
+  {
+    id: "analog-cafe",
+    name: "Cafe Brown",
+    note: "アナログ・温かみのある茶",
+    sampleText: "10:08",
+    category: "analog",
+    config: {
+      clockType: "analog",
+      fontFamily: "Zen Maru Gothic",
+      textColor: "#f3e4cf",
+      backgroundColor: "#5a4636",
+      backgroundOpacity: 1,
+      borderColor: "#caa46f",
+      borderOpacity: 1,
+      borderWidth: 5,
+      strokeColor: "#e8b07a",
+      analogSize: 230,
+      analogMarks: "ticks",
+      analogSecondHand: "sweep"
+    }
+  },
+  {
+    id: "flip-light",
+    name: "Flip Light",
+    note: "パタパタ・白カード",
+    sampleText: "12:34",
+    category: "flip",
+    config: {
+      clockType: "flip",
+      fontFamily: "Poppins",
+      textColor: "#1f2430",
+      backgroundColor: "#f4f5f7",
+      backgroundOpacity: 1,
+      radius: 12,
+      fontSize: 64,
+      fontWeight: 800,
+      borderColor: "#d9dde3",
+      borderOpacity: 1,
+      borderWidth: 1
+    }
+  },
+  {
+    id: "flip-dark",
+    name: "Flip Dark",
+    note: "パタパタ・黒カード",
+    sampleText: "12:34",
+    category: "flip",
+    config: {
+      clockType: "flip",
+      fontFamily: "Poppins",
+      textColor: "#f4f6fb",
+      backgroundColor: "#23262e",
+      backgroundOpacity: 1,
+      radius: 12,
+      fontSize: 64,
+      fontWeight: 800,
+      borderColor: "#3a3f4a",
+      borderOpacity: 1,
+      borderWidth: 1
+    }
+  },
+  {
+    id: "flip-pair",
+    name: "Flip Pair",
+    note: "パタパタ・2桁パネル",
+    sampleText: "12 34",
+    category: "flip",
+    config: {
+      clockType: "flip",
+      flipGroup: "pair",
+      fontFamily: "Poppins",
+      textColor: "#1f2430",
+      backgroundColor: "#f4f5f7",
+      backgroundOpacity: 1,
+      radius: 10,
+      fontSize: 60,
+      fontWeight: 800,
+      borderColor: "#d9dde3",
+      borderOpacity: 1,
+      borderWidth: 1
+    }
   }
 ]);
 
 const DATE_FORMATS = new Set(["slash", "dash", "monthDay", "jp"]);
 const WEEKDAY_FORMATS = new Set(["ja-short", "ja-long", "en-short", "en-long"]);
 const LABEL_POSITIONS = new Set(["top", "bottom", "left", "right", "hidden"]);
-const CLOCK_TYPES = new Set(["digital", "analog"]);
-const ANALOG_MARKS = new Set(["numbers", "ticks", "both", "none"]);
+const CLOCK_TYPES = new Set(["digital", "analog", "flip"]);
+const ANALOG_MARKS = new Set(["numbers", "roman", "ticks", "both", "none"]);
 const ANALOG_SECOND_HANDS = new Set(["sweep", "tick", "off"]);
+const FLIP_GROUPS = new Set(["single", "pair"]);
 const TEMPLATE_IDS = new Set(TEMPLATES.map((template) => template.id));
 
 export const NUMBER_LIMITS = {
@@ -520,6 +625,7 @@ export function normalizeConfig(input = {}) {
   config.clockType = enumValue(raw.clockType, CLOCK_TYPES, DEFAULT_CONFIG.clockType);
   config.analogMarks = enumValue(raw.analogMarks, ANALOG_MARKS, DEFAULT_CONFIG.analogMarks);
   config.analogSecondHand = enumValue(raw.analogSecondHand, ANALOG_SECOND_HANDS, DEFAULT_CONFIG.analogSecondHand);
+  config.flipGroup = enumValue(raw.flipGroup, FLIP_GROUPS, DEFAULT_CONFIG.flipGroup);
   config.timezone = sanitizeTimezone(raw.timezone ?? raw.tz, DEFAULT_CONFIG.timezone);
   config.hour12 = coerceBool(raw.hour12, DEFAULT_CONFIG.hour12);
   config.showSeconds = coerceBool(raw.showSeconds ?? raw.seconds, DEFAULT_CONFIG.showSeconds);

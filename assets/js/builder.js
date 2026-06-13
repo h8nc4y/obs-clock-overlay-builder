@@ -43,7 +43,8 @@ const TEMPLATE_CATEGORIES = [
   { id: "standard", label: "定番" },
   { id: "cute", label: "かわいい" },
   { id: "cool", label: "クール" },
-  { id: "analog", label: "アナログ" }
+  { id: "analog", label: "アナログ" },
+  { id: "flip", label: "パタパタ" }
 ];
 let templateCategory = "all";
 
@@ -138,9 +139,11 @@ const elements = {
   keywordReactionToastText: byId("keywordReactionToastText"),
   clockTypeDigital: byId("clockTypeDigital"),
   clockTypeAnalog: byId("clockTypeAnalog"),
+  clockTypeFlip: byId("clockTypeFlip"),
   analogSize: byId("analogSize"),
   analogMarks: byId("analogMarks"),
-  analogSecondHand: byId("analogSecondHand")
+  analogSecondHand: byId("analogSecondHand"),
+  flipGroup: byId("flipGroup")
 };
 
 const rangeFields = [
@@ -165,7 +168,7 @@ const rangeFields = [
 ];
 const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
 const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
-const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand"];
+const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let shareBlob = null;
 let shareObjectUrl = "";
@@ -196,18 +199,19 @@ function init() {
 function bindClockType() {
   elements.clockTypeDigital.addEventListener("click", () => updateState({ clockType: "digital" }, true));
   elements.clockTypeAnalog.addEventListener("click", () => updateState({ clockType: "analog" }, true));
+  elements.clockTypeFlip.addEventListener("click", () => updateState({ clockType: "flip" }, true));
 }
 
-// 時計種別に応じて、デジタル用/アナログ用のコントロールを出し分ける。
+// 時計種別に応じてコントロールを出し分ける。
+// data-clock-mode は「表示する種別(スペース区切り)」を表し、含まれない種別では隠す。
 function updateClockTypeVisibility() {
-  const analog = state.clockType === "analog";
-  elements.clockTypeDigital.setAttribute("aria-pressed", String(!analog));
-  elements.clockTypeAnalog.setAttribute("aria-pressed", String(analog));
-  document.querySelectorAll('[data-clock-mode="digital"]').forEach((node) => {
-    node.classList.toggle("is-hidden", analog);
-  });
-  document.querySelectorAll('[data-clock-mode="analog"]').forEach((node) => {
-    node.classList.toggle("is-hidden", !analog);
+  const type = state.clockType;
+  elements.clockTypeDigital.setAttribute("aria-pressed", String(type === "digital"));
+  elements.clockTypeAnalog.setAttribute("aria-pressed", String(type === "analog"));
+  elements.clockTypeFlip.setAttribute("aria-pressed", String(type === "flip"));
+  document.querySelectorAll("[data-clock-mode]").forEach((node) => {
+    const modes = node.getAttribute("data-clock-mode").split(/\s+/).filter(Boolean);
+    node.classList.toggle("is-hidden", !modes.includes(type));
   });
 }
 
@@ -293,6 +297,19 @@ function buildTemplateMiniPreview(template) {
     // "tick" にして rAF ループを立てず、固定ポーズの静止アナログだけ描く。
     // 表示サイズは CSS(.template-mini-analog svg)で固定し、analogSize のクランプに左右されないようにする。
     mountClock(holder, { ...applied, analogSecondHand: "tick" }, { now: () => new Date(2026, 0, 1, 10, 8, 36) });
+    mini.append(holder);
+    return mini;
+  }
+
+  if (applied.clockType === "flip") {
+    const holder = document.createElement("span");
+    holder.className = "template-mini-flip";
+    // 小さい表示なので角丸も小さくして、丸くなりすぎないようにする。
+    mountClock(
+      holder,
+      { ...applied, fontSize: 22, showSeconds: false, radius: 4 },
+      { now: () => new Date(2026, 0, 1, 12, 34, 0) }
+    );
     mini.append(holder);
     return mini;
   }
@@ -515,6 +532,7 @@ function syncFormFromState() {
   elements.labelPosition.value = state.labelPosition;
   elements.analogMarks.value = state.analogMarks;
   elements.analogSecondHand.value = state.analogSecondHand;
+  elements.flipGroup.value = state.flipGroup;
   elements.fontFamily.value = state.fontFamily;
   elements.fontPreset.value = FONT_CANDIDATES.includes(state.fontFamily) ? state.fontFamily : "";
   for (const field of colorFields) {

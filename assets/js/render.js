@@ -37,9 +37,13 @@ export function mountClock(container, config, options = {}) {
 }
 
 function createImpl(container, config, options) {
-  return config.clockType === "analog"
-    ? mountAnalogClock(container, config, options)
-    : mountDigitalClock(container, config, options);
+  if (config.clockType === "analog") {
+    return mountAnalogClock(container, config, options);
+  }
+  if (config.clockType === "flip") {
+    return mountFlipClock(container, config, options);
+  }
+  return mountDigitalClock(container, config, options);
 }
 
 function mountDigitalClock(container, config, options = {}) {
@@ -117,6 +121,7 @@ function mountAnalogClock(container, config, options = {}) {
 
   let currentConfig = normalizeConfig(config);
   let formatter = createAnalogFormatter(currentConfig.timezone);
+  let dateFormatters = createFormatters(currentConfig);
   let hands = buildAnalogFace(root, currentConfig);
   let rafId = 0;
 
@@ -127,6 +132,9 @@ function mountAnalogClock(container, config, options = {}) {
     hands.minute.setAttribute("transform", `rotate(${angles.minuteDeg.toFixed(2)} 50 50)`);
     if (hands.second) {
       hands.second.setAttribute("transform", `rotate(${angles.secondDeg.toFixed(2)} 50 50)`);
+    }
+    if (hands.date) {
+      hands.date.textContent = formatClock(dateFormatters, now).date;
     }
   }
 
@@ -153,6 +161,7 @@ function mountAnalogClock(container, config, options = {}) {
     updateConfig(nextConfig) {
       currentConfig = normalizeConfig(nextConfig);
       formatter = createAnalogFormatter(currentConfig.timezone);
+      dateFormatters = createFormatters(currentConfig);
       hands = buildAnalogFace(root, currentConfig);
       render(options.now ? options.now() : new Date());
       startLoop();
@@ -171,6 +180,159 @@ function mountAnalogClock(container, config, options = {}) {
 
   controller.updateConfig(currentConfig);
   return controller;
+}
+
+// パタパタ(フリップ)時計。各桁を「カード」で描き、値が変わったときだけ
+// 短いフリップアニメを再生する。パタパタ時計という形式の独自実装。
+function mountFlipClock(container, config, options = {}) {
+  const root = document.createElement("div");
+  root.className = "clock-flip";
+  container.textContent = "";
+  container.append(root);
+
+  let currentConfig = normalizeConfig(config);
+  let formatters = createFormatters(currentConfig);
+  let slots = [];
+  let layoutKey = "";
+
+  // flipGroup="pair" のときは連続した数字を1枚のカードにまとめる(2桁パネル)。
+  function tokenize(text, group) {
+    const tokens = [];
+    let i = 0;
+    while (i < text.length) {
+      const char = text[i];
+      const isDigit = char >= "0" && char <= "9";
+      if (isDigit && group === "pair") {
+        let value = "";
+        while (i < text.length && text[i] >= "0" && text[i] <= "9") {
+          value += text[i];
+          i += 1;
+        }
+        tokens.push({ digit: true, value });
+      } else {
+        tokens.push({ digit: isDigit, value: char });
+        i += 1;
+      }
+    }
+    return tokens;
+  }
+
+  function makeHalf(extra, value) {
+    const half = document.createElement("span");
+    half.className = `flip-half ${extra}`;
+    const inner = document.createElement("b");
+    inner.textContent = value;
+    half.append(inner);
+    return half;
+  }
+
+  function makeCard(value) {
+    const card = document.createElement("span");
+    card.className = "flip-card";
+    card.style.width = `${(value.length * 0.66 + 0.2).toFixed(2)}em`;
+    const staticTop = makeHalf("flip-top", value);
+    const staticBottom = makeHalf("flip-bottom", value);
+    const flapTop = makeHalf("flip-top flip-flap-top", value);
+    const flapBottom = makeHalf("flip-bottom flip-flap-bottom", value);
+    card.append(staticTop, staticBottom, flapTop, flapBottom);
+    return { digit: true, card, staticTop, staticBottom, flapTop, flapBottom, value, timer: 0 };
+  }
+
+  function setHalf(half, value) {
+    half.firstChild.textContent = value;
+  }
+
+  function build(tokens) {
+    root.textContent = "";
+    slots = tokens.map((token) => {
+      if (token.digit) {
+        const slot = makeCard(token.value);
+        root.append(slot.card);
+        return slot;
+      }
+      const sep = document.createElement("span");
+      sep.className = "flip-sep";
+      sep.textContent = token.value;
+      root.append(sep);
+      return { digit: false, value: token.value };
+    });
+  }
+
+  // 上半分(古い値)が手前に折れ、続いて下半分(新しい値)が起き上がる本物のめくれ。
+  function flip(slot, nextValue) {
+    setHalf(slot.staticTop, nextValue); // 上半分が折れたあとに見える面(新)
+    setHalf(slot.flapBottom, nextValue); // 起き上がる下フラップの面(新)
+    // staticBottom と flapTop は古い値のまま、それぞれが「めくれ」の動く面になる
+    slot.value = nextValue;
+    slot.card.classList.remove("is-flipping");
+    void slot.card.offsetWidth;
+    slot.card.classList.add("is-flipping");
+    if (slot.timer && typeof clearTimeout === "function") {
+      clearTimeout(slot.timer);
+    }
+    const settle = () => {
+      setHalf(slot.staticBottom, nextValue);
+      setHalf(slot.flapTop, nextValue);
+      slot.card.classList.remove("is-flipping");
+      slot.timer = 0;
+    };
+    slot.timer = typeof setTimeout === "function" ? setTimeout(settle, 560) : (settle(), 0);
+  }
+
+  function update(text) {
+    const tokens = tokenize(text, currentConfig.flipGroup);
+    const key = `${currentConfig.flipGroup}:${tokens.map((t) => (t.digit ? `#${t.value.length}` : t.value)).join("|")}`;
+    if (key !== layoutKey) {
+      build(tokens);
+      layoutKey = key;
+      return;
+    }
+    tokens.forEach((token, index) => {
+      const slot = slots[index];
+      if (slot.digit && slot.value !== token.value) {
+        flip(slot, token.value);
+      }
+    });
+  }
+
+  const controller = {
+    element: root,
+    updateConfig(nextConfig) {
+      currentConfig = normalizeConfig(nextConfig);
+      formatters = createFormatters(currentConfig);
+      applyFlipStyles(root, currentConfig);
+      layoutKey = "";
+      this.tick(options.now ? options.now() : new Date());
+    },
+    tick(now = new Date()) {
+      update(formatClock(formatters, now).time);
+    },
+    getConfig() {
+      return { ...currentConfig };
+    },
+    destroy() {
+      for (const slot of slots) {
+        if (slot.timer && typeof clearTimeout === "function") {
+          clearTimeout(slot.timer);
+        }
+      }
+      root.remove();
+    }
+  };
+
+  controller.updateConfig(currentConfig);
+  return controller;
+}
+
+function applyFlipStyles(root, config) {
+  root.className = "clock-flip";
+  root.style.setProperty("--flip-card-bg", hexToRgba(config.backgroundColor, config.backgroundOpacity));
+  root.style.setProperty("--flip-ink", config.textColor);
+  root.style.setProperty("--flip-font", cssStringLiteral(config.fontFamily));
+  root.style.setProperty("--flip-size", `${config.fontSize}px`);
+  root.style.setProperty("--flip-radius", `${config.radius}px`);
+  root.style.setProperty("--flip-border", hexToRgba(config.borderColor, config.borderOpacity));
+  root.style.setProperty("--flip-border-width", `${config.borderWidth}px`);
 }
 
 // 時刻 → 針の角度(12時=0°, 時計回り)。
@@ -217,14 +379,33 @@ function buildAnalogFace(root, config) {
     root.append(second);
   }
 
+  // 文字盤の日付(showDate のときだけ。中心の少し下に小さく)。
+  let date = null;
+  if (config.showDate) {
+    date = svgEl("text", {
+      x: 50,
+      y: 66,
+      fill: inkColor,
+      "text-anchor": "middle",
+      "dominant-baseline": "central"
+    });
+    date.setAttribute("font-size", "6");
+    date.setAttribute("font-weight", "600");
+    date.style.fontFamily = `${config.fontFamily}, sans-serif`;
+    root.append(date);
+  }
+
   root.append(svgEl("circle", { cx: 50, cy: 50, r: 2.4, fill: inkColor }));
   root.append(svgEl("circle", { cx: 50, cy: 50, r: 1.1, fill: accentColor }));
 
-  return { hour, minute, second };
+  return { hour, minute, second, date };
 }
+
+const ROMAN_NUMERALS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
 
 function appendMarks(root, config, inkColor) {
   const showNumbers = config.analogMarks === "numbers" || config.analogMarks === "both";
+  const showRoman = config.analogMarks === "roman";
   const showTicks = config.analogMarks === "ticks" || config.analogMarks === "both";
 
   if (showTicks) {
@@ -242,10 +423,10 @@ function appendMarks(root, config, inkColor) {
     }
   }
 
-  if (showNumbers) {
+  if (showNumbers || showRoman) {
     for (let i = 1; i <= 12; i += 1) {
       const angle = (i * 30 * Math.PI) / 180;
-      const radius = 38;
+      const radius = showRoman ? 39 : 38;
       const text = svgEl("text", {
         x: (50 + radius * Math.sin(angle)).toFixed(2),
         y: (50 - radius * Math.cos(angle)).toFixed(2),
@@ -253,10 +434,10 @@ function appendMarks(root, config, inkColor) {
         "text-anchor": "middle",
         "dominant-baseline": "central"
       });
-      text.setAttribute("font-size", "9");
+      text.setAttribute("font-size", showRoman ? "6.5" : "9");
       text.setAttribute("font-weight", "700");
       text.style.fontFamily = `${config.fontFamily}, sans-serif`;
-      text.textContent = String(i);
+      text.textContent = showRoman ? ROMAN_NUMERALS[i - 1] : String(i);
       root.append(text);
     }
   }

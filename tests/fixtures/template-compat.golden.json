@@ -39,7 +39,8 @@
     "borderWidth": 1,
     "analogSize": 220,
     "analogMarks": "numbers",
-    "analogSecondHand": "sweep"
+    "analogSecondHand": "sweep",
+    "flipGroup": "single"
   },
   "templates": [
     {
@@ -431,6 +432,109 @@
         "analogMarks": "both",
         "analogSecondHand": "sweep"
       }
+    },
+    {
+      "id": "analog-roman",
+      "name": "Classic Roman",
+      "note": "アナログ・ローマ数字",
+      "sampleText": "10:08",
+      "category": "analog",
+      "config": {
+        "clockType": "analog",
+        "fontFamily": "Poppins",
+        "textColor": "#2a2622",
+        "backgroundColor": "#fbf7ee",
+        "backgroundOpacity": 1,
+        "borderColor": "#c9a86a",
+        "borderOpacity": 1,
+        "borderWidth": 4,
+        "strokeColor": "#9a6b4a",
+        "analogSize": 240,
+        "analogMarks": "roman",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "id": "analog-cafe",
+      "name": "Cafe Brown",
+      "note": "アナログ・温かみのある茶",
+      "sampleText": "10:08",
+      "category": "analog",
+      "config": {
+        "clockType": "analog",
+        "fontFamily": "Zen Maru Gothic",
+        "textColor": "#f3e4cf",
+        "backgroundColor": "#5a4636",
+        "backgroundOpacity": 1,
+        "borderColor": "#caa46f",
+        "borderOpacity": 1,
+        "borderWidth": 5,
+        "strokeColor": "#e8b07a",
+        "analogSize": 230,
+        "analogMarks": "ticks",
+        "analogSecondHand": "sweep"
+      }
+    },
+    {
+      "id": "flip-light",
+      "name": "Flip Light",
+      "note": "パタパタ・白カード",
+      "sampleText": "12:34",
+      "category": "flip",
+      "config": {
+        "clockType": "flip",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#f4f5f7",
+        "backgroundOpacity": 1,
+        "radius": 12,
+        "fontSize": 64,
+        "fontWeight": 800,
+        "borderColor": "#d9dde3",
+        "borderOpacity": 1,
+        "borderWidth": 1
+      }
+    },
+    {
+      "id": "flip-dark",
+      "name": "Flip Dark",
+      "note": "パタパタ・黒カード",
+      "sampleText": "12:34",
+      "category": "flip",
+      "config": {
+        "clockType": "flip",
+        "fontFamily": "Poppins",
+        "textColor": "#f4f6fb",
+        "backgroundColor": "#23262e",
+        "backgroundOpacity": 1,
+        "radius": 12,
+        "fontSize": 64,
+        "fontWeight": 800,
+        "borderColor": "#3a3f4a",
+        "borderOpacity": 1,
+        "borderWidth": 1
+      }
+    },
+    {
+      "id": "flip-pair",
+      "name": "Flip Pair",
+      "note": "パタパタ・2桁パネル",
+      "sampleText": "12 34",
+      "category": "flip",
+      "config": {
+        "clockType": "flip",
+        "flipGroup": "pair",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#f4f5f7",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "fontSize": 60,
+        "fontWeight": 800,
+        "borderColor": "#d9dde3",
+        "borderOpacity": 1,
+        "borderWidth": 1
+      }
     }
   ],
   "goldens": [
@@ -476,12 +580,13 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "default-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJSb2JvdG8gTW9ubyIsInRleHRDb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkN2NmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIn0",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJSb2JvdG8gTW9ubyIsInRleHRDb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkN2NmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIiwiZmxpcEdyb3VwIjoic2luZ2xlIn0",
       "expected": {
         "version": 1,
         "template": "mono-compact",
@@ -521,7 +626,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -566,12 +672,13 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-mono-compact-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJSb2JvdG8gTW9ubyIsInRleHRDb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkN2NmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIn0",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1vbm8tY29tcGFjdCIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJSb2JvdG8gTW9ubyIsInRleHRDb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkN2NmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIiwiZmxpcEdyb3VwIjoic2luZ2xlIn0",
       "expected": {
         "version": 1,
         "template": "mono-compact",
@@ -611,7 +718,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -656,12 +764,13 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-minimal-clear-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbmltYWwtY2xlYXIiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuODIsInJhZGl1cyI6MTQsInBhZGRpbmdYIjoyMiwicGFkZGluZ1kiOjEyLCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC40LCJsaW5lSGVpZ2h0IjoxLjA1LCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6NSwic2hhZG93Q29sb3IiOiIjMWYyNDMwIiwic2hhZG93T3BhY2l0eSI6MC4xMiwic2hhZG93Qmx1ciI6OCwic2hhZG93WCI6MCwic2hhZG93WSI6Mywic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2UyZTJlMiIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbmltYWwtY2xlYXIiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuODIsInJhZGl1cyI6MTQsInBhZGRpbmdYIjoyMiwicGFkZGluZ1kiOjEyLCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC40LCJsaW5lSGVpZ2h0IjoxLjA1LCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6NSwic2hhZG93Q29sb3IiOiIjMWYyNDMwIiwic2hhZG93T3BhY2l0eSI6MC4xMiwic2hhZG93Qmx1ciI6OCwic2hhZG93WCI6MCwic2hhZG93WSI6Mywic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2UyZTJlMiIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "minimal-clear",
@@ -701,7 +810,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -746,12 +856,13 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-studio-live-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InN0dWRpby1saXZlIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiIzE2MTgxZCIsImJhY2tncm91bmRDb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC44NiwicmFkaXVzIjoxNiwicGFkZGluZ1giOjIyLCJwYWRkaW5nWSI6MTIsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE4LCJsYWJlbFNpemUiOjE2LCJsZXR0ZXJTcGFjaW5nIjowLjUsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzE2MTgxZCIsInNoYWRvd09wYWNpdHkiOjAuMTQsInNoYWRvd0JsdXIiOjEwLCJzaGFkb3dYIjowLCJzaGFkb3dZIjo0LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZTZlNmU2IiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIn0",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InN0dWRpby1saXZlIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiIzE2MTgxZCIsImJhY2tncm91bmRDb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC44NiwicmFkaXVzIjoxNiwicGFkZGluZ1giOjIyLCJwYWRkaW5nWSI6MTIsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE4LCJsYWJlbFNpemUiOjE2LCJsZXR0ZXJTcGFjaW5nIjowLjUsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzE2MTgxZCIsInNoYWRvd09wYWNpdHkiOjAuMTQsInNoYWRvd0JsdXIiOjEwLCJzaGFkb3dYIjowLCJzaGFkb3dZIjo0LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZTZlNmU2IiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIiwiZmxpcEdyb3VwIjoic2luZ2xlIn0",
       "expected": {
         "version": 1,
         "template": "studio-live",
@@ -791,7 +902,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -836,12 +948,13 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-milk-tea-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbGstdGVhIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJKU1QiLCJsYWJlbFBvc2l0aW9uIjoiYm90dG9tIiwiZm9udEZhbWlseSI6IlplbiBNYXJ1IEdvdGhpYyIsInRleHRDb2xvciI6IiM2YjRhMzUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmN2VmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MjQsInBhZGRpbmdYIjoyNiwicGFkZGluZ1kiOjE2LCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNiwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC4zLCJsaW5lSGVpZ2h0IjoxLjEyLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Nywic2hhZG93Q29sb3IiOiIjY2RhMTdlIiwic2hhZG93T3BhY2l0eSI6MC4zMiwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjYsInN0cm9rZUNvbG9yIjoiI2ZmZmZmZiIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNlOGM5YTgiLCJib3JkZXJPcGFjaXR5IjowLjg1LCJib3JkZXJXaWR0aCI6MiwiYW5hbG9nU2l6ZSI6MjIwLCJhbmFsb2dNYXJrcyI6Im51bWJlcnMiLCJhbmFsb2dTZWNvbmRIYW5kIjoic3dlZXAifQ",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im1pbGstdGVhIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJKU1QiLCJsYWJlbFBvc2l0aW9uIjoiYm90dG9tIiwiZm9udEZhbWlseSI6IlplbiBNYXJ1IEdvdGhpYyIsInRleHRDb2xvciI6IiM2YjRhMzUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmN2VmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MjQsInBhZGRpbmdYIjoyNiwicGFkZGluZ1kiOjE2LCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNiwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC4zLCJsaW5lSGVpZ2h0IjoxLjEyLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Nywic2hhZG93Q29sb3IiOiIjY2RhMTdlIiwic2hhZG93T3BhY2l0eSI6MC4zMiwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjYsInN0cm9rZUNvbG9yIjoiI2ZmZmZmZiIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNlOGM5YTgiLCJib3JkZXJPcGFjaXR5IjowLjg1LCJib3JkZXJXaWR0aCI6MiwiYW5hbG9nU2l6ZSI6MjIwLCJhbmFsb2dNYXJrcyI6Im51bWJlcnMiLCJhbmFsb2dTZWNvbmRIYW5kIjoic3dlZXAiLCJmbGlwR3JvdXAiOiJzaW5nbGUifQ",
       "expected": {
         "version": 1,
         "template": "milk-tea",
@@ -881,7 +994,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -926,12 +1040,13 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-sakura-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoi6YWN5L-h5LitIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJIYWNoaSBNYXJ1IFBvcCIsInRleHRDb2xvciI6IiNiMjRhNmUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmNWY4IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MjQsInBhZGRpbmdYIjoyNiwicGFkZGluZ1kiOjE0LCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxNCwibGV0dGVyU3BhY2luZyI6MC4yLCJsaW5lSGVpZ2h0IjoxLjE1LCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Niwic2hhZG93Q29sb3IiOiIjZmZiN2NkIiwic2hhZG93T3BhY2l0eSI6MC40NSwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjYsInN0cm9rZUNvbG9yIjoiI2ZmZmFmYyIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNmZmI3Y2QiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoi6YWN5L-h5LitIiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJIYWNoaSBNYXJ1IFBvcCIsInRleHRDb2xvciI6IiNiMjRhNmUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmNWY4IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MjQsInBhZGRpbmdYIjoyNiwicGFkZGluZ1kiOjE0LCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxNCwibGV0dGVyU3BhY2luZyI6MC4yLCJsaW5lSGVpZ2h0IjoxLjE1LCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6Niwic2hhZG93Q29sb3IiOiIjZmZiN2NkIiwic2hhZG93T3BhY2l0eSI6MC40NSwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjYsInN0cm9rZUNvbG9yIjoiI2ZmZmFmYyIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNmZmI3Y2QiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "sakura",
@@ -971,7 +1086,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1016,12 +1132,13 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-pastel-pop-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InBhc3RlbC1wb3AiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoidG9wIiwiZm9udEZhbWlseSI6Ik1vY2hpeSBQb3AgT25lIiwidGV4dENvbG9yIjoiI2MyNDc3ZSIsImJhY2tncm91bmRDb2xvciI6IiNmZmYwZjciLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45NiwicmFkaXVzIjoyOCwicGFkZGluZ1giOjI4LCJwYWRkaW5nWSI6MTYsImZvbnRTaXplIjo0NCwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjQsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjcsInNoYWRvd0NvbG9yIjoiI2ZmOWVkMiIsInNoYWRvd09wYWNpdHkiOjAuNDIsInNoYWRvd0JsdXIiOjE0LCJzaGFkb3dYIjowLCJzaGFkb3dZIjo1LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MC40LCJib3JkZXJDb2xvciI6IiNmZjllZDIiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InBhc3RlbC1wb3AiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoidG9wIiwiZm9udEZhbWlseSI6Ik1vY2hpeSBQb3AgT25lIiwidGV4dENvbG9yIjoiI2MyNDc3ZSIsImJhY2tncm91bmRDb2xvciI6IiNmZmYwZjciLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC45NiwicmFkaXVzIjoyOCwicGFkZGluZ1giOjI4LCJwYWRkaW5nWSI6MTYsImZvbnRTaXplIjo0NCwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjQsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjcsInNoYWRvd0NvbG9yIjoiI2ZmOWVkMiIsInNoYWRvd09wYWNpdHkiOjAuNDIsInNoYWRvd0JsdXIiOjE0LCJzaGFkb3dYIjowLCJzaGFkb3dZIjo1LCJzdHJva2VDb2xvciI6IiNmZmZmZmYiLCJzdHJva2VXaWR0aCI6MC40LCJib3JkZXJDb2xvciI6IiNmZjllZDIiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "pastel-pop",
@@ -1061,7 +1178,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1106,12 +1224,13 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-soda-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNvZGEiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoicmlnaHQiLCJmb250RmFtaWx5IjoiTSBQTFVTIFJvdW5kZWQgMWMiLCJ0ZXh0Q29sb3IiOiIjMGU3NDkwIiwiYmFja2dyb3VuZENvbG9yIjoiI2VhZmNmZiIsImJhY2tncm91bmRPcGFjaXR5IjowLjk2LCJyYWRpdXMiOjIyLCJwYWRkaW5nWCI6MjQsInBhZGRpbmdZIjoxNCwiZm9udFNpemUiOjQ2LCJkYXRlU2l6ZSI6MTUsImxhYmVsU2l6ZSI6MTMsImxldHRlclNwYWNpbmciOjAuNywibGluZUhlaWdodCI6MS4wNSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjEyLCJzaGFkb3dDb2xvciI6IiM3ZmRmZWUiLCJzaGFkb3dPcGFjaXR5IjowLjQyLCJzaGFkb3dCbHVyIjoxMiwic2hhZG93WCI6MCwic2hhZG93WSI6NSwic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAuMywiYm9yZGVyQ29sb3IiOiIjN2ZkZmVlIiwiYm9yZGVyT3BhY2l0eSI6MC45LCJib3JkZXJXaWR0aCI6MiwiYW5hbG9nU2l6ZSI6MjIwLCJhbmFsb2dNYXJrcyI6Im51bWJlcnMiLCJhbmFsb2dTZWNvbmRIYW5kIjoic3dlZXAifQ",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNvZGEiLCJjbG9ja1R5cGUiOiJkaWdpdGFsIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkxJVkUiLCJsYWJlbFBvc2l0aW9uIjoicmlnaHQiLCJmb250RmFtaWx5IjoiTSBQTFVTIFJvdW5kZWQgMWMiLCJ0ZXh0Q29sb3IiOiIjMGU3NDkwIiwiYmFja2dyb3VuZENvbG9yIjoiI2VhZmNmZiIsImJhY2tncm91bmRPcGFjaXR5IjowLjk2LCJyYWRpdXMiOjIyLCJwYWRkaW5nWCI6MjQsInBhZGRpbmdZIjoxNCwiZm9udFNpemUiOjQ2LCJkYXRlU2l6ZSI6MTUsImxhYmVsU2l6ZSI6MTMsImxldHRlclNwYWNpbmciOjAuNywibGluZUhlaWdodCI6MS4wNSwiZm9udFdlaWdodCI6ODAwLCJnYXAiOjEyLCJzaGFkb3dDb2xvciI6IiM3ZmRmZWUiLCJzaGFkb3dPcGFjaXR5IjowLjQyLCJzaGFkb3dCbHVyIjoxMiwic2hhZG93WCI6MCwic2hhZG93WSI6NSwic3Ryb2tlQ29sb3IiOiIjZmZmZmZmIiwic3Ryb2tlV2lkdGgiOjAuMywiYm9yZGVyQ29sb3IiOiIjN2ZkZmVlIiwiYm9yZGVyT3BhY2l0eSI6MC45LCJib3JkZXJXaWR0aCI6MiwiYW5hbG9nU2l6ZSI6MjIwLCJhbmFsb2dNYXJrcyI6Im51bWJlcnMiLCJhbmFsb2dTZWNvbmRIYW5kIjoic3dlZXAiLCJmbGlwR3JvdXAiOiJzaW5nbGUifQ",
       "expected": {
         "version": 1,
         "template": "soda",
@@ -1151,7 +1270,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1196,12 +1316,13 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-night-studio-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5pZ2h0LXN0dWRpbyIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNmMWY1ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMTYxYjI2IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxNCwicGFkZGluZ1giOjI0LCJwYWRkaW5nWSI6MTMsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjUsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuNCwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjUsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiMzYTQ2NjAiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5pZ2h0LXN0dWRpbyIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNmMWY1ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMTYxYjI2IiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOSwicmFkaXVzIjoxNCwicGFkZGluZ1giOjI0LCJwYWRkaW5nWSI6MTMsImZvbnRTaXplIjo0NiwiZGF0ZVNpemUiOjE2LCJsYWJlbFNpemUiOjE0LCJsZXR0ZXJTcGFjaW5nIjowLjUsImxpbmVIZWlnaHQiOjEuMSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjYsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuNCwic2hhZG93Qmx1ciI6MTQsInNoYWRvd1giOjAsInNoYWRvd1kiOjUsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiMzYTQ2NjAiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "night-studio",
@@ -1241,7 +1362,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1286,12 +1408,13 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-neon-hud-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5lb24taHVkIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InJpZ2h0IiwiZm9udEZhbWlseSI6IlJvYm90byBNb25vIiwidGV4dENvbG9yIjoiI2JhZmZmNiIsImJhY2tncm91bmRDb2xvciI6IiMwNzEzMjIiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC4zLCJyYWRpdXMiOjYsInBhZGRpbmdYIjoyMCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDQsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MS4xLCJsaW5lSGVpZ2h0IjoxLjA0LCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6MTIsInNoYWRvd0NvbG9yIjoiIzJmZmZlNiIsInNoYWRvd09wYWNpdHkiOjAuNTgsInNoYWRvd0JsdXIiOjE4LCJzaGFkb3dYIjowLCJzaGFkb3dZIjowLCJzdHJva2VDb2xvciI6IiMwMjEzMWYiLCJzdHJva2VXaWR0aCI6MC44LCJib3JkZXJDb2xvciI6IiM0OGZmZTIiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6Im5lb24taHVkIiwiY2xvY2tUeXBlIjoiZGlnaXRhbCIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJMSVZFIiwibGFiZWxQb3NpdGlvbiI6InJpZ2h0IiwiZm9udEZhbWlseSI6IlJvYm90byBNb25vIiwidGV4dENvbG9yIjoiI2JhZmZmNiIsImJhY2tncm91bmRDb2xvciI6IiMwNzEzMjIiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MC4zLCJyYWRpdXMiOjYsInBhZGRpbmdYIjoyMCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDQsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MS4xLCJsaW5lSGVpZ2h0IjoxLjA0LCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6MTIsInNoYWRvd0NvbG9yIjoiIzJmZmZlNiIsInNoYWRvd09wYWNpdHkiOjAuNTgsInNoYWRvd0JsdXIiOjE4LCJzaGFkb3dYIjowLCJzaGFkb3dZIjowLCJzdHJva2VDb2xvciI6IiMwMjEzMWYiLCJzdHJva2VXaWR0aCI6MC44LCJib3JkZXJDb2xvciI6IiM0OGZmZTIiLCJib3JkZXJPcGFjaXR5IjowLjksImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "neon-hud",
@@ -1331,7 +1454,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1376,12 +1500,13 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-aqua-deck-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFxdWEtZGVjayIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNlOGY2ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMjIzMDNjIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTIsInJhZGl1cyI6MTIsInBhZGRpbmdYIjoyMiwicGFkZGluZ1kiOjEyLCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLjEsImZvbnRXZWlnaHQiOjgwMCwiZ2FwIjo2LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjM1LCJzaGFkb3dCbHVyIjoxMiwic2hhZG93WCI6MCwic2hhZG93WSI6NCwic3Ryb2tlQ29sb3IiOiIjMDAwMDAwIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2FlZGRlZCIsImJvcmRlck9wYWNpdHkiOjAuODUsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFxdWEtZGVjayIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiTElWRSIsImxhYmVsUG9zaXRpb24iOiJ0b3AiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNlOGY2ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMjIzMDNjIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTIsInJhZGl1cyI6MTIsInBhZGRpbmdYIjoyMiwicGFkZGluZ1kiOjEyLCJmb250U2l6ZSI6NDYsImRhdGVTaXplIjoxNSwibGFiZWxTaXplIjoxMywibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLjEsImZvbnRXZWlnaHQiOjgwMCwiZ2FwIjo2LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjM1LCJzaGFkb3dCbHVyIjoxMiwic2hhZG93WCI6MCwic2hhZG93WSI6NCwic3Ryb2tlQ29sb3IiOiIjMDAwMDAwIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2FlZGRlZCIsImJvcmRlck9wYWNpdHkiOjAuODUsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "aqua-deck",
@@ -1421,7 +1546,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1466,12 +1592,13 @@
         "borderWidth": 5,
         "analogSize": 240,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-analog-navy-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1uYXZ5IiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNlN2QzYjUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMTYzYTRhIiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjZTA3YTVmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q4YjQ4YyIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjo1LCJhbmFsb2dTaXplIjoyNDAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1uYXZ5IiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNlN2QzYjUiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMTYzYTRhIiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjZTA3YTVmIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q4YjQ4YyIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjo1LCJhbmFsb2dTaXplIjoyNDAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "analog-navy",
@@ -1511,7 +1638,8 @@
         "borderWidth": 5,
         "analogSize": 240,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1556,12 +1684,13 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "both",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
       "name": "template-analog-mono-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1tb25vIiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjZTIzYjNiIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q5ZDdjZiIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoiYm90aCIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1tb25vIiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZmZmZmZmIiwiYmFja2dyb3VuZE9wYWNpdHkiOjAuOTUsInJhZGl1cyI6MTAsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NDIsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo3MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjZTIzYjNiIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q5ZDdjZiIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoiYm90aCIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "analog-mono",
@@ -1601,12 +1730,473 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "both",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-analog-roman-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1yb21hbiIsImNsb2NrVHlwZSI6ImFuYWxvZyIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiIzJhMjYyMiIsImJhY2tncm91bmRDb2xvciI6IiNmYmY3ZWUiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MSwic3Ryb2tlQ29sb3IiOiIjOWE2YjRhIiwiYm9yZGVyQ29sb3IiOiIjYzlhODZhIiwiYm9yZGVyV2lkdGgiOjQsImFuYWxvZ1NpemUiOjI0MCwiYW5hbG9nTWFya3MiOiJyb21hbiJ9",
+      "expected": {
+        "version": 1,
+        "template": "analog-roman",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#2a2622",
+        "backgroundColor": "#fbf7ee",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#9a6b4a",
+        "strokeWidth": 0,
+        "borderColor": "#c9a86a",
+        "borderOpacity": 1,
+        "borderWidth": 4,
+        "analogSize": 240,
+        "analogMarks": "roman",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-analog-roman-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1yb21hbiIsImNsb2NrVHlwZSI6ImFuYWxvZyIsInRpbWV6b25lIjoiQXNpYS9Ub2t5byIsImhvdXIxMiI6ZmFsc2UsInNob3dTZWNvbmRzIjp0cnVlLCJzaG93RGF0ZSI6ZmFsc2UsImRhdGVGb3JtYXQiOiJzbGFzaCIsInNob3dXZWVrZGF5IjpmYWxzZSwid2Vla2RheUZvcm1hdCI6ImphLXNob3J0IiwibGFiZWwiOiJKU1QiLCJsYWJlbFBvc2l0aW9uIjoiaGlkZGVuIiwiZm9udEZhbWlseSI6IlBvcHBpbnMiLCJ0ZXh0Q29sb3IiOiIjMmEyNjIyIiwiYmFja2dyb3VuZENvbG9yIjoiI2ZiZjdlZSIsImJhY2tncm91bmRPcGFjaXR5IjoxLCJyYWRpdXMiOjEwLCJwYWRkaW5nWCI6MTgsInBhZGRpbmdZIjoxMCwiZm9udFNpemUiOjQyLCJkYXRlU2l6ZSI6MTQsImxhYmVsU2l6ZSI6MTIsImxldHRlclNwYWNpbmciOjAuNiwibGluZUhlaWdodCI6MSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjQsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMTgsInNoYWRvd0JsdXIiOjYsInNoYWRvd1giOjAsInNoYWRvd1kiOjIsInN0cm9rZUNvbG9yIjoiIzlhNmI0YSIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNjOWE4NmEiLCJib3JkZXJPcGFjaXR5IjoxLCJib3JkZXJXaWR0aCI6NCwiYW5hbG9nU2l6ZSI6MjQwLCJhbmFsb2dNYXJrcyI6InJvbWFuIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIiwiZmxpcEdyb3VwIjoic2luZ2xlIn0",
+      "expected": {
+        "version": 1,
+        "template": "analog-roman",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#2a2622",
+        "backgroundColor": "#fbf7ee",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#9a6b4a",
+        "strokeWidth": 0,
+        "borderColor": "#c9a86a",
+        "borderOpacity": 1,
+        "borderWidth": 4,
+        "analogSize": 240,
+        "analogMarks": "roman",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-analog-cafe-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1jYWZlIiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwiZm9udEZhbWlseSI6IlplbiBNYXJ1IEdvdGhpYyIsInRleHRDb2xvciI6IiNmM2U0Y2YiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjNWE0NjM2IiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsInN0cm9rZUNvbG9yIjoiI2U4YjA3YSIsImJvcmRlckNvbG9yIjoiI2NhYTQ2ZiIsImJvcmRlcldpZHRoIjo1LCJhbmFsb2dTaXplIjoyMzAsImFuYWxvZ01hcmtzIjoidGlja3MifQ",
+      "expected": {
+        "version": 1,
+        "template": "analog-cafe",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Zen Maru Gothic",
+        "textColor": "#f3e4cf",
+        "backgroundColor": "#5a4636",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#e8b07a",
+        "strokeWidth": 0,
+        "borderColor": "#caa46f",
+        "borderOpacity": 1,
+        "borderWidth": 5,
+        "analogSize": 230,
+        "analogMarks": "ticks",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-analog-cafe-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImFuYWxvZy1jYWZlIiwiY2xvY2tUeXBlIjoiYW5hbG9nIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiWmVuIE1hcnUgR290aGljIiwidGV4dENvbG9yIjoiI2YzZTRjZiIsImJhY2tncm91bmRDb2xvciI6IiM1YTQ2MzYiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo0MiwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjcwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiNlOGIwN2EiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjY2FhNDZmIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjUsImFuYWxvZ1NpemUiOjIzMCwiYW5hbG9nTWFya3MiOiJ0aWNrcyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
+      "expected": {
+        "version": 1,
+        "template": "analog-cafe",
+        "clockType": "analog",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Zen Maru Gothic",
+        "textColor": "#f3e4cf",
+        "backgroundColor": "#5a4636",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 42,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 700,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#e8b07a",
+        "strokeWidth": 0,
+        "borderColor": "#caa46f",
+        "borderOpacity": 1,
+        "borderWidth": 5,
+        "analogSize": 230,
+        "analogMarks": "ticks",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-flip-light-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImZsaXAtbGlnaHQiLCJjbG9ja1R5cGUiOiJmbGlwIiwiZm9udEZhbWlseSI6IlBvcHBpbnMiLCJ0ZXh0Q29sb3IiOiIjMWYyNDMwIiwiYmFja2dyb3VuZENvbG9yIjoiI2Y0ZjVmNyIsImJhY2tncm91bmRPcGFjaXR5IjoxLCJyYWRpdXMiOjEyLCJmb250U2l6ZSI6NjQsImZvbnRXZWlnaHQiOjgwMCwiYm9yZGVyQ29sb3IiOiIjZDlkZGUzIn0",
+      "expected": {
+        "version": 1,
+        "template": "flip-light",
+        "clockType": "flip",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#f4f5f7",
+        "backgroundOpacity": 1,
+        "radius": 12,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 64,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 800,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#000000",
+        "strokeWidth": 0,
+        "borderColor": "#d9dde3",
+        "borderOpacity": 1,
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-flip-light-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImZsaXAtbGlnaHQiLCJjbG9ja1R5cGUiOiJmbGlwIiwidGltZXpvbmUiOiJBc2lhL1Rva3lvIiwiaG91cjEyIjpmYWxzZSwic2hvd1NlY29uZHMiOnRydWUsInNob3dEYXRlIjpmYWxzZSwiZGF0ZUZvcm1hdCI6InNsYXNoIiwic2hvd1dlZWtkYXkiOmZhbHNlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtc2hvcnQiLCJsYWJlbCI6IkpTVCIsImxhYmVsUG9zaXRpb24iOiJoaWRkZW4iLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZjRmNWY3IiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsInJhZGl1cyI6MTIsInBhZGRpbmdYIjoxOCwicGFkZGluZ1kiOjEwLCJmb250U2l6ZSI6NjQsImRhdGVTaXplIjoxNCwibGFiZWxTaXplIjoxMiwibGV0dGVyU3BhY2luZyI6MC42LCJsaW5lSGVpZ2h0IjoxLCJmb250V2VpZ2h0Ijo4MDAsImdhcCI6NCwic2hhZG93Q29sb3IiOiIjMDAwMDAwIiwic2hhZG93T3BhY2l0eSI6MC4xOCwic2hhZG93Qmx1ciI6Niwic2hhZG93WCI6MCwic2hhZG93WSI6Miwic3Ryb2tlQ29sb3IiOiIjMDAwMDAwIiwic3Ryb2tlV2lkdGgiOjAsImJvcmRlckNvbG9yIjoiI2Q5ZGRlMyIsImJvcmRlck9wYWNpdHkiOjEsImJvcmRlcldpZHRoIjoxLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
+      "expected": {
+        "version": 1,
+        "template": "flip-light",
+        "clockType": "flip",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#f4f5f7",
+        "backgroundOpacity": 1,
+        "radius": 12,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 64,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 800,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#000000",
+        "strokeWidth": 0,
+        "borderColor": "#d9dde3",
+        "borderOpacity": 1,
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-flip-dark-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImZsaXAtZGFyayIsImNsb2NrVHlwZSI6ImZsaXAiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiNmNGY2ZmIiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjMjMyNjJlIiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsInJhZGl1cyI6MTIsImZvbnRTaXplIjo2NCwiZm9udFdlaWdodCI6ODAwLCJib3JkZXJDb2xvciI6IiMzYTNmNGEifQ",
+      "expected": {
+        "version": 1,
+        "template": "flip-dark",
+        "clockType": "flip",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#f4f6fb",
+        "backgroundColor": "#23262e",
+        "backgroundOpacity": 1,
+        "radius": 12,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 64,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 800,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#000000",
+        "strokeWidth": 0,
+        "borderColor": "#3a3f4a",
+        "borderOpacity": 1,
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-flip-dark-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImZsaXAtZGFyayIsImNsb2NrVHlwZSI6ImZsaXAiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiI2Y0ZjZmYiIsImJhY2tncm91bmRDb2xvciI6IiMyMzI2MmUiLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MSwicmFkaXVzIjoxMiwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo2NCwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjgwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjM2EzZjRhIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIiwiZmxpcEdyb3VwIjoic2luZ2xlIn0",
+      "expected": {
+        "version": 1,
+        "template": "flip-dark",
+        "clockType": "flip",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#f4f6fb",
+        "backgroundColor": "#23262e",
+        "backgroundOpacity": 1,
+        "radius": 12,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 64,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 800,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#000000",
+        "strokeWidth": 0,
+        "borderColor": "#3a3f4a",
+        "borderOpacity": 1,
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
+      }
+    },
+    {
+      "name": "template-flip-pair-compact",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImZsaXAtcGFpciIsImNsb2NrVHlwZSI6ImZsaXAiLCJmb250RmFtaWx5IjoiUG9wcGlucyIsInRleHRDb2xvciI6IiMxZjI0MzAiLCJiYWNrZ3JvdW5kQ29sb3IiOiIjZjRmNWY3IiwiYmFja2dyb3VuZE9wYWNpdHkiOjEsImZvbnRTaXplIjo2MCwiZm9udFdlaWdodCI6ODAwLCJib3JkZXJDb2xvciI6IiNkOWRkZTMiLCJmbGlwR3JvdXAiOiJwYWlyIn0",
+      "expected": {
+        "version": 1,
+        "template": "flip-pair",
+        "clockType": "flip",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#f4f5f7",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 60,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 800,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#000000",
+        "strokeWidth": 0,
+        "borderColor": "#d9dde3",
+        "borderOpacity": 1,
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep",
+        "flipGroup": "pair"
+      }
+    },
+    {
+      "name": "template-flip-pair-full",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6ImZsaXAtcGFpciIsImNsb2NrVHlwZSI6ImZsaXAiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOmZhbHNlLCJzaG93U2Vjb25kcyI6dHJ1ZSwic2hvd0RhdGUiOmZhbHNlLCJkYXRlRm9ybWF0Ijoic2xhc2giLCJzaG93V2Vla2RheSI6ZmFsc2UsIndlZWtkYXlGb3JtYXQiOiJqYS1zaG9ydCIsImxhYmVsIjoiSlNUIiwibGFiZWxQb3NpdGlvbiI6ImhpZGRlbiIsImZvbnRGYW1pbHkiOiJQb3BwaW5zIiwidGV4dENvbG9yIjoiIzFmMjQzMCIsImJhY2tncm91bmRDb2xvciI6IiNmNGY1ZjciLCJiYWNrZ3JvdW5kT3BhY2l0eSI6MSwicmFkaXVzIjoxMCwicGFkZGluZ1giOjE4LCJwYWRkaW5nWSI6MTAsImZvbnRTaXplIjo2MCwiZGF0ZVNpemUiOjE0LCJsYWJlbFNpemUiOjEyLCJsZXR0ZXJTcGFjaW5nIjowLjYsImxpbmVIZWlnaHQiOjEsImZvbnRXZWlnaHQiOjgwMCwiZ2FwIjo0LCJzaGFkb3dDb2xvciI6IiMwMDAwMDAiLCJzaGFkb3dPcGFjaXR5IjowLjE4LCJzaGFkb3dCbHVyIjo2LCJzaGFkb3dYIjowLCJzaGFkb3dZIjoyLCJzdHJva2VDb2xvciI6IiMwMDAwMDAiLCJzdHJva2VXaWR0aCI6MCwiYm9yZGVyQ29sb3IiOiIjZDlkZGUzIiwiYm9yZGVyT3BhY2l0eSI6MSwiYm9yZGVyV2lkdGgiOjEsImFuYWxvZ1NpemUiOjIyMCwiYW5hbG9nTWFya3MiOiJudW1iZXJzIiwiYW5hbG9nU2Vjb25kSGFuZCI6InN3ZWVwIiwiZmxpcEdyb3VwIjoicGFpciJ9",
+      "expected": {
+        "version": 1,
+        "template": "flip-pair",
+        "clockType": "flip",
+        "timezone": "Asia/Tokyo",
+        "hour12": false,
+        "showSeconds": true,
+        "showDate": false,
+        "dateFormat": "slash",
+        "showWeekday": false,
+        "weekdayFormat": "ja-short",
+        "label": "JST",
+        "labelPosition": "hidden",
+        "fontFamily": "Poppins",
+        "textColor": "#1f2430",
+        "backgroundColor": "#f4f5f7",
+        "backgroundOpacity": 1,
+        "radius": 10,
+        "paddingX": 18,
+        "paddingY": 10,
+        "fontSize": 60,
+        "dateSize": 14,
+        "labelSize": 12,
+        "letterSpacing": 0.6,
+        "lineHeight": 1,
+        "fontWeight": 800,
+        "gap": 4,
+        "shadowColor": "#000000",
+        "shadowOpacity": 0.18,
+        "shadowBlur": 6,
+        "shadowX": 0,
+        "shadowY": 2,
+        "strokeColor": "#000000",
+        "strokeWidth": 0,
+        "borderColor": "#d9dde3",
+        "borderOpacity": 1,
+        "borderWidth": 1,
+        "analogSize": 220,
+        "analogMarks": "numbers",
+        "analogSecondHand": "sweep",
+        "flipGroup": "pair"
       }
     },
     {
       "name": "custom-mixed-options-full",
-      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOnRydWUsInNob3dTZWNvbmRzIjpmYWxzZSwic2hvd0RhdGUiOnRydWUsImRhdGVGb3JtYXQiOiJqcCIsInNob3dXZWVrZGF5Ijp0cnVlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtbG9uZyIsImxhYmVsIjoi44KJ44GE44G2IiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJLaXdpIE1hcnUiLCJ0ZXh0Q29sb3IiOiIjNWEzYTQ3IiwiYmFja2dyb3VuZENvbG9yIjoiI2ZmZjFmNSIsImJhY2tncm91bmRPcGFjaXR5IjowLjg1LCJyYWRpdXMiOjEwLCJwYWRkaW5nWCI6MTgsInBhZGRpbmdZIjoxMCwiZm9udFNpemUiOjY0LCJkYXRlU2l6ZSI6MTQsImxhYmVsU2l6ZSI6MTIsImxldHRlclNwYWNpbmciOjAuNiwibGluZUhlaWdodCI6MSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjQsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMTgsInNoYWRvd0JsdXIiOjYsInNoYWRvd1giOjAsInNoYWRvd1kiOjIsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNkOWQ3Y2YiLCJib3JkZXJPcGFjaXR5IjowLjQsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCJ9",
+      "encoded": "eyJ2ZXJzaW9uIjoxLCJ0ZW1wbGF0ZSI6InNha3VyYSIsImNsb2NrVHlwZSI6ImRpZ2l0YWwiLCJ0aW1lem9uZSI6IkFzaWEvVG9reW8iLCJob3VyMTIiOnRydWUsInNob3dTZWNvbmRzIjpmYWxzZSwic2hvd0RhdGUiOnRydWUsImRhdGVGb3JtYXQiOiJqcCIsInNob3dXZWVrZGF5Ijp0cnVlLCJ3ZWVrZGF5Rm9ybWF0IjoiamEtbG9uZyIsImxhYmVsIjoi44KJ44GE44G2IiwibGFiZWxQb3NpdGlvbiI6InRvcCIsImZvbnRGYW1pbHkiOiJLaXdpIE1hcnUiLCJ0ZXh0Q29sb3IiOiIjNWEzYTQ3IiwiYmFja2dyb3VuZENvbG9yIjoiI2ZmZjFmNSIsImJhY2tncm91bmRPcGFjaXR5IjowLjg1LCJyYWRpdXMiOjEwLCJwYWRkaW5nWCI6MTgsInBhZGRpbmdZIjoxMCwiZm9udFNpemUiOjY0LCJkYXRlU2l6ZSI6MTQsImxhYmVsU2l6ZSI6MTIsImxldHRlclNwYWNpbmciOjAuNiwibGluZUhlaWdodCI6MSwiZm9udFdlaWdodCI6NzAwLCJnYXAiOjQsInNoYWRvd0NvbG9yIjoiIzAwMDAwMCIsInNoYWRvd09wYWNpdHkiOjAuMTgsInNoYWRvd0JsdXIiOjYsInNoYWRvd1giOjAsInNoYWRvd1kiOjIsInN0cm9rZUNvbG9yIjoiIzAwMDAwMCIsInN0cm9rZVdpZHRoIjowLCJib3JkZXJDb2xvciI6IiNkOWQ3Y2YiLCJib3JkZXJPcGFjaXR5IjowLjQsImJvcmRlcldpZHRoIjoyLCJhbmFsb2dTaXplIjoyMjAsImFuYWxvZ01hcmtzIjoibnVtYmVycyIsImFuYWxvZ1NlY29uZEhhbmQiOiJzd2VlcCIsImZsaXBHcm91cCI6InNpbmdsZSJ9",
       "expected": {
         "version": 1,
         "template": "sakura",
@@ -1646,7 +2236,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     }
   ],
@@ -1692,7 +2283,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1736,7 +2328,8 @@
         "borderWidth": 2,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     },
     {
@@ -1780,7 +2373,8 @@
         "borderWidth": 1,
         "analogSize": 220,
         "analogMarks": "numbers",
-        "analogSecondHand": "sweep"
+        "analogSecondHand": "sweep",
+        "flipGroup": "single"
       }
     }
   ],
@@ -2104,6 +2698,141 @@
           "--clock-font-weight": "700",
           "--clock-gap": "4px",
           "--clock-stroke-color": "#e23b3b",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
+        }
+      }
+    },
+    {
+      "id": "analog-roman",
+      "snapshot": {
+        "className": "clock-widget template-analog-roman",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Poppins\"",
+          "--clock-text": "#2a2622",
+          "--clock-bg": "rgba(251, 247, 238, 1)",
+          "--clock-border": "rgba(201, 168, 106, 1)",
+          "--clock-border-width": "4px",
+          "--clock-radius": "10px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "42px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "700",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#9a6b4a",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
+        }
+      }
+    },
+    {
+      "id": "analog-cafe",
+      "snapshot": {
+        "className": "clock-widget template-analog-cafe",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Zen Maru Gothic\"",
+          "--clock-text": "#f3e4cf",
+          "--clock-bg": "rgba(90, 70, 54, 1)",
+          "--clock-border": "rgba(202, 164, 111, 1)",
+          "--clock-border-width": "5px",
+          "--clock-radius": "10px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "42px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "700",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#e8b07a",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
+        }
+      }
+    },
+    {
+      "id": "flip-light",
+      "snapshot": {
+        "className": "clock-widget template-flip-light",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Poppins\"",
+          "--clock-text": "#1f2430",
+          "--clock-bg": "rgba(244, 245, 247, 1)",
+          "--clock-border": "rgba(217, 221, 227, 1)",
+          "--clock-border-width": "1px",
+          "--clock-radius": "12px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "64px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "800",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#000000",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
+        }
+      }
+    },
+    {
+      "id": "flip-dark",
+      "snapshot": {
+        "className": "clock-widget template-flip-dark",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Poppins\"",
+          "--clock-text": "#f4f6fb",
+          "--clock-bg": "rgba(35, 38, 46, 1)",
+          "--clock-border": "rgba(58, 63, 74, 1)",
+          "--clock-border-width": "1px",
+          "--clock-radius": "12px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "64px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "800",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#000000",
+          "--clock-stroke-width": "0px",
+          "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
+        }
+      }
+    },
+    {
+      "id": "flip-pair",
+      "snapshot": {
+        "className": "clock-widget template-flip-pair",
+        "labelPosition": "hidden",
+        "properties": {
+          "--clock-font": "\"Poppins\"",
+          "--clock-text": "#1f2430",
+          "--clock-bg": "rgba(244, 245, 247, 1)",
+          "--clock-border": "rgba(217, 221, 227, 1)",
+          "--clock-border-width": "1px",
+          "--clock-radius": "10px",
+          "--clock-padding-x": "18px",
+          "--clock-padding-y": "10px",
+          "--clock-font-size": "60px",
+          "--clock-date-size": "14px",
+          "--clock-label-size": "12px",
+          "--clock-letter-spacing": "0.6px",
+          "--clock-line-height": "1",
+          "--clock-font-weight": "800",
+          "--clock-gap": "4px",
+          "--clock-stroke-color": "#000000",
           "--clock-stroke-width": "0px",
           "--clock-shadow": "0px 2px 6px rgba(0, 0, 0, 0.18)"
         }

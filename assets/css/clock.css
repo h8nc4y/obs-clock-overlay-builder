@@ -149,6 +149,124 @@
   user-select: none;
 }
 
+/* パタパタ(フリップ)時計。各カードを上下2枚の面に分け、上半分(古い値)が手前へ
+   折れ、続いて下半分(新しい値)が起き上がる、本物のスプリットフラップ動作(独自実装)。 */
+.clock-flip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.16em;
+  font-family: var(--flip-font), var(--fallback-fonts);
+  font-size: var(--flip-size);
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.flip-card {
+  position: relative;
+  display: inline-block;
+  width: 0.86em;
+  height: 1.34em;
+  perspective: 280px;
+  filter: drop-shadow(0 0.08em 0.12em rgba(0, 0, 0, 0.28));
+}
+
+.flip-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0.67em;
+  overflow: hidden;
+  background: var(--flip-card-bg);
+  color: var(--flip-ink);
+  box-sizing: border-box;
+}
+
+.flip-half b {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.34em;
+  line-height: 1.34em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.flip-top {
+  top: 0;
+  border: var(--flip-border-width) solid var(--flip-border);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.34);
+  border-radius: var(--flip-radius) var(--flip-radius) 0 0;
+}
+
+.flip-top b {
+  top: 0;
+}
+
+.flip-bottom {
+  bottom: 0;
+  border: var(--flip-border-width) solid var(--flip-border);
+  border-top: none;
+  border-radius: 0 0 var(--flip-radius) var(--flip-radius);
+}
+
+.flip-bottom b {
+  top: -0.67em;
+}
+
+.flip-flap-top {
+  z-index: 3;
+  transform-origin: bottom center;
+  transform: rotateX(0deg);
+}
+
+.flip-flap-bottom {
+  z-index: 3;
+  transform-origin: top center;
+  transform: rotateX(90deg);
+}
+
+.flip-card.is-flipping .flip-flap-top {
+  animation: flip-fold-top 0.56s ease-in forwards;
+}
+
+.flip-card.is-flipping .flip-flap-bottom {
+  animation: flip-fold-bottom 0.56s ease-out forwards;
+}
+
+@keyframes flip-fold-top {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50%,
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flip-fold-bottom {
+  0%,
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+.flip-sep {
+  color: var(--flip-ink);
+  font-size: 0.7em;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-card.is-flipping .flip-flap-top,
+  .flip-card.is-flipping .flip-flap-bottom {
+    animation-duration: 0.01ms;
+  }
+}
+
 .template-minimal-clear {
   backdrop-filter: none;
 }
