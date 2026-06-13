@@ -183,6 +183,7 @@ function init() {
   bindPreviewBackground();
   syncFormFromState();
   updateEverything();
+  window.addEventListener("resize", () => window.requestAnimationFrame(fitTemplateMiniPreviews));
 }
 
 function readSavedUiTheme() {
@@ -300,6 +301,22 @@ function renderTemplateButtons() {
     });
     elements.templateGrid.append(button);
   }
+  window.requestAnimationFrame(fitTemplateMiniPreviews);
+}
+
+function fitTemplateMiniPreviews() {
+  document.querySelectorAll(".template-mini").forEach((mini) => {
+    const widget = mini.querySelector(".template-mini-clock");
+    if (!widget) {
+      return;
+    }
+    const innerWidth = widget.offsetWidth;
+    const available = mini.clientWidth - 12;
+    if (innerWidth > 0 && available > 0) {
+      const scale = Math.min(0.42, available / innerWidth);
+      widget.style.transform = `scale(${scale.toFixed(3)})`;
+    }
+  });
 }
 
 function renderFontOptions() {
