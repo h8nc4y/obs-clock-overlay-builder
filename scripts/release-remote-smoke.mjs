@@ -6,7 +6,7 @@ if (!baseUrl) {
 }
 
 const checks = [
-  { path: "/", contentType: "text/html", bodyIncludes: "時計オーバーレイURLビルダー" },
+  { path: "/", contentType: "text/html", bodyIncludes: "OBS時計URLビルダー" },
   { path: "/clock/", contentType: "text/html", bodyIncludes: "clockRoot" },
   { path: "/clock", contentType: "text/html", bodyIncludes: "clockRoot" },
   {
