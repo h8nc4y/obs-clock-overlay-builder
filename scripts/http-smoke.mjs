@@ -3,8 +3,6 @@ const targets = [
   "/",
   "/clock/",
   "/clock",
-  "/overlay/keyword-reaction/",
-  "/overlay/keyword-reaction",
   "/api/defaults",
   "/favicon.ico"
 ];

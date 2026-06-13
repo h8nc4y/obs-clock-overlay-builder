@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const dist = join(root, "dist");
-const requiredDeployEntries = ["index.html", "clock", "overlay", "assets", "api", "favicon.ico"];
+const requiredDeployEntries = ["index.html", "clock", "assets", "api", "favicon.ico"];
 const optionalDeployEntries = ["_redirects", "_headers"];
 
 rmSync(dist, { recursive: true, force: true });

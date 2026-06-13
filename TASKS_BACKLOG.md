@@ -37,5 +37,5 @@
 - 1タスク1commitを基本に進める。
 - Web/UI変更時は日本語UIを維持し、可能な範囲で 390px / 768px / 1280px と console/network/error/focus/hover を確認する。
 - Secret/token/OAuth/real data は扱わない。
-- Candidate A の overlay本体fixture transport 本実装(narrow BroadcastChannel fixture transport)は保留。デザイン刷新(TB-012〜TB-017)完了後にオーナーと再判断する。
+- Candidate A(キーワード反応オーバーレイ)は 2026/06/13 オーナー判断で本プロジェクト対象外となり、別プロジェクト `007_yt-live-word-alert-overlay` へ移管。011 からは実験コード・関連docsを撤去済み(上記 TB-001〜TB-003 / TB-009 は当時のスナップショット記録)。
 - TB-013〜TB-015 の互換方針: `DEFAULT_CONFIG` は凍結、`TEMPLATES` preset値は刷新可(既存IDは削除しない)、`.clock-widget` 構造CSSは互換維持。旧flat形式URLの見た目変化はCHANGELOGに明記する。
