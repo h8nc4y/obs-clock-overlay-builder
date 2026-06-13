@@ -39,8 +39,6 @@ const elements = {
   timezone: byId("timezone"),
   localTimezone: byId("localTimezone"),
   useLocalTimezone: byId("useLocalTimezone"),
-  cfTimezone: byId("cfTimezone"),
-  fetchCfDefaults: byId("fetchCfDefaults"),
   hour12: byId("hour12"),
   showSeconds: byId("showSeconds"),
   showDate: byId("showDate"),
@@ -82,6 +80,7 @@ const elements = {
   importConfig: byId("importConfig"),
   resetConfig: byId("resetConfig"),
   importStatus: byId("importStatus"),
+  builderStatus: byId("builderStatus"),
   previewShell: byId("previewShell"),
   previewCustomColor: byId("previewCustomColor"),
   clockPreview: byId("clockPreview"),
@@ -206,6 +205,8 @@ function initAdjustTabs() {
     elements.advancedControls.hidden = !advanced;
     elements.adjustTabEasy.setAttribute("aria-pressed", String(!advanced));
     elements.adjustTabAdvanced.setAttribute("aria-pressed", String(advanced));
+    elements.adjustTabEasy.setAttribute("aria-expanded", String(!advanced));
+    elements.adjustTabAdvanced.setAttribute("aria-expanded", String(advanced));
   };
   elements.adjustTabEasy.addEventListener("click", () => setMode(false));
   elements.adjustTabAdvanced.addEventListener("click", () => setMode(true));
@@ -241,6 +242,8 @@ function renderTemplateCategoryTabs() {
 function buildTemplateMiniPreview(template) {
   const mini = document.createElement("span");
   mini.className = "template-mini";
+  // 常時更新される装飾プレビューはラベルが無く、スクリーンリーダーには雑音なので隠す。
+  mini.setAttribute("aria-hidden", "true");
   const applied = applyTemplate(cloneDefaultConfig(), template.id);
 
   if (applied.clockType === "analog") {
@@ -397,7 +400,6 @@ function bindForm() {
   elements.useLocalTimezone.addEventListener("click", () => {
     updateState({ timezone: elements.localTimezone.textContent }, true);
   });
-  elements.fetchCfDefaults.addEventListener("click", fetchCloudflareDefaults);
   elements.loadLocalFonts.addEventListener("click", loadLocalFonts);
   elements.importConfig.addEventListener("click", importConfig);
   elements.resetConfig.addEventListener("click", () => {
@@ -483,7 +485,9 @@ function updateEverything(status = "") {
   updateTemplatePressed();
   updateClockTypeVisibility();
   if (status) {
-    elements.importStatus.textContent = status;
+    // 汎用ステータスは常時表示の builderStatus へ。importStatus は「こだわり」内に
+    // あり「かんたん」タブでは非表示になるため、確認文が見えなくなるのを防ぐ。
+    elements.builderStatus.textContent = status;
   }
   window.requestAnimationFrame(updateRecommendedSize);
 }
@@ -535,29 +539,6 @@ function updateContrastWarning() {
   }
   elements.contrastWarning.hidden = warnings.length === 0;
   elements.contrastWarning.textContent = warnings.join(" ");
-}
-
-async function fetchCloudflareDefaults() {
-  elements.cfTimezone.textContent = "確認中...";
-  try {
-    const response = await fetch("./api/defaults", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    const data = await response.json();
-    const timezone = data.timezone || "未確認";
-    const country = data.country || "未確認";
-    elements.cfTimezone.textContent = `timezone: ${timezone} / country: ${country}`;
-    if (data.timezone) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = "この候補を採用";
-      button.addEventListener("click", () => updateState({ timezone: data.timezone }, true));
-      elements.cfTimezone.append(" ", button);
-    }
-  } catch {
-    elements.cfTimezone.textContent = "取得できませんでした。Cloudflare外や静的配信だけでも問題なく使えます。";
-  }
 }
 
 async function loadLocalFonts() {
