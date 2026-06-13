@@ -5,14 +5,12 @@ import {
   cloneDefaultConfig,
   configToClockUrl,
   contrastRatio,
-  hexToRgba,
   normalizeConfig,
   parseImportInput
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import { applyClockStyles, mountClock, recommendedObsSize } from "./render.js";
-import { createFormatters, formatClock } from "./time.js";
 
 const STORAGE_KEY = "obs-clock-builder:v1";
 const THEME_STORAGE_KEY = "obs-clock-builder:theme";
@@ -84,13 +82,6 @@ const elements = {
   importConfig: byId("importConfig"),
   resetConfig: byId("resetConfig"),
   importStatus: byId("importStatus"),
-  shareText: byId("shareText"),
-  copyShareText: byId("copyShareText"),
-  generateShareImage: byId("generateShareImage"),
-  shareImage: byId("shareImage"),
-  xIntent: byId("xIntent"),
-  shareImagePreview: byId("shareImagePreview"),
-  downloadShareImage: byId("downloadShareImage"),
   previewShell: byId("previewShell"),
   previewCustomColor: byId("previewCustomColor"),
   clockPreview: byId("clockPreview"),
@@ -135,8 +126,6 @@ const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor
 const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
 const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
-let shareBlob = null;
-let shareObjectUrl = "";
 let localFontSelectBound = false;
 
 const previewClock = mountClock(elements.clockPreview, state);
@@ -421,11 +410,6 @@ function bindForm() {
   elements.openClock.addEventListener("click", () => {
     window.open(elements.generatedUrl.value, "_blank", "noopener");
   });
-  elements.copyShareText.addEventListener("click", () =>
-    copyText(elements.shareText.value, elements.urlStatus, "投稿文をコピーしました。")
-  );
-  elements.generateShareImage.addEventListener("click", generateShareImage);
-  elements.shareImage.addEventListener("click", shareGeneratedImage);
 }
 
 function bindPreviewBackground() {
@@ -494,7 +478,6 @@ function updateEverything(status = "") {
   previewClock.updateConfig(state);
   persistState();
   updatePreviewBackground();
-  updateShareText();
   updateGeneratedUrl();
   updateContrastWarning();
   updateTemplatePressed();
@@ -526,7 +509,6 @@ function updateGeneratedUrl() {
     elements.urlWarning.hidden = false;
     elements.urlWarning.textContent = "URLが長めです。必要なら「デフォルト値を省略して短くする」を使ってください。";
   }
-  updateXIntent();
 }
 
 function updateRecommendedSize() {
@@ -553,20 +535,6 @@ function updateContrastWarning() {
   }
   elements.contrastWarning.hidden = warnings.length === 0;
   elements.contrastWarning.textContent = warnings.join(" ");
-}
-
-function updateShareText() {
-  const text = `OBS用の時計オーバーレイを作ったよ！ テンプレート: ${templateName(state.template)} #OBS #配信素材`;
-  elements.shareText.value = text;
-}
-
-function updateXIntent() {
-  const params = new URLSearchParams({
-    text: elements.shareText.value,
-    url: new URL("./", window.location.href).href,
-    hashtags: "OBS,配信素材"
-  });
-  elements.xIntent.href = `https://x.com/intent/tweet?${params.toString()}`;
 }
 
 async function fetchCloudflareDefaults() {
@@ -690,134 +658,12 @@ function copyTextWithSelectionFallback(text) {
   }
 }
 
-async function generateShareImage() {
-  try {
-    shareBlob = await createShareImageBlob();
-  } catch {
-    shareBlob = null;
-    elements.urlStatus.textContent = "PNG画像を生成できませんでした。ブラウザを更新してもう一度試してください。";
-    return;
-  }
-  if (shareObjectUrl) {
-    URL.revokeObjectURL(shareObjectUrl);
-  }
-  shareObjectUrl = URL.createObjectURL(shareBlob);
-  elements.shareImagePreview.src = shareObjectUrl;
-  elements.shareImagePreview.hidden = false;
-  elements.downloadShareImage.href = shareObjectUrl;
-  elements.downloadShareImage.hidden = false;
-  elements.urlStatus.textContent = "SNS向けPNG画像を生成しました。";
-}
-
-async function shareGeneratedImage() {
-  if (!shareBlob) {
-    await generateShareImage();
-    if (!shareBlob) {
-      return;
-    }
-  }
-  const file = new File([shareBlob], "obs-clock-preview.png", { type: "image/png" });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    await navigator.share({
-      files: [file],
-      title: "OBS Clock Overlay Builder",
-      text: elements.shareText.value,
-      url: new URL("./", window.location.href).href
-    });
-    return;
-  }
-  elements.urlStatus.textContent = "この環境では画像共有に非対応です。PNG保存、投稿文コピー、X投稿画面を使ってください。";
-}
-
-function createShareImageBlob() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1200;
-  canvas.height = 630;
-  const context = canvas.getContext("2d");
-  const formatters = createFormatters(state);
-  const formatted = formatClock(formatters, new Date());
-
-  context.fillStyle = "#fff7ef";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "#dff8ff";
-  context.fillRect(0, 0, canvas.width, 210);
-  context.fillStyle = "#ffe4ef";
-  context.fillRect(0, 420, canvas.width, 210);
-
-  drawRoundedRect(context, 120, 140, 960, 300, 34);
-  context.fillStyle = hexToRgba(state.backgroundColor, Math.max(state.backgroundOpacity, 0.78));
-  context.fill();
-  context.lineWidth = Math.max(2, state.borderWidth);
-  context.strokeStyle = hexToRgba(state.borderColor, Math.max(state.borderOpacity, 0.5));
-  context.stroke();
-
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.shadowColor = hexToRgba(state.shadowColor, state.shadowOpacity);
-  context.shadowBlur = state.shadowBlur;
-  context.shadowOffsetX = state.shadowX;
-  context.shadowOffsetY = state.shadowY;
-  context.fillStyle = state.textColor;
-  context.font = `${state.fontWeight} 86px ${canvasFontFamily(state.fontFamily)}`;
-  context.fillText(formatted.time, 600, 280);
-  context.font = `700 30px ${canvasFontFamily(state.fontFamily)}`;
-  const subline = [state.labelPosition === "hidden" ? "" : state.label, formatted.date, formatted.weekday]
-    .filter(Boolean)
-    .join("  ");
-  context.fillText(subline || templateName(state.template), 600, 355);
-
-  context.shadowColor = "transparent";
-  context.fillStyle = "#23232a";
-  context.font = "800 34px system-ui, sans-serif";
-  context.fillText("OBS Clock Overlay Builder", 600, 505);
-  context.font = "500 23px system-ui, sans-serif";
-  context.fillStyle = "#665f68";
-  context.fillText(new URL("./", window.location.href).href, 600, 552);
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("Canvas PNG generation failed."));
-      }
-    }, "image/png", 0.92);
-  });
-}
-
 function persistState() {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
     // URL remains the source of truth; localStorage is only a convenience.
   }
-}
-
-function drawRoundedRect(context, x, y, width, height, radius) {
-  if (typeof context.roundRect === "function") {
-    context.beginPath();
-    context.roundRect(x, y, width, height, radius);
-    return;
-  }
-  context.beginPath();
-  context.moveTo(x + radius, y);
-  context.arcTo(x + width, y, x + width, y + height, radius);
-  context.arcTo(x + width, y + height, x, y + height, radius);
-  context.arcTo(x, y + height, x, y, radius);
-  context.arcTo(x, y, x + width, y, radius);
-  context.closePath();
-}
-
-function canvasFontFamily(fontFamily) {
-  const clean = String(fontFamily)
-    .replace(/["'\\;\n\r]/g, " ")
-    .trim()
-    .slice(0, 80);
-  return `"${clean || "system-ui"}", system-ui, sans-serif`;
-}
-
-function templateName(templateId) {
-  return TEMPLATES.find((template) => template.id === templateId)?.name ?? "Custom";
 }
 
 function byId(id) {

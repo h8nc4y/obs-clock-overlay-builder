@@ -36,7 +36,7 @@ OBSのブラウザソースで使う時計オーバーレイURLを生成する�
 - 壊れた `c`、壊れたJSON、不正timezone、不正色、不正数値は初期値または安全な範囲へ戻すこと。
 - PC内フォント読み込みは、対応ブラウザでユーザー操作後だけ実行し、非対応・拒否・空状態では手入力へ案内すること。
 - フォント名はOBSを動かすPCに同じfontがある場合だけ同じ表示になります。未インストール時はsystem fallbackを許容します。
-- CanvasによるSNS向けPNG preview、投稿文copy、X Web Intentを提供できます。ただしX Web Intentでは画像自動添付ができないため、手動添付案内を維持します。
+- `/clock/` は同一オリジンの `Date` レスポンスヘッダでサーバー時刻へ自動補正し、取得に失敗したときはPCのsystem timeへフォールバックすること(バックエンドは追加しない)。
 - `/api/defaults` は公開先の補助情報だけを返します。候補が取れない環境でも、時計表示はURL設定だけで動くこと。
 
 ## Deployment and operations requirements
@@ -64,7 +64,7 @@ OBSのブラウザソースで使う時計オーバーレイURLを生成する�
 - OBS実機では、編集画面ではなく生成URLそのものをブラウザソースに貼って確認します。
 - 390px前後、768px前後、1280px以上で横スクロール、読みにくさ、押しにくさ、focus/hover state、console/network errorを確認します。
 - OBSを動かすPCに同じfontが無い場合、同じURLでも見た目が変わる可能性があります。
-- MVPではサーバー時刻補正を行いません。時計表示はユーザーのsystem timeに従います。
+- 時計はサーバー時刻(同一オリジンの `Date` ヘッダ)へ自動補正しますが、補正できないオフライン時はsystem timeに従います。秒未満の精度やNTP級の厳密さは保証しません。
 
 ## Non-goals
 
@@ -73,7 +73,6 @@ OBSのブラウザソースで使う時計オーバーレイURLを生成する�
 - backend state、authentication、database、paid Cloudflare binding、new paid cloud serviceは、別途承認なしに追加しません。
 - Workers AI、AI Gateway、R2、D1、KV、Queues、Durable Objects、Workflows、Hyperdriveなどの有料化し得るbindingを、この要件だけでは追加しません。
 - ライセンス確認と `docs/licenses` 記録なしにfont fileを同梱しません。
-- X Web Intentで画像を自動添付できるとは表現しません。
 - GitHub Actionsの支出上限未確認のまま `push` / `pull_request` triggerを追加しません。
 
 ## AI review workflow requirements

@@ -405,29 +405,6 @@
                 <p id="importStatus" class="status-line" role="status" aria-live="polite"></p>
               </div>
 
-              <div class="control-group">
-                <h3>X共有・画像</h3>
-                <p class="group-hint">X Web Intent は画像を直接添付できないため、画像保存と投稿文コピーを分けています。</p>
-                <label class="field" for="shareText">
-                  <span>投稿文</span>
-                  <textarea id="shareText" rows="3"></textarea>
-                </label>
-                <div class="button-row">
-                  <button id="copyShareText" type="button">投稿文をコピー</button>
-                  <button id="generateShareImage" type="button" class="secondary">PNG画像を生成</button>
-                  <button id="shareImage" type="button" class="secondary">共有</button>
-                  <a id="xIntent" class="button-like secondary" target="_blank" rel="noopener">X投稿画面を開く</a>
-                </div>
-                <div class="share-preview">
-                  <img id="shareImagePreview" alt="SNS向け時計プレビュー画像" hidden>
-                  <a id="downloadShareImage" class="quiet-link" download="obs-clock-preview.png" hidden>PNGを保存</a>
-                </div>
-                <ol class="compact-steps">
-                  <li>PNG画像を生成して保存</li>
-                  <li>投稿文をコピー</li>
-                  <li>X投稿画面を開き、保存した画像を手動で添付</li>
-                </ol>
-              </div>
             </div>
           </div>
           <p id="contrastWarning" class="warning" hidden></p>
@@ -451,28 +428,32 @@
           </ol>
           <div class="faq-grid">
             <details>
-              <summary>背景が白い</summary>
-              <p>時計画面は透明背景です。OBSのブラウザソース設定、カスタムCSS、またはプレビュー背景を確認してください。</p>
+              <summary>背景が白くなる</summary>
+              <p>時計画面は背景が透明です。白くなるときは、OBSのブラウザソース設定やカスタムCSS、プレビューの背景を確認してください。</p>
             </details>
             <details>
-              <summary>フォントが反映されない</summary>
-              <p>OBSを動かすPCにそのフォントが無い可能性があります。フォント名を確認し、無い場合はsystem-uiへフォールバックします。</p>
+              <summary>時刻がずれている</summary>
+              <p>時計はサーバー時刻へ自動で補正されるので、PCの時計が多少ずれていても正しい時刻を表示します。オフラインなどで補正できないときは、PCのシステム時刻で動きます。</p>
             </details>
             <details>
-              <summary>URLをなくした</summary>
-              <p>生成URLが再現の正です。編集画面のlocalStorageには最後の設定が残る場合がありますが、別ブラウザでは復元できません。</p>
-            </details>
-            <details>
-              <summary>PC時刻が違う</summary>
-              <p>MVPではサーバー時刻補正を行いません。PCのシステム時刻がずれると時計表示もずれます。</p>
+              <summary>秒が飛ぶ・止まって見える</summary>
+              <p>ブラウザの非表示タブでは画面更新が間引かれることがあります。OBSのブラウザソースや前面のタブでは通常どおり毎秒進みます。</p>
             </details>
             <details>
               <summary>OBSで表示が切れる</summary>
-              <p>推奨幅・高さより大きめに設定してください。文字サイズや縁取り、影を強くすると必要サイズも増えます。</p>
+              <p>推奨幅・高さより少し大きめに設定してください。文字を大きくしたり、縁取り・影を強くすると、必要なサイズも増えます。</p>
             </details>
             <details>
-              <summary>Xに画像が付かない</summary>
-              <p>X Web Intent は画像を自動添付できません。PNGを保存して、投稿画面で手動添付してください。</p>
+              <summary>フォントが反映されない</summary>
+              <p>OBSを動かすPCにそのフォントが入っていない可能性があります。入っていないときは標準フォント（system-ui）で表示されます。配信に使うPCで最終確認すると安心です。</p>
+            </details>
+            <details>
+              <summary>時計の種類を変えたい</summary>
+              <p>「2. 自分好みに調整する」で デジタル / アナログ / パタパタ を切り替えられます。種類ごとに目盛りや桁のまとめ方なども選べます。</p>
+            </details>
+            <details>
+              <summary>URLをなくした</summary>
+              <p>生成URLが再現の正本です。別のブラウザやPCで同じ見た目へ戻すには、生成URLを保存しておいてください（編集画面のローカル保存だけでは別環境で復元できません）。</p>
             </details>
           </div>
         </section>

@@ -686,19 +686,6 @@ output {
   font-size: 1.1rem;
 }
 
-.share-preview {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.share-preview img {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-.compact-steps,
 .help-steps {
   margin: 14px 0 0;
   padding-left: 1.35rem;

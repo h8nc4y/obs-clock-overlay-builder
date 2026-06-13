@@ -11,11 +11,12 @@ Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 
 - Transparent OBS clock overlay with a dedicated clock-only `/clock/` surface.
 - Reproducible `/clock/?c=...` URL contract for OBS browser sources.
+- Clock auto-corrects to server time via the same-origin HTTP `Date` header, so it stays accurate even when the PC clock is off; it falls back to local time when offline. No backend is added.
 - Eight built-in templates: Minimal Clear, Milk Tea, Pastel Pop, Soda, Sakura, Night Studio, Neon HUD, and Mono Compact.
 - Zero runtime dependencies; the clock renders from URL and browser state only.
 - Static-first, free-tier-friendly Cloudflare Workers Static Assets hosting.
 - Japanese-first editor UI for non-programmer OBS users in Japan.
-- Optional browser features for local font discovery, clipboard copy, canvas preview export, and Web Share.
+- Optional browser features for local font discovery and clipboard copy.
 
 ![OBS Clock Overlay Builder editor preview](docs/assets/editor-preview.png)
 
@@ -57,7 +58,8 @@ Older flat query parameters are still read for compatibility, for example:
 - There is no backend database.
 - Clock rendering is based on the URL and the local browser runtime.
 - This app does not intentionally send user clock configuration to its server.
-- Local font discovery, clipboard, canvas export, and Web Share are optional browser features. Browser permission prompts and browser behavior depend on the user's environment.
+- Local font discovery and clipboard are optional browser features. Browser permission prompts and browser behavior depend on the user's environment.
+- The clock fetches the same-origin `/api/defaults` with `no-store` only to read the response `Date` header for time correction; no clock configuration or personal data is sent.
 
 ## Development
 
@@ -141,6 +143,7 @@ OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける�
 - アナログ時計は文字盤・数字・針・秒針の色、大きさ、目盛り(数字 / ローマ数字 / 目盛り / 両方 / なし)、秒針の動き(なめらか / カチカチ / なし)を選べ、文字盤に日付も表示できます。
 - パタパタ時計はカードがめくれるフリップ表示です。色・文字サイズ・角丸・秒表示などを設定できます。
 - 編集画面のテーマ(白 / コーラル / ふんわりブルー)を切り替えられます。テーマは編集画面だけの設定で、生成される時計URLの見た目には影響しません。
+- 時計はサーバー時刻へ自動補正されるため、配信PCの時計が多少ずれていても正しい時刻を表示します(オフラインなど補正できないときはPCの時刻にフォールバック)。バックエンドは増やしていません。
 - 生成された `/clock/?c=...` URL を OBS のブラウザソースへ貼り付けて使えます。
 
 ### OBS での使い方
@@ -166,16 +169,15 @@ OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける�
 - バックエンド DB はありません。
 - 時計設定は URL とローカルブラウザ上で扱います。
 - このアプリは、ユーザーの時計設定を意図的にサーバーへ送信しません。
-- PC 内フォント読み込み、クリップボード、Canvas、Web Share は任意のブラウザ機能です。利用可否や許可画面はブラウザ環境に依存します。
+- PC 内フォント読み込みとクリップボードは任意のブラウザ機能です。利用可否や許可画面はブラウザ環境に依存します。
 
 ### よくある問題
 
 - 背景が白い: `/clock/` は透明背景を想定しています。OBS のブラウザソース設定やカスタム CSS で背景色が付いていないか確認してください。
 - フォントが反映されない: OBS を動かす PC に同じフォントが入っていない可能性があります。フォントファイルは同梱していません。
 - URL をなくした: 別環境で同じ表示を再現するには、生成された `/clock/?c=...` URL が必要です。
-- PC 時刻がずれる: 時計は表示する PC のシステム時刻を使います。PC 側の時刻設定を確認してください。
+- 時刻がずれる: 時計はサーバー時刻へ自動補正されるため、PC の時計が多少ずれていても正しく表示されます。オフラインなどで補正できないときは PC のシステム時刻を使います。
 - OBS で見切れる: エディターの推奨幅・高さより 20px から 80px 程度大きくしてください。
-- X に画像が自動添付されない: X Web Intent は画像の自動添付に対応していません。Canvas で生成した PNG を手動で添付してください。
 
 ### 開発・貢献
 

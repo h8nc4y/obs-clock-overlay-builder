@@ -6,6 +6,20 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-06-13
+
+### Added
+
+- The clock now auto-corrects to server time. `/clock/` reads the HTTP `Date` response header from a same-origin `no-store` request to `/api/defaults`, computes the offset against the PC clock, and applies it — so the displayed time stays accurate even when the streaming PC's clock is wrong. It re-syncs periodically and when the tab regains focus, and falls back to the local PC time when offline. No backend was added; the correction is computed at runtime, so the appearance of existing `/clock/?c=...` URLs is unchanged.
+
+### Removed
+
+- Removed the X (Twitter) sharing feature from the builder — the "X共有・画像" section (post-text copy, PNG image generation, "X投稿画面を開く", PNG save, and Web Share) and the matching "Xに画像が付かない" FAQ. This keeps the project focused on the clock overlay. `/clock/` and the generated URL contract are unaffected.
+
+### Changed
+
+- Refreshed the "よくある問題" (FAQ): plainer wording for streamers, the time entry now explains the new server-time auto-correction, added entries for skipped/paused seconds and switching clock types, and dropped the X entry.
+
 ## [0.7.0] - 2026-06-13
 
 ### Removed
