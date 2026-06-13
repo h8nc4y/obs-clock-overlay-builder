@@ -999,6 +999,11 @@ details p {
   justify-content: center;
 }
 
+.template-mini-analog svg {
+  width: 64px;
+  height: 64px;
+}
+
 .adjust-tabs {
   display: flex;
   flex-wrap: wrap;

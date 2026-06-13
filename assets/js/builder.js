@@ -291,11 +291,8 @@ function buildTemplateMiniPreview(template) {
     const holder = document.createElement("span");
     holder.className = "template-mini-analog";
     // "tick" にして rAF ループを立てず、固定ポーズの静止アナログだけ描く。
-    mountClock(
-      holder,
-      { ...applied, analogSize: 62, analogSecondHand: "tick" },
-      { now: () => new Date(2026, 0, 1, 10, 8, 36) }
-    );
+    // 表示サイズは CSS(.template-mini-analog svg)で固定し、analogSize のクランプに左右されないようにする。
+    mountClock(holder, { ...applied, analogSecondHand: "tick" }, { now: () => new Date(2026, 0, 1, 10, 8, 36) });
     mini.append(holder);
     return mini;
   }
