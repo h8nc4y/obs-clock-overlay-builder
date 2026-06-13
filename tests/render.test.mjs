@@ -27,6 +27,7 @@ class FakeElement {
     this.style = new FakeStyle();
     this.parent = null;
     this._textContent = "";
+    this.attributes = new Map();
   }
 
   append(...children) {
@@ -42,6 +43,55 @@ class FakeElement {
     }
     this.parent.children = this.parent.children.filter((child) => child !== this);
     this.parent = null;
+  }
+
+  removeChild(child) {
+    this.children = this.children.filter((c) => c !== child);
+    child.parent = null;
+    return child;
+  }
+
+  setAttribute(name, value) {
+    if (name === "class") {
+      this.className = String(value);
+      return;
+    }
+    this.attributes.set(name, String(value));
+  }
+
+  getAttribute(name) {
+    if (name === "class") {
+      return this.className;
+    }
+    return this.attributes.has(name) ? this.attributes.get(name) : null;
+  }
+
+  get firstChild() {
+    return this.children[0] ?? null;
+  }
+
+  get offsetWidth() {
+    return 0;
+  }
+
+  get classList() {
+    const el = this;
+    return {
+      add(name) {
+        if (!el.className.split(" ").includes(name)) {
+          el.className = `${el.className} ${name}`.trim();
+        }
+      },
+      remove(name) {
+        el.className = el.className
+          .split(" ")
+          .filter((token) => token && token !== name)
+          .join(" ");
+      },
+      contains(name) {
+        return el.className.split(" ").includes(name);
+      }
+    };
   }
 
   set textContent(value) {
@@ -62,6 +112,9 @@ class FakeElement {
 
 globalThis.document = {
   createElement(tagName) {
+    return new FakeElement(tagName);
+  },
+  createElementNS(_namespace, tagName) {
     return new FakeElement(tagName);
   }
 };
@@ -191,4 +244,125 @@ test("recommended OBS size reserves the shared visual safe inset around glow", (
 
   assert.equal(size.width, 128 + 18 * 2);
   assert.equal(size.height, 48 + 18 * 2);
+});
+
+function countByTag(element, tagName) {
+  let count = element.tagName === tagName ? 1 : 0;
+  for (const child of element.children) {
+    count += countByTag(child, tagName);
+  }
+  return count;
+}
+
+test("analog clock builds an SVG face whose second hand appears only when enabled", () => {
+  const container = new FakeElement("div");
+  const clock = mountClock(
+    container,
+    normalizeConfig({
+      clockType: "analog",
+      analogMarks: "numbers",
+      analogSecondHand: "tick",
+      showDate: false,
+      borderWidth: 2,
+      timezone: "UTC"
+    }),
+    { now: () => new Date("2026-01-01T10:08:36Z") }
+  );
+
+  const svg = container.children[0];
+  assert.equal(svg.tagName, "svg");
+  assert.equal(svg.getAttribute("class"), "clock-analog");
+  // numbers → 12 numeral texts, no date text
+  assert.equal(countByTag(svg, "text"), 12);
+  // hour + minute + second(tick) hands, no tick-mark rects for "numbers"
+  assert.equal(countByTag(svg, "rect"), 3);
+
+  // turning the second hand off removes exactly the second-hand rect
+  clock.updateConfig(
+    normalizeConfig({
+      clockType: "analog",
+      analogMarks: "numbers",
+      analogSecondHand: "off",
+      showDate: false,
+      borderWidth: 2,
+      timezone: "UTC"
+    })
+  );
+  assert.equal(countByTag(container.children[0], "rect"), 2);
+});
+
+test("analog marks: roman keeps 12 numerals + date text; ticks add 60 tick rects", () => {
+  const container = new FakeElement("div");
+  const clock = mountClock(
+    container,
+    normalizeConfig({
+      clockType: "analog",
+      analogMarks: "roman",
+      analogSecondHand: "off",
+      showDate: true,
+      borderWidth: 0,
+      timezone: "UTC"
+    }),
+    { now: () => new Date("2026-01-01T10:08:36Z") }
+  );
+
+  // roman → 12 numeral texts + 1 date text; off + no rim → 2 hand rects, 0 tick rects
+  assert.equal(countByTag(container.children[0], "text"), 13);
+  assert.equal(countByTag(container.children[0], "rect"), 2);
+
+  clock.updateConfig(
+    normalizeConfig({
+      clockType: "analog",
+      analogMarks: "ticks",
+      analogSecondHand: "off",
+      showDate: false,
+      borderWidth: 0,
+      timezone: "UTC"
+    })
+  );
+  // ticks → 0 texts, 60 tick rects + 2 hand rects
+  assert.equal(countByTag(container.children[0], "text"), 0);
+  assert.equal(countByTag(container.children[0], "rect"), 62);
+});
+
+test("flip clock builds one card per digit and groups pairs into one card", () => {
+  const container = new FakeElement("div");
+  const clock = mountClock(
+    container,
+    normalizeConfig({ clockType: "flip", flipGroup: "single", showSeconds: false, timezone: "UTC" }),
+    { now: () => new Date("2026-01-01T12:34:00Z") }
+  );
+
+  const root = container.children[0];
+  assert.equal(root.className, "clock-flip");
+  // "12:34" single → digits 1 2 3 4 = 4 cards, ":" = 1 separator
+  assert.equal(root.children.filter((c) => c.className === "flip-card").length, 4);
+  assert.equal(root.children.filter((c) => c.className === "flip-sep").length, 1);
+  // each card has 4 halves: static top/bottom + flap top/bottom
+  assert.equal(root.children.find((c) => c.className === "flip-card").children.length, 4);
+
+  clock.updateConfig(
+    normalizeConfig({ clockType: "flip", flipGroup: "pair", showSeconds: false, timezone: "UTC" })
+  );
+  const pairRoot = container.children[0];
+  // "12:34" pair → "12" and "34" = 2 cards, ":" = 1 separator
+  assert.equal(pairRoot.children.filter((c) => c.className === "flip-card").length, 2);
+  assert.equal(pairRoot.children.filter((c) => c.className === "flip-sep").length, 1);
+});
+
+test("mountClock tears down the old implementation when the clock type changes", () => {
+  const container = new FakeElement("div");
+  const clock = mountClock(container, normalizeConfig({ clockType: "digital", timezone: "UTC" }), {
+    now: () => new Date("2026-01-01T00:00:00Z")
+  });
+
+  assert.equal(container.children.length, 1);
+  assert.notEqual(findByClass(container, "clock-widget"), null);
+
+  clock.updateConfig(normalizeConfig({ clockType: "analog", timezone: "UTC" }));
+
+  // exactly one root remains, it is the analog svg, and the digital widget is gone
+  assert.equal(container.children.length, 1);
+  assert.equal(container.children[0].tagName, "svg");
+  assert.equal(findByClass(container, "clock-widget"), null);
 });

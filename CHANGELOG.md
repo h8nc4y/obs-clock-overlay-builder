@@ -6,6 +6,22 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-06-14
+
+### Added
+
+- The timezone field now offers a dropdown of common IANA time zones (you can still type any other zone).
+- Security headers on all responses: a strict `Content-Security-Policy` (`'self'` only; no inline scripts or styles), `X-Content-Type-Options: nosniff`, and `Referrer-Policy: no-referrer`. The CSP does not restrict framing, so `/clock/` stays embeddable as an OBS browser source.
+
+### Removed
+
+- Removed the non-functional "公開環境の候補を確認" button. With the static Workers deployment, `/api/defaults` is a fixed stub that can never return a real time zone, so the button always showed "未確認"; the on-device candidate (端末の候補) already covers this.
+
+### Changed
+
+- Accessibility: decorative live clock previews are hidden from screen readers; the かんたん / こだわり tabs expose `aria-controls` / `aria-expanded`; and confirmation messages now appear in an always-visible status region (they were previously hidden on the かんたん tab).
+- Fixed README inaccuracies (server-time correction is a shipped feature; there are 17 templates) and synced the ops / QA docs. Internal: hardened the test suite (DOM-level tests for the analog and flip renderers, time-sync fetch and offline-fallback tests) and removed dead code (`getOffsetMs`, an unused CSS rule).
+
 ## [0.8.0] - 2026-06-13
 
 ### Added

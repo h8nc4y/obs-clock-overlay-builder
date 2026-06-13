@@ -351,19 +351,6 @@ small,
   background: var(--accent-soft);
 }
 
-.template-sample {
-  align-self: end;
-  display: inline-flex;
-  width: fit-content;
-  max-width: 100%;
-  padding: 5px 8px;
-  border: 1px solid currentColor;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 0.8rem;
-  line-height: 1;
-}
-
 .template-name {
   margin-top: 9px;
   font-weight: 800;
@@ -537,6 +524,11 @@ output {
   margin: 10px 0 0;
   color: #2f6a3c;
   font-size: 0.9rem;
+}
+
+/* 調整タブ直下の常時表示ステータス。空でも高さを確保して切替時のガタつきを防ぐ。 */
+.builder-status {
+  margin: 6px 0 12px;
 }
 
 .preview-status {

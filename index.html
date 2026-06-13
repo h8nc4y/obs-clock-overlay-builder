@@ -52,7 +52,7 @@
             <input id="previewCustomColor" type="color" value="#5f7fbe" aria-label="任意プレビュー背景色">
           </div>
           <div id="previewShell" class="preview-shell preview-checker">
-            <div id="clockPreview" class="preview-stage"></div>
+            <div id="clockPreview" class="preview-stage" aria-hidden="true"></div>
           </div>
           <div class="metrics-grid" aria-label="OBS推奨サイズ">
             <div>
@@ -112,9 +112,10 @@
             <button id="clockTypeFlip" type="button" class="adjust-tab" aria-pressed="false">パタパタ</button>
           </div>
           <div class="adjust-tabs" role="group" aria-label="調整モード切り替え">
-            <button id="adjustTabEasy" type="button" class="adjust-tab" aria-pressed="true">かんたん</button>
-            <button id="adjustTabAdvanced" type="button" class="adjust-tab" aria-pressed="false">こだわり</button>
+            <button id="adjustTabEasy" type="button" class="adjust-tab" aria-pressed="true" aria-controls="easyControls" aria-expanded="true">かんたん</button>
+            <button id="adjustTabAdvanced" type="button" class="adjust-tab" aria-pressed="false" aria-controls="advancedControls" aria-expanded="false">こだわり</button>
           </div>
+          <p id="builderStatus" class="status-line builder-status" role="status" aria-live="polite"></p>
           <div id="easyControls">
             <div class="form-grid dense-grid">
               <label class="field" for="textColor">
@@ -206,18 +207,36 @@
                 <div class="form-grid">
                   <label class="field" for="timezone">
                     <span>タイムゾーン</span>
-                    <input id="timezone" type="text" autocomplete="off" spellcheck="false" aria-describedby="timezoneHelp">
-                    <small id="timezoneHelp">初期値は Asia/Tokyo。IANA名を指定します。</small>
+                    <input id="timezone" type="text" list="timezoneOptions" autocomplete="off" spellcheck="false" aria-describedby="timezoneHelp">
+                    <datalist id="timezoneOptions">
+                      <option value="Asia/Tokyo"></option>
+                      <option value="Asia/Seoul"></option>
+                      <option value="Asia/Shanghai"></option>
+                      <option value="Asia/Taipei"></option>
+                      <option value="Asia/Hong_Kong"></option>
+                      <option value="Asia/Singapore"></option>
+                      <option value="Asia/Bangkok"></option>
+                      <option value="Asia/Kolkata"></option>
+                      <option value="Asia/Dubai"></option>
+                      <option value="Europe/London"></option>
+                      <option value="Europe/Paris"></option>
+                      <option value="Europe/Berlin"></option>
+                      <option value="Europe/Moscow"></option>
+                      <option value="America/New_York"></option>
+                      <option value="America/Chicago"></option>
+                      <option value="America/Denver"></option>
+                      <option value="America/Los_Angeles"></option>
+                      <option value="America/Sao_Paulo"></option>
+                      <option value="Australia/Sydney"></option>
+                      <option value="Pacific/Auckland"></option>
+                      <option value="UTC"></option>
+                    </datalist>
+                    <small id="timezoneHelp">初期値は Asia/Tokyo。候補から選ぶか、IANA名を入力します。</small>
                   </label>
                   <div class="field inline-actions">
                     <span>端末の候補</span>
                     <p id="localTimezone" class="muted">未確認</p>
                     <button id="useLocalTimezone" type="button">採用</button>
-                  </div>
-                  <div class="field inline-actions">
-                    <span>公開環境の候補</span>
-                    <p id="cfTimezone" class="muted">公開先によっては候補を取得できない場合があります。その場合も手入力で使えます。</p>
-                    <button id="fetchCfDefaults" type="button">候補を確認</button>
                   </div>
                   <label class="toggle" for="hour12">
                     <input id="hour12" type="checkbox">

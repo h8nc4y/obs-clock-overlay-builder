@@ -1,7 +1,28 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { computeOffsetMs } from "../assets/js/time-sync.js";
+import { computeOffsetMs, correctedNow, syncOnce } from "../assets/js/time-sync.js";
+
+// fetch を差し替えて syncOnce を1回だけ動かすヘルパー。後始末で元に戻す。
+async function withStubbedFetch(stub, run) {
+  const original = globalThis.fetch;
+  globalThis.fetch = stub;
+  try {
+    return await run();
+  } finally {
+    globalThis.fetch = original;
+  }
+}
+
+function responseWithDate(dateValue) {
+  return {
+    headers: {
+      get(name) {
+        return name.toLowerCase() === "date" ? dateValue : null;
+      }
+    }
+  };
+}
 
 test("computeOffsetMs uses the request round-trip midpoint", () => {
   // サーバーは 1,000,000ms、ローカルは start=900,000 / end=901,000 (中点 900,500)。
@@ -27,4 +48,35 @@ test("computeOffsetMs returns null for a missing or unparseable Date header", ()
 test("computeOffsetMs is near zero when the PC clock matches the server", () => {
   const offset = computeOffsetMs(1_000_000, 999_980, 1_000_020);
   assert.equal(offset, 0);
+});
+
+test("syncOnce returns null and does not throw when the fetch rejects (offline fallback)", async () => {
+  const result = await withStubbedFetch(
+    () => Promise.reject(new Error("offline")),
+    () => syncOnce("/api/defaults")
+  );
+  assert.equal(result, null);
+});
+
+test("syncOnce returns null when the response has no Date header", async () => {
+  const result = await withStubbedFetch(
+    () => Promise.resolve(responseWithDate(null)),
+    () => syncOnce("/api/defaults")
+  );
+  assert.equal(result, null);
+});
+
+test("syncOnce applies the server Date offset and correctedNow reflects it", async () => {
+  // サーバー時刻を約1時間先に見せる → 補正量は約 +3,600,000ms になるはず。
+  const aheadMs = 3_600_000;
+  const serverDate = new Date(Date.now() + aheadMs).toUTCString();
+  const offset = await withStubbedFetch(
+    () => Promise.resolve(responseWithDate(serverDate)),
+    () => syncOnce("/api/defaults")
+  );
+
+  // Date ヘッダは秒精度なので緩い範囲で確認(往復と切り捨て分の許容)。
+  assert.ok(offset > aheadMs - 2_000 && offset < aheadMs + 2_000, `offset ${offset} should be ~${aheadMs}`);
+  // correctedNow() は現在時刻に offset を足したものになる。
+  assert.ok(Math.abs(correctedNow().getTime() - Date.now() - offset) <= 5);
 });

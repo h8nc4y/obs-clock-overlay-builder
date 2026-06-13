@@ -12,7 +12,7 @@ Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 - Transparent OBS clock overlay with a dedicated clock-only `/clock/` surface.
 - Reproducible `/clock/?c=...` URL contract for OBS browser sources.
 - Clock auto-corrects to server time via the same-origin HTTP `Date` header, so it stays accurate even when the PC clock is off; it falls back to local time when offline. No backend is added.
-- Eight built-in templates: Minimal Clear, Milk Tea, Pastel Pop, Soda, Sakura, Night Studio, Neon HUD, and Mono Compact.
+- 17 built-in templates across five categories (standard, cute, cool, analog, flip).
 - Zero runtime dependencies; the clock renders from URL and browser state only.
 - Static-first, free-tier-friendly Cloudflare Workers Static Assets hosting.
 - Japanese-first editor UI for non-programmer OBS users in Japan.
@@ -29,7 +29,7 @@ Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 5. Use the recommended width and height shown by the editor. If any glow or text is clipped, add 20px to 80px in OBS.
 6. Keep the OBS source background transparent and avoid custom CSS that forces a background color.
 
-The OBS clock uses the computer's system clock. Server-side time correction is intentionally out of scope for this static app.
+The OBS clock auto-corrects to server time using the same-origin HTTP `Date` header, so it stays accurate even when the computer's clock is off; it falls back to the local system clock when offline. No backend is added.
 
 ## Reproducibility Contract
 
@@ -139,7 +139,7 @@ OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける�
 
 - 配信用の時計オーバーレイをブラウザ上で調整できます。
 - 透明背景に対応した `/clock/` の時計専用画面を生成できます。
-- 時計の種類を デジタル / アナログ / パタパタ(フリップ) から選べます。テンプレートは全16種(定番 / かわいい / クール / アナログ / パタパタ)。色、文字サイズ、日付・曜日、秒表示、ラベル、フォント名などを設定でき、まずは「かんたん」だけで仕上がります。配信中に時刻が変わっても外枠の幅とコロンの位置は固定されます。
+- 時計の種類を デジタル / アナログ / パタパタ(フリップ) から選べます。テンプレートは全17種(定番 / かわいい / クール / アナログ / パタパタ)。色、文字サイズ、日付・曜日、秒表示、ラベル、フォント名などを設定でき、まずは「かんたん」だけで仕上がります。配信中に時刻が変わっても外枠の幅とコロンの位置は固定されます。
 - アナログ時計は文字盤・数字・針・秒針の色、大きさ、目盛り(数字 / ローマ数字 / 目盛り / 両方 / なし)、秒針の動き(なめらか / カチカチ / なし)を選べ、文字盤に日付も表示できます。
 - パタパタ時計はカードがめくれるフリップ表示です。色・文字サイズ・角丸・秒表示などを設定できます。
 - 編集画面のテーマ(白 / コーラル / ふんわりブルー)を切り替えられます。テーマは編集画面だけの設定で、生成される時計URLの見た目には影響しません。

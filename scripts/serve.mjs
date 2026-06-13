@@ -17,6 +17,15 @@ const contentTypes = {
   ".svg": "image/svg+xml"
 };
 
+// 本番(_headers)と同じセキュリティヘッダをdevでも返し、CSPをローカルで検証できるようにする。
+// frame-ancestors は付けない(/clock/ をOBSや他面に埋め込めるようにするため)。
+const securityHeaders = {
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "no-referrer",
+  "content-security-policy":
+    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'"
+};
+
 const server = createServer((request, response) => {
   const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
   const filePath = resolvePath(url.pathname);
@@ -32,7 +41,8 @@ const server = createServer((request, response) => {
   }
   response.writeHead(200, {
     "content-type": contentTypeFor(url.pathname, filePath),
-    "cache-control": "no-store"
+    "cache-control": "no-store",
+    ...securityHeaders
   });
   createReadStream(filePath).pipe(response);
 });

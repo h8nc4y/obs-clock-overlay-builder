@@ -20,42 +20,40 @@ export function computeOffsetMs(serverDateMs, requestStartMs, responseEndMs) {
   return Math.round(serverDateMs - localMidpoint);
 }
 
-export function getOffsetMs() {
-  return offsetMs;
-}
-
 // 補正後の現在時刻。未同期/同期失敗時は offset が 0 のままなので、実質ローカル時刻。
 export function correctedNow() {
   return new Date(Date.now() + offsetMs);
 }
 
-async function syncOnce(url) {
+// 1回だけ同期する。成功したら補正量(ミリ秒)を返して offset を更新し、
+// 取得失敗/ヘッダ欠落のときは null を返して offset を据え置く(ローカル時刻のまま)。
+export async function syncOnce(url) {
   if (typeof fetch !== "function") {
-    return false;
+    return null;
   }
   const start = Date.now();
   let response;
   try {
     response = await fetch(url, { method: "GET", cache: "no-store" });
   } catch {
-    return false; // オフライン等 → ローカル時刻のまま
+    return null; // オフライン等 → ローカル時刻のまま
   }
   const end = Date.now();
   const header = response.headers.get("date");
   const next = computeOffsetMs(header ? Date.parse(header) : NaN, start, end);
   if (next === null) {
-    return false;
+    return null;
   }
   offsetMs = next;
-  return true;
+  return next;
 }
 
 // 初回同期 + 定期再同期(ドリフト対策) + タブ復帰時の再同期を開始する。
 // onUpdate は補正値が更新できたときに呼ばれ、即座に再描画させるのに使う。
 export function startTimeSync({ url = "/api/defaults", intervalMs = 300000, onUpdate } = {}) {
   const run = async () => {
-    const ok = await syncOnce(url);
-    if (ok && typeof onUpdate === "function") {
+    const synced = await syncOnce(url);
+    if (synced !== null && typeof onUpdate === "function") {
       onUpdate();
     }
   };
