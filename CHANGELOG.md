@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-06-14
+
+### Changed
+
+- Aligned the "調整モード" (かんたん / こだわり) tab row with the "時計の種類" row above it by adding a matching left-hand "調整モード" label, so both rows' buttons share the same left edge and column width instead of the mode tabs starting flush-left. CSS/HTML only — no change to JavaScript, the generated `/clock/?c=...` output, or the clock rendering.
+
 ## [1.0.1] - 2026-06-14
 
 ### Changed
