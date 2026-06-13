@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-06-13
+
+### Fixed
+
+- Template cards no longer clip wide clock previews (Soda, Sakura, Night Studio, Neon HUD, Cinema Bar). Mini previews now auto-fit to the card width.
+
 ## [0.2.0] - 2026-06-13
 
 ### Added

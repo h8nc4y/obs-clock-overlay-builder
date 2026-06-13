@@ -1092,6 +1092,7 @@ button.category-tab[aria-pressed="true"]:hover {
 
 .template-mini-clock {
   flex: 0 0 auto;
+  max-width: none;
   transform: scale(0.42);
   transform-origin: center;
   pointer-events: none;
