@@ -54,16 +54,6 @@ test("pages use embedded favicon to avoid browser 404 noise", () => {
   assert.match(favicon, /<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
 });
 
-test("v0.1.1 backlog keeps release candidates separate from manual checks", () => {
-  const backlog = readFileSync(new URL("../docs/v0.1.1-backlog.md", import.meta.url), "utf8");
-
-  assert.match(backlog, /## v0\.1\.1候補/);
-  assert.match(backlog, /## 後続version候補/);
-  assert.match(backlog, /## 人間確認待ち/);
-  assert.match(backlog, /2026\/05\/26にIssue #12の人間確認コメントで完了扱いになりました。/);
-  assert.match(backlog, /数値、支払い詳細、account識別子、個人情報はrepo docsへ記録しません。/);
-});
-
 test("manual QA and ops docs cover current post-launch checks", () => {
   const manualQa = readFileSync(new URL("../docs/manual-qa.md", import.meta.url), "utf8");
   const postLaunchOps = readFileSync(new URL("../docs/post-launch-ops.md", import.meta.url), "utf8");

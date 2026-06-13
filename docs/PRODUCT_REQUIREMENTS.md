@@ -4,7 +4,7 @@
 
 This is a lightweight summary of existing product requirements and non-goals for `obs-clock-overlay-builder`.
 
-It consolidates requirements already documented in `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/manual-qa.md`, `docs/post-launch-ops.md`, `docs/v0.1.1-backlog.md`, and the AI review coordination docs. It does not introduce new product scope.
+It consolidates requirements already documented in `README.md`, `AGENTS.md`, `CLAUDE.md`, `docs/manual-qa.md`, and `docs/post-launch-ops.md`. It does not introduce new product scope.
 
 ## Product purpose
 

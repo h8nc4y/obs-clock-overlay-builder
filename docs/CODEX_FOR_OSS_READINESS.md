@@ -88,13 +88,8 @@ Prioritize evidence that can be linked from a public application without exposin
 - README feature and privacy sections.
 - MIT license.
 - CONTRIBUTING and CODE_OF_CONDUCT.
-- `docs/HOW_WE_USE_CODEX.md` for AI-assisted maintenance workflow.
-- `docs/DECISION_LOG.md` for decisions and scope control.
-- `docs/AI_REVIEW_TRIAGE.md` for Claude finding triage and ChatGPT approval boundaries.
-- `docs/CODEX_TASKS.md` for Codex implementation queues.
-- `docs/CLAUDE_REVIEW.md` as advisory review evidence.
-- `docs/PR19_REVIEW_READINESS.md` as public-safe readiness evidence.
-- PRs #19 through #24 as recent maintenance examples.
+- `docs/HOW_WE_USE_CODEX.md` for the AI-assisted maintenance workflow; the repository's commit history, pull requests, and release notes are the durable public record of decisions, review triage, and implementation.
+- PRs #19 through #24 (and later) as recent maintenance examples.
 - `package.json` scripts for validation and release checks.
 - `docs/pre-release-qa.md` and `docs/post-launch-ops.md` for release and operations discipline.
 - `docs/FEEDBACK_GUIDE.md`, `.github/ISSUE_TEMPLATE/`, `docs/ROADMAP.md`, and `CHANGELOG.md` for public feedback, roadmap, and release-note preparation.

@@ -36,18 +36,12 @@ The official page says applications are reviewed on a rolling basis and asks app
 - Manual QA checklist: [manual-qa.md](manual-qa.md)
 - Pre-release QA: [pre-release-qa.md](pre-release-qa.md)
 - Post-launch operations: [post-launch-ops.md](post-launch-ops.md)
-- v0.1.1 backlog: [v0.1.1-backlog.md](v0.1.1-backlog.md)
 - Font license notes: [licenses/fonts.md](licenses/fonts.md)
 
 ## AI-Assisted Maintenance Evidence
 
 - How we use Codex: [HOW_WE_USE_CODEX.md](HOW_WE_USE_CODEX.md)
-- Decision log: [DECISION_LOG.md](DECISION_LOG.md)
-- AI review triage: [AI_REVIEW_TRIAGE.md](AI_REVIEW_TRIAGE.md)
-- Codex task queue: [CODEX_TASKS.md](CODEX_TASKS.md)
-- Claude review: [CLAUDE_REVIEW.md](CLAUDE_REVIEW.md)
-- PR #19 review readiness: [PR19_REVIEW_READINESS.md](PR19_REVIEW_READINESS.md)
-- Local review verification: [LOCAL_REVIEW_VERIFICATION.md](LOCAL_REVIEW_VERIFICATION.md)
+- The durable, public record of the AI-assisted review-and-implementation flow is the repository's commit history, pull requests, and release notes.
 
 ## Representative Pull Requests
 
@@ -80,7 +74,7 @@ Key scripts in [../package.json](../package.json):
 - `npm run lint` — JavaScript syntax check.
 - `npm run typecheck` — module/import smoke check.
 - `npm run format:check` — repository text formatting check.
-- `npm test` — Node tests; may generate ignored `dist/`.
+- `npm test` — Node tests; the build test uses a temporary directory, so it does not touch `dist/`.
 - `npm run build` — static build.
 - `npm run release:check` — local release gate including Wrangler dry-run.
 - `npm run release:http-smoke` — bounded local HTTP smoke.
@@ -115,10 +109,7 @@ The repository records a governance flow:
 Evidence:
 
 - [HOW_WE_USE_CODEX.md](HOW_WE_USE_CODEX.md)
-- [DECISION_LOG.md](DECISION_LOG.md)
-- [AI_REVIEW_TRIAGE.md](AI_REVIEW_TRIAGE.md)
-- [CODEX_TASKS.md](CODEX_TASKS.md)
-- [CLAUDE_REVIEW.md](CLAUDE_REVIEW.md)
+- Public pull requests and commit history in the repository.
 
 ## Current Weak Signals
 
