@@ -40,10 +40,9 @@ const KEYWORD_REACTION_FALLBACK_STATUS =
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
 const TEMPLATE_CATEGORIES = [
   { id: "all", label: "すべて" },
+  { id: "standard", label: "定番" },
   { id: "cute", label: "かわいい" },
-  { id: "game", label: "ゲーム" },
-  { id: "chic", label: "シック" },
-  { id: "japanese", label: "和風" }
+  { id: "cool", label: "クール" }
 ];
 let templateCategory = "all";
 

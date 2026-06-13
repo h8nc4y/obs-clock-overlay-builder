@@ -116,8 +116,22 @@
   display: inline-block;
   font-size: var(--clock-font-size);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
   -webkit-text-stroke: var(--clock-stroke-width) var(--clock-stroke-color);
   paint-order: stroke fill;
+}
+
+/* 各数字を等幅スロットにして、配信中に時刻が変わっても外枠とコロン位置を固定する。
+   1ch は数字「0」の送り幅。フォントが変わってもサイズ変更には連動する。 */
+.clock-digit {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}
+
+.clock-sep {
+  display: inline-block;
+  text-align: center;
 }
 
 .clock-date-row[hidden],
@@ -131,4 +145,193 @@
 
 .template-neon-hud {
   text-transform: uppercase;
+}
+
+/* 作り込みの意匠(配信者向け素材の質感): カードの奥行き、形の個性、
+   テンプレートごとのワンポイント。URLのtemplate値からclassで再現される。
+   --clock-bg などの利用者調整値は土台として残し、装飾は重ねるだけにする。 */
+
+/* 定番: 軽い奥行きと上面ハイライトでフラットさを解消 */
+.template-mono-compact,
+.template-minimal-clear {
+  box-shadow: 0 7px 18px rgba(31, 36, 48, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Studio Live: 下げパネル形 + 赤いLIVEバッジ(点滅ドット) + 時刻下線 */
+.template-studio-live {
+  position: relative;
+  border-radius: 7px 7px 18px 18px;
+  box-shadow: 0 9px 24px rgba(22, 24, 29, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.template-studio-live .clock-time {
+  border-bottom: 3px solid #ff3b5c;
+  padding-bottom: 3px;
+}
+
+.template-studio-live .clock-label {
+  position: relative;
+  padding: 2px 11px 2px 22px;
+  border-radius: 6px;
+  background: #ff3b5c;
+  color: #ffffff;
+  letter-spacing: 0.16em;
+}
+
+.template-studio-live .clock-label::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffffff;
+  transform: translateY(-50%);
+  animation: clock-live-pulse 1.6s ease-in-out infinite;
+}
+
+/* Milk Tea: 温かみのある奥行き */
+.template-milk-tea {
+  box-shadow: 0 8px 20px rgba(150, 110, 80, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Sakura: 桜の花びらワンポイント + 桜色の奥行き */
+.template-sakura {
+  position: relative;
+  box-shadow: 0 8px 20px rgba(255, 150, 180, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.template-sakura::after {
+  content: "";
+  position: absolute;
+  top: -9px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='%23ff9ec0'%3E%3Cellipse cx='12' cy='4' rx='3.2' ry='4.2'/%3E%3Cellipse cx='19' cy='9.5' rx='3.2' ry='4.2' transform='rotate(72 19 9.5)'/%3E%3Cellipse cx='16' cy='18' rx='3.2' ry='4.2' transform='rotate(144 16 18)'/%3E%3Cellipse cx='8' cy='18' rx='3.2' ry='4.2' transform='rotate(216 8 18)'/%3E%3Cellipse cx='5' cy='9.5' rx='3.2' ry='4.2' transform='rotate(288 5 9.5)'/%3E%3Ccircle cx='12' cy='12' r='2.4' fill='%23ffd24d'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Pastel Pop: 3色ドットのワンポイント */
+.template-pastel-pop {
+  position: relative;
+  box-shadow: 0 8px 20px rgba(255, 140, 200, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.template-pastel-pop::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 13px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff9ed2;
+  box-shadow: -11px 0 0 #ffd24d, -22px 0 0 #7fd6ee;
+}
+
+/* Soda: 泡のワンポイント + 艶 */
+.template-soda {
+  position: relative;
+  box-shadow: 0 8px 20px rgba(60, 200, 230, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.template-soda::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: -10px 6px 0 -1px rgba(255, 255, 255, 0.8), -4px 13px 0 -2px rgba(255, 255, 255, 0.7);
+}
+
+/* Night Studio: 暗い奥行き + 枠付きLIVEバッジ + シアン下線 */
+.template-night-studio {
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(95, 208, 224, 0.22);
+}
+
+.template-night-studio .clock-time {
+  border-bottom: 2px solid #5fd0e0;
+  padding-bottom: 3px;
+}
+
+.template-night-studio .clock-label {
+  padding: 1px 10px;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  letter-spacing: 0.18em;
+}
+
+/* Neon HUD: 角ブラケット + 走査線 */
+.template-neon-hud {
+  position: relative;
+  box-shadow: 0 0 18px rgba(47, 255, 230, 0.25);
+}
+
+.template-neon-hud::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid #48ffe2;
+  border-left: 2px solid #48ffe2;
+}
+
+.template-neon-hud::after {
+  content: "";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 14px;
+  height: 14px;
+  border-right: 2px solid #48ffe2;
+  border-bottom: 2px solid #48ffe2;
+}
+
+/* Aqua Deck: 上面アクセント帯 + 水色バッジ */
+.template-aqua-deck {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.template-aqua-deck::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #aedded, #5fd0e0);
+}
+
+.template-aqua-deck .clock-label {
+  padding: 2px 11px;
+  border-radius: 6px;
+  background: #aedded;
+  color: #1b3a45;
+  letter-spacing: 0.16em;
+}
+
+@keyframes clock-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .template-studio-live .clock-label::before {
+    animation: none;
+  }
 }

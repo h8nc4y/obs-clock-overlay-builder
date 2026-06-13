@@ -167,6 +167,24 @@ test("applyClockStyles writes expected CSS variables", () => {
   assert.equal(element.style.getPropertyValue("--clock-shadow"), "1px 2px 6px rgba(0, 0, 0, 0.4)");
 });
 
+test("time renders each digit in a fixed-width slot for a stable frame", () => {
+  const container = new FakeElement("div");
+  mountClock(container, normalizeConfig({ showSeconds: true, timezone: "UTC" }), {
+    now: () => new Date("2026-01-02T03:45:06Z")
+  });
+
+  const time = findByClass(container, "clock-time");
+  const digits = time.children.filter((child) => child.className === "clock-digit");
+  const seps = time.children.filter((child) => child.className === "clock-sep");
+
+  assert.equal(digits.length, 6);
+  assert.equal(digits.map((digit) => digit.textContent).join(""), "034506");
+  assert.equal(
+    seps.filter((sep) => sep.textContent === ":").length,
+    2
+  );
+});
+
 test("recommended OBS size reserves the shared visual safe inset around glow", () => {
   const element = new FakeElement("div");
   const size = recommendedObsSize(element);
