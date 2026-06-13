@@ -78,7 +78,7 @@ test("compact URL round-trips non-default template values", () => {
   const restored = parseConfigFromQuery(url);
 
   assert.equal(restored.template, "milk-tea");
-  assert.equal(restored.backgroundColor, "#f3dfc6");
+  assert.equal(restored.backgroundColor, "#fff7ef");
   assert.equal(restored.labelPosition, "bottom");
   assert.equal(restored.timezone, "UTC");
   assert.equal(restored.hour12, true);
@@ -100,7 +100,7 @@ test("parses flat GET parameters when c is missing", () => {
   assert.equal(config.fontFamily, "Poppins");
   assert.equal(config.template, "soda");
   assert.equal(config.labelPosition, "right");
-  assert.equal(config.backgroundColor, "#dff8ff");
+  assert.equal(config.backgroundColor, "#eafcff");
   assert.equal(config.borderWidth, 2);
 });
 

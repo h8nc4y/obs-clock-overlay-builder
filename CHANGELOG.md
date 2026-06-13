@@ -6,6 +6,14 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-13
+
+### Changed
+
+- Refreshed the five cute-series templates (Pastel Pop, Sakura, Soda, Yume Lavender, Milk Tea) with market-researched pastel palettes: whiter backgrounds, 2px candy-color borders, same-hue soft shadows, and larger rounding. Simple and dark templates are unchanged.
+- Added Mochiy Pop One, Hachi Maru Pop, and Yusei Magic to the free font name candidates (names only, no bundled files) and assigned them to cute templates.
+- Existing generated `/clock/?c=...` URLs are unaffected. Legacy flat-query URLs such as `?template=sakura` now render with the refreshed preset colors (documented intentional change; golden fixtures regenerated).
+
 ## [0.2.1] - 2026-06-13
 
 ### Fixed
