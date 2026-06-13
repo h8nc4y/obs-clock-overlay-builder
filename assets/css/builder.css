@@ -1060,3 +1060,88 @@ button.category-tab[aria-pressed="true"]:hover {
   pointer-events: none;
   white-space: nowrap;
 }
+
+/* 共有(Xでシェアして広める)パネル。preview-column 内に置き、OBS用URLの下に並べる。 */
+.share-panel {
+  border-color: var(--line-strong);
+}
+
+.share-actions {
+  margin-top: 0;
+}
+
+.share-actions button:first-child {
+  flex: 1 1 180px;
+}
+
+.share-status {
+  margin: 0 0 10px;
+}
+
+.share-status.is-error {
+  color: #b3261e;
+}
+
+.share-preview-figure {
+  margin: 0 0 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.share-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background:
+    linear-gradient(45deg, #ededed 25%, transparent 25%),
+    linear-gradient(-45deg, #ededed 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ededed 75%),
+    linear-gradient(-45deg, transparent 75%, #ededed 75%);
+  background-color: #f7f7f7;
+  background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+  background-size: 18px 18px;
+  object-fit: contain;
+}
+
+/* 画像未生成のうちは alt テキストの代替表示を避け、プレースホルダー枠だけ見せる。 */
+.share-preview:not(.is-ready) {
+  color: transparent;
+  font-size: 0;
+}
+
+.share-text-field {
+  margin-bottom: 4px;
+}
+
+.share-note {
+  margin-top: 6px;
+}
+
+.share-steps {
+  margin: 4px 0 0;
+  padding-left: 1.35rem;
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 0.92rem;
+}
+
+.share-fallback-actions {
+  margin-top: 10px;
+}
+
+/* 横並び時は2つのリンクで幅を分け合う。flex-basis を 0 にして、
+   max-width:520px の縦積み(主軸=高さ)に切り替わったとき高さが伸びないようにする
+   (160px などの大きな basis を主軸へ持ち込まない)。 */
+.share-fallback-actions .button-like {
+  flex: 1 1 0;
+  min-width: 140px;
+}
+
+.share-fallback-actions .button-like[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.56;
+  pointer-events: none;
+}

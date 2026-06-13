@@ -82,6 +82,46 @@
           <p id="generatedUrlHelp" class="copy-hint">「時計だけを確認」で時計だけの画面を開き、背景が透明で編集UIが出ないことを確認してからOBSへ貼ると安心です。</p>
           <p id="urlWarning" class="warning" hidden></p>
         </section>
+
+        <section class="preview-panel share-panel" aria-labelledby="shareHeading">
+          <div class="section-heading">
+            <h2 id="shareHeading">Xでシェアして広める</h2>
+            <p>作った時計の画像を共有して、ツールを広めましょう。見た人が「自分も作りたい」と思える宣伝になります。</p>
+          </div>
+
+          <div class="button-row share-actions">
+            <button id="shareImage" type="button">画像を共有</button>
+            <button id="generateShareImage" type="button" class="secondary">プレビュー画像を作り直す</button>
+          </div>
+          <p id="shareStatus" class="status-line share-status" role="status" aria-live="polite"></p>
+
+          <figure class="share-preview-figure">
+            <img id="shareImagePreview" class="share-preview" alt="共有用に生成した時計の画像プレビュー" width="1200" height="675">
+            <figcaption id="shareImageCaption" class="copy-hint">「画像を共有」を押すと、今の時計デザインの宣伝画像を作ります。</figcaption>
+          </figure>
+
+          <label class="field field-wide share-text-field" for="shareText">
+            <span>投稿文（編集できます）</span>
+            <textarea id="shareText" rows="5" spellcheck="false" aria-describedby="shareTextHelp"></textarea>
+          </label>
+          <p id="shareTextHelp" class="copy-hint">ビルダーURLを含めておくと、見た人がそのまま作りに来られます。自由に書き換えてください。</p>
+
+          <div class="info-note share-note">
+            <strong>Xが共有先に出ないとき</strong>
+            <p>スマホ（Xアプリ入り）だと共有先にXが出やすいです。PCではアプリ次第で出ないことがあります。出ないときは下の手順で手動添付してください。</p>
+          </div>
+
+          <ol class="share-steps">
+            <li>まず「画像を共有」か「プレビュー画像を作り直す」で画像を用意する</li>
+            <li>「PNGを保存」で画像をPCへ保存</li>
+            <li>「X投稿画面を開く」を押す</li>
+            <li>X側で保存した画像を添付して投稿</li>
+          </ol>
+          <div class="button-row share-fallback-actions">
+            <a id="downloadShareImage" class="button-like secondary" download="obs-clock-share.png" href="#" aria-disabled="true" tabindex="-1">PNGを保存</a>
+            <a id="xIntent" class="button-like" href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer">X投稿画面を開く</a>
+          </div>
+        </section>
       </aside>
 
       <section class="control-surface" aria-label="時計デザイン設定">
