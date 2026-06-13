@@ -204,44 +204,38 @@
               <div class="control-group">
                 <h3>表示</h3>
                 <p class="group-hint">時刻、日付、曜日、ラベルをURLへ保存します。</p>
-                <div class="form-grid">
-                  <label class="field" for="timezone">
-                    <span>タイムゾーン</span>
+                <label class="field field-wide" for="timezone">
+                  <span>タイムゾーン</span>
+                  <div class="field-inline">
                     <input id="timezone" type="text" list="timezoneOptions" autocomplete="off" spellcheck="false" aria-describedby="timezoneHelp">
-                    <datalist id="timezoneOptions">
-                      <option value="Asia/Tokyo"></option>
-                      <option value="Asia/Seoul"></option>
-                      <option value="Asia/Shanghai"></option>
-                      <option value="Asia/Taipei"></option>
-                      <option value="Asia/Hong_Kong"></option>
-                      <option value="Asia/Singapore"></option>
-                      <option value="Asia/Bangkok"></option>
-                      <option value="Asia/Kolkata"></option>
-                      <option value="Asia/Dubai"></option>
-                      <option value="Europe/London"></option>
-                      <option value="Europe/Paris"></option>
-                      <option value="Europe/Berlin"></option>
-                      <option value="Europe/Moscow"></option>
-                      <option value="America/New_York"></option>
-                      <option value="America/Chicago"></option>
-                      <option value="America/Denver"></option>
-                      <option value="America/Los_Angeles"></option>
-                      <option value="America/Sao_Paulo"></option>
-                      <option value="Australia/Sydney"></option>
-                      <option value="Pacific/Auckland"></option>
-                      <option value="UTC"></option>
-                    </datalist>
-                    <small id="timezoneHelp">初期値は Asia/Tokyo。候補から選ぶか、IANA名を入力します。</small>
-                  </label>
-                  <div class="field inline-actions">
-                    <span>端末の候補</span>
-                    <p id="localTimezone" class="muted">未確認</p>
-                    <button id="useLocalTimezone" type="button">採用</button>
+                    <button id="useLocalTimezone" type="button" class="secondary">端末の地域を採用</button>
                   </div>
-                  <label class="toggle" for="hour12">
-                    <input id="hour12" type="checkbox">
-                    <span>12時間表示にする</span>
-                  </label>
+                  <datalist id="timezoneOptions">
+                    <option value="Asia/Tokyo"></option>
+                    <option value="Asia/Seoul"></option>
+                    <option value="Asia/Shanghai"></option>
+                    <option value="Asia/Taipei"></option>
+                    <option value="Asia/Hong_Kong"></option>
+                    <option value="Asia/Singapore"></option>
+                    <option value="Asia/Bangkok"></option>
+                    <option value="Asia/Kolkata"></option>
+                    <option value="Asia/Dubai"></option>
+                    <option value="Europe/London"></option>
+                    <option value="Europe/Paris"></option>
+                    <option value="Europe/Berlin"></option>
+                    <option value="Europe/Moscow"></option>
+                    <option value="America/New_York"></option>
+                    <option value="America/Chicago"></option>
+                    <option value="America/Denver"></option>
+                    <option value="America/Los_Angeles"></option>
+                    <option value="America/Sao_Paulo"></option>
+                    <option value="Australia/Sydney"></option>
+                    <option value="Pacific/Auckland"></option>
+                    <option value="UTC"></option>
+                  </datalist>
+                  <small id="timezoneHelp">初期値は Asia/Tokyo。候補から選ぶか、IANA名を入力します。<br>この端末の地域: <span id="localTimezone" class="muted">未確認</span></small>
+                </label>
+                <div class="form-grid dense-grid form-grid-top">
                   <label class="field" for="dateFormat">
                     <span>日付フォーマット</span>
                     <select id="dateFormat">
@@ -271,6 +265,10 @@
                     </select>
                   </label>
                 </div>
+                <label class="toggle" for="hour12">
+                  <input id="hour12" type="checkbox">
+                  <span>12時間表示にする</span>
+                </label>
               </div>
 
               <div class="control-group">
@@ -280,27 +278,30 @@
                   <strong>フォントの考え方</strong>
                   <p>この画面で選んだフォント名をURLに保存します。OBS側PCにそのフォントが無い場合は、近い標準フォントで表示され、見た目が変わることがあります。URLには表示名ではなく、OBSで実際に参照するフォント名を保存します。</p>
                 </div>
-                <div class="form-grid">
+                <div class="form-grid form-grid-top">
                   <label class="field" for="fontPreset">
                     <span>無料フォント候補</span>
                     <select id="fontPreset"></select>
+                    <small>まず候補から選ぶと手軽です。細かく指定したいときは手入力欄へ。</small>
                   </label>
                   <label class="field" for="fontFamily">
                     <span>手入力フォント名</span>
                     <input id="fontFamily" type="text" autocomplete="off" spellcheck="false" aria-describedby="fontFamilyHelp">
-                    <small id="fontFamilyHelp">例: Noto Sans JP, M PLUS Rounded 1c, Poppins。OBS側PCに無い名前は標準フォントへ置き換わります。配信に使うPCで最後に確認してください。</small>
-                  </label>
-                  <div class="field inline-actions">
-                    <span>PC内フォント</span>
-                    <p id="localFontStatus" class="muted">対応ブラウザだけ、ボタンを押したあとにPC内フォント名を読み込みます。ブラウザから許可を求められたら、PC内フォント名を読むことを許可してください。一覧が空でも、手入力フォント名にOBSを動かすPCで使える正式なフォント名を入れられます。</p>
-                    <button id="loadLocalFonts" type="button">PC内フォントを読み込む</button>
-                  </div>
-                  <label class="field is-hidden" id="localFontSelectWrap" for="localFontSelect">
-                    <span>読み込んだフォント</span>
-                    <select id="localFontSelect"></select>
-                    <small>日本語名で表示される場合も、URLにはOBSで実際に使うフォント名を保存します。別PCでは同じフォントが必要です。</small>
+                    <small id="fontFamilyHelp">例: Noto Sans JP / M PLUS Rounded 1c / Poppins。OBS側PCに無い名前は標準フォントへ置き換わります。配信に使うPCで最後に確認してください。</small>
                   </label>
                 </div>
+                <div class="field field-wide local-font">
+                  <div class="field-inline">
+                    <span>PC内フォントの読み込み</span>
+                    <button id="loadLocalFonts" type="button" class="secondary">PC内フォントを読み込む</button>
+                  </div>
+                  <p id="localFontStatus" class="muted">対応ブラウザでボタンを押すと、PC内のフォント名を一覧にできます。許可を求められたら「PC内フォント名を読む」ことを許可してください。一覧が空でも、手入力フォント名にOBS側PCで使える正式名を入れれば大丈夫です。</p>
+                </div>
+                <label class="field field-wide is-hidden" id="localFontSelectWrap" for="localFontSelect">
+                  <span>読み込んだフォント</span>
+                  <select id="localFontSelect"></select>
+                  <small>日本語名で表示される場合も、URLにはOBSで実際に使うフォント名を保存します。別PCでは同じフォントが必要です。</small>
+                </label>
               </div>
 
               <div class="control-group">
