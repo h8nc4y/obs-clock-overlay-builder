@@ -6,6 +6,21 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-13
+
+### Added
+
+- Switchable editor themes inspired by tools familiar to Japanese streamers: white (default), coral, and soft-gradient blue. The choice persists in editor localStorage only and never affects `/clock/` output.
+- Six new clock templates: Yume Lavender, Cream Soda, Cyber Frame, Retro LCD, Cinema Bar, and Sumi (14 templates total).
+- Template category tabs (かわいい / ゲーム / シック / 和風) with template cards that render the actual clock appearance on a transparent checker.
+- Template compatibility golden guard tests that freeze `DEFAULT_CONFIG`, the original eight template presets, representative `?c=` URLs, and `applyClockStyles` output.
+
+### Changed
+
+- Rebuilt the editor as a step flow (1. choose a template, 2. adjust with かんたん/こだわり layers, 3. paste into OBS) with the keyword reaction experiment collapsed into a bottom "実験室" section.
+- Split `styles.css` into `tokens.css` / `base.css` / `clock.css` / `overlay.css` / `builder.css`; the old `styles.css` remains as an import shim for cached HTML.
+- Existing generated `/clock/?c=...` URLs keep their exact appearance (guarded by golden tests). Legacy flat-query URLs are also unchanged because the original eight template presets were kept frozen.
+
 ## [0.1.1] - 2026-06-13
 
 ### Added
