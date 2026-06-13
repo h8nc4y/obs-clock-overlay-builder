@@ -53,7 +53,7 @@ OBSのブラウザソースで使う時計オーバーレイURLを生成する�
 
 - `npm run lint` はESLintではなく、`node --check` によるJavaScript構文チェックです。
 - `npm run typecheck` はTypeScript型検査ではなく、主要module importとencode/decode/time formatのsmoke checkです。
-- `npm test` はNode testを実行します。`tests/build.test.mjs` がbuildを実行するため、ignore済みの `dist/` をローカル生成することがあります。
+- `npm test` はNode testを実行します。`tests/build.test.mjs` は `DIST_DIR` で指定した一時ディレクトリへビルドして検証するため、共有 `dist/` を生成・変更せず、並列実行でも競合しません。
 - `npm run build` は `dist/` を生成します。
 - 通常のrelease preflightは `npm run release:check` と `npm run release:http-smoke` です。
 - staging/production確認では `SMOKE_BASE_URL=<deploy-url> npm run release:remote-smoke` を使います。ただし外部URLへのremote smokeやdeployは、現在の作業方針と承認条件に従います。
