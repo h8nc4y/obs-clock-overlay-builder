@@ -6,7 +6,11 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
-## [1.1.1] - 2026-06-14
+## [1.2.0] - 2026-06-15
+
+### Added
+
+- A pin (📌) toggle on the live preview (desktop). Pinned — the default — keeps the live clock at the top of the left column so you can watch it while adjusting settings on the right; unpin to scroll the left column down to the OBS URL and share panels. The choice is remembered. This also removes a layout jump where switching the かんたん / こだわり adjust mode could shift the left preview by ~340px: the sticky behaviour now lives on the live-preview panel alone instead of the whole column. The toggle is hidden on narrow (≤1100px) single-column layouts.
 
 ### Changed
 
