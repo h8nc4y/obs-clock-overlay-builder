@@ -21,6 +21,7 @@ const SHARE_IMAGE_HEIGHT = 675;
 
 const STORAGE_KEY = "obs-clock-builder:v1";
 const THEME_STORAGE_KEY = "obs-clock-builder:theme";
+const PIN_STORAGE_KEY = "obs-clock-builder:pin";
 const UI_THEMES = new Set(["white", "booth", "fanbox"]);
 const LONG_URL_WARNING = 1800;
 const TOO_LONG_URL_WARNING = 4000;
@@ -92,6 +93,9 @@ const elements = {
   resetConfig: byId("resetConfig"),
   importStatus: byId("importStatus"),
   builderStatus: byId("builderStatus"),
+  preview: document.querySelector(".preview-primary"),
+  pinPreview: byId("pinPreview"),
+  pinLabel: document.querySelector("#pinPreview .pin-toggle-label"),
   previewShell: byId("previewShell"),
   previewCustomColor: byId("previewCustomColor"),
   clockPreview: byId("clockPreview"),
@@ -157,6 +161,7 @@ init();
 function init() {
   initUiTheme();
   initAdjustTabs();
+  initPinPreview();
   renderTemplateCategoryTabs();
   renderTemplateButtons();
   renderFontOptions();
@@ -235,6 +240,43 @@ function initAdjustTabs() {
   elements.adjustTabEasy.addEventListener("click", () => setMode(false));
   elements.adjustTabAdvanced.addEventListener("click", () => setMode(true));
   setMode(false);
+}
+
+// ライブプレビューのピン留め(固定)切り替え。
+// ピンON: .preview-primary だけを sticky にし、右の設定を調整する間も時計を上部へ表示し続ける
+//   (列全体を sticky にすると かんたん/こだわり の高さ差でプレビューが飛ぶため、パネル単体に限定する)。
+// ピンOFF: 静的配置に戻し、左列を普通にスクロールして OBS用URL や 共有パネルへ到達できる。
+// 既定はON。選択は localStorage に保存するが、保存できない環境でもこの画面内の切り替えはそのまま使える。
+function initPinPreview() {
+  if (!elements.pinPreview) {
+    return;
+  }
+  const setPinned = (pinned) => {
+    elements.preview.classList.toggle("is-pinned", pinned);
+    elements.pinPreview.classList.toggle("is-active", pinned);
+    elements.pinPreview.setAttribute("aria-pressed", String(pinned));
+    elements.pinPreview.setAttribute("aria-label", pinned ? "プレビューの固定を外す" : "プレビューを固定する");
+    elements.pinLabel.textContent = pinned ? "固定中" : "固定する";
+  };
+  setPinned(readSavedPinPreference());
+  elements.pinPreview.addEventListener("click", () => {
+    const next = elements.pinPreview.getAttribute("aria-pressed") !== "true";
+    setPinned(next);
+    try {
+      window.localStorage.setItem(PIN_STORAGE_KEY, next ? "1" : "0");
+    } catch {
+      // 保存できない環境でも、この画面内の切り替えはそのまま使える。
+    }
+  });
+}
+
+function readSavedPinPreference() {
+  try {
+    // 既定はON。明示的に "0" が保存されているときだけOFFにする。
+    return window.localStorage.getItem(PIN_STORAGE_KEY) !== "0";
+  } catch {
+    return true;
+  }
 }
 
 function loadInitialConfig() {
