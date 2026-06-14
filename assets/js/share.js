@@ -25,6 +25,29 @@ export function resolveShareText(userText, builderUrl) {
   return String(userText ?? "").trim() || buildShareText(builderUrl);
 }
 
+export function buildShareLines(config, formatted) {
+  const label = config.labelPosition === "hidden" ? "" : config.label;
+  const dateLine = [
+    config.showDate ? formatted.date : "",
+    config.showWeekday ? formatted.weekday : ""
+  ].filter(Boolean).join("  ");
+
+  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
+  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
+  const lines = [];
+  if (label && labelAbove) {
+    lines.push({ text: label, size: config.labelSize });
+  }
+  if (dateLine) {
+    lines.push({ text: dateLine, size: config.dateSize });
+  }
+  lines.push({ text: formatted.time, size: config.fontSize, isTime: true });
+  if (label && labelBelow) {
+    lines.push({ text: label, size: config.labelSize });
+  }
+  return lines;
+}
+
 // x.com/intent/tweet 用のURLを組み立てる。画像は添付できない仕様なので
 // text / url / hashtags のみを載せる。hashtags は配列でも "a,b" 文字列でも受ける。
 export function buildXIntentUrl({ text = "", url = "", hashtags = [] } = {}) {

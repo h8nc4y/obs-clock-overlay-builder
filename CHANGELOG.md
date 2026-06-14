@@ -6,6 +6,25 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-15
+
+### Added
+
+- A pin (📌) toggle on the live preview (desktop). Pinned — the default — keeps the live clock at the top of the left column so you can watch it while adjusting settings on the right; unpin to scroll the left column down to the OBS URL and share panels. The choice is remembered. This also removes a layout jump where switching the かんたん / こだわり adjust mode could shift the left preview by ~340px: the sticky behaviour now lives on the live-preview panel alone instead of the whole column. The toggle is hidden on narrow (≤1100px) single-column layouts.
+
+### Changed
+
+- Polish and hardening from a multi-agent UI/UX + health review (0 blockers; all findings minor):
+  - On phones the builder now shows Step 1 (テンプレを選ぶ) before the preview / copy / share output, so the 1→2→3 flow reads top-to-bottom; the template grid opens on the curated 定番 category instead of all templates; `.field-inline` rows stack full-width on narrow screens.
+  - Clearer Japanese copy: the label helper no longer reads like a security warning, the copy-URL success message bridges to "paste into OBS → share on X", and the font explanation is consolidated.
+  - Accessibility: the share-preview image's `alt` now reflects whether an image exists / has gone stale; range sliders announce their value and unit (`aria-describedby` + `aria-valuetext`); the かんたん/こだわり tabs no longer double-signal ARIA.
+  - Visual: the info/warning notes and inner corner radii now follow each of the three editor themes (white / booth / fanbox) instead of fixed colors.
+  - Internals: the flip digit-grouping and the digital share-image line composition are now single shared, unit-tested functions (no behavior change); a localStorage config from a different schema version falls back to defaults. Test count 98 → 105.
+  - Security: added `form-action 'self'` to the Content-Security-Policy (the builder has no forms; defense-in-depth). `/clock/` stays framable for OBS as before.
+- Docs: the README and the manual-QA checklist now cover the v1.1.0 share feature; corrected a stale template count (→ 17) and removed a hardcoded version reference.
+
+The `/clock/?c=...` reproduction contract and the clock rendering are unchanged.
+
 ## [1.1.0] - 2026-06-14
 
 ### Added

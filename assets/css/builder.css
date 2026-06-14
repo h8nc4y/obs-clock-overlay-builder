@@ -1,6 +1,7 @@
 /* ビルダー編集画面(index.html)専用スタイル。
    画面テーマ: 既定は「白(わんコメ風)」。html[data-theme="booth"] / [data-theme="fanbox"] で
-   トークンを差し替える。テーマはビルダー画面専用で、/clock/ には適用されない。 */
+   トークンを差し替える。テーマはビルダー画面専用で、/clock/ には適用されない。
+   UIラベル対応: booth=「コーラル」(BOOTH配色由来) / fanbox=「ふんわりブルー」(pixivFANBOX配色由来)。 */
 
 :root {
   --page-bg: #ffffff;
@@ -17,8 +18,12 @@
   --accent-bright: #f57c1f;
   --warm: #b3520a;
   --warm-soft: #fdf3ea;
+  --warn-line: #efd2ac;
+  --warn-ink: #3d3027;
+  --success-ink: #2f6a3c;
   --panel-radius: 10px;
   --button-radius: 8px;
+  --inner-radius: calc(var(--panel-radius) - 4px);
   --shadow: 0 2px 10px rgba(40, 36, 32, 0.05);
   --shadow-soft: 0 1px 6px rgba(40, 36, 32, 0.05);
 }
@@ -30,6 +35,8 @@
   --accent-bright: #fc4d50;
   --warm: #d83538;
   --warm-soft: #fdf1f1;
+  --warn-line: #f0c9ca;
+  --warn-ink: #4a2c2c;
   --line: #e5e5e4;
   --line-strong: #d2d2d0;
   --button-radius: 6px;
@@ -47,6 +54,8 @@
   --accent-bright: #0096fa;
   --warm: #0075c4;
   --warm-soft: #ecf6fd;
+  --warn-line: #b8dcf2;
+  --warn-ink: #1f3947;
   --panel-radius: 16px;
   --button-radius: 999px;
   --shadow: 0 4px 16px rgba(70, 90, 100, 0.12);
@@ -243,11 +252,26 @@ code {
 
 .preview-column {
   grid-area: preview;
-  position: sticky;
-  top: 16px;
   display: grid;
   gap: 14px;
   min-width: 0;
+}
+
+/* ライブプレビューのピン留め。左列(.preview-column = プレビュー + OBS用URL + 共有)全体を
+   sticky にして固定サイドバー化し、右の設定をスクロールしてもまとめて上部に残す。
+   max-height で列を viewport 高に上限化することで、右列が常に列より高くなり sticky に
+   トラベルが生まれる → かんたん/こだわり を切り替えても飛ばない。列が画面より高いときは
+   overflow-y で列内スクロールにし、OBS用URL/共有パネルへ到達できるようにする
+   (画面に収まる高さなら何もスクロールしない)。scrollbar-gutter でスクロールバー分の
+   横ガタつきを防ぐ。デスクトップ(>1100px)専用。1100px以下は1カラムなので固定しない。 */
+@media (min-width: 1101px) {
+  .preview-column.is-pinned {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
 }
 
 .panel,
@@ -296,11 +320,11 @@ small,
 .info-note {
   margin: 0 0 14px;
   padding: 11px 12px;
-  border: 1px solid #efd2ac;
+  border: 1px solid var(--warn-line);
   border-left: 4px solid var(--warm);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: var(--warm-soft);
-  color: #3d3027;
+  color: var(--warn-ink);
   line-height: 1.65;
 }
 
@@ -333,7 +357,7 @@ small,
   min-height: 96px;
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #ffffff;
   color: var(--ink);
   text-align: left;
@@ -395,7 +419,7 @@ small,
 .control-group {
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #fafafa;
 }
 
@@ -573,7 +597,7 @@ output {
 .status-line {
   min-height: 1.4em;
   margin: 10px 0 0;
-  color: #2f6a3c;
+  color: var(--success-ink);
   font-size: 0.9rem;
 }
 
@@ -589,11 +613,70 @@ output {
 .warning {
   margin: 12px 0 0;
   padding: 10px 12px;
-  border: 1px solid #e5b769;
-  border-radius: 8px;
-  background: #fff7e8;
-  color: #62400d;
+  border: 1px solid var(--warn-line);
+  border-left: 4px solid var(--warm);
+  border-radius: var(--inner-radius);
+  background: var(--warm-soft);
+  color: var(--warn-ink);
   line-height: 1.6;
+}
+
+/* ライブプレビューの見出し行。説明文(左)とピン留めボタン(右上)を横並びにする。 */
+.preview-heading {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-heading-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.preview-heading-copy h2,
+.preview-heading-copy p {
+  margin: 0;
+}
+
+/* ピン留めトグル。固定中(is-active)はアクセント塗り、未固定は控えめな枠線ボタン。 */
+button.pin-toggle {
+  flex: 0 0 auto;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--muted);
+  border-color: var(--line-strong);
+  font-size: 0.86rem;
+}
+
+button.pin-toggle:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-bright);
+}
+
+button.pin-toggle.is-active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+button.pin-toggle.is-active:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.pin-toggle-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* 未固定のあいだはアイコンを少し傾けて「ピンが外れている」状態を視覚的に示す。 */
+button.pin-toggle:not(.is-active) .pin-toggle-icon {
+  transform: rotate(45deg);
 }
 
 .preview-toolbar {
@@ -659,7 +742,7 @@ output {
   min-height: 250px;
   padding: 24px;
   border: 1px solid var(--line-strong);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   overflow: hidden;
 }
 
@@ -714,7 +797,7 @@ output {
 .metrics-grid div {
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #ffffff;
 }
 
@@ -744,7 +827,7 @@ output {
 
 details {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #ffffff;
   padding: 10px 12px;
 }
@@ -767,13 +850,24 @@ details p {
 @media (max-width: 1100px) {
   .builder-layout {
     grid-template-columns: 1fr;
+    /* スマホ/タブレットでは Step 1(テンプレを選ぶ)を先頭に出し、
+       プレビューやコピー/共有ボタンはその後に置く。DOM順は変えず areas だけ入れ替える。 */
     grid-template-areas:
-      "preview"
-      "controls";
+      "controls"
+      "preview";
   }
 
-  .preview-column {
+  /* 1カラムではプレビューが下に来るため固定しない。ピンボタンも隠して誤操作を防ぐ
+     (is-pinned が残っていても上の sticky は min-width:1101px なので適用されない)。
+     念のため列の高さ上限/列内スクロールも解除し、ページが普通にスクロールできるようにする。 */
+  .preview-column.is-pinned {
     position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .pin-toggle {
+    display: none;
   }
 }
 
@@ -819,6 +913,21 @@ details p {
 
   .template-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* 狭い画面では入力欄＋ボタンの横並びをやめ、縦に積んで全幅にそろえる。
+     ラベル(span)は1行に独立させ、ガタついた段組みを防ぐ。 */
+  .field-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field-inline > span,
+  .field-inline > input[type="text"],
+  .field-inline > select,
+  .field-inline > button {
+    flex: 1 1 auto;
+    width: 100%;
   }
 
   .button-row,
@@ -1041,7 +1150,7 @@ button.category-tab[aria-pressed="true"]:hover {
   justify-content: center;
   height: 76px;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background:
     linear-gradient(45deg, #e3e3e3 25%, transparent 25%),
     linear-gradient(-45deg, #e3e3e3 25%, transparent 25%),
@@ -1094,7 +1203,7 @@ button.category-tab[aria-pressed="true"]:hover {
   height: auto;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--line-strong);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background:
     linear-gradient(45deg, #ededed 25%, transparent 25%),
     linear-gradient(-45deg, #ededed 25%, transparent 25%),

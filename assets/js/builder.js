@@ -11,9 +11,9 @@ import {
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
-import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize } from "./render.js";
+import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize, tokenizeFlip } from "./render.js";
 import { analogParts, createAnalogFormatter, createFormatters, formatClock } from "./time.js";
-import { buildShareText, buildXIntentUrl, canvasFontStack, resolveShareText } from "./share.js";
+import { buildShareLines, buildShareText, buildXIntentUrl, canvasFontStack, resolveShareText } from "./share.js";
 
 const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 const SHARE_IMAGE_WIDTH = 1200;
@@ -21,19 +21,24 @@ const SHARE_IMAGE_HEIGHT = 675;
 
 const STORAGE_KEY = "obs-clock-builder:v1";
 const THEME_STORAGE_KEY = "obs-clock-builder:theme";
+const PIN_STORAGE_KEY = "obs-clock-builder:pin";
 const UI_THEMES = new Set(["white", "booth", "fanbox"]);
 const LONG_URL_WARNING = 1800;
 const TOO_LONG_URL_WARNING = 4000;
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
+// label は系統名。analog/flip は雰囲気ではなく「時計の種類」なので、title で種類だと補足する
+// (定番/かわいい/クールは雰囲気で選ぶグループ)。
 const TEMPLATE_CATEGORIES = [
   { id: "all", label: "すべて" },
   { id: "standard", label: "定番" },
   { id: "cute", label: "かわいい" },
   { id: "cool", label: "クール" },
-  { id: "analog", label: "アナログ" },
-  { id: "flip", label: "パタパタ" }
+  { id: "analog", label: "アナログ", hint: "時計の種類: アナログ（針の時計）" },
+  { id: "flip", label: "パタパタ", hint: "時計の種類: パタパタ（数字がめくれる時計）" }
 ];
-let templateCategory = "all";
+// 初期表示は「定番」に絞り、最初の一覧を小さく見やすくする(既定テンプレ mono-compact も定番)。
+// 「すべて」はユーザーがタブを押したときだけ全件を表示する。
+let templateCategory = "standard";
 
 const elements = {
   uiTheme: byId("uiTheme"),
@@ -88,6 +93,9 @@ const elements = {
   resetConfig: byId("resetConfig"),
   importStatus: byId("importStatus"),
   builderStatus: byId("builderStatus"),
+  preview: document.querySelector(".preview-column"),
+  pinPreview: byId("pinPreview"),
+  pinLabel: document.querySelector("#pinPreview .pin-toggle-label"),
   previewShell: byId("previewShell"),
   previewCustomColor: byId("previewCustomColor"),
   clockPreview: byId("clockPreview"),
@@ -153,6 +161,7 @@ init();
 function init() {
   initUiTheme();
   initAdjustTabs();
+  initPinPreview();
   renderTemplateCategoryTabs();
   renderTemplateButtons();
   renderFontOptions();
@@ -220,17 +229,56 @@ function initUiTheme() {
 }
 
 function initAdjustTabs() {
+  // かんたん/こだわりは「表示の切り替え(トグル)」として扱い、aria-pressed のみで状態を示す。
+  // aria-controls/aria-expanded は併用しない(二重シグナルを避ける)。
   const setMode = (advanced) => {
     elements.easyControls.hidden = advanced;
     elements.advancedControls.hidden = !advanced;
     elements.adjustTabEasy.setAttribute("aria-pressed", String(!advanced));
     elements.adjustTabAdvanced.setAttribute("aria-pressed", String(advanced));
-    elements.adjustTabEasy.setAttribute("aria-expanded", String(!advanced));
-    elements.adjustTabAdvanced.setAttribute("aria-expanded", String(advanced));
   };
   elements.adjustTabEasy.addEventListener("click", () => setMode(false));
   elements.adjustTabAdvanced.addEventListener("click", () => setMode(true));
   setMode(false);
+}
+
+// ライブプレビューのピン留め(固定)切り替え。
+// ピンON: 左列(.preview-column = ライブプレビュー + OBS用URL + 共有)全体を sticky にし、
+//   右の設定をスクロールしても固定サイドバーとして残す。列が画面より高いときは
+//   max-height(=viewport)+overflow で列内スクロールにして、URL/共有パネルへ到達できるようにする
+//   (列全体を高さ無制限で sticky にすると かんたん/こだわり の高さ差で飛ぶため、CSS側で高さを上限化する)。
+// ピンOFF: 静的配置に戻し、ページを普通にスクロールして OBS用URL や 共有パネルへ到達できる。
+// 既定はON。選択は localStorage に保存するが、保存できない環境でもこの画面内の切り替えはそのまま使える。
+function initPinPreview() {
+  if (!elements.pinPreview) {
+    return;
+  }
+  const setPinned = (pinned) => {
+    elements.preview.classList.toggle("is-pinned", pinned);
+    elements.pinPreview.classList.toggle("is-active", pinned);
+    elements.pinPreview.setAttribute("aria-pressed", String(pinned));
+    elements.pinPreview.setAttribute("aria-label", pinned ? "プレビューの固定を外す" : "プレビューを固定する");
+    elements.pinLabel.textContent = pinned ? "固定中" : "固定する";
+  };
+  setPinned(readSavedPinPreference());
+  elements.pinPreview.addEventListener("click", () => {
+    const next = elements.pinPreview.getAttribute("aria-pressed") !== "true";
+    setPinned(next);
+    try {
+      window.localStorage.setItem(PIN_STORAGE_KEY, next ? "1" : "0");
+    } catch {
+      // 保存できない環境でも、この画面内の切り替えはそのまま使える。
+    }
+  });
+}
+
+function readSavedPinPreference() {
+  try {
+    // 既定はON。明示的に "0" が保存されているときだけOFFにする。
+    return window.localStorage.getItem(PIN_STORAGE_KEY) !== "0";
+  } catch {
+    return true;
+  }
 }
 
 function loadInitialConfig() {
@@ -248,6 +296,10 @@ function renderTemplateCategoryTabs() {
     tab.type = "button";
     tab.className = "category-tab";
     tab.textContent = category.label;
+    if (category.hint) {
+      // アナログ/パタパタは雰囲気ではなく時計の種類なので、ホバー説明で補足する。
+      tab.title = category.hint;
+    }
     tab.setAttribute("aria-pressed", String(category.id === templateCategory));
     tab.addEventListener("click", () => {
       templateCategory = category.id;
@@ -428,7 +480,13 @@ function bindForm() {
     updateEverything("初期設定へ戻しました。");
   });
   elements.compactUrl.addEventListener("change", () => updateEverything());
-  elements.copyUrl.addEventListener("click", () => copyText(elements.generatedUrl.value, elements.urlStatus, "URLをコピーしました。"));
+  elements.copyUrl.addEventListener("click", () =>
+    copyText(
+      elements.generatedUrl.value,
+      elements.urlStatus,
+      "URLをコピーしました。OBSのブラウザソースに貼り付け、最後に下の『Xでシェア』で宣伝できます。"
+    )
+  );
   elements.openClock.addEventListener("click", () => {
     window.open(elements.generatedUrl.value, "_blank", "noopener");
   });
@@ -438,7 +496,14 @@ function bindPreviewBackground() {
   document.querySelectorAll('input[name="previewBg"]').forEach((radio) => {
     radio.addEventListener("change", updatePreviewBackground);
   });
-  elements.previewCustomColor.addEventListener("input", updatePreviewBackground);
+  elements.previewCustomColor.addEventListener("input", () => {
+    // 任意色を編集したら「任意色」ラジオを自動選択し、見た目と選択状態(SR向け)を一致させる。
+    const customRadio = document.querySelector('input[name="previewBg"][value="custom"]');
+    if (customRadio && !customRadio.checked) {
+      customRadio.checked = true;
+    }
+    updatePreviewBackground();
+  });
 }
 
 function updateState(partial, sync = false) {
@@ -483,15 +548,20 @@ function syncOutputValues() {
       continue;
     }
     const value = Number(elements[field].value);
+    let text;
     if (["backgroundOpacity", "borderOpacity", "shadowOpacity", "lineHeight"].includes(field)) {
-      output.textContent = value.toFixed(2);
+      text = value.toFixed(2);
     } else if (field === "letterSpacing" || field === "strokeWidth") {
-      output.textContent = `${value.toFixed(1)}px`;
+      text = `${value.toFixed(1)}px`;
     } else if (field === "fontWeight") {
-      output.textContent = String(value);
+      text = String(value);
     } else {
-      output.textContent = `${value}px`;
+      text = `${value}px`;
     }
+    output.textContent = text;
+    // 表示中の単位付き文字列をそのまま読み上げへ流用し、二重管理を避ける。
+    // aria-describedby(HTML側)で output と関連付け、ここで値の読みも単位付きにする。
+    elements[field].setAttribute("aria-valuetext", text);
   }
 }
 
@@ -705,6 +775,9 @@ function markShareImageStale() {
     return;
   }
   elements.shareImagePreview.classList.remove("is-ready");
+  // 画像が今のデザインと食い違う(古い)あいだは alt を空にして装飾扱いにし、
+  // 状態は figcaption(下の説明)で伝える。読み上げが古い説明を読まないようにする。
+  elements.shareImagePreview.setAttribute("alt", "");
   elements.shareImageCaption.textContent =
     "デザインを変えました。『プレビュー画像を作り直す』で更新できます。";
   // 古い画像のダウンロードを防ぐ。キーボードでも活性化しないよう tabindex も外す。
@@ -749,6 +822,8 @@ async function regenerateShareImage(successMessage) {
   shareImageDirty = false;
   elements.shareImagePreview.src = dataUrl;
   elements.shareImagePreview.classList.add("is-ready");
+  // 生成できたときだけ意味のある alt を付け、読み上げにも画像があると伝える。
+  elements.shareImagePreview.setAttribute("alt", "作成した宣伝画像のプレビュー");
   elements.shareImageCaption.textContent = "今の時計デザインで宣伝画像を作りました。共有や保存ができます。";
   elements.downloadShareImage.href = dataUrl;
   elements.downloadShareImage.removeAttribute("aria-disabled");
@@ -914,10 +989,10 @@ function drawDigitalShareClock(ctx, config) {
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
 
-  const label = config.labelPosition === "hidden" ? "" : config.label;
-  const labelPx = Math.round(config.labelSize * scale);
-  const datePx = Math.round(config.dateSize * scale);
-  const dateLine = [formatted.date, formatted.weekday].filter(Boolean).join("  ");
+  const lines = buildShareLines(config, formatted).map((line) => ({
+    ...line,
+    px: Math.round(line.size * scale)
+  }));
 
   // ライブ時計は --clock-letter-spacing(字間)を反映する。Canvas2D の letterSpacing が
   // 使える環境では同じ字間を適用し、計測も同じ状態で行ってパネル幅を実際の描画に揃える。
@@ -932,33 +1007,16 @@ function drawDigitalShareClock(ctx, config) {
   ctx.font = `${config.fontWeight} ${fontPx}px ${fontStack}`;
   const timeWidth = ctx.measureText(formatted.time).width;
   let panelContentWidth = timeWidth;
-  if (label) {
-    ctx.font = `${config.fontWeight} ${labelPx}px ${fontStack}`;
-    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(label).width);
-  }
-  if (dateLine) {
-    ctx.font = `${config.fontWeight} ${datePx}px ${fontStack}`;
-    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(dateLine).width);
+  for (const line of lines) {
+    if (line.isTime) {
+      continue;
+    }
+    ctx.font = `${config.fontWeight} ${line.px}px ${fontStack}`;
+    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(line.text).width);
   }
 
   const padX = config.paddingX * scale + 24;
   const padY = config.paddingY * scale + 18;
-  // 宣伝カードは1列に積む簡易表現。left/right の横並びは縦積みで近似し、
-  // "left" は上(top 相当)、"right" は下(bottom 相当)へ置いてラベルを必ず残す
-  // (Soda / Neon HUD など labelPosition:"right" のテンプレでラベルが消えないように)。
-  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
-  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
-  const lines = [];
-  if (label && labelAbove) {
-    lines.push({ text: label, px: labelPx });
-  }
-  if (dateLine) {
-    lines.push({ text: dateLine, px: datePx });
-  }
-  lines.push({ text: formatted.time, px: fontPx, isTime: true });
-  if (label && labelBelow) {
-    lines.push({ text: label, px: labelPx });
-  }
 
   const gap = Math.max(8, config.gap * scale);
   const linesHeight = lines.reduce((sum, line) => sum + line.px, 0) + gap * (lines.length - 1);
@@ -1145,24 +1203,7 @@ function drawFlipShareClock(ctx, config) {
   const time = formatClock(formatters, new Date()).time;
   const fontStack = canvasFontStack(config.fontFamily);
 
-  // flipGroup に合わせて数字/区切りをトークン化(render.js の tokenize と同方針)。
-  const tokens = [];
-  let i = 0;
-  while (i < time.length) {
-    const char = time[i];
-    const isDigit = char >= "0" && char <= "9";
-    if (isDigit && config.flipGroup === "pair") {
-      let value = "";
-      while (i < time.length && time[i] >= "0" && time[i] <= "9") {
-        value += time[i];
-        i += 1;
-      }
-      tokens.push({ digit: true, value });
-    } else {
-      tokens.push({ digit: isDigit, value: char });
-      i += 1;
-    }
-  }
+  const tokens = tokenizeFlip(time, config.flipGroup);
 
   const scale = 2.6;
   const cardFontPx = Math.round(config.fontSize * scale);

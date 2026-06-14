@@ -13,7 +13,11 @@
   --accent-soft: #e1f2ef;
   --warm: #a85422;
   --warm-soft: #fff1df;
+  --warn-line: #e7c79f;
+  --warn-ink: #4a3826;
+  --success-ink: #2f6a3c;
   --focus: #2457d6;
+  --inner-radius: 8px;
   --shadow: 0 10px 26px rgba(31, 39, 36, 0.08);
   --shadow-soft: 0 6px 16px rgba(31, 39, 36, 0.07);
   --content-width: 1280px;

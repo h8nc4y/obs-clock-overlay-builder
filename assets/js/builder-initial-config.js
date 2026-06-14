@@ -1,4 +1,4 @@
-import { cloneDefaultConfig, normalizeConfig, parseConfigFromQuery } from "./config.js";
+import { CONFIG_VERSION, cloneDefaultConfig, normalizeConfig, parseConfigFromQuery } from "./config.js";
 
 const CONFIG_QUERY_KEYS = [
   "c",
@@ -55,7 +55,11 @@ export function loadInitialConfigFromSources({ href, search, getSavedConfig }) {
   try {
     const saved = getSavedConfig?.();
     if (saved) {
-      return normalizeConfig(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      if (parsed?.version !== CONFIG_VERSION) {
+        return cloneDefaultConfig();
+      }
+      return normalizeConfig(parsed);
     }
   } catch {
     // localStorage may be blocked or stale; URL generation still works without it.

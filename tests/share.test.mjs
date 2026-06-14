@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   SHARE_HASHTAGS,
+  buildShareLines,
   buildShareText,
   buildXIntentUrl,
   canvasFontStack,
   resolveShareText
 } from "../assets/js/share.js";
+import { normalizeConfig } from "../assets/js/config.js";
+import { tokenizeFlip } from "../assets/js/render.js";
 
 const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 
@@ -133,4 +136,141 @@ test("resolveShareText returns the edited text or falls back to the default", ()
   assert.equal(resolveShareText(undefined, BUILDER_URL), buildShareText(BUILDER_URL));
   // 編集済みはそのまま返す(trim はされない先頭末尾以外は維持)。
   assert.equal(resolveShareText("好きな投稿文", BUILDER_URL), "好きな投稿文");
+});
+
+test("tokenizeFlip keeps each digit as a card in single grouping", () => {
+  assert.deepEqual(tokenizeFlip("12:34:56", "single"), [
+    { digit: true, value: "1" },
+    { digit: true, value: "2" },
+    { digit: false, value: ":" },
+    { digit: true, value: "3" },
+    { digit: true, value: "4" },
+    { digit: false, value: ":" },
+    { digit: true, value: "5" },
+    { digit: true, value: "6" }
+  ]);
+});
+
+test("tokenizeFlip groups continuous digit runs into pair cards", () => {
+  assert.deepEqual(tokenizeFlip("12:34:56", "pair"), [
+    { digit: true, value: "12" },
+    { digit: false, value: ":" },
+    { digit: true, value: "34" },
+    { digit: false, value: ":" },
+    { digit: true, value: "56" }
+  ]);
+  assert.deepEqual(tokenizeFlip("09:05", "pair"), [
+    { digit: true, value: "09" },
+    { digit: false, value: ":" },
+    { digit: true, value: "05" }
+  ]);
+});
+
+test("tokenizeFlip treats every non-digit as a grouping boundary", () => {
+  assert.deepEqual(tokenizeFlip("12:34 PM", "pair"), [
+    { digit: true, value: "12" },
+    { digit: false, value: ":" },
+    { digit: true, value: "34" },
+    { digit: false, value: " " },
+    { digit: false, value: "P" },
+    { digit: false, value: "M" }
+  ]);
+});
+
+const formattedShareClock = {
+  time: "12:34",
+  date: "2026/06/14",
+  weekday: "日"
+};
+
+function shareLineSummary(lines) {
+  return lines.map((line) => ({
+    text: line.text,
+    size: line.size,
+    isTime: line.isTime === true
+  }));
+}
+
+test("buildShareLines places top and left labels above the date and time", () => {
+  for (const labelPosition of ["top", "left"]) {
+    const config = normalizeConfig({
+      label: "LIVE",
+      labelPosition,
+      showDate: true,
+      showWeekday: true,
+      fontSize: 42,
+      dateSize: 14,
+      labelSize: 12
+    });
+
+    assert.deepEqual(shareLineSummary(buildShareLines(config, formattedShareClock)), [
+      { text: "LIVE", size: 12, isTime: false },
+      { text: "2026/06/14  日", size: 14, isTime: false },
+      { text: "12:34", size: 42, isTime: true }
+    ]);
+  }
+});
+
+test("buildShareLines places bottom and right labels below the time", () => {
+  for (const labelPosition of ["bottom", "right"]) {
+    const config = normalizeConfig({
+      label: "LIVE",
+      labelPosition,
+      showDate: true,
+      showWeekday: false,
+      fontSize: 42,
+      dateSize: 14,
+      labelSize: 12
+    });
+
+    assert.deepEqual(shareLineSummary(buildShareLines(config, formattedShareClock)), [
+      { text: "2026/06/14", size: 14, isTime: false },
+      { text: "12:34", size: 42, isTime: true },
+      { text: "LIVE", size: 12, isTime: false }
+    ]);
+  }
+});
+
+test("buildShareLines hides labels and omits date or weekday lines when disabled", () => {
+  const hiddenLabel = normalizeConfig({
+    label: "LIVE",
+    labelPosition: "hidden",
+    showDate: true,
+    showWeekday: true,
+    fontSize: 42,
+    dateSize: 14,
+    labelSize: 12
+  });
+  assert.deepEqual(shareLineSummary(buildShareLines(hiddenLabel, formattedShareClock)), [
+    { text: "2026/06/14  日", size: 14, isTime: false },
+    { text: "12:34", size: 42, isTime: true }
+  ]);
+
+  const noDateOrWeekday = normalizeConfig({
+    label: "LIVE",
+    labelPosition: "top",
+    showDate: false,
+    showWeekday: false,
+    fontSize: 42,
+    dateSize: 14,
+    labelSize: 12
+  });
+  assert.deepEqual(shareLineSummary(buildShareLines(noDateOrWeekday, formattedShareClock)), [
+    { text: "LIVE", size: 12, isTime: false },
+    { text: "12:34", size: 42, isTime: true }
+  ]);
+
+  const weekdayOnly = normalizeConfig({
+    label: "",
+    labelPosition: "top",
+    showDate: false,
+    showWeekday: true,
+    fontSize: 42,
+    dateSize: 14,
+    labelSize: 12
+  });
+  assert.deepEqual(shareLineSummary(buildShareLines(weekdayOnly, formattedShareClock)), [
+    { text: "日", size: 14, isTime: false },
+    { text: "12:34", size: 42, isTime: true }
+  ]);
 });
