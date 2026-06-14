@@ -25,15 +25,19 @@ const UI_THEMES = new Set(["white", "booth", "fanbox"]);
 const LONG_URL_WARNING = 1800;
 const TOO_LONG_URL_WARNING = 4000;
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
+// label は系統名。analog/flip は雰囲気ではなく「時計の種類」なので、title で種類だと補足する
+// (定番/かわいい/クールは雰囲気で選ぶグループ)。
 const TEMPLATE_CATEGORIES = [
   { id: "all", label: "すべて" },
   { id: "standard", label: "定番" },
   { id: "cute", label: "かわいい" },
   { id: "cool", label: "クール" },
-  { id: "analog", label: "アナログ" },
-  { id: "flip", label: "パタパタ" }
+  { id: "analog", label: "アナログ", hint: "時計の種類: アナログ（針の時計）" },
+  { id: "flip", label: "パタパタ", hint: "時計の種類: パタパタ（数字がめくれる時計）" }
 ];
-let templateCategory = "all";
+// 初期表示は「定番」に絞り、最初の一覧を小さく見やすくする(既定テンプレ mono-compact も定番)。
+// 「すべて」はユーザーがタブを押したときだけ全件を表示する。
+let templateCategory = "standard";
 
 const elements = {
   uiTheme: byId("uiTheme"),
@@ -220,13 +224,13 @@ function initUiTheme() {
 }
 
 function initAdjustTabs() {
+  // かんたん/こだわりは「表示の切り替え(トグル)」として扱い、aria-pressed のみで状態を示す。
+  // aria-controls/aria-expanded は併用しない(二重シグナルを避ける)。
   const setMode = (advanced) => {
     elements.easyControls.hidden = advanced;
     elements.advancedControls.hidden = !advanced;
     elements.adjustTabEasy.setAttribute("aria-pressed", String(!advanced));
     elements.adjustTabAdvanced.setAttribute("aria-pressed", String(advanced));
-    elements.adjustTabEasy.setAttribute("aria-expanded", String(!advanced));
-    elements.adjustTabAdvanced.setAttribute("aria-expanded", String(advanced));
   };
   elements.adjustTabEasy.addEventListener("click", () => setMode(false));
   elements.adjustTabAdvanced.addEventListener("click", () => setMode(true));
@@ -248,6 +252,10 @@ function renderTemplateCategoryTabs() {
     tab.type = "button";
     tab.className = "category-tab";
     tab.textContent = category.label;
+    if (category.hint) {
+      // アナログ/パタパタは雰囲気ではなく時計の種類なので、ホバー説明で補足する。
+      tab.title = category.hint;
+    }
     tab.setAttribute("aria-pressed", String(category.id === templateCategory));
     tab.addEventListener("click", () => {
       templateCategory = category.id;
@@ -428,7 +436,13 @@ function bindForm() {
     updateEverything("初期設定へ戻しました。");
   });
   elements.compactUrl.addEventListener("change", () => updateEverything());
-  elements.copyUrl.addEventListener("click", () => copyText(elements.generatedUrl.value, elements.urlStatus, "URLをコピーしました。"));
+  elements.copyUrl.addEventListener("click", () =>
+    copyText(
+      elements.generatedUrl.value,
+      elements.urlStatus,
+      "URLをコピーしました。OBSのブラウザソースに貼り付け、最後に下の『Xでシェア』で宣伝できます。"
+    )
+  );
   elements.openClock.addEventListener("click", () => {
     window.open(elements.generatedUrl.value, "_blank", "noopener");
   });
@@ -438,7 +452,14 @@ function bindPreviewBackground() {
   document.querySelectorAll('input[name="previewBg"]').forEach((radio) => {
     radio.addEventListener("change", updatePreviewBackground);
   });
-  elements.previewCustomColor.addEventListener("input", updatePreviewBackground);
+  elements.previewCustomColor.addEventListener("input", () => {
+    // 任意色を編集したら「任意色」ラジオを自動選択し、見た目と選択状態(SR向け)を一致させる。
+    const customRadio = document.querySelector('input[name="previewBg"][value="custom"]');
+    if (customRadio && !customRadio.checked) {
+      customRadio.checked = true;
+    }
+    updatePreviewBackground();
+  });
 }
 
 function updateState(partial, sync = false) {
@@ -483,15 +504,20 @@ function syncOutputValues() {
       continue;
     }
     const value = Number(elements[field].value);
+    let text;
     if (["backgroundOpacity", "borderOpacity", "shadowOpacity", "lineHeight"].includes(field)) {
-      output.textContent = value.toFixed(2);
+      text = value.toFixed(2);
     } else if (field === "letterSpacing" || field === "strokeWidth") {
-      output.textContent = `${value.toFixed(1)}px`;
+      text = `${value.toFixed(1)}px`;
     } else if (field === "fontWeight") {
-      output.textContent = String(value);
+      text = String(value);
     } else {
-      output.textContent = `${value}px`;
+      text = `${value}px`;
     }
+    output.textContent = text;
+    // 表示中の単位付き文字列をそのまま読み上げへ流用し、二重管理を避ける。
+    // aria-describedby(HTML側)で output と関連付け、ここで値の読みも単位付きにする。
+    elements[field].setAttribute("aria-valuetext", text);
   }
 }
 
@@ -705,6 +731,9 @@ function markShareImageStale() {
     return;
   }
   elements.shareImagePreview.classList.remove("is-ready");
+  // 画像が今のデザインと食い違う(古い)あいだは alt を空にして装飾扱いにし、
+  // 状態は figcaption(下の説明)で伝える。読み上げが古い説明を読まないようにする。
+  elements.shareImagePreview.setAttribute("alt", "");
   elements.shareImageCaption.textContent =
     "デザインを変えました。『プレビュー画像を作り直す』で更新できます。";
   // 古い画像のダウンロードを防ぐ。キーボードでも活性化しないよう tabindex も外す。
@@ -749,6 +778,8 @@ async function regenerateShareImage(successMessage) {
   shareImageDirty = false;
   elements.shareImagePreview.src = dataUrl;
   elements.shareImagePreview.classList.add("is-ready");
+  // 生成できたときだけ意味のある alt を付け、読み上げにも画像があると伝える。
+  elements.shareImagePreview.setAttribute("alt", "作成した宣伝画像のプレビュー");
   elements.shareImageCaption.textContent = "今の時計デザインで宣伝画像を作りました。共有や保存ができます。";
   elements.downloadShareImage.href = dataUrl;
   elements.downloadShareImage.removeAttribute("aria-disabled");

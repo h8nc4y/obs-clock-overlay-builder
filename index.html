@@ -86,7 +86,7 @@
         <section class="preview-panel share-panel" aria-labelledby="shareHeading">
           <div class="section-heading">
             <h2 id="shareHeading">Xでシェアして広める</h2>
-            <p>作った時計の画像を共有して、ツールを広めましょう。見た人が「自分も作りたい」と思える宣伝になります。</p>
+            <p>まず上の「OBS用URLをコピー」でOBSに貼れたら、最後にここで作った時計を画像でシェアして広めましょう。見た人が「自分も作りたい」と思える宣伝になります。</p>
           </div>
 
           <div class="button-row share-actions">
@@ -96,7 +96,7 @@
           <p id="shareStatus" class="status-line share-status" role="status" aria-live="polite"></p>
 
           <figure class="share-preview-figure">
-            <img id="shareImagePreview" class="share-preview" alt="共有用に生成した時計の画像プレビュー" width="1200" height="675">
+            <img id="shareImagePreview" class="share-preview" alt="" width="1200" height="675">
             <figcaption id="shareImageCaption" class="copy-hint">「画像を共有」を押すと、今の時計デザインの宣伝画像を作ります。</figcaption>
           </figure>
 
@@ -153,8 +153,8 @@
           </div>
           <div class="adjust-tabs" role="group" aria-label="調整モード切り替え">
             <span>調整モード</span>
-            <button id="adjustTabEasy" type="button" class="adjust-tab" aria-pressed="true" aria-controls="easyControls" aria-expanded="true">かんたん</button>
-            <button id="adjustTabAdvanced" type="button" class="adjust-tab" aria-pressed="false" aria-controls="advancedControls" aria-expanded="false">こだわり</button>
+            <button id="adjustTabEasy" type="button" class="adjust-tab" aria-pressed="true">かんたん</button>
+            <button id="adjustTabAdvanced" type="button" class="adjust-tab" aria-pressed="false">こだわり</button>
           </div>
           <p id="builderStatus" class="status-line builder-status" role="status" aria-live="polite"></p>
           <div id="easyControls">
@@ -171,18 +171,18 @@
               </label>
               <label class="field" for="backgroundOpacity">
                 <span>背景不透明度</span>
-                <input id="backgroundOpacity" type="range" min="0" max="1" step="0.01">
+                <input id="backgroundOpacity" type="range" min="0" max="1" step="0.01" aria-describedby="backgroundOpacityValue">
                 <output id="backgroundOpacityValue"></output>
               </label>
               <label class="field" data-clock-mode="digital flip" for="fontSize">
                 <span>文字サイズ</span>
-                <input id="fontSize" type="range" min="18" max="120" step="1">
+                <input id="fontSize" type="range" min="18" max="120" step="1" aria-describedby="fontSizeValue">
                 <output id="fontSizeValue"></output>
               </label>
               <label class="field" data-clock-mode="digital" for="labelText">
                 <span>ラベル</span>
                 <input id="labelText" type="text" maxlength="40" placeholder="LIVE / JST / 配信中" aria-describedby="labelTextHelp">
-                <small id="labelTextHelp">入力した文字は、そのまま画面用の命令として実行されない形で表示します。</small>
+                <small id="labelTextHelp">画面に出したい一言を入れます（例: LIVE、JST、配信中）。入力した文字はそのまま表示され、絵文字や記号も使えます。</small>
               </label>
             </div>
             <div class="toggle-row">
@@ -204,7 +204,7 @@
               <div class="form-grid dense-grid">
                 <label class="field" for="analogSize">
                   <span>大きさ</span>
-                  <input id="analogSize" type="range" min="120" max="480" step="2">
+                  <input id="analogSize" type="range" min="120" max="480" step="2" aria-describedby="analogSizeValue">
                   <output id="analogSizeValue"></output>
                 </label>
                 <label class="field" for="analogMarks">
@@ -314,10 +314,10 @@
 
               <div class="control-group">
                 <h3>フォント</h3>
-                <p class="group-hint">生成URLにはフォント名だけを保存します。フォントファイルは同梱しないため、OBSを動かすPCに同じフォントが必要です。</p>
+                <p class="group-hint">フォントファイルは同梱しないため、フォント名だけをURLに保存します。</p>
                 <div class="info-note">
-                  <strong>フォントの考え方</strong>
-                  <p>この画面で選んだフォント名をURLに保存します。OBS側PCにそのフォントが無い場合は、近い標準フォントで表示され、見た目が変わることがあります。URLには表示名ではなく、OBSで実際に参照するフォント名を保存します。</p>
+                  <strong>最初に知っておくこと</strong>
+                  <p>選んだフォント名はURLに保存されます。配信に使うPCにそのフォントが無いと、近い標準フォントで表示され見た目が変わることがあります。URLには画面の表示名ではなく、OBSで実際に参照するフォント名を保存します。配信に使うPCで最終確認すると安心です。</p>
                 </div>
                 <div class="form-grid form-grid-top">
                   <label class="field" for="fontPreset">
@@ -328,7 +328,7 @@
                   <label class="field" for="fontFamily">
                     <span>手入力フォント名</span>
                     <input id="fontFamily" type="text" autocomplete="off" spellcheck="false" aria-describedby="fontFamilyHelp">
-                    <small id="fontFamilyHelp">例: Noto Sans JP / M PLUS Rounded 1c / Poppins。OBS側PCに無い名前は標準フォントへ置き換わります。配信に使うPCで最後に確認してください。</small>
+                    <small id="fontFamilyHelp">例: Noto Sans JP / M PLUS Rounded 1c / Poppins。正式なフォント名を入れてください。</small>
                   </label>
                 </div>
                 <div class="field field-wide local-font">
@@ -341,7 +341,7 @@
                 <label class="field field-wide is-hidden" id="localFontSelectWrap" for="localFontSelect">
                   <span>読み込んだフォント</span>
                   <select id="localFontSelect"></select>
-                  <small>日本語名で表示される場合も、URLにはOBSで実際に使うフォント名を保存します。別PCでは同じフォントが必要です。</small>
+                  <small>一覧から選ぶと、その正式なフォント名をURLに保存します。</small>
                 </label>
               </div>
 
@@ -350,27 +350,27 @@
                 <div class="form-grid dense-grid">
                   <label class="field" for="dateSize">
                     <span>日付サイズ</span>
-                    <input id="dateSize" type="range" min="10" max="56" step="1">
+                    <input id="dateSize" type="range" min="10" max="56" step="1" aria-describedby="dateSizeValue">
                     <output id="dateSizeValue"></output>
                   </label>
                   <label class="field" for="labelSize">
                     <span>ラベルサイズ</span>
-                    <input id="labelSize" type="range" min="10" max="48" step="1">
+                    <input id="labelSize" type="range" min="10" max="48" step="1" aria-describedby="labelSizeValue">
                     <output id="labelSizeValue"></output>
                   </label>
                   <label class="field" for="fontWeight">
                     <span>太さ</span>
-                    <input id="fontWeight" type="range" min="300" max="900" step="100">
+                    <input id="fontWeight" type="range" min="300" max="900" step="100" aria-describedby="fontWeightValue">
                     <output id="fontWeightValue"></output>
                   </label>
                   <label class="field" for="letterSpacing">
                     <span>文字間隔</span>
-                    <input id="letterSpacing" type="range" min="-1" max="8" step="0.1">
+                    <input id="letterSpacing" type="range" min="-1" max="8" step="0.1" aria-describedby="letterSpacingValue">
                     <output id="letterSpacingValue"></output>
                   </label>
                   <label class="field" for="lineHeight">
                     <span>行間</span>
-                    <input id="lineHeight" type="range" min="0.9" max="1.8" step="0.01">
+                    <input id="lineHeight" type="range" min="0.9" max="1.8" step="0.01" aria-describedby="lineHeightValue">
                     <output id="lineHeightValue"></output>
                   </label>
                 </div>
@@ -381,17 +381,17 @@
                 <div class="form-grid dense-grid">
                   <label class="field" for="paddingX">
                     <span>左右余白</span>
-                    <input id="paddingX" type="range" min="0" max="80" step="1">
+                    <input id="paddingX" type="range" min="0" max="80" step="1" aria-describedby="paddingXValue">
                     <output id="paddingXValue"></output>
                   </label>
                   <label class="field" for="paddingY">
                     <span>上下余白</span>
-                    <input id="paddingY" type="range" min="0" max="60" step="1">
+                    <input id="paddingY" type="range" min="0" max="60" step="1" aria-describedby="paddingYValue">
                     <output id="paddingYValue"></output>
                   </label>
                   <label class="field" for="radius">
                     <span>角丸</span>
-                    <input id="radius" type="range" min="0" max="48" step="1">
+                    <input id="radius" type="range" min="0" max="48" step="1" aria-describedby="radiusValue">
                     <output id="radiusValue"></output>
                   </label>
                   <label class="field" for="borderColor">
@@ -401,12 +401,12 @@
                   </label>
                   <label class="field" for="borderWidth">
                     <span>枠線幅</span>
-                    <input id="borderWidth" type="range" min="0" max="8" step="1">
+                    <input id="borderWidth" type="range" min="0" max="8" step="1" aria-describedby="borderWidthValue">
                     <output id="borderWidthValue"></output>
                   </label>
                   <label class="field" for="borderOpacity">
                     <span>枠線不透明度</span>
-                    <input id="borderOpacity" type="range" min="0" max="1" step="0.01">
+                    <input id="borderOpacity" type="range" min="0" max="1" step="0.01" aria-describedby="borderOpacityValue">
                     <output id="borderOpacityValue"></output>
                   </label>
                 </div>
@@ -422,22 +422,22 @@
                   </label>
                   <label class="field" for="shadowOpacity">
                     <span>影の濃さ</span>
-                    <input id="shadowOpacity" type="range" min="0" max="1" step="0.01">
+                    <input id="shadowOpacity" type="range" min="0" max="1" step="0.01" aria-describedby="shadowOpacityValue">
                     <output id="shadowOpacityValue"></output>
                   </label>
                   <label class="field" for="shadowBlur">
                     <span>影ぼかし</span>
-                    <input id="shadowBlur" type="range" min="0" max="36" step="1">
+                    <input id="shadowBlur" type="range" min="0" max="36" step="1" aria-describedby="shadowBlurValue">
                     <output id="shadowBlurValue"></output>
                   </label>
                   <label class="field" for="shadowX">
                     <span>影X</span>
-                    <input id="shadowX" type="range" min="-20" max="20" step="1">
+                    <input id="shadowX" type="range" min="-20" max="20" step="1" aria-describedby="shadowXValue">
                     <output id="shadowXValue"></output>
                   </label>
                   <label class="field" for="shadowY">
                     <span>影Y</span>
-                    <input id="shadowY" type="range" min="-20" max="20" step="1">
+                    <input id="shadowY" type="range" min="-20" max="20" step="1" aria-describedby="shadowYValue">
                     <output id="shadowYValue"></output>
                   </label>
                   <label class="field" for="strokeColor">
@@ -446,7 +446,7 @@
                   </label>
                   <label class="field" for="strokeWidth">
                     <span>縁取り幅</span>
-                    <input id="strokeWidth" type="range" min="0" max="8" step="0.5">
+                    <input id="strokeWidth" type="range" min="0" max="8" step="0.5" aria-describedby="strokeWidthValue">
                     <output id="strokeWidthValue"></output>
                   </label>
                 </div>

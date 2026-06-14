@@ -17,8 +17,12 @@
   --accent-bright: #f57c1f;
   --warm: #b3520a;
   --warm-soft: #fdf3ea;
+  --warn-line: #efd2ac;
+  --warn-ink: #3d3027;
+  --success-ink: #2f6a3c;
   --panel-radius: 10px;
   --button-radius: 8px;
+  --inner-radius: calc(var(--panel-radius) - 4px);
   --shadow: 0 2px 10px rgba(40, 36, 32, 0.05);
   --shadow-soft: 0 1px 6px rgba(40, 36, 32, 0.05);
 }
@@ -30,6 +34,8 @@
   --accent-bright: #fc4d50;
   --warm: #d83538;
   --warm-soft: #fdf1f1;
+  --warn-line: #f0c9ca;
+  --warn-ink: #4a2c2c;
   --line: #e5e5e4;
   --line-strong: #d2d2d0;
   --button-radius: 6px;
@@ -47,6 +53,8 @@
   --accent-bright: #0096fa;
   --warm: #0075c4;
   --warm-soft: #ecf6fd;
+  --warn-line: #b8dcf2;
+  --warn-ink: #1f3947;
   --panel-radius: 16px;
   --button-radius: 999px;
   --shadow: 0 4px 16px rgba(70, 90, 100, 0.12);
@@ -296,11 +304,11 @@ small,
 .info-note {
   margin: 0 0 14px;
   padding: 11px 12px;
-  border: 1px solid #efd2ac;
+  border: 1px solid var(--warn-line);
   border-left: 4px solid var(--warm);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: var(--warm-soft);
-  color: #3d3027;
+  color: var(--warn-ink);
   line-height: 1.65;
 }
 
@@ -333,7 +341,7 @@ small,
   min-height: 96px;
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #ffffff;
   color: var(--ink);
   text-align: left;
@@ -395,7 +403,7 @@ small,
 .control-group {
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #fafafa;
 }
 
@@ -573,7 +581,7 @@ output {
 .status-line {
   min-height: 1.4em;
   margin: 10px 0 0;
-  color: #2f6a3c;
+  color: var(--success-ink);
   font-size: 0.9rem;
 }
 
@@ -589,10 +597,11 @@ output {
 .warning {
   margin: 12px 0 0;
   padding: 10px 12px;
-  border: 1px solid #e5b769;
-  border-radius: 8px;
-  background: #fff7e8;
-  color: #62400d;
+  border: 1px solid var(--warn-line);
+  border-left: 4px solid var(--warm);
+  border-radius: var(--inner-radius);
+  background: var(--warm-soft);
+  color: var(--warn-ink);
   line-height: 1.6;
 }
 
@@ -659,7 +668,7 @@ output {
   min-height: 250px;
   padding: 24px;
   border: 1px solid var(--line-strong);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   overflow: hidden;
 }
 
@@ -714,7 +723,7 @@ output {
 .metrics-grid div {
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #ffffff;
 }
 
@@ -744,7 +753,7 @@ output {
 
 details {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background: #ffffff;
   padding: 10px 12px;
 }
@@ -767,9 +776,11 @@ details p {
 @media (max-width: 1100px) {
   .builder-layout {
     grid-template-columns: 1fr;
+    /* スマホ/タブレットでは Step 1(テンプレを選ぶ)を先頭に出し、
+       プレビューやコピー/共有ボタンはその後に置く。DOM順は変えず areas だけ入れ替える。 */
     grid-template-areas:
-      "preview"
-      "controls";
+      "controls"
+      "preview";
   }
 
   .preview-column {
@@ -819,6 +830,21 @@ details p {
 
   .template-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* 狭い画面では入力欄＋ボタンの横並びをやめ、縦に積んで全幅にそろえる。
+     ラベル(span)は1行に独立させ、ガタついた段組みを防ぐ。 */
+  .field-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field-inline > span,
+  .field-inline > input[type="text"],
+  .field-inline > select,
+  .field-inline > button {
+    flex: 1 1 auto;
+    width: 100%;
   }
 
   .button-row,
@@ -1041,7 +1067,7 @@ button.category-tab[aria-pressed="true"]:hover {
   justify-content: center;
   height: 76px;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background:
     linear-gradient(45deg, #e3e3e3 25%, transparent 25%),
     linear-gradient(-45deg, #e3e3e3 25%, transparent 25%),
@@ -1094,7 +1120,7 @@ button.category-tab[aria-pressed="true"]:hover {
   height: auto;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--line-strong);
-  border-radius: 8px;
+  border-radius: var(--inner-radius);
   background:
     linear-gradient(45deg, #ededed 25%, transparent 25%),
     linear-gradient(-45deg, #ededed 25%, transparent 25%),
