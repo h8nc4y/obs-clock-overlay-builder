@@ -93,7 +93,7 @@ const elements = {
   resetConfig: byId("resetConfig"),
   importStatus: byId("importStatus"),
   builderStatus: byId("builderStatus"),
-  preview: document.querySelector(".preview-primary"),
+  preview: document.querySelector(".preview-column"),
   pinPreview: byId("pinPreview"),
   pinLabel: document.querySelector("#pinPreview .pin-toggle-label"),
   previewShell: byId("previewShell"),
@@ -243,9 +243,11 @@ function initAdjustTabs() {
 }
 
 // ライブプレビューのピン留め(固定)切り替え。
-// ピンON: .preview-primary だけを sticky にし、右の設定を調整する間も時計を上部へ表示し続ける
-//   (列全体を sticky にすると かんたん/こだわり の高さ差でプレビューが飛ぶため、パネル単体に限定する)。
-// ピンOFF: 静的配置に戻し、左列を普通にスクロールして OBS用URL や 共有パネルへ到達できる。
+// ピンON: 左列(.preview-column = ライブプレビュー + OBS用URL + 共有)全体を sticky にし、
+//   右の設定をスクロールしても固定サイドバーとして残す。列が画面より高いときは
+//   max-height(=viewport)+overflow で列内スクロールにして、URL/共有パネルへ到達できるようにする
+//   (列全体を高さ無制限で sticky にすると かんたん/こだわり の高さ差で飛ぶため、CSS側で高さを上限化する)。
+// ピンOFF: 静的配置に戻し、ページを普通にスクロールして OBS用URL や 共有パネルへ到達できる。
 // 既定はON。選択は localStorage に保存するが、保存できない環境でもこの画面内の切り替えはそのまま使える。
 function initPinPreview() {
   if (!elements.pinPreview) {

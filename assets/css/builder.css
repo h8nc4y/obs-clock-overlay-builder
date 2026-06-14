@@ -257,13 +257,20 @@ code {
   min-width: 0;
 }
 
-/* ライブプレビューのピン留め。列全体ではなくこのパネル単体を sticky にすることで、
-   かんたん/こだわり の高さ差があってもプレビューが飛ばず、右の設定を調整する間も上部に残る。
-   デスクトップ(>1100px)専用。1100px以下は1カラムでプレビューが下に来るため固定しない。 */
+/* ライブプレビューのピン留め。左列(.preview-column = プレビュー + OBS用URL + 共有)全体を
+   sticky にして固定サイドバー化し、右の設定をスクロールしてもまとめて上部に残す。
+   max-height で列を viewport 高に上限化することで、右列が常に列より高くなり sticky に
+   トラベルが生まれる → かんたん/こだわり を切り替えても飛ばない。列が画面より高いときは
+   overflow-y で列内スクロールにし、OBS用URL/共有パネルへ到達できるようにする
+   (画面に収まる高さなら何もスクロールしない)。scrollbar-gutter でスクロールバー分の
+   横ガタつきを防ぐ。デスクトップ(>1100px)専用。1100px以下は1カラムなので固定しない。 */
 @media (min-width: 1101px) {
-  .preview-primary.is-pinned {
+  .preview-column.is-pinned {
     position: sticky;
     top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 }
 
@@ -851,9 +858,12 @@ details p {
   }
 
   /* 1カラムではプレビューが下に来るため固定しない。ピンボタンも隠して誤操作を防ぐ
-     (is-pinned が残っていても上の sticky は min-width:1101px なので適用されない)。 */
-  .preview-primary.is-pinned {
+     (is-pinned が残っていても上の sticky は min-width:1101px なので適用されない)。
+     念のため列の高さ上限/列内スクロールも解除し、ページが普通にスクロールできるようにする。 */
+  .preview-column.is-pinned {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 
   .pin-toggle {
