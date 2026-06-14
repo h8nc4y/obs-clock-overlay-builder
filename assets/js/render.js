@@ -182,6 +182,28 @@ function mountAnalogClock(container, config, options = {}) {
   return controller;
 }
 
+// flipGroup="pair" のときは連続した数字を1枚のカードにまとめる(2桁パネル)。
+export function tokenizeFlip(text, group) {
+  const tokens = [];
+  let i = 0;
+  while (i < text.length) {
+    const char = text[i];
+    const isDigit = char >= "0" && char <= "9";
+    if (isDigit && group === "pair") {
+      let value = "";
+      while (i < text.length && text[i] >= "0" && text[i] <= "9") {
+        value += text[i];
+        i += 1;
+      }
+      tokens.push({ digit: true, value });
+    } else {
+      tokens.push({ digit: isDigit, value: char });
+      i += 1;
+    }
+  }
+  return tokens;
+}
+
 // パタパタ(フリップ)時計。各桁を「カード」で描き、値が変わったときだけ
 // 短いフリップアニメを再生する。パタパタ時計という形式の独自実装。
 function mountFlipClock(container, config, options = {}) {
@@ -194,28 +216,6 @@ function mountFlipClock(container, config, options = {}) {
   let formatters = createFormatters(currentConfig);
   let slots = [];
   let layoutKey = "";
-
-  // flipGroup="pair" のときは連続した数字を1枚のカードにまとめる(2桁パネル)。
-  function tokenize(text, group) {
-    const tokens = [];
-    let i = 0;
-    while (i < text.length) {
-      const char = text[i];
-      const isDigit = char >= "0" && char <= "9";
-      if (isDigit && group === "pair") {
-        let value = "";
-        while (i < text.length && text[i] >= "0" && text[i] <= "9") {
-          value += text[i];
-          i += 1;
-        }
-        tokens.push({ digit: true, value });
-      } else {
-        tokens.push({ digit: isDigit, value: char });
-        i += 1;
-      }
-    }
-    return tokens;
-  }
 
   function makeHalf(extra, value) {
     const half = document.createElement("span");
@@ -280,7 +280,7 @@ function mountFlipClock(container, config, options = {}) {
   }
 
   function update(text) {
-    const tokens = tokenize(text, currentConfig.flipGroup);
+    const tokens = tokenizeFlip(text, currentConfig.flipGroup);
     const key = `${currentConfig.flipGroup}:${tokens.map((t) => (t.digit ? `#${t.value.length}` : t.value)).join("|")}`;
     if (key !== layoutKey) {
       build(tokens);

@@ -11,9 +11,9 @@ import {
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
-import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize } from "./render.js";
+import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize, tokenizeFlip } from "./render.js";
 import { analogParts, createAnalogFormatter, createFormatters, formatClock } from "./time.js";
-import { buildShareText, buildXIntentUrl, canvasFontStack, resolveShareText } from "./share.js";
+import { buildShareLines, buildShareText, buildXIntentUrl, canvasFontStack, resolveShareText } from "./share.js";
 
 const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 const SHARE_IMAGE_WIDTH = 1200;
@@ -945,10 +945,10 @@ function drawDigitalShareClock(ctx, config) {
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
 
-  const label = config.labelPosition === "hidden" ? "" : config.label;
-  const labelPx = Math.round(config.labelSize * scale);
-  const datePx = Math.round(config.dateSize * scale);
-  const dateLine = [formatted.date, formatted.weekday].filter(Boolean).join("  ");
+  const lines = buildShareLines(config, formatted).map((line) => ({
+    ...line,
+    px: Math.round(line.size * scale)
+  }));
 
   // ライブ時計は --clock-letter-spacing(字間)を反映する。Canvas2D の letterSpacing が
   // 使える環境では同じ字間を適用し、計測も同じ状態で行ってパネル幅を実際の描画に揃える。
@@ -963,33 +963,16 @@ function drawDigitalShareClock(ctx, config) {
   ctx.font = `${config.fontWeight} ${fontPx}px ${fontStack}`;
   const timeWidth = ctx.measureText(formatted.time).width;
   let panelContentWidth = timeWidth;
-  if (label) {
-    ctx.font = `${config.fontWeight} ${labelPx}px ${fontStack}`;
-    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(label).width);
-  }
-  if (dateLine) {
-    ctx.font = `${config.fontWeight} ${datePx}px ${fontStack}`;
-    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(dateLine).width);
+  for (const line of lines) {
+    if (line.isTime) {
+      continue;
+    }
+    ctx.font = `${config.fontWeight} ${line.px}px ${fontStack}`;
+    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(line.text).width);
   }
 
   const padX = config.paddingX * scale + 24;
   const padY = config.paddingY * scale + 18;
-  // 宣伝カードは1列に積む簡易表現。left/right の横並びは縦積みで近似し、
-  // "left" は上(top 相当)、"right" は下(bottom 相当)へ置いてラベルを必ず残す
-  // (Soda / Neon HUD など labelPosition:"right" のテンプレでラベルが消えないように)。
-  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
-  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
-  const lines = [];
-  if (label && labelAbove) {
-    lines.push({ text: label, px: labelPx });
-  }
-  if (dateLine) {
-    lines.push({ text: dateLine, px: datePx });
-  }
-  lines.push({ text: formatted.time, px: fontPx, isTime: true });
-  if (label && labelBelow) {
-    lines.push({ text: label, px: labelPx });
-  }
 
   const gap = Math.max(8, config.gap * scale);
   const linesHeight = lines.reduce((sum, line) => sum + line.px, 0) + gap * (lines.length - 1);
@@ -1176,24 +1159,7 @@ function drawFlipShareClock(ctx, config) {
   const time = formatClock(formatters, new Date()).time;
   const fontStack = canvasFontStack(config.fontFamily);
 
-  // flipGroup に合わせて数字/区切りをトークン化(render.js の tokenize と同方針)。
-  const tokens = [];
-  let i = 0;
-  while (i < time.length) {
-    const char = time[i];
-    const isDigit = char >= "0" && char <= "9";
-    if (isDigit && config.flipGroup === "pair") {
-      let value = "";
-      while (i < time.length && time[i] >= "0" && time[i] <= "9") {
-        value += time[i];
-        i += 1;
-      }
-      tokens.push({ digit: true, value });
-    } else {
-      tokens.push({ digit: isDigit, value: char });
-      i += 1;
-    }
-  }
+  const tokens = tokenizeFlip(time, config.flipGroup);
 
   const scale = 2.6;
   const cardFontPx = Math.round(config.fontSize * scale);

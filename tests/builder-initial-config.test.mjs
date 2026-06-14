@@ -30,6 +30,18 @@ test("no-query editor load may use localStorage", () => {
   assert.equal(config.showDate, true);
 });
 
+test("saved config with a stale version falls back to the current default", () => {
+  const staleConfig = { ...normalizeConfig({ label: "古い保存", timezone: "UTC", showDate: true }), version: 0 };
+
+  const config = loadInitialConfigFromSources({
+    href: "https://example.com/",
+    search: "",
+    getSavedConfig: () => JSON.stringify(staleConfig)
+  });
+
+  assert.deepEqual(config, DEFAULT_CONFIG);
+});
+
 test("invalid URL config source falls back safely instead of localStorage", () => {
   const saved = JSON.stringify(normalizeConfig({ label: "保存済み", timezone: "UTC", showDate: true }));
 
