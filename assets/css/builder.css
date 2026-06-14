@@ -923,7 +923,8 @@ details p {
   margin-bottom: 12px;
 }
 
-.clock-type-row > span {
+.clock-type-row > span,
+.adjust-tabs > span {
   margin-right: 4px;
   color: var(--muted);
   font-size: 0.88rem;
@@ -959,6 +960,7 @@ details p {
 .adjust-tabs {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   margin-bottom: 14px;
 }
