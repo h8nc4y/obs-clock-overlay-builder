@@ -23,7 +23,7 @@ const securityHeaders = {
   "x-content-type-options": "nosniff",
   "referrer-policy": "no-referrer",
   "content-security-policy":
-    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'"
+    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'"
 };
 
 const server = createServer((request, response) => {

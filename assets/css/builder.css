@@ -1,6 +1,7 @@
 /* ビルダー編集画面(index.html)専用スタイル。
    画面テーマ: 既定は「白(わんコメ風)」。html[data-theme="booth"] / [data-theme="fanbox"] で
-   トークンを差し替える。テーマはビルダー画面専用で、/clock/ には適用されない。 */
+   トークンを差し替える。テーマはビルダー画面専用で、/clock/ には適用されない。
+   UIラベル対応: booth=「コーラル」(BOOTH配色由来) / fanbox=「ふんわりブルー」(pixivFANBOX配色由来)。 */
 
 :root {
   --page-bg: #ffffff;
