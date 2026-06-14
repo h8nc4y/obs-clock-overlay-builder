@@ -5,12 +5,19 @@ import {
   cloneDefaultConfig,
   configToClockUrl,
   contrastRatio,
+  hexToRgba,
   normalizeConfig,
   parseImportInput
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
-import { applyClockStyles, mountClock, recommendedObsSize } from "./render.js";
+import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize } from "./render.js";
+import { analogParts, createAnalogFormatter, createFormatters, formatClock } from "./time.js";
+import { buildShareText, buildXIntentUrl, canvasFontStack, resolveShareText } from "./share.js";
+
+const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
+const SHARE_IMAGE_WIDTH = 1200;
+const SHARE_IMAGE_HEIGHT = 675;
 
 const STORAGE_KEY = "obs-clock-builder:v1";
 const THEME_STORAGE_KEY = "obs-clock-builder:theme";
@@ -98,7 +105,15 @@ const elements = {
   analogSize: byId("analogSize"),
   analogMarks: byId("analogMarks"),
   analogSecondHand: byId("analogSecondHand"),
-  flipGroup: byId("flipGroup")
+  flipGroup: byId("flipGroup"),
+  shareText: byId("shareText"),
+  shareImage: byId("shareImage"),
+  generateShareImage: byId("generateShareImage"),
+  shareStatus: byId("shareStatus"),
+  shareImagePreview: byId("shareImagePreview"),
+  shareImageCaption: byId("shareImageCaption"),
+  downloadShareImage: byId("downloadShareImage"),
+  xIntent: byId("xIntent")
 };
 
 const rangeFields = [
@@ -126,6 +141,10 @@ const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
 const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let localFontSelectBound = false;
+// 生成済みの宣伝画像をキャッシュし、設定が変わったら無効化する。
+// 共有時にまだ無ければ作り、ある間は再生成を省く。
+let shareImageBlob = null;
+let shareImageDirty = true;
 
 const previewClock = mountClock(elements.clockPreview, state);
 
@@ -142,6 +161,7 @@ function init() {
   bindForm();
   bindPreviewBackground();
   bindClockType();
+  bindShare();
   syncFormFromState();
   updateEverything();
   window.addEventListener("resize", () => window.requestAnimationFrame(fitTemplateMiniPreviews));
@@ -484,6 +504,15 @@ function updateEverything(status = "") {
   updateContrastWarning();
   updateTemplatePressed();
   updateClockTypeVisibility();
+  // 設定が変わったら生成済み画像は古くなる。次の共有時に作り直す。
+  // 既に画像を作っていてこれが「初めて古くなった」瞬間なら、プレビュー/説明/保存リンクを
+  // 古い状態として示す(自動再生成はしない)。共有ボタンは ensureShareImage で作り直す。
+  const becameStale = shareImageBlob && !shareImageDirty;
+  shareImageDirty = true;
+  if (becameStale) {
+    markShareImageStale();
+  }
+  updateXIntent();
   if (status) {
     // 汎用ステータスは常時表示の builderStatus へ。importStatus は「こだわり」内に
     // あり「かんたん」タブでは非表示になるため、確認文が見えなくなるのを防ぐ。
@@ -647,6 +676,596 @@ function persistState() {
   } catch {
     // URL remains the source of truth; localStorage is only a convenience.
   }
+}
+
+// ---- 共有(Xでシェアして広める) ------------------------------------------
+
+function bindShare() {
+  updateShareText();
+  elements.shareImage.addEventListener("click", shareGeneratedImage);
+  elements.generateShareImage.addEventListener("click", () => {
+    regenerateShareImage("プレビュー画像を作り直しました。");
+  });
+  // 「PNGを保存」リンクは画像が無い間は aria-disabled。pointer-events だけでは
+  // キーボード(Tab+Enter)で href="#" が発火しページ先頭へ飛ぶため、活性化も止める。
+  elements.downloadShareImage.addEventListener("click", (event) => {
+    if (elements.downloadShareImage.getAttribute("aria-disabled") === "true") {
+      event.preventDefault();
+    }
+  });
+  // 投稿文を編集したら、X投稿画面リンク(intent)へ即座に反映する。
+  elements.shareText.addEventListener("input", updateXIntent);
+  updateXIntent();
+}
+
+// 生成済み画像が「今のデザイン」と一致しなくなったことを画面へ反映する。
+// 再生成は行わず(コストを避ける)、プレビュー/説明/保存リンクを古い状態として示す。
+function markShareImageStale() {
+  if (!elements.shareImagePreview) {
+    return;
+  }
+  elements.shareImagePreview.classList.remove("is-ready");
+  elements.shareImageCaption.textContent =
+    "デザインを変えました。『プレビュー画像を作り直す』で更新できます。";
+  // 古い画像のダウンロードを防ぐ。キーボードでも活性化しないよう tabindex も外す。
+  elements.downloadShareImage.setAttribute("aria-disabled", "true");
+  elements.downloadShareImage.setAttribute("href", "#");
+  elements.downloadShareImage.setAttribute("tabindex", "-1");
+}
+
+function updateShareText() {
+  // 既定文は最初の一度だけ流し込み、ユーザーが編集した内容は上書きしない。
+  if (!elements.shareText.value) {
+    elements.shareText.value = buildShareText(BUILDER_URL);
+  }
+}
+
+function updateXIntent() {
+  // 投稿文側にURL/ハッシュタグを含めているので、intent側は text だけにして
+  // 重複表示を避ける。X Web Intent は画像添付には非対応(テキスト導線のみ)。
+  if (!elements.xIntent) {
+    return;
+  }
+  // 本文(buildShareText)に URL とハッシュタグを既に含めているため、intent には text のみ
+  // 渡す。url= / hashtags= を併せて渡すと X Web Intent が本文末へ二重に追記してしまう。
+  const text = resolveShareText(elements.shareText.value, BUILDER_URL);
+  elements.xIntent.href = buildXIntentUrl({ text });
+}
+
+async function regenerateShareImage(successMessage) {
+  setShareStatus("宣伝画像を作成中…");
+  let dataUrl;
+  let blob;
+  try {
+    const result = await createShareImage();
+    dataUrl = result.dataUrl;
+    blob = result.blob;
+  } catch {
+    shareImageBlob = null;
+    setShareStatus("画像を作成できませんでした。ブラウザを更新してもう一度試してください。", true);
+    return false;
+  }
+  shareImageBlob = blob;
+  shareImageDirty = false;
+  elements.shareImagePreview.src = dataUrl;
+  elements.shareImagePreview.classList.add("is-ready");
+  elements.shareImageCaption.textContent = "今の時計デザインで宣伝画像を作りました。共有や保存ができます。";
+  elements.downloadShareImage.href = dataUrl;
+  elements.downloadShareImage.removeAttribute("aria-disabled");
+  // 無効化時に外したキーボード活性化(tabindex=-1)を戻し、再び Tab で辿れるようにする。
+  elements.downloadShareImage.removeAttribute("tabindex");
+  if (successMessage) {
+    setShareStatus(successMessage);
+  }
+  return true;
+}
+
+// 画像が無い/古いときだけ作り直す。共有や保存の直前に呼ぶ。
+async function ensureShareImage() {
+  if (shareImageBlob && !shareImageDirty) {
+    return true;
+  }
+  return regenerateShareImage("");
+}
+
+async function shareGeneratedImage() {
+  const ready = await ensureShareImage();
+  if (!ready || !shareImageBlob) {
+    return;
+  }
+  const file = new File([shareImageBlob], "obs-clock-share.png", { type: "image/png" });
+  const text = resolveShareText(elements.shareText.value, BUILDER_URL);
+
+  // 画像ファイルごと共有できる端末(主にスマホ)では OS の共有シートを開く。
+  if (typeof navigator !== "undefined" && navigator.canShare?.({ files: [file] }) && navigator.share) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: "OBS時計URLビルダー",
+        text
+      });
+      setShareStatus("共有メニューを開きました。Xなどの共有先を選んでください。");
+    } catch (error) {
+      // ユーザーが共有シートを閉じただけ(キャンセル)はエラー扱いしない。
+      if (error && error.name === "AbortError") {
+        setShareStatus("共有をキャンセルしました。");
+      } else {
+        setShareStatus("共有できませんでした。下の「PNGを保存」→「X投稿画面を開く」で手動添付してください。", true);
+      }
+    }
+    return;
+  }
+
+  // 画像共有に非対応の環境(主にPC)はフォールバック手順へ誘導する。
+  setShareStatus("この環境は画像の直接共有に未対応です。「PNGを保存」→「X投稿画面を開く」で画像を手動添付してください。");
+}
+
+function setShareStatus(message, isError = false) {
+  elements.shareStatus.textContent = message;
+  elements.shareStatus.classList.toggle("is-error", Boolean(isError));
+}
+
+// 今の state を 1200x675 の宣伝カードとして Canvas へ描く。
+// 外部画像・外部フォント・ネットワークは一切使わない(CSP/オフライン両対応)。
+// 返り値: { dataUrl, blob } — dataUrl は img プレビュー/保存(CSP: data: 許可)、
+// blob は navigator.share 用の File 生成に使う。
+async function createShareImage() {
+  const canvas = document.createElement("canvas");
+  canvas.width = SHARE_IMAGE_WIDTH;
+  canvas.height = SHARE_IMAGE_HEIGHT;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Canvas 2D context unavailable.");
+  }
+
+  drawShareBackground(ctx, state);
+  drawShareClock(ctx, state);
+  drawShareFooter(ctx);
+
+  const dataUrl = canvas.toDataURL("image/png");
+  const blob = await canvasToBlob(canvas);
+  return { dataUrl, blob };
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    if (typeof canvas.toBlob !== "function") {
+      reject(new Error("canvas.toBlob unavailable."));
+      return;
+    }
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Canvas PNG generation failed."));
+      }
+    }, "image/png");
+  });
+}
+
+// 背景: 時計の背景色から淡いグラデーションを作り、上品な無地カード風にする。
+function drawShareBackground(ctx, config) {
+  const tint = hexToRgba(config.backgroundColor, 0.16);
+  const gradient = ctx.createLinearGradient(0, 0, SHARE_IMAGE_WIDTH, SHARE_IMAGE_HEIGHT);
+  gradient.addColorStop(0, "#f4f6fb");
+  gradient.addColorStop(0.5, tint);
+  gradient.addColorStop(1, "#eef1f7");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, SHARE_IMAGE_WIDTH, SHARE_IMAGE_HEIGHT);
+
+  // 主役を載せる白いステージ。中央やや上に大きく取り、足元に余白を残す。
+  const stageX = 90;
+  const stageY = 96;
+  const stageW = SHARE_IMAGE_WIDTH - stageX * 2;
+  const stageH = 410;
+  ctx.save();
+  ctx.shadowColor = "rgba(31, 36, 48, 0.16)";
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetY = 18;
+  drawRoundedRectPath(ctx, stageX, stageY, stageW, stageH, 28);
+  ctx.fillStyle = "#ffffff";
+  ctx.fill();
+  ctx.restore();
+
+  // ステージ中央へ時計を描くための領域を共有(他の draw 関数が参照)。
+  ctx.__stage = { x: stageX, y: stageY, w: stageW, h: stageH, cx: SHARE_IMAGE_WIDTH / 2, cy: stageY + stageH / 2 };
+}
+
+function drawShareClock(ctx, config) {
+  if (config.clockType === "analog") {
+    drawAnalogShareClock(ctx, config);
+  } else if (config.clockType === "flip") {
+    drawFlipShareClock(ctx, config);
+  } else {
+    drawDigitalShareClock(ctx, config);
+  }
+}
+
+// 時計の影と縁取りを Canvas のテキスト描画へ反映する共通処理。
+function applyTextEffects(ctx, config) {
+  if (config.shadowOpacity > 0 && config.shadowBlur > 0) {
+    ctx.shadowColor = hexToRgba(config.shadowColor, config.shadowOpacity);
+    ctx.shadowBlur = config.shadowBlur * 1.6;
+    ctx.shadowOffsetX = config.shadowX * 1.6;
+    ctx.shadowOffsetY = config.shadowY * 1.6;
+  } else {
+    clearShadow(ctx);
+  }
+}
+
+function clearShadow(ctx) {
+  ctx.shadowColor = "rgba(0, 0, 0, 0)";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+}
+
+function drawDigitalShareClock(ctx, config) {
+  const stage = ctx.__stage;
+  const formatters = createFormatters(config);
+  const formatted = formatClock(formatters, new Date());
+
+  // プレビューの時計パネル(背景色+枠+角丸)を、実寸より大きめに描いて主役にする。
+  const scale = 2.4;
+  const fontPx = Math.round(config.fontSize * scale);
+  const fontStack = canvasFontStack(config.fontFamily);
+
+  // パネル幅は時刻文字の実測から決める。
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+
+  const label = config.labelPosition === "hidden" ? "" : config.label;
+  const labelPx = Math.round(config.labelSize * scale);
+  const datePx = Math.round(config.dateSize * scale);
+  const dateLine = [formatted.date, formatted.weekday].filter(Boolean).join("  ");
+
+  // ライブ時計は --clock-letter-spacing(字間)を反映する。Canvas2D の letterSpacing が
+  // 使える環境では同じ字間を適用し、計測も同じ状態で行ってパネル幅を実際の描画に揃える。
+  // 非対応環境では従来どおり字間なしで描く(グレースフルフォールバック)。
+  const supportsLetterSpacing = "letterSpacing" in ctx;
+  const letterSpacingCss = `${config.letterSpacing * scale}px`;
+  if (supportsLetterSpacing) {
+    ctx.letterSpacing = letterSpacingCss;
+  }
+
+  clearShadow(ctx);
+  ctx.font = `${config.fontWeight} ${fontPx}px ${fontStack}`;
+  const timeWidth = ctx.measureText(formatted.time).width;
+  let panelContentWidth = timeWidth;
+  if (label) {
+    ctx.font = `${config.fontWeight} ${labelPx}px ${fontStack}`;
+    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(label).width);
+  }
+  if (dateLine) {
+    ctx.font = `${config.fontWeight} ${datePx}px ${fontStack}`;
+    panelContentWidth = Math.max(panelContentWidth, ctx.measureText(dateLine).width);
+  }
+
+  const padX = config.paddingX * scale + 24;
+  const padY = config.paddingY * scale + 18;
+  // 宣伝カードは1列に積む簡易表現。left/right の横並びは縦積みで近似し、
+  // "left" は上(top 相当)、"right" は下(bottom 相当)へ置いてラベルを必ず残す
+  // (Soda / Neon HUD など labelPosition:"right" のテンプレでラベルが消えないように)。
+  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
+  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
+  const lines = [];
+  if (label && labelAbove) {
+    lines.push({ text: label, px: labelPx });
+  }
+  if (dateLine) {
+    lines.push({ text: dateLine, px: datePx });
+  }
+  lines.push({ text: formatted.time, px: fontPx, isTime: true });
+  if (label && labelBelow) {
+    lines.push({ text: label, px: labelPx });
+  }
+
+  const gap = Math.max(8, config.gap * scale);
+  const linesHeight = lines.reduce((sum, line) => sum + line.px, 0) + gap * (lines.length - 1);
+  // 高さが上限を超えるなら、文字サイズ・行送り・縦パディングを同率で縮めてカード内に収める
+  // (クランプだけだと行カーソルがクランプ前の値のまま進み、最下行がカード外へはみ出す)。
+  const maxW = stage.w - 80;
+  const maxH = stage.h - 80;
+  const fullHeight = linesHeight + padY * 2;
+  const fit = fullHeight > maxH ? maxH / fullHeight : 1;
+  const fitGap = gap * fit;
+  const fitPadY = padY * fit;
+  let panelW = panelContentWidth + padX * 2;
+  let panelH = fullHeight * fit;
+  // 幅は字を縮めず上限でクランプ(従来挙動を維持。横はみ出しはここで止める)。
+  if (panelW > maxW) {
+    panelW = maxW;
+  }
+  const panelX = stage.cx - panelW / 2;
+  const panelY = stage.cy - panelH / 2;
+
+  // 時計パネル本体(背景・角丸・枠線)。
+  clearShadow(ctx);
+  drawRoundedRectPath(ctx, panelX, panelY, panelW, panelH, Math.min(config.radius * scale, panelH / 2));
+  ctx.fillStyle = hexToRgba(config.backgroundColor, config.backgroundOpacity);
+  ctx.fill();
+  if (config.borderWidth > 0) {
+    ctx.lineWidth = Math.max(1, config.borderWidth * scale);
+    ctx.strokeStyle = hexToRgba(config.borderColor, config.borderOpacity);
+    ctx.stroke();
+  }
+
+  // 各行を縦に積んで描く。時刻行だけ影/縁取りを反映する。
+  // フォントサイズ・行送り・パディングは収まり係数 fit を掛けてカード内に収める。
+  let cursorY = panelY + fitPadY + (lines[0].px * fit) / 2;
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const linePx = line.px * fit;
+    ctx.font = `${config.fontWeight} ${linePx}px ${fontStack}`;
+    if (line.isTime) {
+      applyTextEffects(ctx, config);
+    } else {
+      clearShadow(ctx);
+    }
+    ctx.fillStyle = config.textColor;
+    ctx.fillText(line.text, stage.cx, cursorY);
+    if (line.isTime && config.strokeWidth > 0) {
+      clearShadow(ctx);
+      ctx.lineWidth = config.strokeWidth * scale * fit;
+      ctx.strokeStyle = config.strokeColor;
+      ctx.strokeText(line.text, stage.cx, cursorY);
+    }
+    if (i < lines.length - 1) {
+      cursorY += linePx / 2 + fitGap + (lines[i + 1].px * fit) / 2;
+    }
+  }
+  clearShadow(ctx);
+  // 字間が footer など後続の描画へ漏れないよう必ず初期状態へ戻す。
+  if (supportsLetterSpacing) {
+    ctx.letterSpacing = "0px";
+  }
+}
+
+function drawAnalogShareClock(ctx, config) {
+  const stage = ctx.__stage;
+  // 宣伝カードは固定フレーム(1200x675のティザー)として描く設計。半径はステージに
+  // フィットさせ、config.analogSize は意図的に反映しない(忠実再現の正は /clock/?c= URL)。
+  const radius = Math.min(stage.h, stage.w) / 2 - 36;
+  const cx = stage.cx;
+  const cy = stage.cy;
+  const rimWidth = Math.max(0, config.borderWidth) / 48 * radius;
+
+  clearShadow(ctx);
+  // 外周(枠)→ 文字盤の順に塗る。render.js の比率(r=48, rim=borderWidth)に合わせる。
+  if (config.borderWidth > 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = hexToRgba(config.borderColor, config.borderOpacity);
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius - rimWidth, 0, Math.PI * 2);
+  ctx.fillStyle = hexToRgba(config.backgroundColor, config.backgroundOpacity);
+  ctx.fill();
+
+  const ink = config.textColor;
+  const accent = config.strokeColor;
+  const fontStack = canvasFontStack(config.fontFamily);
+
+  drawAnalogMarks(ctx, config, cx, cy, radius, ink, fontStack);
+
+  // 針の角度はタイムゾーン補正済みの実時刻から計算(プレビューと一致)。
+  const formatter = createAnalogFormatter(config.timezone);
+  const parts = analogParts(formatter, new Date());
+  const angles = computeAnalogAngles(parts, config.analogSecondHand);
+
+  // 文字盤の日付(showDate のとき)。ライブ面(render.js)は viewBox 0-100 / r=48 で
+  // y=66・font-size=6 に描くので、中心の下 radius*0.333・サイズ radius*0.125 で近似する。
+  if (config.showDate) {
+    const dateText = formatClock(createFormatters(config), new Date()).date;
+    if (dateText) {
+      clearShadow(ctx);
+      ctx.fillStyle = ink;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `600 ${radius * 0.125}px ${fontStack}`;
+      ctx.fillText(dateText, cx, cy + radius * 0.333);
+    }
+  }
+
+  drawHand(ctx, cx, cy, angles.hourDeg, radius * 0.5, radius * 0.05, ink);
+  drawHand(ctx, cx, cy, angles.minuteDeg, radius * 0.72, radius * 0.037, ink);
+  if (config.analogSecondHand !== "off") {
+    drawHand(ctx, cx, cy, angles.secondDeg, radius * 0.8, radius * 0.017, accent);
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.05, 0, Math.PI * 2);
+  ctx.fillStyle = ink;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.023, 0, Math.PI * 2);
+  ctx.fillStyle = accent;
+  ctx.fill();
+}
+
+function drawAnalogMarks(ctx, config, cx, cy, radius, ink, fontStack) {
+  const marks = config.analogMarks;
+  const showNumbers = marks === "numbers" || marks === "both";
+  const showRoman = marks === "roman";
+  const showTicks = marks === "ticks" || marks === "both";
+  const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+
+  clearShadow(ctx);
+  if (showTicks) {
+    for (let i = 0; i < 60; i += 1) {
+      const isHour = i % 5 === 0;
+      const angle = (i * 6 * Math.PI) / 180;
+      const outer = radius * 0.92;
+      const inner = outer - radius * (isHour ? 0.09 : 0.05);
+      ctx.beginPath();
+      ctx.lineWidth = isHour ? radius * 0.024 : radius * 0.012;
+      ctx.strokeStyle = ink;
+      ctx.moveTo(cx + outer * Math.sin(angle), cy - outer * Math.cos(angle));
+      ctx.lineTo(cx + inner * Math.sin(angle), cy - inner * Math.cos(angle));
+      ctx.stroke();
+    }
+  }
+  if (showNumbers || showRoman) {
+    ctx.fillStyle = ink;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const numberRadius = radius * (showRoman ? 0.78 : 0.76);
+    const fontPx = radius * (showRoman ? 0.13 : 0.18);
+    ctx.font = `700 ${fontPx}px ${fontStack}`;
+    for (let i = 1; i <= 12; i += 1) {
+      const angle = (i * 30 * Math.PI) / 180;
+      const x = cx + numberRadius * Math.sin(angle);
+      const y = cy - numberRadius * Math.cos(angle);
+      ctx.fillText(showRoman ? roman[i - 1] : String(i), x, y);
+    }
+  }
+}
+
+function drawHand(ctx, cx, cy, deg, length, width, color) {
+  const angle = (deg * Math.PI) / 180;
+  // 針は12時方向(上)に伸ばし、後端を中心から少し下げる。
+  const tailLength = length * 0.18;
+  const tipX = cx + length * Math.sin(angle);
+  const tipY = cy - length * Math.cos(angle);
+  const tailX = cx - tailLength * Math.sin(angle);
+  const tailY = cy + tailLength * Math.cos(angle);
+  ctx.beginPath();
+  ctx.lineCap = "round";
+  ctx.lineWidth = Math.max(2, width);
+  ctx.strokeStyle = color;
+  ctx.moveTo(tailX, tailY);
+  ctx.lineTo(tipX, tipY);
+  ctx.stroke();
+}
+
+function drawFlipShareClock(ctx, config) {
+  const stage = ctx.__stage;
+  const formatters = createFormatters(config);
+  const time = formatClock(formatters, new Date()).time;
+  const fontStack = canvasFontStack(config.fontFamily);
+
+  // flipGroup に合わせて数字/区切りをトークン化(render.js の tokenize と同方針)。
+  const tokens = [];
+  let i = 0;
+  while (i < time.length) {
+    const char = time[i];
+    const isDigit = char >= "0" && char <= "9";
+    if (isDigit && config.flipGroup === "pair") {
+      let value = "";
+      while (i < time.length && time[i] >= "0" && time[i] <= "9") {
+        value += time[i];
+        i += 1;
+      }
+      tokens.push({ digit: true, value });
+    } else {
+      tokens.push({ digit: isDigit, value: char });
+      i += 1;
+    }
+  }
+
+  const scale = 2.6;
+  const cardFontPx = Math.round(config.fontSize * scale);
+  const cardH = cardFontPx * 1.4;
+  const sepW = cardFontPx * 0.5;
+  const gap = cardFontPx * 0.12;
+  const radius = Math.min(config.radius * scale, cardH / 4);
+
+  ctx.font = `${config.fontWeight} ${cardFontPx}px ${fontStack}`;
+  // 各トークンの横幅を決める。
+  const sized = tokens.map((token) => {
+    if (!token.digit) {
+      return { ...token, w: sepW };
+    }
+    const w = ctx.measureText(token.value).width + cardFontPx * 0.5;
+    return { ...token, w: Math.max(w, cardFontPx * 0.78) };
+  });
+  let totalW = sized.reduce((sum, token) => sum + token.w, 0) + gap * (sized.length - 1);
+  // 広すぎる場合はステージ幅に収める。
+  const maxW = stage.w - 80;
+  let drawScale = 1;
+  if (totalW > maxW) {
+    drawScale = maxW / totalW;
+  }
+
+  ctx.save();
+  ctx.translate(stage.cx, stage.cy);
+  ctx.scale(drawScale, drawScale);
+  let cursorX = -totalW / 2;
+  const cardBg = hexToRgba(config.backgroundColor, config.backgroundOpacity);
+  const border = hexToRgba(config.borderColor, config.borderOpacity);
+  for (const token of sized) {
+    if (!token.digit) {
+      clearShadow(ctx);
+      ctx.fillStyle = config.textColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `${config.fontWeight} ${cardFontPx}px ${fontStack}`;
+      ctx.fillText(token.value, cursorX + token.w / 2, 0);
+      cursorX += token.w + gap;
+      continue;
+    }
+    const cardX = cursorX;
+    const cardY = -cardH / 2;
+    ctx.save();
+    ctx.shadowColor = "rgba(20, 22, 28, 0.28)";
+    ctx.shadowBlur = 22;
+    ctx.shadowOffsetY = 10;
+    drawRoundedRectPath(ctx, cardX, cardY, token.w, cardH, radius);
+    ctx.fillStyle = cardBg;
+    ctx.fill();
+    ctx.restore();
+    if (config.borderWidth > 0) {
+      drawRoundedRectPath(ctx, cardX, cardY, token.w, cardH, radius);
+      ctx.lineWidth = Math.max(1, config.borderWidth * scale);
+      ctx.strokeStyle = border;
+      ctx.stroke();
+    }
+    // カード中央の分割線(パタパタの折れ目を示す)。
+    clearShadow(ctx);
+    ctx.beginPath();
+    ctx.strokeStyle = hexToRgba("#000000", 0.12);
+    ctx.lineWidth = Math.max(1, cardFontPx * 0.02);
+    ctx.moveTo(cardX, 0);
+    ctx.lineTo(cardX + token.w, 0);
+    ctx.stroke();
+
+    ctx.fillStyle = config.textColor;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `${config.fontWeight} ${cardFontPx}px ${fontStack}`;
+    ctx.fillText(token.value, cardX + token.w / 2, 0);
+    cursorX += token.w + gap;
+  }
+  ctx.restore();
+  clearShadow(ctx);
+}
+
+function drawShareFooter(ctx) {
+  clearShadow(ctx);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = "#2a2f3a";
+  ctx.font = "800 38px system-ui, sans-serif";
+  ctx.fillText("OBS時計URLビルダーで作成", SHARE_IMAGE_WIDTH / 2, 588);
+  ctx.fillStyle = "#5a6172";
+  ctx.font = "500 26px system-ui, sans-serif";
+  ctx.fillText(BUILDER_URL, SHARE_IMAGE_WIDTH / 2, 628);
+}
+
+function drawRoundedRectPath(ctx, x, y, width, height, radius) {
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+  ctx.beginPath();
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, width, height, r);
+    return;
+  }
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + width, y, x + width, y + height, r);
+  ctx.arcTo(x + width, y + height, x, y + height, r);
+  ctx.arcTo(x, y + height, x, y, r);
+  ctx.arcTo(x, y, x + width, y, r);
+  ctx.closePath();
 }
 
 function byId(id) {

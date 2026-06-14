@@ -188,7 +188,8 @@ test("editor refresh does not add risky HTML sinks", () => {
   const changedSources = [
     readFileSync(new URL("../index.html", import.meta.url), "utf8"),
     readBundledCss(),
-    readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8")
+    readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../assets/js/share.js", import.meta.url), "utf8")
   ].join("\n");
 
   assert.doesNotMatch(changedSources, /innerHTML|insertAdjacentHTML|eval\s*\(|new Function|document\.write|onclick=/);
