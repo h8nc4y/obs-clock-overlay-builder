@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-14
+
+### Added
+
+- Share your clock as a promotional image. A new "Xでシェアして広める" panel generates a 1200×675 promo card (Canvas, fully client-side — no upload, no backend, no external fonts or network) that faithfully shows your current clock — digital / analog / flip, with your colors, font, label, date, weekday, and marks — alongside an editable promo message that already includes the builder URL and streamer hashtags. The primary "画像を共有" button uses the Web Share API (`navigator.share({ files })`) to open the OS share sheet (best on mobile, where X is usually a share target); when file sharing isn't available (often on desktop), a fallback saves the PNG and opens the X compose window so you can attach it manually. The preview image and download both use `data:` URLs, so the strict Content-Security-Policy (`img-src 'self' data:`) is unchanged. This partially restores the X-share capability removed in 0.8.0, reframed around image-led promotion. The `/clock/?c=...` reproduction contract and the clock rendering are unchanged.
+
 ## [1.0.2] - 2026-06-14
 
 ### Changed
