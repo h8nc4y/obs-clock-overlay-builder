@@ -40,7 +40,7 @@
               <h2>ライブプレビュー</h2>
               <p>背景を切り替えて、配信画面に重ねた時の読みやすさを確認します。</p>
             </div>
-            <button id="pinPreview" type="button" class="pin-toggle" aria-pressed="true" aria-label="プレビューを固定する">
+            <button id="pinPreview" type="button" class="pin-toggle" aria-pressed="true" aria-label="プレビューの固定を外す">
               <span class="pin-toggle-icon" aria-hidden="true">📌</span>
               <span class="pin-toggle-label">固定中</span>
             </button>
@@ -209,7 +209,7 @@
               </label>
             </div>
             <div class="analog-controls is-hidden" data-clock-mode="analog">
-              <p class="group-hint">アナログでは「背景色＝文字盤」「文字色＝数字と針」「枠線色＝ふち」「縁取り色＝秒針」になります。</p>
+              <p class="group-hint">アナログでは「背景色＝文字盤」「文字色＝数字と針」になります。（「枠線色＝ふち」「縁取り色＝秒針」は「こだわり」で調整できます。）</p>
               <div class="form-grid dense-grid">
                 <label class="field" for="analogSize">
                   <span>大きさ</span>
@@ -300,8 +300,8 @@
                     <select id="weekdayFormat">
                       <option value="ja-short">短い日本語</option>
                       <option value="ja-long">長い日本語</option>
-                      <option value="en-short">英語短縮</option>
-                      <option value="en-long">英語ロング</option>
+                      <option value="en-short">短い英語</option>
+                      <option value="en-long">長い英語</option>
                     </select>
                   </label>
                   <label class="field" for="labelPosition">

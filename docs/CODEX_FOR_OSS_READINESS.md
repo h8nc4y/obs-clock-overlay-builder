@@ -37,7 +37,7 @@ The project is public and maintained, but public traction is still early. Do not
 | Public repository | Good | GitHub visibility is public. |
 | Meaningful usage / broad adoption / ecosystem importance | Weak today | Stars and forks are 0 at inspection time. The strongest current claim is ecosystem relevance for OBS browser-source overlays, not demonstrated adoption. |
 | Active maintenance evidence | Good for a young project | PR history shows repeated documentation, release, review, bugfix, and UI maintenance. |
-| PR review / issue triage / release workflow | Partial to good | PR workflow and release checks are documented, and `v0.1.0` has a public GitHub Release/tag. Issue triage evidence is still limited. GitHub Actions are intentionally absent. |
+| PR review / issue triage / release workflow | Partial to good | PR workflow and release checks are documented, and every version ships a git tag and a Japanese-titled GitHub Release (v0.1.0 onward; see the GitHub Releases page for the current list). Issue triage evidence is still limited. GitHub Actions are intentionally absent. |
 | Maintainer automation | Partial | Local validation, release scripts, smoke checks, and AI-assisted review docs exist. There is no CI automation yet by design. |
 | Codex usage for OSS maintenance | Good as evidence, early as impact | `docs/HOW_WE_USE_CODEX.md`, decision logs, triage docs, and PR history show Codex use for scoped implementation and validation. |
 | Confidential information safety | Good posture | Public-safe docs avoid exact private operational metadata. Need a final pre-application scan before copying text into any form. |
@@ -71,10 +71,8 @@ Prioritize evidence that can be linked from a public application without exposin
 
 - Public issues from real users or documented maintainer-created issue triage.
 - More merged PRs showing sustained maintenance after public launch.
-- Release tags and concise release notes beyond the existing `v0.1.0` release.
 - A small public roadmap or good-first-issue list.
 - Public feedback guide and issue templates that invite OBS setup reports without requesting private data.
-- Changelog entries and release notes that can be tied to tags once releases are created.
 - Manual OBS QA evidence recorded in public-safe form.
 - README examples that show real OBS use without private account or stream data.
 - External mentions, users, stars, forks, or discussions if they happen organically.

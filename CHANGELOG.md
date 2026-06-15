@@ -2,9 +2,26 @@
 
 All notable public changes to this project will be recorded in this file.
 
-This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The `v0.1.0` GitHub Release and tag exist; later entries should be tied to future tags when releases are created.
+This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
 ## [Unreleased]
+
+## [1.3.1] - 2026-06-15
+
+### Changed
+
+- Editor wording polish (from a UI/UX review): the weekday options now read 「短い英語」「長い英語」 to match the Japanese pair, the copy-success message quotes the actual 「Xでシェアして広める」 heading, the "確認中…" / "作成中…" ellipses are unified, and the easy-mode analog hint no longer lists the 枠線色/縁取り色 colors that only appear in the advanced tab.
+- Editor visual consistency: the preview-toolbar label color and the theme-picker corner radius now follow theme tokens (`var(--ink)` / `var(--button-radius)`) instead of hardcoded values.
+
+### Fixed
+
+- Accessibility: color swatch buttons now announce a Japanese label (e.g. 「文字色 を #ffffff にする」) instead of the internal English id; the pin button's initial `aria-label` now matches its pressed (固定中) state.
+- The share image's "PNGを保存" link is now disabled when image generation fails, so a previously generated (stale) PNG can no longer be downloaded after an error.
+- On browsers without `IntersectionObserver`, the pinned mobile preview no longer floats permanently (which showed the clock twice); the fallback now shows only the real preview.
+
+### Docs
+
+- Refreshed stale "only `v0.1.0` is released" statements in the CHANGELOG intro and the Codex-for-OSS readiness/evidence docs (every version now ships a tag + GitHub Release), and updated manual-qa's analog template examples to list all four analog templates.
 
 ## [1.3.0] - 2026-06-15
 
