@@ -6,7 +6,8 @@ import {
   buildShareText,
   buildXIntentUrl,
   canvasFontStack,
-  resolveShareText
+  resolveShareText,
+  templateDecoration
 } from "../assets/js/share.js";
 import { normalizeConfig } from "../assets/js/config.js";
 import { tokenizeFlip } from "../assets/js/render.js";
@@ -84,6 +85,35 @@ test("canvasFontStack slices to 80 chars and removes newlines", () => {
   assert.equal(canvasFontStack(long), `"${"a".repeat(80)}", system-ui, sans-serif`);
   // 改行は空白へ置換され、家族名が複数行に割れない。
   assert.equal(canvasFontStack("a\nb"), '"a b", system-ui, sans-serif');
+});
+
+test("templateDecoration returns the studio-live underline and badge decision", () => {
+  assert.deepEqual(templateDecoration("studio-live"), {
+    underlineColor: "#ff3b5c",
+    underlinePx: 3,
+    badge: { color: "#ff3b5c", text: "LIVE", inkColor: "#ffffff" }
+  });
+});
+
+test("templateDecoration returns cyan and teal underlines for soda and neon-hud", () => {
+  assert.deepEqual(templateDecoration("soda"), {
+    underlineColor: "#5fd0e0",
+    underlinePx: 2,
+    badge: null
+  });
+  assert.deepEqual(templateDecoration("neon-hud"), {
+    underlineColor: "#48ffe2",
+    underlinePx: 2,
+    badge: null
+  });
+});
+
+test("templateDecoration returns empty decoration data for unknown templates", () => {
+  assert.deepEqual(templateDecoration("unknown-template"), {
+    underlineColor: null,
+    underlinePx: null,
+    badge: null
+  });
 });
 
 // 回帰: 既定の投稿文から intent を組むと、本文に URL/ハッシュタグが既に入っているので

@@ -13,11 +13,19 @@ import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize, tokenizeFlip } from "./render.js";
 import { analogParts, createAnalogFormatter, createFormatters, formatClock } from "./time.js";
-import { buildShareLines, buildShareText, buildXIntentUrl, canvasFontStack, resolveShareText } from "./share.js";
+import {
+  buildShareLines,
+  buildShareText,
+  buildXIntentUrl,
+  canvasFontStack,
+  resolveShareText,
+  templateDecoration
+} from "./share.js";
 
 const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 const SHARE_IMAGE_WIDTH = 1200;
 const SHARE_IMAGE_HEIGHT = 675;
+const SHARE_IMAGE_AUTO_REGENERATE_DELAY_MS = 400;
 
 const STORAGE_KEY = "obs-clock-builder:v1";
 const THEME_STORAGE_KEY = "obs-clock-builder:theme";
@@ -156,6 +164,8 @@ let localFontSelectBound = false;
 // 共有時にまだ無ければ作り、ある間は再生成を省く。
 let shareImageBlob = null;
 let shareImageDirty = true;
+let shareImageAutoRegenerateTimer = 0;
+let userHasGeneratedShareImage = false;
 
 const previewClock = mountClock(elements.clockPreview, state);
 // スマホのピン留め用に浮かべる「ミニ時計」。メインのライブプレビューと同じ state を
@@ -625,12 +635,13 @@ function updateEverything(status = "") {
   updateClockTypeVisibility();
   // 設定が変わったら生成済み画像は古くなる。次の共有時に作り直す。
   // 既に画像を作っていてこれが「初めて古くなった」瞬間なら、プレビュー/説明/保存リンクを
-  // 古い状態として示す(自動再生成はしない)。共有ボタンは ensureShareImage で作り直す。
+  // 一時的に古い状態として示す。生成済みプレビューがある場合は debounce 後に自動更新する。
   const becameStale = shareImageBlob && !shareImageDirty;
   shareImageDirty = true;
   if (becameStale) {
     markShareImageStale();
   }
+  scheduleShareImageAutoRegenerate();
   updateXIntent();
   if (status) {
     // 汎用ステータスは常時表示の builderStatus へ。importStatus は「こだわり」内に
@@ -852,11 +863,16 @@ function bindShare() {
   });
   // 投稿文を編集したら、X投稿画面リンク(intent)へ即座に反映する。
   elements.shareText.addEventListener("input", updateXIntent);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      cancelShareImageAutoRegenerate();
+    }
+  });
   updateXIntent();
 }
 
 // 生成済み画像が「今のデザイン」と一致しなくなったことを画面へ反映する。
-// 再生成は行わず(コストを避ける)、プレビュー/説明/保存リンクを古い状態として示す。
+// 自動更新までの短い間、プレビュー/説明/保存リンクを古い状態として示す。
 function markShareImageStale() {
   if (!elements.shareImagePreview) {
     return;
@@ -871,6 +887,25 @@ function markShareImageStale() {
   elements.downloadShareImage.setAttribute("aria-disabled", "true");
   elements.downloadShareImage.setAttribute("href", "#");
   elements.downloadShareImage.setAttribute("tabindex", "-1");
+}
+
+function cancelShareImageAutoRegenerate() {
+  if (!shareImageAutoRegenerateTimer) {
+    return;
+  }
+  window.clearTimeout(shareImageAutoRegenerateTimer);
+  shareImageAutoRegenerateTimer = 0;
+}
+
+function scheduleShareImageAutoRegenerate() {
+  cancelShareImageAutoRegenerate();
+  if (document.hidden || !userHasGeneratedShareImage) {
+    return;
+  }
+  shareImageAutoRegenerateTimer = window.setTimeout(() => {
+    shareImageAutoRegenerateTimer = 0;
+    regenerateShareImage("");
+  }, SHARE_IMAGE_AUTO_REGENERATE_DELAY_MS);
 }
 
 function updateShareText() {
@@ -893,7 +928,10 @@ function updateXIntent() {
 }
 
 async function regenerateShareImage(successMessage) {
-  setShareStatus("宣伝画像を作成中…");
+  cancelShareImageAutoRegenerate();
+  if (successMessage) {
+    setShareStatus("宣伝画像を作成中…");
+  }
   let dataUrl;
   let blob;
   try {
@@ -907,6 +945,7 @@ async function regenerateShareImage(successMessage) {
   }
   shareImageBlob = blob;
   shareImageDirty = false;
+  userHasGeneratedShareImage = true;
   elements.shareImagePreview.src = dataUrl;
   elements.shareImagePreview.classList.add("is-ready");
   // 生成できたときだけ意味のある alt を付け、読み上げにも画像があると伝える。
@@ -1076,9 +1115,15 @@ function drawDigitalShareClock(ctx, config) {
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
 
-  const lines = buildShareLines(config, formatted).map((line) => ({
+  const rawLines = buildShareLines(config, formatted);
+  const label = config.labelPosition === "hidden" ? "" : config.label;
+  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
+  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
+  const labelIndex = label ? (labelAbove ? 0 : labelBelow ? rawLines.length - 1 : -1) : -1;
+  const lines = rawLines.map((line, index) => ({
     ...line,
-    px: Math.round(line.size * scale)
+    px: Math.round(line.size * scale),
+    isLabel: index === labelIndex
   }));
 
   // ライブ時計は --clock-letter-spacing(字間)を反映する。Canvas2D の letterSpacing が
@@ -1138,10 +1183,19 @@ function drawDigitalShareClock(ctx, config) {
   // 各行を縦に積んで描く。時刻行だけ影/縁取りを反映する。
   // フォントサイズ・行送り・パディングは収まり係数 fit を掛けてカード内に収める。
   let cursorY = panelY + fitPadY + (lines[0].px * fit) / 2;
+  let timeLineMetrics = null;
+  let labelLineMetrics = null;
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
     const linePx = line.px * fit;
     ctx.font = `${config.fontWeight} ${linePx}px ${fontStack}`;
+    const lineWidth = ctx.measureText(line.text).width;
+    const metrics = { text: line.text, y: cursorY, px: linePx, width: lineWidth };
+    if (line.isTime) {
+      timeLineMetrics = metrics;
+    } else if (line.isLabel) {
+      labelLineMetrics = metrics;
+    }
     if (line.isTime) {
       applyTextEffects(ctx, config);
     } else {
@@ -1159,11 +1213,66 @@ function drawDigitalShareClock(ctx, config) {
       cursorY += linePx / 2 + fitGap + (lines[i + 1].px * fit) / 2;
     }
   }
+  drawDigitalTemplateDecorations(ctx, {
+    config,
+    decoration: templateDecoration(config.template),
+    fontStack,
+    fit,
+    labelLine: labelLineMetrics,
+    scale,
+    timeLine: timeLineMetrics
+  });
   clearShadow(ctx);
   // 字間が footer など後続の描画へ漏れないよう必ず初期状態へ戻す。
   if (supportsLetterSpacing) {
     ctx.letterSpacing = "0px";
   }
+}
+
+function drawDigitalTemplateDecorations(ctx, { config, decoration, fontStack, fit, labelLine, scale, timeLine }) {
+  if (!decoration.underlineColor && !decoration.badge) {
+    return;
+  }
+  const unit = scale * fit;
+
+  ctx.save();
+  clearShadow(ctx);
+  if (timeLine && decoration.underlineColor && decoration.underlinePx) {
+    const underlineWidth = Math.max(1, decoration.underlinePx * unit);
+    const underlineY = timeLine.y + timeLine.px / 2 + 3 * unit + underlineWidth / 2;
+    ctx.beginPath();
+    ctx.lineCap = "butt";
+    ctx.lineWidth = underlineWidth;
+    ctx.strokeStyle = decoration.underlineColor;
+    ctx.moveTo(ctx.__stage.cx - timeLine.width / 2, underlineY);
+    ctx.lineTo(ctx.__stage.cx + timeLine.width / 2, underlineY);
+    ctx.stroke();
+  }
+
+  if (labelLine && decoration.badge) {
+    const paddingLeft = 22 * unit;
+    const paddingRight = 11 * unit;
+    const paddingY = 2 * unit;
+    const badgeX = ctx.__stage.cx - labelLine.width / 2 - paddingLeft;
+    const badgeY = labelLine.y - labelLine.px / 2 - paddingY;
+    const badgeW = labelLine.width + paddingLeft + paddingRight;
+    const badgeH = labelLine.px + paddingY * 2;
+    drawRoundedRectPath(ctx, badgeX, badgeY, badgeW, badgeH, Math.min(6 * unit, badgeH / 2));
+    ctx.fillStyle = decoration.badge.color;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(badgeX + 12.5 * unit, labelLine.y, Math.max(2, 3.5 * unit), 0, Math.PI * 2);
+    ctx.fillStyle = decoration.badge.inkColor;
+    ctx.fill();
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `${config.fontWeight} ${labelLine.px}px ${fontStack}`;
+    ctx.fillStyle = decoration.badge.inkColor;
+    ctx.fillText(labelLine.text, ctx.__stage.cx, labelLine.y);
+  }
+  ctx.restore();
 }
 
 function drawAnalogShareClock(ctx, config) {
