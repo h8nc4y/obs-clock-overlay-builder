@@ -266,11 +266,20 @@ code {
 
 /* ライブプレビューのピン留め。左列(.preview-column)は普通に流し、その中で「時計の箱だけ」を
    sticky にして、右の設定をスクロールしている間も時計だけが上部に浮いて追従するようにする。
-   sticky の包含ブロックは .preview-column(3パネル分の高い列)なので、列の高さいっぱいまで
-   トラベルがある → かんたん/こだわり を切り替えて右列の高さが変わっても、左列に依存する
-   このトラベルは変わらず飛ばない。z-index で後続パネルより前面に出し、影で浮遊感を出す。
+   注意: sticky の追従距離(トラベル)は包含ブロック=左列(.preview-column)の高さで決まる一方、
+   ページのスクロール量は最長列=右の設定列(.control-surface)で決まる。こだわり等で右列が
+   左列より高いと、左列の終端で追従が打ち切られ「時計が途中でついてこない」状態になる。
+   そこで左列を行の高さいっぱい(=右列と同じ高さ)へ伸ばし(align-self:stretch。.builder-layout の
+   align-items:start を上書き)、中のパネルは上詰めのまま下を空ける(align-content:start)ことで、
+   設定を最後までスクロールしても時計が追従し続けるようにする。
+   z-index で後続パネルより前面に出し、影で浮遊感を出す。
    デスクトップ(>1100px)専用。1100px以下は1カラムなので固定しない。 */
 @media (min-width: 1101px) {
+  .preview-column.is-pinned {
+    align-self: stretch;
+    align-content: start;
+  }
+
   .preview-column.is-pinned .preview-stage-dock {
     position: sticky;
     top: 16px;

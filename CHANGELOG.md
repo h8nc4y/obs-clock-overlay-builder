@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-06-16
+
+### Fixed
+
+- On desktop, the pinned live preview now keeps following all the way down while you scroll the settings. Previously, in 「こだわり」 (advanced) mode the right-hand settings column grows much taller than the left preview column, and because a `position: sticky` element can only travel within its own containing block (the left column), the floating clock stopped following partway down. The pinned preview column now stretches to the full grid-row height (`align-self: stretch`) with its panels kept top-aligned (`align-content: start`), so the sticky clock travels the entire scroll. CSS-only, desktop (>1100px) only; mobile and the `/clock/?c=...` output are unchanged.
+
 ## [1.3.1] - 2026-06-15
 
 ### Changed
