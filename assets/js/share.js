@@ -48,31 +48,88 @@ export function buildShareLines(config, formatted) {
   return lines;
 }
 
+// 共有カードのデジタル時計テンプレ装飾を「種類と色」の純粋データで返す。
+// 実際の描画(下線・バッジ・角ブラケット・モチーフ・上部帯)は builder.js が
+// この戻り値とパネル幾何から行う。clock.css の `.template-<id>` 装飾を正とし、
+// 共有カード側を実時計へ合わせる(実時計の CSS は変更しない)。
+//
+// 戻り値の形:
+//   timeUnderline: { color, px } | null   … 時刻の下線(studio-live / night-studio)
+//   badge:         { mode, fill?, ink?, dot } | null
+//                    mode='fill'    … 塗りバッジ。fill=背景色 / ink=文字色
+//                    mode='outline' … 枠バッジ。色は config.textColor を builder 側で解決
+//                    dot=true のときだけ左に白丸ドットを描く
+//   brackets:      { color, px } | null   … パネル左上+右下の角ブラケット(neon-hud)
+//   motif:         { kind } | null        … パネル右上のワンポイント
+//                    'bubbles'(soda) / 'dots'(pastel-pop) / 'sakura'(sakura)
+//                    各色は kind ごとに固定のため builder 側が持つ
+//   topBar:        { from, to, px } | null … パネル上辺のグラデ帯(aqua-deck)
 export function templateDecoration(template) {
   switch (String(template ?? "")) {
     case "studio-live":
       return {
-        underlineColor: "#ff3b5c",
-        underlinePx: 3,
-        badge: { color: "#ff3b5c", text: "LIVE", inkColor: "#ffffff" }
+        timeUnderline: { color: "#ff3b5c", px: 3 },
+        badge: { mode: "fill", fill: "#ff3b5c", ink: "#ffffff", dot: true },
+        brackets: null,
+        motif: null,
+        topBar: null
       };
-    case "soda":
+    case "night-studio":
       return {
-        underlineColor: "#5fd0e0",
-        underlinePx: 2,
-        badge: null
+        timeUnderline: { color: "#5fd0e0", px: 2 },
+        badge: { mode: "outline", dot: false },
+        brackets: null,
+        motif: null,
+        topBar: null
       };
     case "neon-hud":
       return {
-        underlineColor: "#48ffe2",
-        underlinePx: 2,
-        badge: null
+        timeUnderline: null,
+        badge: null,
+        brackets: { color: "#48ffe2", px: 2 },
+        motif: null,
+        topBar: null
+      };
+    case "soda":
+      return {
+        timeUnderline: null,
+        badge: null,
+        brackets: null,
+        motif: { kind: "bubbles" },
+        topBar: null
+      };
+    case "pastel-pop":
+      return {
+        timeUnderline: null,
+        badge: null,
+        brackets: null,
+        motif: { kind: "dots" },
+        topBar: null
+      };
+    case "sakura":
+      return {
+        timeUnderline: null,
+        badge: null,
+        brackets: null,
+        motif: { kind: "sakura" },
+        topBar: null
+      };
+    case "aqua-deck":
+      return {
+        timeUnderline: null,
+        badge: { mode: "fill", fill: "#aedded", ink: "#1b3a45", dot: false },
+        brackets: null,
+        motif: null,
+        topBar: { from: "#aedded", to: "#5fd0e0", px: 4 }
       };
     default:
+      // mono-compact / minimal-clear / milk-tea など装飾なし(影のみ)。
       return {
-        underlineColor: null,
-        underlinePx: null,
-        badge: null
+        timeUnderline: null,
+        badge: null,
+        brackets: null,
+        motif: null,
+        topBar: null
       };
   }
 }

@@ -87,33 +87,95 @@ test("canvasFontStack slices to 80 chars and removes newlines", () => {
   assert.equal(canvasFontStack("a\nb"), '"a b", system-ui, sans-serif');
 });
 
-test("templateDecoration returns the studio-live underline and badge decision", () => {
+// 装飾なしテンプレ(影のみ)はすべての装飾フィールドが null。
+const EMPTY_DECORATION = {
+  timeUnderline: null,
+  badge: null,
+  brackets: null,
+  motif: null,
+  topBar: null
+};
+
+test("templateDecoration draws a red underline and filled LIVE badge with dot for studio-live", () => {
   assert.deepEqual(templateDecoration("studio-live"), {
-    underlineColor: "#ff3b5c",
-    underlinePx: 3,
-    badge: { color: "#ff3b5c", text: "LIVE", inkColor: "#ffffff" }
+    timeUnderline: { color: "#ff3b5c", px: 3 },
+    badge: { mode: "fill", fill: "#ff3b5c", ink: "#ffffff", dot: true },
+    brackets: null,
+    motif: null,
+    topBar: null
   });
 });
 
-test("templateDecoration returns cyan and teal underlines for soda and neon-hud", () => {
-  assert.deepEqual(templateDecoration("soda"), {
-    underlineColor: "#5fd0e0",
-    underlinePx: 2,
-    badge: null
+test("templateDecoration draws a cyan underline and outline badge (no dot) for night-studio", () => {
+  assert.deepEqual(templateDecoration("night-studio"), {
+    timeUnderline: { color: "#5fd0e0", px: 2 },
+    badge: { mode: "outline", dot: false },
+    brackets: null,
+    motif: null,
+    topBar: null
   });
+});
+
+test("templateDecoration draws corner brackets (not an underline) for neon-hud", () => {
   assert.deepEqual(templateDecoration("neon-hud"), {
-    underlineColor: "#48ffe2",
-    underlinePx: 2,
-    badge: null
+    timeUnderline: null,
+    badge: null,
+    brackets: { color: "#48ffe2", px: 2 },
+    motif: null,
+    topBar: null
   });
+});
+
+test("templateDecoration draws a bubbles motif (not an underline) for soda", () => {
+  assert.deepEqual(templateDecoration("soda"), {
+    timeUnderline: null,
+    badge: null,
+    brackets: null,
+    motif: { kind: "bubbles" },
+    topBar: null
+  });
+});
+
+test("templateDecoration draws a three-color dots motif for pastel-pop", () => {
+  assert.deepEqual(templateDecoration("pastel-pop"), {
+    timeUnderline: null,
+    badge: null,
+    brackets: null,
+    motif: { kind: "dots" },
+    topBar: null
+  });
+});
+
+test("templateDecoration draws a sakura motif for sakura", () => {
+  assert.deepEqual(templateDecoration("sakura"), {
+    timeUnderline: null,
+    badge: null,
+    brackets: null,
+    motif: { kind: "sakura" },
+    topBar: null
+  });
+});
+
+test("templateDecoration draws a top gradient bar and aqua filled badge (no dot) for aqua-deck", () => {
+  assert.deepEqual(templateDecoration("aqua-deck"), {
+    timeUnderline: null,
+    badge: { mode: "fill", fill: "#aedded", ink: "#1b3a45", dot: false },
+    brackets: null,
+    motif: null,
+    topBar: { from: "#aedded", to: "#5fd0e0", px: 4 }
+  });
+});
+
+test("templateDecoration returns empty decoration data for plain digital templates", () => {
+  for (const id of ["mono-compact", "minimal-clear", "milk-tea"]) {
+    assert.deepEqual(templateDecoration(id), EMPTY_DECORATION, `${id} should have no decoration`);
+  }
 });
 
 test("templateDecoration returns empty decoration data for unknown templates", () => {
-  assert.deepEqual(templateDecoration("unknown-template"), {
-    underlineColor: null,
-    underlinePx: null,
-    badge: null
-  });
+  assert.deepEqual(templateDecoration("unknown-template"), EMPTY_DECORATION);
+  assert.deepEqual(templateDecoration(""), EMPTY_DECORATION);
+  assert.deepEqual(templateDecoration(undefined), EMPTY_DECORATION);
 });
 
 // 回帰: 既定の投稿文から intent を組むと、本文に URL/ハッシュタグが既に入っているので
