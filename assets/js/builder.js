@@ -107,9 +107,7 @@ const elements = {
   previewShell: byId("previewShell"),
   previewCustomColor: byId("previewCustomColor"),
   clockPreview: byId("clockPreview"),
-  miniPreview: byId("miniPreview"),
-  miniShell: byId("miniShell"),
-  miniClock: byId("miniClock"),
+  previewStageDock: document.querySelector(".preview-stage-dock"),
   recommendedWidth: byId("recommendedWidth"),
   recommendedHeight: byId("recommendedHeight"),
   compactUrl: byId("compactUrl"),
@@ -168,10 +166,6 @@ let shareImageAutoRegenerateTimer = 0;
 let userHasGeneratedShareImage = false;
 
 const previewClock = mountClock(elements.clockPreview, state);
-// スマホのピン留め用に浮かべる「ミニ時計」。メインのライブプレビューと同じ state を
-// 別インスタンスでミラーし、設定変更でも追従する。CSSで普段は非表示なので、
-// 表示されないときも軽い更新が走るだけで害はない。
-const miniClock = elements.miniClock ? mountClock(elements.miniClock, state) : null;
 
 init();
 
@@ -193,13 +187,15 @@ function init() {
   updateEverything();
   window.addEventListener("resize", () => {
     window.requestAnimationFrame(fitTemplateMiniPreviews);
-    window.requestAnimationFrame(fitMiniClock);
+    // 浮遊中(.show-mini-float)に幅が変わると実プレビューの高さも変わるので、
+    // 予約しておく min-height を測り直して、解除時の段ずれを防ぐ。
+    window.requestAnimationFrame(refreshFloatReservedHeight);
   });
   startPreviewTicker();
 }
 
-// ライブプレビュー(と浮かぶミニ時計)を毎秒進める共有ティッカー。
-// 編集していない間も時刻が更新され、浮かぶミニ時計が止まって見えないようにする。
+// ライブプレビューを毎秒進めるティッカー。編集していない間も時刻が更新され、
+// 浮遊中(スマホで上部に固定した実プレビュー)でも止まって見えないようにする。
 // 非表示タブでは setTimeout が間引かれるが、OBSへ貼る本番URL(/clock/)とは独立した
 // プレビュー専用の更新なので問題ない。タブが前面に戻ったら即同期する。
 function startPreviewTicker() {
@@ -207,9 +203,6 @@ function startPreviewTicker() {
   const tickAll = () => {
     const now = new Date();
     previewClock.tick(now);
-    if (miniClock) {
-      miniClock.tick(now);
-    }
   };
   const schedule = () => {
     window.clearTimeout(timerId);
@@ -295,8 +288,9 @@ function initAdjustTabs() {
 // ライブプレビューのピン留め(固定)切り替え。固定するのは「時計の箱だけ」。
 // ピンON(デスクトップ >=1101px): 時計ステージ(.preview-stage-dock)を sticky にし、
 //   右の設定をスクロールしても時計だけが上部に浮いて追従する。見出し/コピー/共有などは普通に流れる。
-// ピンON(スマホ <=1100px): 画面上部に短いミニ時計(.mini-preview)を固定して浮かせ、
-//   設定をスクロールしても時計が見える。透明な余白はタップを下の設定へ通す。
+// ピンON(スマホ <=1100px): スクロールで実プレビュー(.preview-stage-dock)が上端から外れたら、
+//   その実物の時計の箱を実寸のまま画面上部へ fixed で浮かせる(複製ではない)。
+//   透明な余白はタップを下の設定へ通す。出し入れは .show-mini-float クラスで切り替える。
 // ピンOFF: どちらの幅でも何も固定せず、ページを普通にスクロールできる。
 // 既定はON。選択は localStorage に保存するが、保存できない環境でもこの画面内の切り替えはそのまま使える。
 function initPinPreview() {
@@ -309,10 +303,9 @@ function initPinPreview() {
     elements.pinPreview.setAttribute("aria-pressed", String(pinned));
     elements.pinPreview.setAttribute("aria-label", pinned ? "プレビューの固定を外す" : "プレビューを固定する");
     elements.pinLabel.textContent = pinned ? "固定中" : "固定する";
-    // ミニ時計が表示状態に変わった直後は、収まりを測り直して scale を合わせる。
-    // 同期 + rAF の二段で、非表示タブから戻った直後でも崩れないようにする。
-    fitMiniClock();
-    window.requestAnimationFrame(fitMiniClock);
+    // ピンOFFにすると実プレビューは固定されなくなる。浮遊が解けるので、
+    // 予約していた高さを片付けて(=段ずれ防止の min-height を外して)整える。
+    refreshFloatReservedHeight();
   };
   setPinned(readSavedPinPreference());
   elements.pinPreview.addEventListener("click", () => {
@@ -326,33 +319,88 @@ function initPinPreview() {
   });
 }
 
-// 浮かぶミニ時計を「スクロールで実プレビューが上に外れそうになったときだけ」出す。
-// v1.2.2 以降はページ上部に実プレビュー(#previewShell)も流れるため、ピンONのまま
-// 常時ミニを浮かべると上部で時計が二重に見える。IntersectionObserver で実プレビューを
-// 監視し、見えている間は .show-mini-float を外して二重表示を防ぎ、上端から外れそうな
-// 瞬間に付けてミニへ受け渡す。表示の最終的な出し分けは CSS(.is-pinned かつ
-// .show-mini-float かつ 1カラム幅)が担うので、ピンOFF/デスクトップでは出ない。
-// 受け渡しが途切れて「時計が一瞬どこにも見えない」状態にならないよう、rootMargin の
-// 上を固定ストリップの高さ分(約80px=ストリップ76px+上余白8px)だけ内側に縮める。
-// これで実プレビューの下端が「ミニが座る帯」に差し掛かった時点で交代する。
+// スクロールで実プレビューが上端から外れそうになったとき「だけ」、実物の時計の箱
+// (#previewShell)を実寸のまま画面上部へ浮かせる(複製は作らない)。
+// ページ上部には実プレビューが普通に流れているので、見えている間に浮かべると
+// 上部で時計が二重に見える。IntersectionObserver で実プレビューを監視し、見えて
+// いる間は .show-mini-float を外して二重表示を防ぎ、上端から外れた瞬間に付ける。
+// 表示の最終的な出し分けは CSS(.is-pinned かつ .show-mini-float かつ 1カラム幅)が
+// 担うので、ピンOFF/デスクトップでは浮かない。
+//
+// 浮かせると CSS は中の箱(#previewShell)だけを position:fixed にし、外側の
+// .preview-stage-dock は通常フローに残す。fixed で中身が抜けると dock の高さは
+// ほぼ0に潰れて左列がその分だけ縮み、ページがガタッと飛ぶ。これを防ぐため、浮かす
+// 直前に dock の実高を測って min-height で場所を確保し(reserveFloatHeight)、
+// 解除時に外す(clearFloatHeight)。setFloat はクラスと予約高をまとめて管理する単一窓口。
+function setFloat(active) {
+  const column = elements.preview;
+  const dock = elements.previewStageDock;
+  if (!column || !dock) {
+    return;
+  }
+  const changed = column.classList.contains("show-mini-float") !== active;
+  if (!changed) {
+    return;
+  }
+  if (active) {
+    // #previewShell の実高を dock の min-height として予約してから fixed 化する。
+    // shell の高さは fixed 後も同じなので順序に厳密な依存はないが、先に予約して
+    // から付けることで、付けた瞬間の段ずれを一度も見せない。
+    reserveFloatHeight();
+    column.classList.add("show-mini-float");
+  } else {
+    column.classList.remove("show-mini-float");
+    clearFloatHeight();
+  }
+}
+
+// 実プレビューの箱(#previewShell)の実高を dock の min-height として予約し、中身の
+// fixed 化後の段ずれを防ぐ。#previewShell の高さは「通常フロー」でも「fixed(浮遊中)」でも
+// そのまま測れる(fixed でも要素は描画され、その実寸を返す)ので、予約済み min-height で
+// 潰れた dock を測ってしまう取り違えが起きない。
+// CSSOM(element.style)で設定する(インラインstyle属性ではない=CSP順守。
+// 時計スタイルと同じ element.style API)。
+function reserveFloatHeight() {
+  const dock = elements.previewStageDock;
+  const shell = elements.previewShell;
+  if (!dock || !shell) {
+    return;
+  }
+  const height = shell.getBoundingClientRect().height;
+  if (height > 0) {
+    dock.style.minHeight = `${Math.round(height)}px`;
+  }
+}
+
+// 予約していた高さを片付ける(通常フローへ戻す)。
+function clearFloatHeight() {
+  const dock = elements.previewStageDock;
+  if (!dock) {
+    return;
+  }
+  dock.style.minHeight = "";
+}
+
+// 浮遊中に幅が変わる/設定で高さが変わる/ピンが外れる、などで状態が変わったとき、予約高を
+// 測り直す。浮遊していない(または fixed が効かないデスクトップ)ときは予約を外す。
+// 浮遊中は #previewShell の実寸を測り直して付け直すので、実プレビューの高さ変化に追従する。
+function refreshFloatReservedHeight() {
+  const column = elements.preview;
+  if (!column || !column.classList.contains("show-mini-float")) {
+    clearFloatHeight();
+    return;
+  }
+  reserveFloatHeight();
+}
+
 function initMiniFloatObserver() {
   const target = elements.previewShell;
   const column = elements.preview;
   if (!target || !column) {
     return;
   }
-  const setFloat = (active) => {
-    const changed = column.classList.contains("show-mini-float") !== active;
-    column.classList.toggle("show-mini-float", active);
-    // 非表示→表示に変わった直後は実寸を測って scale を合わせ直す。
-    // 同期 + rAF の二段で、レイアウト確定前でも崩れないようにする。
-    if (active && changed) {
-      fitMiniClock();
-      window.requestAnimationFrame(fitMiniClock);
-    }
-  };
-  // IntersectionObserver 非対応の旧ブラウザでは、従来どおり「ピンONなら常時表示」に
-  // フォールバックする(CSS の .is-pinned ゲートで OFF 時やデスクトップでは出ない)。
+  // IntersectionObserver 非対応の旧ブラウザでは、従来どおり「ピンONなら常時浮遊」に
+  // フォールバックする(CSS の .is-pinned ゲートで OFF 時やデスクトップでは浮かない)。
   if (typeof window.IntersectionObserver !== "function") {
     setFloat(true);
     return;
@@ -360,12 +408,12 @@ function initMiniFloatObserver() {
   const observer = new window.IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        // 実プレビューが(縮めた)ビューポートに掛かっていれば見えている→ミニは隠す。
-        // 上端から外れたら→ミニを出す。
+        // 実プレビューが(縮めた)ビューポートに掛かっていれば見えている→浮かせない。
+        // 上端から外れたら→実物の箱を浮かせる。
         setFloat(!entry.isIntersecting);
       }
     },
-    { rootMargin: "-80px 0px 0px 0px", threshold: 0 }
+    { rootMargin: "0px 0px 0px 0px", threshold: 0 }
   );
   observer.observe(target);
 }
@@ -666,12 +714,6 @@ function syncOutputValues() {
 function updateEverything(status = "") {
   state = normalizeConfig(state);
   previewClock.updateConfig(state);
-  if (miniClock) {
-    miniClock.updateConfig(state);
-    // 描画直後に同期的に収め直す。rAF は非表示タブでは止まるため、それだけに頼らない
-    // (getBoundingClientRect が同期レイアウトを起こすので、この時点で実寸を測れる)。
-    fitMiniClock();
-  }
   persistState();
   updatePreviewBackground();
   updateGeneratedUrl();
@@ -695,7 +737,9 @@ function updateEverything(status = "") {
   }
   window.requestAnimationFrame(() => {
     updateRecommendedSize();
-    fitMiniClock();
+    // 設定変更で実プレビューの高さが変わると、浮遊中に予約した min-height とずれる。
+    // 浮遊中なら測り直し、未浮遊なら予約を外して段ずれを防ぐ。
+    refreshFloatReservedHeight();
   });
 }
 
@@ -731,43 +775,13 @@ function updateRecommendedSize() {
 function updatePreviewBackground() {
   const selected = document.querySelector('input[name="previewBg"]:checked')?.value ?? "checker";
   const customColor = elements.previewCustomColor.value;
-  for (const shell of [elements.previewShell, elements.miniShell]) {
-    if (!shell) {
-      continue;
-    }
-    shell.classList.remove("preview-checker", "preview-light", "preview-dark", "preview-custom");
-    shell.classList.add(`preview-${selected}`);
-    shell.style.setProperty("--preview-custom", customColor);
-  }
-}
-
-// 浮かぶミニ時計を固定ストリップ内に収める。テンプレのミニプレビューと同じく、
-// 実寸の時計を scale() で縮めて高さに収める(縦横の余白も少し残す)。
-// CSSで非表示(=幅0)のときは何もしない。表示されているスマホ幅でだけ効く。
-function fitMiniClock() {
-  const host = elements.miniClock;
-  if (!host) {
+  const shell = elements.previewShell;
+  if (!shell) {
     return;
   }
-  const widget = host.firstElementChild;
-  if (!widget) {
-    return;
-  }
-  // 一旦等倍に戻してから実寸を測る(前回の scale を含めない)。
-  widget.style.transform = "scale(1)";
-  const availableWidth = host.clientWidth;
-  const availableHeight = host.clientHeight;
-  if (availableWidth <= 0 || availableHeight <= 0) {
-    // 非表示(=幅0)のスマホ以外では何もしない。
-    return;
-  }
-  const rect = widget.getBoundingClientRect();
-  if (rect.width <= 0 || rect.height <= 0) {
-    return;
-  }
-  // 端で切れないよう少しだけ内側に収める。拡大はせず(<=1)、縮小だけ行う。
-  const scale = Math.min(1, (availableWidth - 4) / rect.width, (availableHeight - 4) / rect.height);
-  widget.style.transform = `scale(${scale.toFixed(3)})`;
+  shell.classList.remove("preview-checker", "preview-light", "preview-dark", "preview-custom");
+  shell.classList.add(`preview-${selected}`);
+  shell.style.setProperty("--preview-custom", customColor);
 }
 
 function updateContrastWarning() {
