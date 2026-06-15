@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-15
+
+### Changed
+
+- The promo share PNG (1200x675) now reproduces each digital template's decoration faithfully, matching the live clock (`clock.css` `.template-*`). soda draws bubbles and neon-hud draws corner brackets (previously a stand-in underline), and night-studio (cyan underline + outline badge), pastel-pop (three-color dots), sakura (sakura mark), and aqua-deck (top gradient bar + aqua badge) are now rendered too. studio-live is unchanged (red underline + filled LIVE badge with dot). All decorations are drawn with Canvas primitives only.
+
 ## [1.2.5] - 2026-06-15
 
 ### Fixed
