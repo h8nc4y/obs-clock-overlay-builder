@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-06-15
+
+### Changed
+
+- On mobile, the floating mini-clock (shown while the preview is pinned) now appears **only after the real preview scrolls off the top**, instead of always. So at the top of the page you no longer see the same clock twice — you just see the real live preview; the compact floating clock fades in once the real one leaves the top of the screen and disappears again when you scroll back up. Implemented with an `IntersectionObserver` on the live preview (with a graceful fallback to always-show on browsers without it). Desktop behaviour is unchanged.
+
 ## [1.2.2] - 2026-06-15
 
 ### Changed
