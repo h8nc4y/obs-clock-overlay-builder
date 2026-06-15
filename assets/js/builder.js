@@ -179,6 +179,7 @@ function init() {
   initUiTheme();
   initAdjustTabs();
   initPinPreview();
+  initMiniFloatObserver();
   renderTemplateCategoryTabs();
   renderTemplateButtons();
   renderFontOptions();
@@ -323,6 +324,50 @@ function initPinPreview() {
       // 保存できない環境でも、この画面内の切り替えはそのまま使える。
     }
   });
+}
+
+// 浮かぶミニ時計を「スクロールで実プレビューが上に外れそうになったときだけ」出す。
+// v1.2.2 以降はページ上部に実プレビュー(#previewShell)も流れるため、ピンONのまま
+// 常時ミニを浮かべると上部で時計が二重に見える。IntersectionObserver で実プレビューを
+// 監視し、見えている間は .show-mini-float を外して二重表示を防ぎ、上端から外れそうな
+// 瞬間に付けてミニへ受け渡す。表示の最終的な出し分けは CSS(.is-pinned かつ
+// .show-mini-float かつ 1カラム幅)が担うので、ピンOFF/デスクトップでは出ない。
+// 受け渡しが途切れて「時計が一瞬どこにも見えない」状態にならないよう、rootMargin の
+// 上を固定ストリップの高さ分(約80px=ストリップ76px+上余白8px)だけ内側に縮める。
+// これで実プレビューの下端が「ミニが座る帯」に差し掛かった時点で交代する。
+function initMiniFloatObserver() {
+  const target = elements.previewShell;
+  const column = elements.preview;
+  if (!target || !column) {
+    return;
+  }
+  const setFloat = (active) => {
+    const changed = column.classList.contains("show-mini-float") !== active;
+    column.classList.toggle("show-mini-float", active);
+    // 非表示→表示に変わった直後は実寸を測って scale を合わせ直す。
+    // 同期 + rAF の二段で、レイアウト確定前でも崩れないようにする。
+    if (active && changed) {
+      fitMiniClock();
+      window.requestAnimationFrame(fitMiniClock);
+    }
+  };
+  // IntersectionObserver 非対応の旧ブラウザでは、従来どおり「ピンONなら常時表示」に
+  // フォールバックする(CSS の .is-pinned ゲートで OFF 時やデスクトップでは出ない)。
+  if (typeof window.IntersectionObserver !== "function") {
+    setFloat(true);
+    return;
+  }
+  const observer = new window.IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        // 実プレビューが(縮めた)ビューポートに掛かっていれば見えている→ミニは隠す。
+        // 上端から外れたら→ミニを出す。
+        setFloat(!entry.isIntersecting);
+      }
+    },
+    { rootMargin: "-80px 0px 0px 0px", threshold: 0 }
+  );
+  observer.observe(target);
 }
 
 function readSavedPinPreference() {

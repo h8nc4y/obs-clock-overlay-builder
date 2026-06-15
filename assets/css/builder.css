@@ -877,11 +877,13 @@ details p {
       "controls";
   }
 
-  /* 1カラムではプレビューが下に来てスクロールで見えなくなる。ピンON のときは
-     画面上部に固定した短いミニ時計を浮かせ、設定をスクロールしても時計が見える。
+  /* 1カラムではプレビューが下に来てスクロールで見えなくなる。ピンON かつ
+     「実プレビュー(#previewShell)が画面上から外れそう」なとき(=JSが付ける
+     .show-mini-float)だけ、画面上部に固定した短いミニ時計を浮かせる。
+     実プレビューが見えている間は二重表示を避けて非表示のまま。
      in-flow の時計ステージ(.preview-stage-dock)は普通に流したまま固定しない
      (min-width:1101px の sticky はここでは効かない)。 */
-  .preview-column.is-pinned .mini-preview {
+  .preview-column.is-pinned.show-mini-float .mini-preview {
     display: block;
     position: fixed;
     top: 8px;
