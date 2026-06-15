@@ -94,6 +94,7 @@ Confirmed release evidence:
 - Published date: 2026-05-20.
 - Tag: `v0.1.0`.
 - Local tag object resolves to commit `a1ecefd87a4e46a6327bfc13009ba6fb5351ef2b`.
+- Subsequent releases: every version since `v0.1.0` ships a git tag and a published, Japanese-titled GitHub Release. See the full list at <https://github.com/h8nc4y/obs-clock-overlay-builder/releases>.
 
 This is release-discipline evidence. It is not evidence of broad adoption, user count, stars, forks, or Codex for OSS acceptance.
 

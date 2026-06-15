@@ -34,6 +34,16 @@ const UI_THEMES = new Set(["white", "booth", "fanbox"]);
 const LONG_URL_WARNING = 1800;
 const TOO_LONG_URL_WARNING = 4000;
 const colorPresets = ["#ffffff", "#101828", "#ff8fbd", "#42c6e8", "#f3dfc6", "#151722", "#bafff6", "#563047"];
+// 色見本ボタンの読み上げ用に、内部ID(英語)を日本語ラベルへ対応づける。ボタンは可視テキストを
+// 持たないため、この aria-label が唯一のアクセシブル名になる。renderSwatches は init() から
+// 早期に呼ばれるので、この定義は呼び出しより前(モジュール上部)に置く必要がある(TDZ回避)。
+const SWATCH_TARGET_LABELS = {
+  textColor: "文字色",
+  backgroundColor: "背景色",
+  borderColor: "枠線色",
+  shadowColor: "影色",
+  strokeColor: "縁取り色"
+};
 // label は系統名。analog/flip は雰囲気ではなく「時計の種類」なので、title で種類だと補足する
 // (定番/かわいい/クールは雰囲気で選ぶグループ)。
 const TEMPLATE_CATEGORIES = [
@@ -408,10 +418,11 @@ function initMiniFloatObserver() {
   if (!target || !column) {
     return;
   }
-  // IntersectionObserver 非対応の旧ブラウザでは、従来どおり「ピンONなら常時浮遊」に
-  // フォールバックする(CSS の .is-pinned ゲートで OFF 時やデスクトップでは浮かない)。
+  // IntersectionObserver 非対応の旧ブラウザでは、スクロール連動の出し分けができない。
+  // ここで常時浮遊にすると、上部に実プレビューが流れている間も浮遊時計が出て二重に
+  // 見えてしまう。二重表示を避けるため、フォールバックでは浮かせず実プレビューのみ表示する。
   if (typeof window.IntersectionObserver !== "function") {
-    setFloat(true);
+    setFloat(false);
     return;
   }
   const observer = new window.IntersectionObserver(
@@ -577,7 +588,7 @@ function renderSwatches() {
       button.type = "button";
       button.className = "swatch";
       button.style.background = color;
-      button.setAttribute("aria-label", `${target} を ${color} にする`);
+      button.setAttribute("aria-label", `${SWATCH_TARGET_LABELS[target] ?? target} を ${color} にする`);
       button.addEventListener("click", () => {
         state[target] = color;
         syncFormFromState();
@@ -639,7 +650,7 @@ function bindForm() {
     copyText(
       elements.generatedUrl.value,
       elements.urlStatus,
-      "URLをコピーしました。OBSのブラウザソースに貼り付け、最後に下の『Xでシェア』で宣伝できます。"
+      "URLをコピーしました。OBSのブラウザソースに貼り付け、最後に下の『Xでシェアして広める』で宣伝できます。"
     )
   );
   elements.openClock.addEventListener("click", () => {
@@ -812,7 +823,7 @@ async function loadLocalFonts() {
       "このブラウザではPC内フォント一覧を読み込めません。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
     return;
   }
-  elements.localFontStatus.textContent = "PC内フォント名を確認中...";
+  elements.localFontStatus.textContent = "PC内フォント名を確認中…";
   try {
     const fonts = await window.queryLocalFonts();
     const options = localFontOptions(fonts);
@@ -1008,6 +1019,12 @@ async function regenerateShareImage(successMessage) {
     blob = result.blob;
   } catch {
     shareImageBlob = null;
+    // 生成に失敗したら、直前に成功した古いPNGを保存できないよう保存リンクを無効化する。
+    // 説明文(figcaption)はエラー表示のままにしたいので、markShareImageStale ではなく
+    // 保存リンクの属性だけを無効状態に揃える(キーボードでも辿れないよう tabindex も外す)。
+    elements.downloadShareImage.setAttribute("aria-disabled", "true");
+    elements.downloadShareImage.setAttribute("href", "#");
+    elements.downloadShareImage.setAttribute("tabindex", "-1");
     setShareStatus("画像を作成できませんでした。ブラウザを更新してもう一度試してください。", true);
     return false;
   }
