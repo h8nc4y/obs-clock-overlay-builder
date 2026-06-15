@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-06-15
+
+### Fixed
+
+- On mobile, the pinned floating preview no longer rapidly flickers (toggling visible/hidden many times a second). The `IntersectionObserver` was watching `#previewShell` — the very element that floats to the top of the screen when it scrolls off — so floating it brought it back into view, which made the observer immediately un-float it, and so on in a tight loop. The observer now watches the outer placeholder box (`.preview-stage-dock`) instead, which keeps its size and position (height is reserved while floating) regardless of float state, so the visibility decision depends only on scroll position. Desktop behaviour is unchanged.
+
 ## [1.2.4] - 2026-06-15
 
 ### Changed
