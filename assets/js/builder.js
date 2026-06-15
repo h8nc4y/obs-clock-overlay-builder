@@ -319,13 +319,20 @@ function initPinPreview() {
   });
 }
 
-// スクロールで実プレビューが上端から外れそうになったとき「だけ」、実物の時計の箱
+// スクロールで実プレビューが上端から外れたとき「だけ」、実物の時計の箱
 // (#previewShell)を実寸のまま画面上部へ浮かせる(複製は作らない)。
 // ページ上部には実プレビューが普通に流れているので、見えている間に浮かべると
-// 上部で時計が二重に見える。IntersectionObserver で実プレビューを監視し、見えて
-// いる間は .show-mini-float を外して二重表示を防ぎ、上端から外れた瞬間に付ける。
+// 上部で時計が二重に見える。IntersectionObserver で監視し、見えている間は
+// .show-mini-float を外して二重表示を防ぎ、上端から外れた瞬間に付ける。
 // 表示の最終的な出し分けは CSS(.is-pinned かつ .show-mini-float かつ 1カラム幅)が
 // 担うので、ピンOFF/デスクトップでは浮かない。
+//
+// 監視対象は #previewShell ではなく「外側の器(.preview-stage-dock)」にする。
+// 浮遊時に fixed 化して画面内へ戻すのは中身(#previewShell)の方なので、もし
+// #previewShell 自体を監視すると「外れた→上部へ出す→画面内に入った判定→外す→
+// また外れた…」を毎フレーム繰り返して点滅(自己フィードバックループ)になる。
+// dock は浮遊中も min-height で実寸を確保したまま通常フローに残り、高さも位置も
+// 変わらないので、交差判定はスクロール位置だけで決まりループが起きない。
 //
 // 浮かせると CSS は中の箱(#previewShell)だけを position:fixed にし、外側の
 // .preview-stage-dock は通常フローに残す。fixed で中身が抜けると dock の高さは
@@ -394,7 +401,9 @@ function refreshFloatReservedHeight() {
 }
 
 function initMiniFloatObserver() {
-  const target = elements.previewShell;
+  // 監視するのは「外側の器(dock)」。中身(#previewShell)を監視すると、浮遊時に
+  // fixed で画面内へ戻った瞬間に交差判定が反転して点滅する(関数上のコメント参照)。
+  const target = elements.previewStageDock;
   const column = elements.preview;
   if (!target || !column) {
     return;
@@ -408,8 +417,8 @@ function initMiniFloatObserver() {
   const observer = new window.IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        // 実プレビューが(縮めた)ビューポートに掛かっていれば見えている→浮かせない。
-        // 上端から外れたら→実物の箱を浮かせる。
+        // 実プレビューの器が(縮めた)ビューポートに掛かっていれば見えている→浮かせない。
+        // 上端から完全に外れたら→実物の箱を浮かせる。
         setFloat(!entry.isIntersecting);
       }
     },
