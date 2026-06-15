@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-06-15
+
+### Changed
+
+- On phones/tablets (≤1100px) the builder now shows the preview column first — live preview, OBS URL, and the "Xでシェア" panel — and the template/settings area below it (the desktop left-then-right order). Previously the settings came first, which buried the share panel ~4100px down the page so it was easy to miss; it now sits near the top of the scroll. CSS-only (grid-template-areas), no change to the `/clock/?c=...` output.
+
 ## [1.2.1] - 2026-06-15
 
 ### Changed
