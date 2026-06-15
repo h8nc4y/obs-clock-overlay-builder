@@ -57,9 +57,6 @@
             <label><input type="radio" name="previewBg" value="custom"> 任意色</label>
             <input id="previewCustomColor" type="color" value="#5f7fbe" aria-label="任意プレビュー背景色">
           </div>
-          <div id="previewShell" class="preview-shell preview-checker">
-            <div id="clockPreview" class="preview-stage" aria-hidden="true"></div>
-          </div>
           <div class="metrics-grid" role="group" aria-label="OBS推奨サイズ">
             <div>
               <span>推奨幅</span>
@@ -71,6 +68,12 @@
             </div>
           </div>
         </section>
+
+        <div class="preview-stage-dock">
+          <div id="previewShell" class="preview-shell preview-checker">
+            <div id="clockPreview" class="preview-stage" aria-hidden="true"></div>
+          </div>
+        </div>
 
         <section class="preview-panel url-panel">
           <div class="section-heading">
@@ -128,6 +131,15 @@
             <a id="xIntent" class="button-like" href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer">X投稿画面を開く</a>
           </div>
         </section>
+
+        <!-- スマホ用の浮かぶミニ時計。ピンON(固定中)かつ1カラム表示のときだけCSSで表示する。
+             ライブプレビューの複製(装飾)なので aria-hidden。同じ state を別インスタンスで
+             ミラーし、設定変更でも追従する。fixed なのでDOM位置はレイアウトに影響しない。 -->
+        <div id="miniPreview" class="mini-preview" aria-hidden="true">
+          <div id="miniShell" class="mini-shell preview-checker">
+            <div id="miniClock" class="mini-stage"></div>
+          </div>
+        </div>
       </aside>
 
       <section class="control-surface" aria-label="時計デザイン設定">

@@ -99,6 +99,9 @@ const elements = {
   previewShell: byId("previewShell"),
   previewCustomColor: byId("previewCustomColor"),
   clockPreview: byId("clockPreview"),
+  miniPreview: byId("miniPreview"),
+  miniShell: byId("miniShell"),
+  miniClock: byId("miniClock"),
   recommendedWidth: byId("recommendedWidth"),
   recommendedHeight: byId("recommendedHeight"),
   compactUrl: byId("compactUrl"),
@@ -155,6 +158,10 @@ let shareImageBlob = null;
 let shareImageDirty = true;
 
 const previewClock = mountClock(elements.clockPreview, state);
+// スマホのピン留め用に浮かべる「ミニ時計」。メインのライブプレビューと同じ state を
+// 別インスタンスでミラーし、設定変更でも追従する。CSSで普段は非表示なので、
+// 表示されないときも軽い更新が走るだけで害はない。
+const miniClock = elements.miniClock ? mountClock(elements.miniClock, state) : null;
 
 init();
 
@@ -173,7 +180,39 @@ function init() {
   bindShare();
   syncFormFromState();
   updateEverything();
-  window.addEventListener("resize", () => window.requestAnimationFrame(fitTemplateMiniPreviews));
+  window.addEventListener("resize", () => {
+    window.requestAnimationFrame(fitTemplateMiniPreviews);
+    window.requestAnimationFrame(fitMiniClock);
+  });
+  startPreviewTicker();
+}
+
+// ライブプレビュー(と浮かぶミニ時計)を毎秒進める共有ティッカー。
+// 編集していない間も時刻が更新され、浮かぶミニ時計が止まって見えないようにする。
+// 非表示タブでは setTimeout が間引かれるが、OBSへ貼る本番URL(/clock/)とは独立した
+// プレビュー専用の更新なので問題ない。タブが前面に戻ったら即同期する。
+function startPreviewTicker() {
+  let timerId = 0;
+  const tickAll = () => {
+    const now = new Date();
+    previewClock.tick(now);
+    if (miniClock) {
+      miniClock.tick(now);
+    }
+  };
+  const schedule = () => {
+    window.clearTimeout(timerId);
+    tickAll();
+    // 次の「秒の頭」に合わせて更新し、毎秒きっかりで時刻が変わるようにする。
+    const delay = 1000 - (Date.now() % 1000);
+    timerId = window.setTimeout(schedule, delay);
+  };
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      schedule();
+    }
+  });
+  schedule();
 }
 
 function bindClockType() {
@@ -242,12 +281,12 @@ function initAdjustTabs() {
   setMode(false);
 }
 
-// ライブプレビューのピン留め(固定)切り替え。
-// ピンON: 左列(.preview-column = ライブプレビュー + OBS用URL + 共有)全体を sticky にし、
-//   右の設定をスクロールしても固定サイドバーとして残す。列が画面より高いときは
-//   max-height(=viewport)+overflow で列内スクロールにして、URL/共有パネルへ到達できるようにする
-//   (列全体を高さ無制限で sticky にすると かんたん/こだわり の高さ差で飛ぶため、CSS側で高さを上限化する)。
-// ピンOFF: 静的配置に戻し、ページを普通にスクロールして OBS用URL や 共有パネルへ到達できる。
+// ライブプレビューのピン留め(固定)切り替え。固定するのは「時計の箱だけ」。
+// ピンON(デスクトップ >=1101px): 時計ステージ(.preview-stage-dock)を sticky にし、
+//   右の設定をスクロールしても時計だけが上部に浮いて追従する。見出し/コピー/共有などは普通に流れる。
+// ピンON(スマホ <=1100px): 画面上部に短いミニ時計(.mini-preview)を固定して浮かせ、
+//   設定をスクロールしても時計が見える。透明な余白はタップを下の設定へ通す。
+// ピンOFF: どちらの幅でも何も固定せず、ページを普通にスクロールできる。
 // 既定はON。選択は localStorage に保存するが、保存できない環境でもこの画面内の切り替えはそのまま使える。
 function initPinPreview() {
   if (!elements.pinPreview) {
@@ -259,6 +298,10 @@ function initPinPreview() {
     elements.pinPreview.setAttribute("aria-pressed", String(pinned));
     elements.pinPreview.setAttribute("aria-label", pinned ? "プレビューの固定を外す" : "プレビューを固定する");
     elements.pinLabel.textContent = pinned ? "固定中" : "固定する";
+    // ミニ時計が表示状態に変わった直後は、収まりを測り直して scale を合わせる。
+    // 同期 + rAF の二段で、非表示タブから戻った直後でも崩れないようにする。
+    fitMiniClock();
+    window.requestAnimationFrame(fitMiniClock);
   };
   setPinned(readSavedPinPreference());
   elements.pinPreview.addEventListener("click", () => {
@@ -568,6 +611,12 @@ function syncOutputValues() {
 function updateEverything(status = "") {
   state = normalizeConfig(state);
   previewClock.updateConfig(state);
+  if (miniClock) {
+    miniClock.updateConfig(state);
+    // 描画直後に同期的に収め直す。rAF は非表示タブでは止まるため、それだけに頼らない
+    // (getBoundingClientRect が同期レイアウトを起こすので、この時点で実寸を測れる)。
+    fitMiniClock();
+  }
   persistState();
   updatePreviewBackground();
   updateGeneratedUrl();
@@ -588,7 +637,10 @@ function updateEverything(status = "") {
     // あり「かんたん」タブでは非表示になるため、確認文が見えなくなるのを防ぐ。
     elements.builderStatus.textContent = status;
   }
-  window.requestAnimationFrame(updateRecommendedSize);
+  window.requestAnimationFrame(() => {
+    updateRecommendedSize();
+    fitMiniClock();
+  });
 }
 
 function updateTemplatePressed() {
@@ -622,9 +674,44 @@ function updateRecommendedSize() {
 
 function updatePreviewBackground() {
   const selected = document.querySelector('input[name="previewBg"]:checked')?.value ?? "checker";
-  elements.previewShell.classList.remove("preview-checker", "preview-light", "preview-dark", "preview-custom");
-  elements.previewShell.classList.add(`preview-${selected}`);
-  elements.previewShell.style.setProperty("--preview-custom", elements.previewCustomColor.value);
+  const customColor = elements.previewCustomColor.value;
+  for (const shell of [elements.previewShell, elements.miniShell]) {
+    if (!shell) {
+      continue;
+    }
+    shell.classList.remove("preview-checker", "preview-light", "preview-dark", "preview-custom");
+    shell.classList.add(`preview-${selected}`);
+    shell.style.setProperty("--preview-custom", customColor);
+  }
+}
+
+// 浮かぶミニ時計を固定ストリップ内に収める。テンプレのミニプレビューと同じく、
+// 実寸の時計を scale() で縮めて高さに収める(縦横の余白も少し残す)。
+// CSSで非表示(=幅0)のときは何もしない。表示されているスマホ幅でだけ効く。
+function fitMiniClock() {
+  const host = elements.miniClock;
+  if (!host) {
+    return;
+  }
+  const widget = host.firstElementChild;
+  if (!widget) {
+    return;
+  }
+  // 一旦等倍に戻してから実寸を測る(前回の scale を含めない)。
+  widget.style.transform = "scale(1)";
+  const availableWidth = host.clientWidth;
+  const availableHeight = host.clientHeight;
+  if (availableWidth <= 0 || availableHeight <= 0) {
+    // 非表示(=幅0)のスマホ以外では何もしない。
+    return;
+  }
+  const rect = widget.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) {
+    return;
+  }
+  // 端で切れないよう少しだけ内側に収める。拡大はせず(<=1)、縮小だけ行う。
+  const scale = Math.min(1, (availableWidth - 4) / rect.width, (availableHeight - 4) / rect.height);
+  widget.style.transform = `scale(${scale.toFixed(3)})`;
 }
 
 function updateContrastWarning() {
