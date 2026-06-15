@@ -36,16 +36,45 @@ export function buildShareLines(config, formatted) {
   const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
   const lines = [];
   if (label && labelAbove) {
-    lines.push({ text: label, size: config.labelSize });
+    lines.push({ text: label, size: config.labelSize, isLabel: true });
   }
   if (dateLine) {
     lines.push({ text: dateLine, size: config.dateSize });
   }
   lines.push({ text: formatted.time, size: config.fontSize, isTime: true });
   if (label && labelBelow) {
-    lines.push({ text: label, size: config.labelSize });
+    lines.push({ text: label, size: config.labelSize, isLabel: true });
   }
   return lines;
+}
+
+export function templateDecoration(template) {
+  switch (String(template ?? "")) {
+    case "studio-live":
+      return {
+        underlineColor: "#ff3b5c",
+        underlinePx: 3,
+        badge: { color: "#ff3b5c", text: "LIVE", inkColor: "#ffffff" }
+      };
+    case "soda":
+      return {
+        underlineColor: "#5fd0e0",
+        underlinePx: 2,
+        badge: null
+      };
+    case "neon-hud":
+      return {
+        underlineColor: "#48ffe2",
+        underlinePx: 2,
+        badge: null
+      };
+    default:
+      return {
+        underlineColor: null,
+        underlinePx: null,
+        badge: null
+      };
+  }
 }
 
 // x.com/intent/tweet 用のURLを組み立てる。画像は添付できない仕様なので

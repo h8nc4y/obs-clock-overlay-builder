@@ -6,6 +6,19 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-06-15
+
+### Changed
+
+- The pin (📌) now floats only a **compact clock**, not the whole left column — on **both desktop and mobile**. On desktop the clock box itself becomes sticky inside the left column, so the OBS URL and share panels scroll normally below it. On mobile a short floating mini-clock strip stays at the top of the screen while you scroll the settings; taps pass through to the controls beneath. The mini-clock mirrors the same state as the main preview, so it updates as you adjust settings. Switching かんたん / こだわり no longer jumps the layout in either mode.
+- The live preview now ticks every second (the floating mini-clock too), so the clock stays current while you work — independent of `/clock/`.
+- The share promo image now auto-regenerates ~400 ms after each settings edit (only when a preview was previously generated), so the thumbnail always reflects the current design without having to click 「プレビュー画像を作り直す」 between edits.
+- The share Canvas now reproduces template decorations on the promo PNG: Studio Live's red time-underline + red LIVE badge, Soda's cyan underline, and Neon HUD's teal underline. Pulsing dots become static; the goal is a faithful-enough teaser, not pixel-perfect.
+
+### Fixed
+
+- The 「画像を共有」 button rendered as a giant rounded oval on mobile (≈200 px tall) because a row-only `flex-basis` was being put on the column axis when the row wrapped. Now both share buttons keep their normal 44 px height.
+
 ## [1.2.0] - 2026-06-15
 
 ### Added

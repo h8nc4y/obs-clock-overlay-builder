@@ -257,21 +257,40 @@ code {
   min-width: 0;
 }
 
-/* ライブプレビューのピン留め。左列(.preview-column = プレビュー + OBS用URL + 共有)全体を
-   sticky にして固定サイドバー化し、右の設定をスクロールしてもまとめて上部に残す。
-   max-height で列を viewport 高に上限化することで、右列が常に列より高くなり sticky に
-   トラベルが生まれる → かんたん/こだわり を切り替えても飛ばない。列が画面より高いときは
-   overflow-y で列内スクロールにし、OBS用URL/共有パネルへ到達できるようにする
-   (画面に収まる高さなら何もスクロールしない)。scrollbar-gutter でスクロールバー分の
-   横ガタつきを防ぐ。デスクトップ(>1100px)専用。1100px以下は1カラムなので固定しない。 */
+/* 時計ステージのドック。#previewShell を .preview-column の直下グリッド子として置く器。
+   左列を普通に流したまま、この器(=時計だけ)を sticky で浮かせる土台にする。
+   未固定のときは透明な器のままで、見た目は #previewShell の枠がそのまま出る。 */
+.preview-stage-dock {
+  min-width: 0;
+}
+
+/* ライブプレビューのピン留め。左列(.preview-column)は普通に流し、その中で「時計の箱だけ」を
+   sticky にして、右の設定をスクロールしている間も時計だけが上部に浮いて追従するようにする。
+   sticky の包含ブロックは .preview-column(3パネル分の高い列)なので、列の高さいっぱいまで
+   トラベルがある → かんたん/こだわり を切り替えて右列の高さが変わっても、左列に依存する
+   このトラベルは変わらず飛ばない。z-index で後続パネルより前面に出し、影で浮遊感を出す。
+   デスクトップ(>1100px)専用。1100px以下は1カラムなので固定しない。 */
 @media (min-width: 1101px) {
-  .preview-column.is-pinned {
+  .preview-column.is-pinned .preview-stage-dock {
     position: sticky;
     top: 16px;
-    max-height: calc(100vh - 32px);
-    overflow-y: auto;
-    scrollbar-gutter: stable;
+    z-index: 5;
   }
+
+  /* シャドウは時計の箱(ID指定)へ直接付ける。クラスのシェル基底ルールより前に
+     同名クラスで終わるルールを増やすと、ui-static の正規表現テストが基底ブロックを
+     取り違えるため、ここではIDセレクタを使って衝突を避ける。 */
+  .preview-column.is-pinned .preview-stage-dock #previewShell {
+    box-shadow: 0 10px 26px rgba(34, 30, 26, 0.18);
+  }
+}
+
+/* スマホ用の浮かぶミニ時計。デスクトップでは常に非表示。1カラム(<=1100px)かつ
+   ピンON のときだけ、画面上部に固定した短いストリップとして時計を見せる。
+   既定では display:none で、レイアウトにもa11yツリーにも出さない。
+   表示の出し分けは下の @media (max-width:1100px) 内で行う。 */
+.mini-preview {
+  display: none;
 }
 
 .panel,
@@ -857,17 +876,52 @@ details p {
       "preview";
   }
 
-  /* 1カラムではプレビューが下に来るため固定しない。ピンボタンも隠して誤操作を防ぐ
-     (is-pinned が残っていても上の sticky は min-width:1101px なので適用されない)。
-     念のため列の高さ上限/列内スクロールも解除し、ページが普通にスクロールできるようにする。 */
-  .preview-column.is-pinned {
-    position: static;
-    max-height: none;
-    overflow: visible;
+  /* 1カラムではプレビューが下に来てスクロールで見えなくなる。ピンON のときは
+     画面上部に固定した短いミニ時計を浮かせ、設定をスクロールしても時計が見える。
+     in-flow の時計ステージ(.preview-stage-dock)は普通に流したまま固定しない
+     (min-width:1101px の sticky はここでは効かない)。 */
+  .preview-column.is-pinned .mini-preview {
+    display: block;
+    position: fixed;
+    top: 8px;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    padding: 0 10px;
+    /* 透明な余白部分はタップを下の設定へ通し、ミニ時計が操作を邪魔しないようにする。
+       ミニ時計は見るだけの複製なので、箱自体もイベントを受けない。 */
+    pointer-events: none;
   }
 
-  .pin-toggle {
-    display: none;
+  .mini-shell {
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+    width: min(420px, 100%);
+    height: 76px;
+    margin: 0 auto;
+    padding: 6px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(20, 18, 16, 0.28);
+  }
+
+  .mini-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* 大きな時計でもストリップ内に収める。実寸は JS の scale 変換で詰める。 */
+  .mini-stage .clock-widget,
+  .mini-stage .clock-analog,
+  .mini-stage .clock-flip {
+    flex: 0 0 auto;
+    transform-origin: center center;
   }
 }
 
@@ -1179,8 +1233,12 @@ button.category-tab[aria-pressed="true"]:hover {
   margin-top: 0;
 }
 
+/* 横並び時は主ボタンを伸ばして埋める。flex-basis を 0 にして、狭い画面で
+   .button-row が縦積み(主軸=高さ)に切り替わったときボタンが 180px 縦に伸びないようにする
+   (大きな basis を主軸へ持ち込まない。.share-fallback-actions と同じ直し方)。 */
 .share-actions button:first-child {
-  flex: 1 1 180px;
+  flex: 1 1 0;
+  min-width: 160px;
 }
 
 .share-status {
