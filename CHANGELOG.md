@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-06-15
+
+### Changed
+
+- On mobile, the pinned floating preview is now **the real live-preview clock box at its real size** — the same box desktop floats — instead of a small scaled-down copy. When you scroll the settings and the real preview leaves the top, that exact preview box floats at the top; the space it leaves is reserved so the page doesn't jump, and it keeps updating live as you change settings. The separate mini-clock replica was removed. Desktop behaviour is unchanged.
+
 ## [1.2.3] - 2026-06-15
 
 ### Changed

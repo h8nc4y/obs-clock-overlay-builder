@@ -285,14 +285,6 @@ code {
   }
 }
 
-/* スマホ用の浮かぶミニ時計。デスクトップでは常に非表示。1カラム(<=1100px)かつ
-   ピンON のときだけ、画面上部に固定した短いストリップとして時計を見せる。
-   既定では display:none で、レイアウトにもa11yツリーにも出さない。
-   表示の出し分けは下の @media (max-width:1100px) 内で行う。 */
-.mini-preview {
-  display: none;
-}
-
 .panel,
 .preview-panel {
   border: 1px solid var(--line);
@@ -878,53 +870,34 @@ details p {
   }
 
   /* 1カラムではプレビューが下に来てスクロールで見えなくなる。ピンON かつ
-     「実プレビュー(#previewShell)が画面上から外れそう」なとき(=JSが付ける
-     .show-mini-float)だけ、画面上部に固定した短いミニ時計を浮かせる。
-     実プレビューが見えている間は二重表示を避けて非表示のまま。
-     in-flow の時計ステージ(.preview-stage-dock)は普通に流したまま固定しない
-     (min-width:1101px の sticky はここでは効かない)。 */
-  .preview-column.is-pinned.show-mini-float .mini-preview {
-    display: block;
-    position: fixed;
-    top: 8px;
-    left: 0;
-    right: 0;
-    z-index: 40;
-    padding: 0 10px;
-    /* 透明な余白部分はタップを下の設定へ通し、ミニ時計が操作を邪魔しないようにする。
-       ミニ時計は見るだけの複製なので、箱自体もイベントを受けない。 */
+     「実プレビュー(#previewShell)が画面上から外れた」とき(=JSが付ける
+     .show-mini-float)だけ、複製ではなく実物の時計の箱(#previewShell)を実寸のまま
+     画面上部へ固定して浮かせる。実プレビューが見えている間は二重表示を避けて
+     普通にフローへ流す(min-width:1101px の sticky はここでは効かない)。
+
+     固定で抜けるのは「中の箱(#previewShell)」だけで、外側の .preview-stage-dock は
+     通常フローに残す。これにより JS が dock に予約した min-height がそのまま場所取りに
+     効き、固定化で抜けた分の高さを保ってページが飛ばない(dock 自体を fixed にすると
+     dock がフローから抜けてしまい、その min-height は場所取りに効かない)。
+     透明な余白部分はタップを下の設定へ通し、見るだけの時計が操作を邪魔しないようにする。 */
+  .preview-column.is-pinned.show-mini-float .preview-stage-dock {
+    /* 中身が fixed で抜けた分は、JS が付ける min-height(実高の予約)で確保する。
+       予約があるので flow 上の高さは保たれ、ページのガタつきを防ぐ。 */
     pointer-events: none;
   }
 
-  .mini-shell {
-    box-sizing: border-box;
-    display: grid;
-    place-items: center;
-    width: min(420px, 100%);
-    height: 76px;
+  .preview-column.is-pinned.show-mini-float .preview-stage-dock #previewShell {
+    position: fixed;
+    top: 8px;
+    left: 10px;
+    right: 10px;
+    z-index: 40;
+    /* 列幅(最大420px)で中央寄せし、影で浮遊感を出す。中身(#clockPreview)は実寸のまま。
+       left/right の10pxで画面端から離し、横はみ出しを防ぐ。 */
+    width: auto;
+    max-width: min(420px, 100%);
     margin: 0 auto;
-    padding: 6px 14px;
-    border: 1px solid var(--line-strong);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 22px rgba(20, 18, 16, 0.28);
-  }
-
-  .mini-stage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  /* 大きな時計でもストリップ内に収める。実寸は JS の scale 変換で詰める。 */
-  .mini-stage .clock-widget,
-  .mini-stage .clock-analog,
-  .mini-stage .clock-flip {
-    flex: 0 0 auto;
-    transform-origin: center center;
+    box-shadow: 0 10px 26px rgba(20, 18, 16, 0.3);
   }
 }
 
