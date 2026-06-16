@@ -6,6 +6,7 @@ import {
   buildShareText,
   buildXIntentUrl,
   canvasFontStack,
+  computeSideLabelLayout,
   resolveShareText,
   templateDecoration
 } from "../assets/js/share.js";
@@ -365,4 +366,84 @@ test("buildShareLines hides labels and omits date or weekday lines when disabled
     { text: "日", size: 14, isTime: false },
     { text: "12:34", size: 42, isTime: true }
   ]);
+});
+
+// 共有カードの left/right(横並び)レイアウト。ライブ(clock.css)では label が
+// main(日付+時刻)ブロックの真横・縦中央に並ぶ。computeSideLabelLayout が main とラベルを
+// 横に並べ、グループをステージ中央へ置くことを座標で確かめる。
+// stage は SHARE_IMAGE と同じ前提(幅1200・カードは内側)で代表値を使う。
+const SIDE_LABEL_INPUT = {
+  mainW: 300,
+  mainH: 120,
+  labelW: 60,
+  labelH: 30,
+  widgetGap: 14,
+  mainGap: 8,
+  padX: 80,
+  padY: 50,
+  maxW: 1120,
+  maxH: 595,
+  stageCx: 600,
+  stageCy: 340
+};
+
+test("computeSideLabelLayout (right) places the label to the right of the main block, both vertically centered", () => {
+  const layout = computeSideLabelLayout({ ...SIDE_LABEL_INPUT, isLeft: false });
+
+  // 縦は余裕があるので縮小しない。
+  assert.equal(layout.fit, 1);
+  // グループ幅 = main + gap + label。左端はステージ中央を基準に対称配置。
+  const groupW = SIDE_LABEL_INPUT.mainW + SIDE_LABEL_INPUT.widgetGap + SIDE_LABEL_INPUT.labelW;
+  assert.equal(layout.groupLeft, SIDE_LABEL_INPUT.stageCx - groupW / 2);
+  // right: main が左端から始まり、ラベルは main の右(main幅 + gap の先)に中心を置く。
+  assert.equal(layout.mainLeft, layout.groupLeft);
+  assert.equal(
+    layout.labelCx,
+    layout.groupLeft + SIDE_LABEL_INPUT.mainW + SIDE_LABEL_INPUT.widgetGap + SIDE_LABEL_INPUT.labelW / 2
+  );
+  // ラベルは main より右にある(=時刻の右隣)。
+  assert.ok(layout.labelCx > layout.mainLeft + SIDE_LABEL_INPUT.mainW);
+  // main もラベルも同じ縦中央(=ステージ中央)。これがライブの align-items:center の再現。
+  assert.equal(layout.centerY, SIDE_LABEL_INPUT.stageCy);
+  // パネルはグループ+左右パディングで、ステージ中央に置かれる。
+  assert.equal(layout.panel.w, groupW + SIDE_LABEL_INPUT.padX * 2);
+  assert.equal(layout.panel.x, SIDE_LABEL_INPUT.stageCx - layout.panel.w / 2);
+  assert.equal(layout.panel.h, SIDE_LABEL_INPUT.mainH + SIDE_LABEL_INPUT.padY * 2);
+});
+
+test("computeSideLabelLayout (left) places the label to the left of the main block", () => {
+  const layout = computeSideLabelLayout({ ...SIDE_LABEL_INPUT, isLeft: true });
+
+  // left: ラベルが先頭(グループ左端に中心)、main はその右(ラベル幅 + gap の先)。
+  assert.equal(layout.labelCx, layout.groupLeft + SIDE_LABEL_INPUT.labelW / 2);
+  assert.equal(layout.mainLeft, layout.groupLeft + SIDE_LABEL_INPUT.labelW + SIDE_LABEL_INPUT.widgetGap);
+  // ラベルは main より左にある。
+  assert.ok(layout.labelCx < layout.mainLeft);
+  // 縦中央は right と同じ。
+  assert.equal(layout.centerY, SIDE_LABEL_INPUT.stageCy);
+});
+
+test("computeSideLabelLayout shrinks every dimension by fit when the group is too tall", () => {
+  // main を上限より高くして fit<1 を強制する。
+  const tall = { ...SIDE_LABEL_INPUT, mainH: 700, isLeft: false };
+  const layout = computeSideLabelLayout(tall);
+
+  const fullHeight = tall.mainH + tall.padY * 2;
+  const expectedFit = tall.maxH / fullHeight;
+  assert.ok(Math.abs(layout.fit - expectedFit) < 1e-9);
+  assert.ok(layout.fit < 1);
+  // パネル高さは収まり係数を掛けて上限内へ収まる。
+  assert.ok(Math.abs(layout.panel.h - fullHeight * expectedFit) < 1e-9);
+  assert.ok(layout.panel.h <= tall.maxH + 1e-9);
+  // 行間も fit 適用済みで返る(描画側がそのまま積めるように)。
+  assert.ok(Math.abs(layout.fitMainGap - tall.mainGap * expectedFit) < 1e-9);
+});
+
+test("computeSideLabelLayout clamps panel width to maxW without shrinking glyphs", () => {
+  // group がとても広く padding 込みで maxW を超えるケース。幅はクランプされる(fit は縦基準のまま)。
+  const wide = { ...SIDE_LABEL_INPUT, mainW: 1100, labelW: 200, isLeft: false };
+  const layout = computeSideLabelLayout(wide);
+
+  assert.equal(layout.fit, 1); // 縦は収まるので字は縮めない。
+  assert.equal(layout.panel.w, wide.maxW); // 幅だけ上限でクランプ。
 });
