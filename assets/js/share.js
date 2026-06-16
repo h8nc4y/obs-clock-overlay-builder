@@ -134,6 +134,83 @@ export function templateDecoration(template) {
   }
 }
 
+// 共有カードの left/right ラベル(横並び)レイアウトを「純粋計算」で返す。
+// ライブ(clock.css)の .clock-widget(inline-flex / align-items:center / gap:--clock-gap)を
+// 模し、main ブロック(日付↑時刻↓)とラベルを横に並べてパネル中央へ置く。
+// builder.js は measureText で測った各寸法(スケール済み px)を渡し、戻り値の座標で描画する。
+// Canvas に触れないのでここで単体テストでき、ライブ面の見た目と一致しているか検証できる。
+//
+// 入力(すべてスケール 2.4 を掛けた px。fit は未適用):
+//   mainW/mainH … main ブロック(時刻+日付行)の最大幅・合計高さ(行間 mainGap 込み)
+//   labelW/labelH … ラベル文字の幅・高さ
+//   widgetGap … main とラベルの間隔(= config.gap * scale)
+//   mainGap … main 内の日付↔時刻の行間(= config.gap * 0.55 * scale)
+//   padX/padY … パネル内側の余白
+//   maxW/maxH … パネルの最大幅・高さ(stage から 80px 内側)
+//   stageCx/stageCy … ステージ中心
+//   isLeft … ラベルが main の左(true)か右(false=right)か
+// 戻り値:
+//   fit … 縦が収まらないとき全寸法へ掛ける係数(0<fit<=1)
+//   panel{ x,y,w,h } … パネル矩形(fit 適用済み・幅は maxW でクランプ)
+//   groupLeft … main+ラベルのグループ左端 x(stageCx 中心)
+//   mainLeft … main 各行の左端 x(左揃え描画の基準)
+//   labelCx … ラベルの中心 x
+//   centerY … グループ(main/ラベル)の縦中央 y(= stageCy)
+//   fitMainGap … fit 適用済みの main 行間
+export function computeSideLabelLayout({
+  mainW,
+  mainH,
+  labelW,
+  labelH,
+  widgetGap,
+  mainGap,
+  padX,
+  padY,
+  maxW,
+  maxH,
+  stageCx,
+  stageCy,
+  isLeft
+}) {
+  const groupW = mainW + widgetGap + labelW;
+  const groupH = Math.max(mainH, labelH);
+
+  // 縦が上限を超えるなら、全寸法・全ギャップへ同率 fit を掛けて収める(縦積みパスと同方針)。
+  const fullHeight = groupH + padY * 2;
+  const fit = fullHeight > maxH ? maxH / fullHeight : 1;
+
+  const fitGroupW = groupW * fit;
+  const fitWidgetGap = widgetGap * fit;
+  const fitMainW = mainW * fit;
+  const fitLabelW = labelW * fit;
+
+  // 幅は字を縮めず上限でクランプ(縦積みパスと同じく横はみ出しはここで止める)。
+  let panelW = fitGroupW + padX * 2;
+  if (panelW > maxW) {
+    panelW = maxW;
+  }
+  const panelH = fullHeight * fit;
+  const panelX = stageCx - panelW / 2;
+  const panelY = stageCy - panelH / 2;
+
+  // グループをパネル中央へ。right は main が左・label が右、left は逆。
+  const groupLeft = stageCx - fitGroupW / 2;
+  const mainLeft = isLeft ? groupLeft + fitLabelW + fitWidgetGap : groupLeft;
+  const labelCx = isLeft
+    ? groupLeft + fitLabelW / 2
+    : groupLeft + fitMainW + fitWidgetGap + fitLabelW / 2;
+
+  return {
+    fit,
+    panel: { x: panelX, y: panelY, w: panelW, h: panelH },
+    groupLeft,
+    mainLeft,
+    labelCx,
+    centerY: stageCy,
+    fitMainGap: mainGap * fit
+  };
+}
+
 // x.com/intent/tweet 用のURLを組み立てる。画像は添付できない仕様なので
 // text / url / hashtags のみを載せる。hashtags は配列でも "a,b" 文字列でも受ける。
 export function buildXIntentUrl({ text = "", url = "", hashtags = [] } = {}) {

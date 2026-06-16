@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.3.4] - 2026-06-17
+
+### Fixed
+
+- The promo share PNG now matches the live clock for templates whose label sits beside the time (`labelPosition: left`/`right` — the built-in Neon HUD and Soda). The live clock (and OBS `/clock/`) lays the label out next to the date+time block (vertically centered), but the share image was stacking it above/below, so Neon HUD/Soda looked misaligned between the live preview and the shared image. The share image now lays left/right labels beside the date+time block, matching the live `.clock-widget` flex layout (gap, main grid spacing, vertical centering). Top/bottom/hidden label positions are unchanged. The `/clock/?c=...` output and the live clock are unchanged (only the promo image rendering was corrected).
+
 ## [1.3.3] - 2026-06-16
 
 ### Changed

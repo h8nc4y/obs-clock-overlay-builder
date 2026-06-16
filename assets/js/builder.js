@@ -18,6 +18,7 @@ import {
   buildShareText,
   buildXIntentUrl,
   canvasFontStack,
+  computeSideLabelLayout,
   resolveShareText,
   templateDecoration
 } from "./share.js";
@@ -1190,29 +1191,11 @@ function clearShadow(ctx) {
 }
 
 function drawDigitalShareClock(ctx, config) {
-  const stage = ctx.__stage;
-  const formatters = createFormatters(config);
-  const formatted = formatClock(formatters, new Date());
-
   // プレビューの時計パネル(背景色+枠+角丸)を、実寸より大きめに描いて主役にする。
   const scale = 2.4;
-  const fontPx = Math.round(config.fontSize * scale);
+  const formatters = createFormatters(config);
+  const formatted = formatClock(formatters, new Date());
   const fontStack = canvasFontStack(config.fontFamily);
-
-  // パネル幅は時刻文字の実測から決める。
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "center";
-
-  const rawLines = buildShareLines(config, formatted);
-  const label = config.labelPosition === "hidden" ? "" : config.label;
-  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
-  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
-  const labelIndex = label ? (labelAbove ? 0 : labelBelow ? rawLines.length - 1 : -1) : -1;
-  const lines = rawLines.map((line, index) => ({
-    ...line,
-    px: Math.round(line.size * scale),
-    isLabel: index === labelIndex
-  }));
 
   // ライブ時計は --clock-letter-spacing(字間)を反映する。Canvas2D の letterSpacing が
   // 使える環境では同じ字間を適用し、計測も同じ状態で行ってパネル幅を実際の描画に揃える。
@@ -1222,6 +1205,56 @@ function drawDigitalShareClock(ctx, config) {
   if (supportsLetterSpacing) {
     ctx.letterSpacing = letterSpacingCss;
   }
+
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+
+  // ライブ(clock.css)では labelPosition が left/right のとき、ラベルは日付+時刻ブロックの
+  // 横(縦中央)に並ぶ。共有カードもこれに合わせ、ラベル表示ありの left/right のときだけ
+  // 横並びパスへ分岐する。それ以外(top/bottom/hidden・ラベル空)は従来の縦積みのまま。
+  const label = config.labelPosition === "hidden" ? "" : config.label;
+  const isSideLabel =
+    Boolean(label) && (config.labelPosition === "left" || config.labelPosition === "right");
+  if (isSideLabel) {
+    drawDigitalShareClockSideLabel(ctx, config, {
+      formatted,
+      fontStack,
+      label,
+      scale
+    });
+  } else {
+    drawDigitalShareClockStacked(ctx, config, {
+      formatted,
+      fontStack,
+      label,
+      scale
+    });
+  }
+
+  clearShadow(ctx);
+  // 字間が footer など後続の描画へ漏れないよう必ず初期状態へ戻す。
+  ctx.textAlign = "center";
+  if (supportsLetterSpacing) {
+    ctx.letterSpacing = "0px";
+  }
+}
+
+// 従来の縦積みパス: 各行(ラベル/日付/時刻)を上から下へ積み、パネル中央へ置く。
+// top / bottom / hidden ラベルと、ラベル非表示の left/right はこのパスで描く。
+function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label, scale }) {
+  const stage = ctx.__stage;
+  const fontPx = Math.round(config.fontSize * scale);
+
+  // パネル幅は時刻文字の実測から決める。
+  const rawLines = buildShareLines(config, formatted);
+  const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
+  const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
+  const labelIndex = label ? (labelAbove ? 0 : labelBelow ? rawLines.length - 1 : -1) : -1;
+  const lines = rawLines.map((line, index) => ({
+    ...line,
+    px: Math.round(line.size * scale),
+    isLabel: index === labelIndex
+  }));
 
   clearShadow(ctx);
   ctx.font = `${config.fontWeight} ${fontPx}px ${fontStack}`;
@@ -1317,11 +1350,149 @@ function drawDigitalShareClock(ctx, config) {
     scale,
     timeLine: timeLineMetrics
   });
-  clearShadow(ctx);
-  // 字間が footer など後続の描画へ漏れないよう必ず初期状態へ戻す。
-  if (supportsLetterSpacing) {
-    ctx.letterSpacing = "0px";
+}
+
+// 横並びパス: ライブ(clock.css)の left/right ラベルを再現する。
+// .clock-widget は inline-flex / align-items:center / gap:--clock-gap で、
+//   right → [ main(日付↑時刻↓・左揃え) ] [gap] [ LABEL ]
+//   left  → [ LABEL ] [gap] [ main ]
+// を縦中央に揃え、ウィジェット全体をパネル中央へ置く。
+// .clock-main は grid(日付行↑時刻行↓・行間 --clock-gap*0.55)。
+function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, label, scale }) {
+  const stage = ctx.__stage;
+
+  // main 行を作る。buildShareLines と同じ作り(日付と曜日は全角スペース2つで連結)。
+  const dateText = [
+    config.showDate ? formatted.date : "",
+    config.showWeekday ? formatted.weekday : ""
+  ]
+    .filter(Boolean)
+    .join("  ");
+  const mainRows = [];
+  if (dateText) {
+    mainRows.push({ text: dateText, px: Math.round(config.dateSize * scale), isTime: false });
   }
+  mainRows.push({ text: formatted.time, px: Math.round(config.fontSize * scale), isTime: true });
+
+  // 各 main 行の幅(描画と同じ字間で計測)→ mainW/mainH。
+  let mainW = 0;
+  let mainH = 0;
+  const mainGap = config.gap * 0.55 * scale;
+  for (const row of mainRows) {
+    ctx.font = `${config.fontWeight} ${row.px}px ${fontStack}`;
+    mainW = Math.max(mainW, ctx.measureText(row.text).width);
+    mainH += row.px;
+  }
+  mainH += mainGap * (mainRows.length - 1);
+
+  // ラベル(LABEL)の幅/高さ。ライブの .clock-label は font-weight:800。
+  const labelPx = Math.round(config.labelSize * scale);
+  ctx.font = `800 ${labelPx}px ${fontStack}`;
+  const labelW = ctx.measureText(label).width;
+  const labelH = labelPx;
+
+  // ウィジェット間ギャップ(--clock-gap)。
+  const widgetGap = config.gap * scale;
+  const padX = config.paddingX * scale + 24;
+  const padY = config.paddingY * scale + 18;
+
+  // 横並びの座標計算は純粋関数(share.js)へ委譲し、ライブ面との一致を単体テストできるようにする。
+  const layout = computeSideLabelLayout({
+    mainW,
+    mainH,
+    labelW,
+    labelH,
+    widgetGap,
+    mainGap,
+    padX,
+    padY,
+    maxW: stage.w - 80,
+    maxH: stage.h - 80,
+    stageCx: stage.cx,
+    stageCy: stage.cy,
+    isLeft: config.labelPosition === "left"
+  });
+  const { fit, panel, mainLeft, labelCx, centerY: groupCenterY, fitMainGap } = layout;
+  const { x: panelX, y: panelY, w: panelW, h: panelH } = panel;
+
+  // 時計パネル本体(背景・角丸・枠線)。
+  clearShadow(ctx);
+  drawRoundedRectPath(ctx, panelX, panelY, panelW, panelH, Math.min(config.radius * scale, panelH / 2));
+  ctx.fillStyle = hexToRgba(config.backgroundColor, config.backgroundOpacity);
+  ctx.fill();
+  if (config.borderWidth > 0) {
+    ctx.lineWidth = Math.max(1, config.borderWidth * scale);
+    ctx.strokeStyle = hexToRgba(config.borderColor, config.borderOpacity);
+    ctx.stroke();
+  }
+
+  // main の各行(左揃え)。日付↑・時刻↓を fitMainGap で積み、main ブロックを縦中央に。
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  const fitMainH = mainH * fit;
+  let rowY = groupCenterY - fitMainH / 2;
+  let timeLineMetrics = null;
+  for (let i = 0; i < mainRows.length; i += 1) {
+    const row = mainRows[i];
+    const rowPx = row.px * fit;
+    rowY += rowPx / 2;
+    ctx.font = `${config.fontWeight} ${rowPx}px ${fontStack}`;
+    const rowWidth = ctx.measureText(row.text).width;
+    if (row.isTime) {
+      // cx は時刻の中心x(左寄せ描画のため left + 幅/2)。装飾(下線)はこれを基準にする。
+      timeLineMetrics = {
+        text: row.text,
+        y: rowY,
+        px: rowPx,
+        width: rowWidth,
+        cx: mainLeft + rowWidth / 2
+      };
+      applyTextEffects(ctx, config);
+    } else {
+      clearShadow(ctx);
+    }
+    ctx.fillStyle = config.textColor;
+    ctx.fillText(row.text, mainLeft, rowY);
+    if (row.isTime && config.strokeWidth > 0) {
+      clearShadow(ctx);
+      ctx.lineWidth = config.strokeWidth * scale * fit;
+      ctx.strokeStyle = config.strokeColor;
+      ctx.strokeText(row.text, mainLeft, rowY);
+    }
+    rowY += rowPx / 2 + fitMainGap;
+  }
+
+  // ラベルはグループの縦中央に置く(影なし)。textAlign は center にして labelCx を中心に描く。
+  const fitLabelPx = labelPx * fit;
+  clearShadow(ctx);
+  ctx.textAlign = "center";
+  ctx.font = `800 ${fitLabelPx}px ${fontStack}`;
+  ctx.fillStyle = config.textColor;
+  ctx.fillText(label, labelCx, groupCenterY);
+  const labelLineMetrics = {
+    text: label,
+    y: groupCenterY,
+    px: fitLabelPx,
+    width: labelW * fit,
+    cx: labelCx
+  };
+
+  drawDigitalTemplateDecorations(ctx, {
+    config,
+    decoration: templateDecoration(config.template),
+    fontStack,
+    fit,
+    labelLine: labelLineMetrics,
+    panel: {
+      x: panelX,
+      y: panelY,
+      w: panelW,
+      h: panelH,
+      radius: Math.min(config.radius * scale, panelH / 2)
+    },
+    scale,
+    timeLine: timeLineMetrics
+  });
 }
 
 // 各デジタルテンプレの装飾を、clock.css の `.template-<id>` に忠実な見た目で描く。
@@ -1363,15 +1534,18 @@ function drawDigitalTemplateDecorations(
   }
 
   // studio-live / night-studio: 時刻の下線。
+  // 縦積みパスは時刻が中央なので __stage.cx 基準。横並びパスは時刻が左寄せのため
+  // timeLine.cx(時刻の中心x)を渡してくる。あればそれを優先し、下線を時刻の真下へ揃える。
   if (timeLine && decoration.timeUnderline) {
     const underlineWidth = Math.max(1, decoration.timeUnderline.px * unit);
     const underlineY = timeLine.y + timeLine.px / 2 + 3 * unit + underlineWidth / 2;
+    const timeCx = timeLine.cx ?? ctx.__stage.cx;
     ctx.beginPath();
     ctx.lineCap = "butt";
     ctx.lineWidth = underlineWidth;
     ctx.strokeStyle = decoration.timeUnderline.color;
-    ctx.moveTo(ctx.__stage.cx - timeLine.width / 2, underlineY);
-    ctx.lineTo(ctx.__stage.cx + timeLine.width / 2, underlineY);
+    ctx.moveTo(timeCx - timeLine.width / 2, underlineY);
+    ctx.lineTo(timeCx + timeLine.width / 2, underlineY);
     ctx.stroke();
   }
 
@@ -1488,7 +1662,9 @@ function fillCircle(ctx, cx, cy, r, color) {
 // ラベルバッジ。mode='fill' は塗りバッジ(fill 背景 / ink 文字、dot 有のとき左に白丸)。
 // mode='outline' は枠バッジ(枠線=文字色=config.textColor、塗りなし、ドットなし)。
 function drawTemplateBadge(ctx, badge, { config, fontStack, labelLine, unit }) {
-  const cx = ctx.__stage.cx;
+  // 縦積みパスはラベルが中央なので __stage.cx 基準。横並びパスはラベルが左右どちらかに
+  // 寄るため labelLine.cx(ラベルの中心x)を渡してくる。あればそれを優先する。
+  const cx = labelLine.cx ?? ctx.__stage.cx;
   const dot = badge.dot === true;
   // ドット有(studio-live)は左に余白を多く取り、ドットを置く。ドット無は左右対称の padding。
   const paddingLeft = (dot ? 22 : 11) * unit;
