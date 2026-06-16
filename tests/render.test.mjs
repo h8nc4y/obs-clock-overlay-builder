@@ -220,6 +220,16 @@ test("applyClockStyles writes expected CSS variables", () => {
   assert.equal(element.style.getPropertyValue("--clock-shadow"), "1px 2px 6px rgba(0, 0, 0, 0.4)");
 });
 
+test("applyClockStyles writes none for disabled shadows", () => {
+  const element = new FakeElement("div");
+
+  applyClockStyles(element, normalizeConfig({ shadowOpacity: 0, shadowBlur: 6 }));
+  assert.equal(element.style.getPropertyValue("--clock-shadow"), "none");
+
+  applyClockStyles(element, normalizeConfig({ shadowOpacity: 0.5, shadowBlur: 0 }));
+  assert.equal(element.style.getPropertyValue("--clock-shadow"), "none");
+});
+
 test("time renders each digit in a fixed-width slot for a stable frame", () => {
   const container = new FakeElement("div");
   mountClock(container, normalizeConfig({ showSeconds: true, timezone: "UTC" }), {
@@ -348,6 +358,32 @@ test("flip clock builds one card per digit and groups pairs into one card", () =
   // "12:34" pair → "12" and "34" = 2 cards, ":" = 1 separator
   assert.equal(pairRoot.children.filter((c) => c.className === "flip-card").length, 2);
   assert.equal(pairRoot.children.filter((c) => c.className === "flip-sep").length, 1);
+});
+
+test("flip clock writes flip CSS variables on its root", () => {
+  const container = new FakeElement("div");
+  mountClock(
+    container,
+    normalizeConfig({
+      clockType: "flip",
+      backgroundColor: "#112233",
+      backgroundOpacity: 0.5,
+      textColor: "#abcdef",
+      fontSize: 64,
+      radius: 14,
+      borderColor: "#445566",
+      borderOpacity: 0.25,
+      borderWidth: 2,
+      timezone: "UTC"
+    }),
+    { now: () => new Date("2026-01-01T12:34:00Z") }
+  );
+
+  const root = container.children[0];
+  assert.equal(root.style.getPropertyValue("--flip-card-bg"), "rgba(17, 34, 51, 0.5)");
+  assert.equal(root.style.getPropertyValue("--flip-ink"), "#abcdef");
+  assert.equal(root.style.getPropertyValue("--flip-size"), "64px");
+  assert.equal(root.style.getPropertyValue("--flip-border"), "rgba(68, 85, 102, 0.25)");
 });
 
 test("mountClock tears down the old implementation when the clock type changes", () => {

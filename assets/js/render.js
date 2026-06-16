@@ -260,6 +260,9 @@ function mountFlipClock(container, config, options = {}) {
 
   // 上半分(古い値)が手前に折れ、続いて下半分(新しい値)が起き上がる本物のめくれ。
   function flip(slot, nextValue) {
+    const previousValue = slot.value;
+    setHalf(slot.staticBottom, previousValue);
+    setHalf(slot.flapTop, previousValue);
     setHalf(slot.staticTop, nextValue); // 上半分が折れたあとに見える面(新)
     setHalf(slot.flapBottom, nextValue); // 起き上がる下フラップの面(新)
     // staticBottom と flapTop は古い値のまま、それぞれが「めくれ」の動く面になる
@@ -401,7 +404,7 @@ function buildAnalogFace(root, config) {
   return { hour, minute, second, date };
 }
 
-const ROMAN_NUMERALS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+export const ROMAN_NUMERALS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
 
 function appendMarks(root, config, inkColor) {
   const showNumbers = config.analogMarks === "numbers" || config.analogMarks === "both";

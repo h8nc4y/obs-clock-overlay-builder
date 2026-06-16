@@ -575,6 +575,7 @@ export const NUMBER_LIMITS = {
   letterSpacing: [-1, 8],
   lineHeight: [0.9, 1.8],
   fontWeight: [300, 900],
+  // gap はテンプレ専用・編集UI非公開。旧flat/テンプレ/描画の互換性維持用。
   gap: [0, 40],
   shadowOpacity: [0, 1],
   shadowBlur: [0, 36],
@@ -916,6 +917,9 @@ function normalizeHex(value, fallback) {
 }
 
 function clampNumber(value, min, max, fallback) {
+  if (value === null || value === undefined || value === "") {
+    return fallback;
+  }
   const number = Number(value);
   if (!Number.isFinite(number)) {
     return fallback;
