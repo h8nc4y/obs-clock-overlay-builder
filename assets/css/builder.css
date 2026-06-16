@@ -699,6 +699,33 @@ button.pin-toggle:not(.is-active) .pin-toggle-icon {
   transform: rotate(45deg);
 }
 
+/* ピン留めトグルをライブプレビューの右上に重ねて置く(操作対象=時計の上にピンがある形)。
+   #previewShell は position:relative・overflow:hidden なので、その右上へ絶対配置する。
+   アイコンのみの小さな丸ボタンにして時計への重なりを最小化し、状態は塗り色(固定中=アクセント塗り
+   /未固定=白枠)とピンの傾き、読み上げ名(aria-label)とホバー説明(title)で伝える。チェッカー/明暗
+   どの背景でも読めるよう不透明塗り＋薄い影で分離。固定中はデスクトップで dock が sticky になり
+   時計と一緒に追従する。selector は button.pin-toggle と同等の特異度にして padding 等を上書きする。 */
+button.pin-toggle-on-stage {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(34, 30, 26, 0.24);
+}
+
+button.pin-toggle-on-stage .pin-toggle-label {
+  /* アイコンのみ表示。状態は色・ピンの傾き・aria-label/title で伝えるのでラベル文字は隠す。 */
+  display: none;
+}
+
+button.pin-toggle-on-stage .pin-toggle-icon {
+  font-size: 1.1rem;
+}
+
 .preview-toolbar {
   display: flex;
   flex-wrap: wrap;
