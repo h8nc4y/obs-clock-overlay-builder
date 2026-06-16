@@ -16,6 +16,7 @@ Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 - Zero runtime dependencies; the clock renders from URL and browser state only.
 - Static-first, free-tier-friendly Cloudflare Workers Static Assets hosting.
 - Japanese-first editor UI for non-programmer OBS users in Japan.
+- Editor live-preview pinning: keep the clock preview in view while scrolling the settings (editor-only; does not affect the `/clock/?c=...` output).
 - Optional browser features for local font discovery and clipboard copy.
 - Share your clock as a Canvas-rendered promo image (1200×675) via the Web Share API, with a save-PNG + X-compose fallback — fully client-side, no upload or backend.
 
@@ -151,6 +152,7 @@ OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける�
 - パタパタ時計はカードがめくれるフリップ表示です。色・文字サイズ・角丸・秒表示などを設定できます。
 - 作った時計を宣伝画像(PNG)にして X などへ共有できます。スマホは共有メニューから、PC は「PNGを保存 → X投稿画面を開く」で手動添付します。すべてブラウザ内で完結し、アップロードやバックエンドはありません。
 - 編集画面のテーマ(白 / コーラル / ふんわりブルー)を切り替えられます。テーマは編集画面だけの設定で、生成される時計URLの見た目には影響しません。
+- 編集中に時計プレビューを画面に固定(ピン留め)して、設定をスクロールしながら見比べられます。ピン留めは編集画面だけの機能で、生成される時計URLの見た目には影響しません。
 - 時計はサーバー時刻へ自動補正されるため、配信PCの時計が多少ずれていても正しい時刻を表示します(オフラインなど補正できないときはPCの時刻にフォールバック)。バックエンドは増やしていません。
 - 生成された `/clock/?c=...` URL を OBS のブラウザソースへ貼り付けて使えます。
 

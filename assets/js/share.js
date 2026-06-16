@@ -134,6 +134,43 @@ export function templateDecoration(template) {
   }
 }
 
+// 共有カードの top/bottom/hidden ラベル(縦積み)レイアウトを「純粋計算」で返す。
+// builder.js 側で測った行サイズとパネル内容幅を受け、従来の Canvas 描画と同じ fit/clamp を返す。
+export function computeStackedLayout({
+  lineSizesPx,
+  panelContentWidth,
+  padX,
+  padY,
+  gap,
+  maxW,
+  maxH,
+  stageCx,
+  stageCy
+}) {
+  const linesHeight = lineSizesPx.reduce((sum, size) => sum + size, 0) + gap * (lineSizesPx.length - 1);
+  const fullHeight = linesHeight + padY * 2;
+  const fit = fullHeight > maxH ? maxH / fullHeight : 1;
+  const fitGap = gap * fit;
+  const fitPadY = padY * fit;
+  let panelW = panelContentWidth + padX * 2;
+  const panelH = fullHeight * fit;
+  if (panelW > maxW) {
+    panelW = maxW;
+  }
+  const panelX = stageCx - panelW / 2;
+  const panelY = stageCy - panelH / 2;
+
+  return {
+    fit,
+    fitGap,
+    fitPadY,
+    panelW,
+    panelH,
+    panelX,
+    panelY
+  };
+}
+
 // 共有カードの left/right ラベル(横並び)レイアウトを「純粋計算」で返す。
 // ライブ(clock.css)の .clock-widget(inline-flex / align-items:center / gap:--clock-gap)を
 // 模し、main ブロック(日付↑時刻↓)とラベルを横に並べてパネル中央へ置く。
@@ -151,12 +188,13 @@ export function templateDecoration(template) {
 //   isLeft … ラベルが main の左(true)か右(false=right)か
 // 戻り値:
 //   fit … 縦が収まらないとき全寸法へ掛ける係数(0<fit<=1)
+//   hfit … 横が収まらないとき fit 後の横寸法へ掛ける係数(0<=hfit<=1)
 //   panel{ x,y,w,h } … パネル矩形(fit 適用済み・幅は maxW でクランプ)
 //   groupLeft … main+ラベルのグループ左端 x(stageCx 中心)
 //   mainLeft … main 各行の左端 x(左揃え描画の基準)
 //   labelCx … ラベルの中心 x
 //   centerY … グループ(main/ラベル)の縦中央 y(= stageCy)
-//   fitMainGap … fit 適用済みの main 行間
+//   fitMainGap … fit/hfit 適用済みの main 行間
 export function computeSideLabelLayout({
   mainW,
   mainH,
@@ -184,8 +222,15 @@ export function computeSideLabelLayout({
   const fitMainW = mainW * fit;
   const fitLabelW = labelW * fit;
 
-  // 幅は字を縮めず上限でクランプ(縦積みパスと同じく横はみ出しはここで止める)。
-  let panelW = fitGroupW + padX * 2;
+  const maxContentW = Math.max(0, maxW - padX * 2);
+  const hfit = fitGroupW > maxContentW && fitGroupW > 0 ? maxContentW / fitGroupW : 1;
+  const fittedGroupW = fitGroupW * hfit;
+  const fittedWidgetGap = fitWidgetGap * hfit;
+  const fittedMainW = fitMainW * hfit;
+  const fittedLabelW = fitLabelW * hfit;
+
+  // 幅は上限でクランプし、収まり切らないときは横方向の hfit で中身を縮める。
+  let panelW = fittedGroupW + padX * 2;
   if (panelW > maxW) {
     panelW = maxW;
   }
@@ -194,20 +239,21 @@ export function computeSideLabelLayout({
   const panelY = stageCy - panelH / 2;
 
   // グループをパネル中央へ。right は main が左・label が右、left は逆。
-  const groupLeft = stageCx - fitGroupW / 2;
-  const mainLeft = isLeft ? groupLeft + fitLabelW + fitWidgetGap : groupLeft;
+  const groupLeft = stageCx - fittedGroupW / 2;
+  const mainLeft = isLeft ? groupLeft + fittedLabelW + fittedWidgetGap : groupLeft;
   const labelCx = isLeft
-    ? groupLeft + fitLabelW / 2
-    : groupLeft + fitMainW + fitWidgetGap + fitLabelW / 2;
+    ? groupLeft + fittedLabelW / 2
+    : groupLeft + fittedMainW + fittedWidgetGap + fittedLabelW / 2;
 
   return {
     fit,
+    hfit,
     panel: { x: panelX, y: panelY, w: panelW, h: panelH },
     groupLeft,
     mainLeft,
     labelCx,
     centerY: stageCy,
-    fitMainGap: mainGap * fit
+    fitMainGap: mainGap * fit * hfit
   };
 }
 

@@ -6,6 +6,31 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-06-17
+
+A hardening pass from a full multi-agent source review (8 dimensions, each finding adversarially re-verified). The core was healthy (no blockers/majors); these are the confirmed minor/nit fixes, test-coverage additions, and accessibility/consistency polish. The `/clock/?c=...` reproduction contract, the live clock rendering, and the strict CSP are unchanged.
+
+### Fixed
+
+- Share image: a stale promo PNG could be shared for a brief moment if you kept editing while an auto-regeneration was in flight. Image generation now uses a generation counter so only the latest render commits the blob/preview/save-link.
+- Share image: for templates whose label sits beside the time (`labelPosition: left`/`right`) with a long label and a large font, the time could overflow the card. The side-label layout now also shrinks horizontally and re-centers so the content stays inside the panel.
+- Config import: importing a settings JSON with `null`/empty numeric values (from another tool or hand-editing) no longer collapses them to `0` (e.g. a fully transparent background); they now fall back to the proper defaults. The `/clock/?c=...` payload was never affected.
+- Flip clock: rapid consecutive flips of the same digit (e.g. right after the tab regains focus) no longer briefly show a two-steps-old face.
+
+### Changed
+
+- Accessibility: the contrast warning is now a live region (`role="status"`), so screen readers are notified when it appears; the secondary-button hover text color now meets WCAG AA (4.5:1) across all three editor themes; the `ふんわりブルー` (fanbox) theme's muted text and eyebrow color were darkened slightly to meet AA over its gradient background.
+- Performance: dragging a range slider now debounces the `localStorage` save and the generated-URL re-encode (the live preview still updates immediately), reducing per-frame work during a drag.
+- Maintainability: `tokens.css` now holds only values genuinely shared by both the builder and `/clock/` (the builder white-theme palette is owned solely by `builder.css`, removing dead/overridden tokens); the Roman-numeral list and the share-image download-link enable/disable logic are now single-sourced; the share-image decoration drawing moved to a dedicated `share-decorations.js` module; the side-label and stacked share-layout math are pure functions in `share.js`. No visual/behavioral change.
+
+### Tests
+
+- Added coverage for: the stacked and side-label share-layout math (fit/clamp), the share-image template decoration drawing (via a Canvas spy), `time.js` date/weekday/12-hour/timezone-boundary formatting, the bare-`c=` import path, `clampNumber` null/empty fallback, compact round-trip for non-default analog/flip fields, and the shadow-`none` / flip CSS-variable render branches. Test count 118 → 139.
+
+### Docs
+
+- Documented the live-preview pinning/float feature in the README and added pin/float QA steps to `docs/manual-qa.md`.
+
 ## [1.3.4] - 2026-06-17
 
 ### Fixed

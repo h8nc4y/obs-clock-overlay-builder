@@ -89,6 +89,27 @@ test("compact URL round-trips non-default template values", () => {
   assert.equal(restored.weekdayFormat, "en-long");
 });
 
+test("compact config preserves analog and flip-specific fields", () => {
+  const analog = normalizeConfig({
+    clockType: "analog",
+    analogMarks: "ticks",
+    analogSecondHand: "off",
+    analogSize: 300
+  });
+  const decodedAnalog = decodeConfig(encodeConfig(analog, { compact: true }));
+
+  assert.equal(decodedAnalog.clockType, "analog");
+  assert.equal(decodedAnalog.analogMarks, "ticks");
+  assert.equal(decodedAnalog.analogSecondHand, "off");
+  assert.equal(decodedAnalog.analogSize, 300);
+
+  const flip = normalizeConfig({ clockType: "flip", flipGroup: "pair" });
+  const decodedFlip = decodeConfig(encodeConfig(flip, { compact: true }));
+
+  assert.equal(decodedFlip.clockType, "flip");
+  assert.equal(decodedFlip.flipGroup, "pair");
+});
+
 test("parses flat GET parameters when c is missing", () => {
   const config = parseConfigFromQuery("?tz=UTC&hour12=1&seconds=0&date=1&weekday=true&font=Poppins&theme=soda");
 
@@ -119,6 +140,14 @@ test("parses import input with whitespace and URL hash", () => {
   assert.equal(config.timezone, "UTC");
 });
 
+test("parses a bare base64url config paste", () => {
+  const encoded = encodeConfig({ label: "BARE", timezone: "UTC" });
+  const config = parseImportInput(encoded);
+
+  assert.equal(config.label, "BARE");
+  assert.equal(config.timezone, "UTC");
+});
+
 test("empty import input reports a clear error", () => {
   assert.throws(() => parseImportInput("  \n\t  "), /入力が空です。/);
 });
@@ -145,6 +174,14 @@ test("invalid values fall back to safe defaults", () => {
   assert.equal(config.textColor, DEFAULT_CONFIG.textColor);
   assert.equal(config.labelPosition, DEFAULT_CONFIG.labelPosition);
   assert.equal(config.weekdayFormat, DEFAULT_CONFIG.weekdayFormat);
+});
+
+test("null and empty numeric inputs fall back to defaults", () => {
+  assert.equal(normalizeConfig({ backgroundOpacity: null }).backgroundOpacity, DEFAULT_CONFIG.backgroundOpacity);
+
+  const flat = parseConfigFromQuery("?backgroundOpacity=&fontSize=");
+  assert.equal(flat.backgroundOpacity, DEFAULT_CONFIG.backgroundOpacity);
+  assert.equal(flat.fontSize, DEFAULT_CONFIG.fontSize);
 });
 
 test("number limits match HTML range inputs", () => {

@@ -7,6 +7,7 @@ import {
   buildXIntentUrl,
   canvasFontStack,
   computeSideLabelLayout,
+  computeStackedLayout,
   resolveShareText,
   templateDecoration
 } from "../assets/js/share.js";
@@ -387,6 +388,70 @@ const SIDE_LABEL_INPUT = {
   stageCy: 340
 };
 
+test("computeStackedLayout returns unscaled centered panel values when content fits", () => {
+  const layout = computeStackedLayout({
+    lineSizesPx: [32, 100],
+    panelContentWidth: 420,
+    padX: 60,
+    padY: 40,
+    gap: 12,
+    maxW: 1000,
+    maxH: 600,
+    stageCx: 600,
+    stageCy: 340
+  });
+
+  assert.equal(layout.fit, 1);
+  assert.equal(layout.fitGap, 12);
+  assert.equal(layout.fitPadY, 40);
+  assert.equal(layout.panelW, 540);
+  assert.equal(layout.panelH, 224);
+  assert.equal(layout.panelX, 330);
+  assert.equal(layout.panelY, 228);
+});
+
+test("computeStackedLayout scales vertical dimensions when the stacked group is too tall", () => {
+  const layout = computeStackedLayout({
+    lineSizesPx: [240, 200],
+    panelContentWidth: 300,
+    padX: 40,
+    padY: 50,
+    gap: 20,
+    maxW: 1000,
+    maxH: 280,
+    stageCx: 600,
+    stageCy: 340
+  });
+
+  assert.equal(layout.fit, 0.5);
+  assert.equal(layout.fitGap, 10);
+  assert.equal(layout.fitPadY, 25);
+  assert.equal(layout.panelW, 380);
+  assert.equal(layout.panelH, 280);
+  assert.equal(layout.panelX, 410);
+  assert.equal(layout.panelY, 200);
+});
+
+test("computeStackedLayout clamps panel width without changing the vertical fit", () => {
+  const layout = computeStackedLayout({
+    lineSizesPx: [40, 120],
+    panelContentWidth: 1200,
+    padX: 80,
+    padY: 40,
+    gap: 12,
+    maxW: 800,
+    maxH: 600,
+    stageCx: 600,
+    stageCy: 340
+  });
+
+  assert.equal(layout.fit, 1);
+  assert.equal(layout.panelW, 800);
+  assert.equal(layout.panelH, 252);
+  assert.equal(layout.panelX, 200);
+  assert.equal(layout.panelY, 214);
+});
+
 test("computeSideLabelLayout (right) places the label to the right of the main block, both vertically centered", () => {
   const layout = computeSideLabelLayout({ ...SIDE_LABEL_INPUT, isLeft: false });
 
@@ -439,11 +504,40 @@ test("computeSideLabelLayout shrinks every dimension by fit when the group is to
   assert.ok(Math.abs(layout.fitMainGap - tall.mainGap * expectedFit) < 1e-9);
 });
 
-test("computeSideLabelLayout clamps panel width to maxW without shrinking glyphs", () => {
-  // group がとても広く padding 込みで maxW を超えるケース。幅はクランプされる(fit は縦基準のまま)。
+test("computeSideLabelLayout clamps panel width to maxW and applies an independent horizontal fit", () => {
+  // group がとても広く padding 込みで maxW を超えるケース。幅はクランプされ、横方向だけ hfit が効く。
   const wide = { ...SIDE_LABEL_INPUT, mainW: 1100, labelW: 200, isLeft: false };
   const layout = computeSideLabelLayout(wide);
 
   assert.equal(layout.fit, 1); // 縦は収まるので字は縮めない。
+  assert.ok(layout.hfit < 1);
   assert.equal(layout.panel.w, wide.maxW); // 幅だけ上限でクランプ。
+});
+
+test("computeSideLabelLayout keeps a huge right label inside the clamped panel", () => {
+  const wide = { ...SIDE_LABEL_INPUT, mainW: 120, labelW: 1600, widgetGap: 60, isLeft: false };
+  const layout = computeSideLabelLayout(wide);
+  const minX = layout.panel.x + wide.padX;
+  const maxX = layout.panel.x + layout.panel.w - wide.padX;
+  const fittedMainW = wide.mainW * layout.fit * layout.hfit;
+  const fittedLabelW = wide.labelW * layout.fit * layout.hfit;
+
+  assert.ok(layout.mainLeft >= minX - 1e-9);
+  assert.ok(layout.mainLeft + fittedMainW <= maxX + 1e-9);
+  assert.ok(layout.labelCx - fittedLabelW / 2 >= minX - 1e-9);
+  assert.ok(layout.labelCx + fittedLabelW / 2 <= maxX + 1e-9);
+});
+
+test("computeSideLabelLayout keeps a huge left label inside the clamped panel", () => {
+  const wide = { ...SIDE_LABEL_INPUT, mainW: 120, labelW: 1600, widgetGap: 60, isLeft: true };
+  const layout = computeSideLabelLayout(wide);
+  const minX = layout.panel.x + wide.padX;
+  const maxX = layout.panel.x + layout.panel.w - wide.padX;
+  const fittedMainW = wide.mainW * layout.fit * layout.hfit;
+  const fittedLabelW = wide.labelW * layout.fit * layout.hfit;
+
+  assert.ok(layout.labelCx - fittedLabelW / 2 >= minX - 1e-9);
+  assert.ok(layout.labelCx + fittedLabelW / 2 <= maxX + 1e-9);
+  assert.ok(layout.mainLeft >= minX - 1e-9);
+  assert.ok(layout.mainLeft + fittedMainW <= maxX + 1e-9);
 });

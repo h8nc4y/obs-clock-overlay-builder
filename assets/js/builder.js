@@ -11,7 +11,15 @@ import {
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
-import { applyClockStyles, computeAnalogAngles, mountClock, recommendedObsSize, tokenizeFlip } from "./render.js";
+import {
+  ROMAN_NUMERALS,
+  applyClockStyles,
+  computeAnalogAngles,
+  mountClock,
+  recommendedObsSize,
+  tokenizeFlip
+} from "./render.js";
+import { clearShadow, drawDigitalTemplateDecorations, drawRoundedRectPath } from "./share-decorations.js";
 import { analogParts, createAnalogFormatter, createFormatters, formatClock } from "./time.js";
 import {
   buildShareLines,
@@ -19,6 +27,7 @@ import {
   buildXIntentUrl,
   canvasFontStack,
   computeSideLabelLayout,
+  computeStackedLayout,
   resolveShareText,
   templateDecoration
 } from "./share.js";
@@ -27,6 +36,7 @@ const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 const SHARE_IMAGE_WIDTH = 1200;
 const SHARE_IMAGE_HEIGHT = 675;
 const SHARE_IMAGE_AUTO_REGENERATE_DELAY_MS = 400;
+const PERSIST_URL_DEBOUNCE_MS = 180;
 
 const STORAGE_KEY = "obs-clock-builder:v1";
 const THEME_STORAGE_KEY = "obs-clock-builder:theme";
@@ -174,6 +184,8 @@ let localFontSelectBound = false;
 let shareImageBlob = null;
 let shareImageDirty = true;
 let shareImageAutoRegenerateTimer = 0;
+let shareImageGeneration = 0;
+let persistUrlTimer = 0;
 let userHasGeneratedShareImage = false;
 
 const previewClock = mountClock(elements.clockPreview, state);
@@ -636,7 +648,10 @@ function bindForm() {
     elements[field].addEventListener("input", () => updateState({ [field]: elements[field].value }));
   }
   for (const field of rangeFields) {
-    elements[field].addEventListener("input", () => updateState({ [field]: Number(elements[field].value) }));
+    elements[field].addEventListener("input", () =>
+      updateState({ [field]: Number(elements[field].value) }, false, { deferPersistent: true })
+    );
+    elements[field].addEventListener("change", () => updateState({ [field]: Number(elements[field].value) }));
   }
 
   elements.useLocalTimezone.addEventListener("click", () => {
@@ -676,14 +691,14 @@ function bindPreviewBackground() {
   });
 }
 
-function updateState(partial, sync = false) {
+function updateState(partial, sync = false, options = {}) {
   state = normalizeConfig({ ...state, ...partial });
   if (sync) {
     syncFormFromState();
   } else {
     syncOutputValues();
   }
-  updateEverything();
+  updateEverything("", options);
 }
 
 function syncFormFromState() {
@@ -735,12 +750,15 @@ function syncOutputValues() {
   }
 }
 
-function updateEverything(status = "") {
+function updateEverything(status = "", options = {}) {
   state = normalizeConfig(state);
   previewClock.updateConfig(state);
-  persistState();
+  if (options.deferPersistent) {
+    schedulePersistentOutputs();
+  } else {
+    commitPersistentOutputs();
+  }
   updatePreviewBackground();
-  updateGeneratedUrl();
   updateContrastWarning();
   updateTemplatePressed();
   updateClockTypeVisibility();
@@ -749,6 +767,7 @@ function updateEverything(status = "") {
   // 一時的に古い状態として示す。生成済みプレビューがある場合は debounce 後に自動更新する。
   const becameStale = shareImageBlob && !shareImageDirty;
   shareImageDirty = true;
+  shareImageGeneration += 1;
   if (becameStale) {
     markShareImageStale();
   }
@@ -788,6 +807,26 @@ function updateGeneratedUrl() {
     elements.urlWarning.hidden = false;
     elements.urlWarning.textContent = "URLが長めです。必要なら「デフォルト値を省略して短くする」を使ってください。";
   }
+}
+
+function schedulePersistentOutputs() {
+  if (persistUrlTimer) {
+    window.clearTimeout(persistUrlTimer);
+  }
+  persistUrlTimer = window.setTimeout(() => {
+    persistUrlTimer = 0;
+    persistState();
+    updateGeneratedUrl();
+  }, PERSIST_URL_DEBOUNCE_MS);
+}
+
+function commitPersistentOutputs() {
+  if (persistUrlTimer) {
+    window.clearTimeout(persistUrlTimer);
+    persistUrlTimer = 0;
+  }
+  persistState();
+  updateGeneratedUrl();
 }
 
 function updateRecommendedSize() {
@@ -967,8 +1006,19 @@ function markShareImageStale() {
   elements.shareImageCaption.textContent =
     "デザインを変えました。『プレビュー画像を作り直す』で更新できます。";
   // 古い画像のダウンロードを防ぐ。キーボードでも活性化しないよう tabindex も外す。
-  elements.downloadShareImage.setAttribute("aria-disabled", "true");
+  setDownloadShareImageEnabled(false);
+}
+
+function setDownloadShareImageEnabled(enabled, href = "#") {
+  if (enabled) {
+    elements.downloadShareImage.href = href;
+    elements.downloadShareImage.removeAttribute("aria-disabled");
+    // 無効化時に外したキーボード活性化(tabindex=-1)を戻し、再び Tab で辿れるようにする。
+    elements.downloadShareImage.removeAttribute("tabindex");
+    return;
+  }
   elements.downloadShareImage.setAttribute("href", "#");
+  elements.downloadShareImage.setAttribute("aria-disabled", "true");
   elements.downloadShareImage.setAttribute("tabindex", "-1");
 }
 
@@ -1012,6 +1062,7 @@ function updateXIntent() {
 
 async function regenerateShareImage(successMessage) {
   cancelShareImageAutoRegenerate();
+  const myGeneration = ++shareImageGeneration;
   if (successMessage) {
     setShareStatus("宣伝画像を作成中…");
   }
@@ -1022,14 +1073,18 @@ async function regenerateShareImage(successMessage) {
     dataUrl = result.dataUrl;
     blob = result.blob;
   } catch {
+    if (myGeneration !== shareImageGeneration) {
+      return false;
+    }
     shareImageBlob = null;
     // 生成に失敗したら、直前に成功した古いPNGを保存できないよう保存リンクを無効化する。
     // 説明文(figcaption)はエラー表示のままにしたいので、markShareImageStale ではなく
     // 保存リンクの属性だけを無効状態に揃える(キーボードでも辿れないよう tabindex も外す)。
-    elements.downloadShareImage.setAttribute("aria-disabled", "true");
-    elements.downloadShareImage.setAttribute("href", "#");
-    elements.downloadShareImage.setAttribute("tabindex", "-1");
+    setDownloadShareImageEnabled(false);
     setShareStatus("画像を作成できませんでした。ブラウザを更新してもう一度試してください。", true);
+    return false;
+  }
+  if (myGeneration !== shareImageGeneration) {
     return false;
   }
   shareImageBlob = blob;
@@ -1040,10 +1095,7 @@ async function regenerateShareImage(successMessage) {
   // 生成できたときだけ意味のある alt を付け、読み上げにも画像があると伝える。
   elements.shareImagePreview.setAttribute("alt", "作成した宣伝画像のプレビュー");
   elements.shareImageCaption.textContent = "今の時計デザインで宣伝画像を作りました。共有や保存ができます。";
-  elements.downloadShareImage.href = dataUrl;
-  elements.downloadShareImage.removeAttribute("aria-disabled");
-  // 無効化時に外したキーボード活性化(tabindex=-1)を戻し、再び Tab で辿れるようにする。
-  elements.downloadShareImage.removeAttribute("tabindex");
+  setDownloadShareImageEnabled(true, dataUrl);
   if (successMessage) {
     setShareStatus(successMessage);
   }
@@ -1183,13 +1235,6 @@ function applyTextEffects(ctx, config) {
   }
 }
 
-function clearShadow(ctx) {
-  ctx.shadowColor = "rgba(0, 0, 0, 0)";
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 0;
-}
-
 function drawDigitalShareClock(ctx, config) {
   // プレビューの時計パネル(背景色+枠+角丸)を、実寸より大きめに描いて主役にする。
   const scale = 2.4;
@@ -1272,23 +1317,19 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
   const padY = config.paddingY * scale + 18;
 
   const gap = Math.max(8, config.gap * scale);
-  const linesHeight = lines.reduce((sum, line) => sum + line.px, 0) + gap * (lines.length - 1);
   // 高さが上限を超えるなら、文字サイズ・行送り・縦パディングを同率で縮めてカード内に収める
   // (クランプだけだと行カーソルがクランプ前の値のまま進み、最下行がカード外へはみ出す)。
-  const maxW = stage.w - 80;
-  const maxH = stage.h - 80;
-  const fullHeight = linesHeight + padY * 2;
-  const fit = fullHeight > maxH ? maxH / fullHeight : 1;
-  const fitGap = gap * fit;
-  const fitPadY = padY * fit;
-  let panelW = panelContentWidth + padX * 2;
-  let panelH = fullHeight * fit;
-  // 幅は字を縮めず上限でクランプ(従来挙動を維持。横はみ出しはここで止める)。
-  if (panelW > maxW) {
-    panelW = maxW;
-  }
-  const panelX = stage.cx - panelW / 2;
-  const panelY = stage.cy - panelH / 2;
+  const { fit, fitGap, fitPadY, panelW, panelH, panelX, panelY } = computeStackedLayout({
+    lineSizesPx: lines.map((line) => line.px),
+    panelContentWidth,
+    padX,
+    padY,
+    gap,
+    maxW: stage.w - 80,
+    maxH: stage.h - 80,
+    stageCx: stage.cx,
+    stageCy: stage.cy
+  });
 
   // 時計パネル本体(背景・角丸・枠線)。
   clearShadow(ctx);
@@ -1412,7 +1453,8 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     stageCy: stage.cy,
     isLeft: config.labelPosition === "left"
   });
-  const { fit, panel, mainLeft, labelCx, centerY: groupCenterY, fitMainGap } = layout;
+  const { fit, hfit, panel, mainLeft, labelCx, centerY: groupCenterY, fitMainGap } = layout;
+  const textFit = fit * hfit;
   const { x: panelX, y: panelY, w: panelW, h: panelH } = panel;
 
   // 時計パネル本体(背景・角丸・枠線)。
@@ -1429,12 +1471,12 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
   // main の各行(左揃え)。日付↑・時刻↓を fitMainGap で積み、main ブロックを縦中央に。
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  const fitMainH = mainH * fit;
+  const fitMainH = mainH * textFit;
   let rowY = groupCenterY - fitMainH / 2;
   let timeLineMetrics = null;
   for (let i = 0; i < mainRows.length; i += 1) {
     const row = mainRows[i];
-    const rowPx = row.px * fit;
+    const rowPx = row.px * textFit;
     rowY += rowPx / 2;
     ctx.font = `${config.fontWeight} ${rowPx}px ${fontStack}`;
     const rowWidth = ctx.measureText(row.text).width;
@@ -1455,7 +1497,7 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     ctx.fillText(row.text, mainLeft, rowY);
     if (row.isTime && config.strokeWidth > 0) {
       clearShadow(ctx);
-      ctx.lineWidth = config.strokeWidth * scale * fit;
+      ctx.lineWidth = config.strokeWidth * scale * textFit;
       ctx.strokeStyle = config.strokeColor;
       ctx.strokeText(row.text, mainLeft, rowY);
     }
@@ -1463,7 +1505,7 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
   }
 
   // ラベルはグループの縦中央に置く(影なし)。textAlign は center にして labelCx を中心に描く。
-  const fitLabelPx = labelPx * fit;
+  const fitLabelPx = labelPx * textFit;
   clearShadow(ctx);
   ctx.textAlign = "center";
   ctx.font = `800 ${fitLabelPx}px ${fontStack}`;
@@ -1473,7 +1515,7 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     text: label,
     y: groupCenterY,
     px: fitLabelPx,
-    width: labelW * fit,
+    width: labelW * textFit,
     cx: labelCx
   };
 
@@ -1481,7 +1523,7 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     config,
     decoration: templateDecoration(config.template),
     fontStack,
-    fit,
+    fit: textFit,
     labelLine: labelLineMetrics,
     panel: {
       x: panelX,
@@ -1493,217 +1535,6 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     scale,
     timeLine: timeLineMetrics
   });
-}
-
-// 各デジタルテンプレの装飾を、clock.css の `.template-<id>` に忠実な見た目で描く。
-// 装飾の「種類と色」は templateDecoration(純粋データ)が決め、ここでは Canvas の
-// プリミティブ(fillRect/arc/ellipse/lineTo 等)だけで描画する。clock.css の px 値は
-// unit = scale * fit を掛けて共有カードのスケールへ揃え、位置はパネル矩形 panel を基準にする。
-function drawDigitalTemplateDecorations(
-  ctx,
-  { config, decoration, fontStack, fit, labelLine, panel, scale, timeLine }
-) {
-  if (
-    !decoration.timeUnderline &&
-    !decoration.badge &&
-    !decoration.brackets &&
-    !decoration.motif &&
-    !decoration.topBar
-  ) {
-    return;
-  }
-  const unit = scale * fit;
-
-  ctx.save();
-  clearShadow(ctx);
-
-  // aqua-deck: パネル上辺のグラデ帯。CSS の overflow:hidden に合わせ、パネルの角丸で
-  // クリップしてから帯を塗る(上の角だけ丸く欠ける)。
-  if (decoration.topBar && panel) {
-    drawTemplateTopBar(ctx, decoration.topBar, panel, unit);
-  }
-
-  // neon-hud: パネル左上+右下の角ブラケット。
-  if (decoration.brackets && panel) {
-    drawTemplateBrackets(ctx, decoration.brackets, panel, unit);
-  }
-
-  // soda / pastel-pop / sakura: パネル右上のワンポイント。
-  if (decoration.motif && panel) {
-    drawTemplateMotif(ctx, decoration.motif, panel, unit);
-  }
-
-  // studio-live / night-studio: 時刻の下線。
-  // 縦積みパスは時刻が中央なので __stage.cx 基準。横並びパスは時刻が左寄せのため
-  // timeLine.cx(時刻の中心x)を渡してくる。あればそれを優先し、下線を時刻の真下へ揃える。
-  if (timeLine && decoration.timeUnderline) {
-    const underlineWidth = Math.max(1, decoration.timeUnderline.px * unit);
-    const underlineY = timeLine.y + timeLine.px / 2 + 3 * unit + underlineWidth / 2;
-    const timeCx = timeLine.cx ?? ctx.__stage.cx;
-    ctx.beginPath();
-    ctx.lineCap = "butt";
-    ctx.lineWidth = underlineWidth;
-    ctx.strokeStyle = decoration.timeUnderline.color;
-    ctx.moveTo(timeCx - timeLine.width / 2, underlineY);
-    ctx.lineTo(timeCx + timeLine.width / 2, underlineY);
-    ctx.stroke();
-  }
-
-  // ラベルバッジ(塗り/枠)。ラベルが表示されているときだけ描く(実物と同じ)。
-  if (labelLine && decoration.badge) {
-    drawTemplateBadge(ctx, decoration.badge, { config, fontStack, labelLine, unit });
-  }
-  ctx.restore();
-}
-
-// aqua-deck: パネル上辺の左→右グラデ帯。CSS overflow:hidden を再現するため、パネルの
-// 角丸 path でクリップしてから幅いっぱいに塗る。
-function drawTemplateTopBar(ctx, topBar, panel, unit) {
-  const barH = topBar.px * unit;
-  ctx.save();
-  drawRoundedRectPath(ctx, panel.x, panel.y, panel.w, panel.h, panel.radius);
-  ctx.clip();
-  const gradient = ctx.createLinearGradient(panel.x, panel.y, panel.x + panel.w, panel.y);
-  gradient.addColorStop(0, topBar.from);
-  gradient.addColorStop(1, topBar.to);
-  ctx.fillStyle = gradient;
-  ctx.fillRect(panel.x, panel.y, panel.w, barH);
-  ctx.restore();
-}
-
-// neon-hud: 左上は (x+4u, y+4u) を角に水平・垂直の腕 14u、右下は (x+w-4u, y+h-4u) を角に。
-function drawTemplateBrackets(ctx, brackets, panel, unit) {
-  const inset = 4 * unit;
-  const arm = 14 * unit;
-  const lineW = Math.max(1, brackets.px * unit);
-  ctx.save();
-  ctx.beginPath();
-  ctx.lineWidth = lineW;
-  ctx.lineCap = "butt";
-  ctx.strokeStyle = brackets.color;
-  // border は path の中心ではなく内側に乗るので、腕の基準線を線幅の半分だけ内側へ寄せる
-  // (CSS の border-top/left が要素の内側へ描かれる見え方に合わせる)。
-  const half = lineW / 2;
-  // 左上(border-top + border-left)
-  const tlX = panel.x + inset + half;
-  const tlY = panel.y + inset + half;
-  ctx.moveTo(tlX, tlY);
-  ctx.lineTo(tlX + arm, tlY);
-  ctx.moveTo(tlX, tlY);
-  ctx.lineTo(tlX, tlY + arm);
-  // 右下(border-right + border-bottom)
-  const brX = panel.x + panel.w - inset - half;
-  const brY = panel.y + panel.h - inset - half;
-  ctx.moveTo(brX, brY);
-  ctx.lineTo(brX - arm, brY);
-  ctx.moveTo(brX, brY);
-  ctx.lineTo(brX, brY - arm);
-  ctx.stroke();
-  ctx.restore();
-}
-
-// soda / pastel-pop / sakura のワンポイント(パネル右上)。色は kind ごとに固定。
-function drawTemplateMotif(ctx, motif, panel, unit) {
-  const right = panel.x + panel.w;
-  const top = panel.y;
-  ctx.save();
-  if (motif.kind === "bubbles") {
-    // CSS: ::after top:9px right:12px w/h:7px(=r3.5) +box-shadow 2つ。
-    const mainCx = right - (12 + 3.5) * unit;
-    const mainCy = top + (9 + 3.5) * unit;
-    fillCircle(ctx, mainCx, mainCy, 3.5 * unit, "rgba(255, 255, 255, 0.9)");
-    fillCircle(ctx, mainCx - 10 * unit, mainCy + 6 * unit, 2.5 * unit, "rgba(255, 255, 255, 0.8)");
-    fillCircle(ctx, mainCx - 4 * unit, mainCy + 13 * unit, 1.5 * unit, "rgba(255, 255, 255, 0.7)");
-  } else if (motif.kind === "dots") {
-    // CSS: ::after top:10px right:13px w/h:6px(=r3) +box-shadow で左に2つ。
-    const pinkCx = right - (13 + 3) * unit;
-    const cy = top + (10 + 3) * unit;
-    fillCircle(ctx, pinkCx, cy, 3 * unit, "#ff9ed2");
-    fillCircle(ctx, pinkCx - 11 * unit, cy, 3 * unit, "#ffd24d");
-    fillCircle(ctx, pinkCx - 22 * unit, cy, 3 * unit, "#7fd6ee");
-  } else if (motif.kind === "sakura") {
-    // CSS: ::after 22x22, top:-9px right:12px。SVG viewBox24 を全体スケール 22u/24 で描く。
-    const flowerCx = right - (12 + 11) * unit;
-    const flowerCy = top + (-9 + 11) * unit;
-    drawSakura(ctx, flowerCx, flowerCy, (22 * unit) / 24);
-  }
-  ctx.restore();
-}
-
-// 桜マーク: 中心から放射状にピンクの花びら5枚 + 黄色い芯。SVG(viewBox24, 中心(12,12))を
-// 基準に、上(cx12,cy4=中心から上へ8)を起点に 72°刻みで楕円(rx3.2 ry4.2)を5枚配置する。
-function drawSakura(ctx, cx, cy, s) {
-  ctx.save();
-  ctx.fillStyle = "#ff9ec0";
-  const petalDist = 8 * s; // 中心(12,12)から上の花びら中心(12,4)までの距離
-  for (let i = 0; i < 5; i += 1) {
-    const angle = (i * 72 * Math.PI) / 180; // 0=真上
-    const px = cx + Math.sin(angle) * petalDist;
-    const py = cy - Math.cos(angle) * petalDist;
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.rotate(angle);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 3.2 * s, 4.2 * s, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  fillCircle(ctx, cx, cy, 2.4 * s, "#ffd24d");
-  ctx.restore();
-}
-
-function fillCircle(ctx, cx, cy, r, color) {
-  ctx.beginPath();
-  ctx.arc(cx, cy, Math.max(0.5, r), 0, Math.PI * 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-}
-
-// ラベルバッジ。mode='fill' は塗りバッジ(fill 背景 / ink 文字、dot 有のとき左に白丸)。
-// mode='outline' は枠バッジ(枠線=文字色=config.textColor、塗りなし、ドットなし)。
-function drawTemplateBadge(ctx, badge, { config, fontStack, labelLine, unit }) {
-  // 縦積みパスはラベルが中央なので __stage.cx 基準。横並びパスはラベルが左右どちらかに
-  // 寄るため labelLine.cx(ラベルの中心x)を渡してくる。あればそれを優先する。
-  const cx = labelLine.cx ?? ctx.__stage.cx;
-  const dot = badge.dot === true;
-  // ドット有(studio-live)は左に余白を多く取り、ドットを置く。ドット無は左右対称の padding。
-  const paddingLeft = (dot ? 22 : 11) * unit;
-  const paddingRight = 11 * unit;
-  const paddingY = 2 * unit;
-  const badgeX = cx - labelLine.width / 2 - paddingLeft;
-  const badgeY = labelLine.y - labelLine.px / 2 - paddingY;
-  const badgeW = labelLine.width + paddingLeft + paddingRight;
-  const badgeH = labelLine.px + paddingY * 2;
-  const radius = Math.min(6 * unit, badgeH / 2);
-
-  if (badge.mode === "outline") {
-    // 枠バッジ: 枠線も文字も config.textColor。塗りはしない。
-    const ink = config.textColor;
-    const lineW = Math.max(1, 2 * unit);
-    drawRoundedRectPath(ctx, badgeX, badgeY, badgeW, badgeH, radius);
-    ctx.lineWidth = lineW;
-    ctx.strokeStyle = ink;
-    ctx.stroke();
-    drawBadgeText(ctx, labelLine, fontStack, config.fontWeight, ink, cx);
-    return;
-  }
-
-  // 塗りバッジ。
-  drawRoundedRectPath(ctx, badgeX, badgeY, badgeW, badgeH, radius);
-  ctx.fillStyle = badge.fill;
-  ctx.fill();
-  if (dot) {
-    fillCircle(ctx, badgeX + 12.5 * unit, labelLine.y, Math.max(2, 3.5 * unit), "#ffffff");
-  }
-  drawBadgeText(ctx, labelLine, fontStack, config.fontWeight, badge.ink, cx);
-}
-
-function drawBadgeText(ctx, labelLine, fontStack, fontWeight, ink, cx) {
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.font = `${fontWeight} ${labelLine.px}px ${fontStack}`;
-  ctx.fillStyle = ink;
-  ctx.fillText(labelLine.text, cx, labelLine.y);
 }
 
 function drawAnalogShareClock(ctx, config) {
@@ -1774,7 +1605,6 @@ function drawAnalogMarks(ctx, config, cx, cy, radius, ink, fontStack) {
   const showNumbers = marks === "numbers" || marks === "both";
   const showRoman = marks === "roman";
   const showTicks = marks === "ticks" || marks === "both";
-  const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
 
   clearShadow(ctx);
   if (showTicks) {
@@ -1802,7 +1632,7 @@ function drawAnalogMarks(ctx, config, cx, cy, radius, ink, fontStack) {
       const angle = (i * 30 * Math.PI) / 180;
       const x = cx + numberRadius * Math.sin(angle);
       const y = cy - numberRadius * Math.cos(angle);
-      ctx.fillText(showRoman ? roman[i - 1] : String(i), x, y);
+      ctx.fillText(showRoman ? ROMAN_NUMERALS[i - 1] : String(i), x, y);
     }
   }
 }
@@ -1919,21 +1749,6 @@ function drawShareFooter(ctx) {
   ctx.fillStyle = "#5a6172";
   ctx.font = "500 26px system-ui, sans-serif";
   ctx.fillText(BUILDER_URL, SHARE_IMAGE_WIDTH / 2, 628);
-}
-
-function drawRoundedRectPath(ctx, x, y, width, height, radius) {
-  const r = Math.max(0, Math.min(radius, width / 2, height / 2));
-  ctx.beginPath();
-  if (typeof ctx.roundRect === "function") {
-    ctx.roundRect(x, y, width, height, r);
-    return;
-  }
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + width, y, x + width, y + height, r);
-  ctx.arcTo(x + width, y + height, x, y + height, r);
-  ctx.arcTo(x, y + height, x, y, r);
-  ctx.arcTo(x, y, x + width, y, r);
-  ctx.closePath();
 }
 
 function byId(id) {

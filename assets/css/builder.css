@@ -3,6 +3,10 @@
    トークンを差し替える。テーマはビルダー画面専用で、/clock/ には適用されない。
    UIラベル対応: booth=「コーラル」(BOOTH配色由来) / fanbox=「ふんわりブルー」(pixivFANBOX配色由来)。 */
 
+/* :root = ビルダー画面の白テーマ(わんコメ風)パレットの正。index.html では tokens.css の後に
+   読み込まれるため、ここで定義した色・影・角丸が後勝ちで効く(tokens.css 側に同名の色を置くと
+   死に値化するので置かない)。--focus / --content-width / --fallback-fonts は両画面共有値として
+   tokens.css が供給するのでここでは再定義しない。テーマ差し替えは下の data-theme ブロックで行う。 */
 :root {
   --page-bg: #ffffff;
   --ink: #222222;
@@ -45,14 +49,21 @@
 :root[data-theme="fanbox"] {
   --page-bg: linear-gradient(120deg, #e9f6c8 0%, #d9f0e3 45%, #cfeaf8 100%);
   --ink: #1f2d33;
-  --muted: #5d6b73;
+  /* muted は補足文(.lead 等)がパネル外の青緑グラデ上に直接乗ることがある。元の #5d6b73 は
+     グラデ最濃ストップ #cfeaf8 上で 4.40:1 と AA(4.5:1)を僅かに割るため、色相を保ったまま少しだけ
+     暗くして全背景で AA を満たす(白パネル6.19 / 最明ストップ#e9f6c8 5.45 / 最濃ストップ#cfeaf8 4.95)。 */
+  --muted: #55636d;
   --line: #e3eaee;
   --line-strong: #c9d6dd;
   --accent: #0075c4;
   --accent-hover: #005d9e;
   --accent-soft: #e3f3fd;
   --accent-bright: #0096fa;
-  --warm: #0075c4;
+  /* warm は .eyebrow(小さい太字)がパネル外の青緑グラデ上に直接乗る。元の #0075c4 は
+     グラデ上で 3.86〜4.26:1 と AA(4.5:1)を割るため、--accent-hover と同じ濃さ #005d9e にして
+     全ストップで AA を満たす(最濃#cfeaf8 上で約5.5:1)。--warm の他用途は info-note の
+     左ボーダー(装飾)のみでコントラスト要件に無関係。 */
+  --warm: #005d9e;
   --warm-soft: #ecf6fd;
   --warn-line: #b8dcf2;
   --warn-ink: #1f3947;
@@ -122,6 +133,10 @@ button.secondary,
 button.secondary:hover,
 .button-like.secondary:hover {
   background: var(--accent-soft);
+  /* ホバー背景 --accent-soft の上で文字を --accent のままにすると AA(4.5:1)未満になる
+     (3テーマとも約4.1〜4.3:1)。少し濃い --accent-hover にして全テーマ AA を満たす
+     (わんコメ5.59 / コーラル5.62 / ふんわりブルー6.05)。 */
+  color: var(--accent-hover);
   border-color: var(--accent);
   box-shadow: var(--shadow-soft);
 }

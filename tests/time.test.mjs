@@ -45,6 +45,61 @@ test("formats date and weekday variants", () => {
   assert.equal(formatted.weekday, "Friday");
 });
 
+test("formats slash dash and month-day date variants deterministically", () => {
+  const date = new Date("2026-01-02T03:04:05Z");
+
+  assert.equal(formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showDate: true, dateFormat: "dash" })), date).date, "2026-01-02");
+  assert.equal(
+    formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showDate: true, dateFormat: "monthDay" })), date).date,
+    "01/02"
+  );
+  assert.equal(
+    formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showDate: true, dateFormat: "slash" })), date).date,
+    "2026/01/02"
+  );
+});
+
+test("formats Japanese and English weekday variants deterministically", () => {
+  const date = new Date("2026-01-02T03:04:05Z");
+
+  assert.equal(
+    formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showWeekday: true, weekdayFormat: "ja-short" })), date)
+      .weekday,
+    "金"
+  );
+  assert.equal(
+    formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showWeekday: true, weekdayFormat: "ja-long" })), date)
+      .weekday,
+    "金曜日"
+  );
+  assert.equal(
+    formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showWeekday: true, weekdayFormat: "en-short" })), date)
+      .weekday,
+    "Fri"
+  );
+  assert.equal(
+    formatClock(createFormatters(normalizeConfig({ timezone: "UTC", showWeekday: true, weekdayFormat: "en-long" })), date)
+      .weekday,
+    "Friday"
+  );
+});
+
+test("formats 12-hour midnight and noon boundaries", () => {
+  const config = normalizeConfig({ timezone: "UTC", hour12: true, showSeconds: false });
+  const formatters = createFormatters(config);
+
+  assert.equal(formatClock(formatters, new Date("2026-01-02T00:30:00Z")).time, "12:30 AM");
+  assert.equal(formatClock(formatters, new Date("2026-01-02T12:30:00Z")).time, "12:30 PM");
+});
+
+test("formats timezone date rollback and half-hour offset minutes", () => {
+  const ny = normalizeConfig({ timezone: "America/New_York", showDate: true, dateFormat: "slash" });
+  const kolkata = normalizeConfig({ timezone: "Asia/Kolkata", showSeconds: false });
+
+  assert.equal(formatClock(createFormatters(ny), new Date("2026-01-02T02:30:00Z")).date, "2026/01/01");
+  assert.equal(formatClock(createFormatters(kolkata), new Date("2026-01-02T00:05:00Z")).time, "05:35");
+});
+
 test("next tick is scheduled near the next second boundary", () => {
   assert.equal(nextSecondDelay(new Date("2026-01-01T00:00:00.250Z"), 16), 766);
   assert.equal(nextSecondDelay(new Date("2026-01-01T00:00:00.999Z"), 16), 50);
