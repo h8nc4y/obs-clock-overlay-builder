@@ -40,10 +40,6 @@
               <h2>ライブプレビュー</h2>
               <p>背景を切り替えて、配信画面に重ねた時の読みやすさを確認します。</p>
             </div>
-            <button id="pinPreview" type="button" class="pin-toggle" aria-pressed="true" aria-label="プレビューの固定を外す">
-              <span class="pin-toggle-icon" aria-hidden="true">📌</span>
-              <span class="pin-toggle-label">固定中</span>
-            </button>
           </div>
           <div class="button-row primary-actions preview-actions">
             <button id="copyUrl" type="button">OBS用URLをコピー</button>
@@ -71,6 +67,10 @@
 
         <div class="preview-stage-dock">
           <div id="previewShell" class="preview-shell preview-checker">
+            <button id="pinPreview" type="button" class="pin-toggle pin-toggle-on-stage" aria-pressed="true" aria-label="プレビューの固定を外す" title="プレビューの固定を外す">
+              <span class="pin-toggle-icon" aria-hidden="true">📌</span>
+              <span class="pin-toggle-label">固定中</span>
+            </button>
             <div id="clockPreview" class="preview-stage" aria-hidden="true"></div>
           </div>
         </div>

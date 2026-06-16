@@ -6,6 +6,12 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-06-16
+
+### Changed
+
+- The pin (📌) toggle now sits **on the live preview itself** (top-right corner of the preview box) instead of in the preview heading, so the control lives on the thing it controls. It is a compact icon-only round button; its state is shown by fill color (pinned = accent fill, unpinned = white outline) and the pin's tilt, with the accessible name (`aria-label`) and a hover tooltip (`title`) kept in sync. On desktop the button travels with the clock while pinned (it is inside the sticky clock box). Editor-only; the `/clock/?c=...` output is unchanged.
+
 ## [1.3.2] - 2026-06-16
 
 ### Fixed

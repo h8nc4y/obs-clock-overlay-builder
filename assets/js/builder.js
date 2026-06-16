@@ -311,7 +311,10 @@ function initPinPreview() {
     elements.preview.classList.toggle("is-pinned", pinned);
     elements.pinPreview.classList.toggle("is-active", pinned);
     elements.pinPreview.setAttribute("aria-pressed", String(pinned));
-    elements.pinPreview.setAttribute("aria-label", pinned ? "プレビューの固定を外す" : "プレビューを固定する");
+    const pinActionLabel = pinned ? "プレビューの固定を外す" : "プレビューを固定する";
+    elements.pinPreview.setAttribute("aria-label", pinActionLabel);
+    // プレビュー上はアイコンのみ表示なので、ホバー時の説明(title)も状態に合わせて出す。
+    elements.pinPreview.setAttribute("title", pinActionLabel);
     elements.pinLabel.textContent = pinned ? "固定中" : "固定する";
     // ピンOFFにすると実プレビューは固定されなくなる。浮遊が解けるので、
     // 予約していた高さを片付けて(=段ずれ防止の min-height を外して)整える。
