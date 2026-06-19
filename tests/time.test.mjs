@@ -8,6 +8,8 @@ test("formats Tokyo time as HH:MM:SS when seconds are on", () => {
   const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05.200Z"));
 
   assert.equal(formatted.time, "00:04:05");
+  assert.equal(formatted.timeMain, "00:04");
+  assert.equal(formatted.secondsText, "05");
 });
 
 test("hides seconds by default", () => {
@@ -15,6 +17,8 @@ test("hides seconds by default", () => {
   const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05.200Z"));
 
   assert.equal(formatted.time, "00:04");
+  assert.equal(formatted.timeMain, "00:04");
+  assert.equal(formatted.secondsText, "");
 });
 
 test("can hide seconds", () => {
@@ -22,6 +26,8 @@ test("can hide seconds", () => {
   const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05Z"));
 
   assert.equal(formatted.time, "15:04");
+  assert.equal(formatted.timeMain, "15:04");
+  assert.equal(formatted.secondsText, "");
 });
 
 test("formats 12-hour time with day period", () => {
@@ -29,6 +35,8 @@ test("formats 12-hour time with day period", () => {
   const formatted = formatClock(createFormatters(config), new Date("2026-01-01T15:04:05Z"));
 
   assert.equal(formatted.time, "03:04:05 PM");
+  assert.equal(formatted.timeMain, "03:04 PM");
+  assert.equal(formatted.secondsText, "05");
 });
 
 test("formats date and weekday variants", () => {

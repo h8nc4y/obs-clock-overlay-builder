@@ -37,8 +37,11 @@ export function createFormatters(config) {
 
 export function formatClock(formatters, date = new Date()) {
   const { config } = formatters;
+  const timeParts = formatTimeParts(formatters, date);
   const result = {
-    time: formatTime(formatters, date),
+    time: timeParts.time,
+    timeMain: timeParts.timeMain,
+    secondsText: timeParts.secondsText,
     date: "",
     weekday: ""
   };
@@ -52,12 +55,21 @@ export function formatClock(formatters, date = new Date()) {
 }
 
 export function formatTime(formatters, date = new Date()) {
+  return formatTimeParts(formatters, date).time;
+}
+
+function formatTimeParts(formatters, date) {
   const parts = partsToObject(formatters.timeFormatter.formatToParts(date));
   const hour = normalizeHour(parts.hour);
   const minute = parts.minute ?? "00";
-  const second = formatters.config.showSeconds ? `:${parts.second ?? "00"}` : "";
+  const secondsText = formatters.config.showSeconds ? parts.second ?? "00" : "";
+  const second = secondsText ? `:${secondsText}` : "";
   const dayPeriod = formatters.config.hour12 && parts.dayPeriod ? ` ${parts.dayPeriod.toUpperCase()}` : "";
-  return `${hour}:${minute}${second}${dayPeriod}`;
+  return {
+    time: `${hour}:${minute}${second}${dayPeriod}`,
+    timeMain: `${hour}:${minute}${dayPeriod}`,
+    secondsText
+  };
 }
 
 export function formatDate(formatters, date = new Date()) {

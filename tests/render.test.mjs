@@ -132,6 +132,10 @@ function findByClass(element, className) {
   return null;
 }
 
+function fixedText(element) {
+  return element.children.map((child) => child.textContent).join("");
+}
+
 test("mountClock toggles label date weekday and date row visibility", () => {
   const container = new FakeElement("div");
   const clock = mountClock(
@@ -246,6 +250,36 @@ test("time renders each digit in a fixed-width slot for a stable frame", () => {
     seps.filter((sep) => sep.textContent === ":").length,
     2
   );
+});
+
+test("small seconds render in a separate fixed-width slot when enabled", () => {
+  const container = new FakeElement("div");
+  mountClock(container, normalizeConfig({ showSeconds: true, smallSeconds: true, timezone: "UTC" }), {
+    now: () => new Date("2026-01-02T03:45:06Z")
+  });
+
+  const time = findByClass(container, "clock-time");
+  const seconds = findByClass(container, "clock-seconds-small");
+
+  assert.equal(seconds.hidden, false);
+  assert.equal(fixedText(time), "03:45");
+  assert.equal(fixedText(seconds), "06");
+  assert.equal(seconds.children.filter((child) => child.className === "clock-digit").length, 2);
+  assert.equal(seconds.children.filter((child) => child.textContent === ":").length, 0);
+});
+
+test("small seconds node stays hidden and full time remains unchanged when disabled", () => {
+  const container = new FakeElement("div");
+  mountClock(container, normalizeConfig({ showSeconds: true, smallSeconds: false, timezone: "UTC" }), {
+    now: () => new Date("2026-01-02T03:45:06Z")
+  });
+
+  const time = findByClass(container, "clock-time");
+  const seconds = findByClass(container, "clock-seconds-small");
+
+  assert.equal(seconds.hidden, true);
+  assert.equal(fixedText(time), "03:45:06");
+  assert.equal(fixedText(seconds), "");
 });
 
 test("recommended OBS size reserves the shared visual safe inset around glow", () => {

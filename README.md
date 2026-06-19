@@ -12,7 +12,7 @@ Demo: https://obs-clock-overlay-builder.h8nc4y.workers.dev
 - Transparent OBS clock overlay with a dedicated clock-only `/clock/` surface.
 - Reproducible `/clock/?c=...` URL contract for OBS browser sources.
 - Clock auto-corrects to server time via the same-origin HTTP `Date` header, so it stays accurate even when the PC clock is off; it falls back to local time when offline. No backend is added.
-- 17 built-in templates across five categories (standard, cute, cool, analog, flip).
+- 18 built-in templates across five categories (standard, cute, cool, analog, flip), including a digital small-seconds style.
 - Zero runtime dependencies; the clock renders from URL and browser state only.
 - Static-first, free-tier-friendly Cloudflare Workers Static Assets hosting.
 - Japanese-first editor UI for non-programmer OBS users in Japan.
@@ -147,7 +147,7 @@ OBS Clock Overlay Builder は、OBS のブラウザソースに貼り付ける�
 
 - 配信用の時計オーバーレイをブラウザ上で調整できます。
 - 透明背景に対応した `/clock/` の時計専用画面を生成できます。
-- 時計の種類を デジタル / アナログ / パタパタ(フリップ) から選べます。テンプレートは全17種(定番 / かわいい / クール / アナログ / パタパタ)。色、文字サイズ、日付・曜日、秒表示、ラベル、フォント名などを設定でき、まずは「かんたん」だけで仕上がります。配信中に時刻が変わっても外枠の幅とコロンの位置は固定されます。
+- 時計の種類を デジタル / アナログ / パタパタ(フリップ) から選べます。テンプレートは全18種(定番 / かわいい / クール / アナログ / パタパタ)。色、文字サイズ、日付・曜日、秒表示、秒を小さく表示、ラベル、フォント名などを設定でき、まずは「かんたん」だけで仕上がります。配信中に時刻が変わっても外枠の幅とコロンの位置は固定されます。
 - アナログ時計は文字盤・数字・針・秒針の色、大きさ、目盛り(数字 / ローマ数字 / 目盛り / 数字＋目盛り / なし)、秒針の動き(なめらか / カチカチ / なし)を選べ、文字盤に日付も表示できます。
 - パタパタ時計はカードがめくれるフリップ表示です。色・文字サイズ・角丸・秒表示などを設定できます。
 - 作った時計を宣伝画像(PNG)にして X などへ共有できます。スマホは共有メニューから、PC は「PNGを保存 → X投稿画面を開く」で手動添付します。すべてブラウザ内で完結し、アップロードやバックエンドはありません。

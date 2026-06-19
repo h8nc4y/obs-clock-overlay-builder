@@ -11,6 +11,7 @@ import {
   resolveShareText,
   templateDecoration
 } from "../assets/js/share.js";
+import { drawShareTime, hasSmallShareSeconds, measureShareTime } from "../assets/js/share-time.js";
 import { normalizeConfig } from "../assets/js/config.js";
 import { tokenizeFlip } from "../assets/js/render.js";
 
@@ -87,6 +88,116 @@ test("canvasFontStack slices to 80 chars and removes newlines", () => {
   assert.equal(canvasFontStack(long), `"${"a".repeat(80)}", system-ui, sans-serif`);
   // 改行は空白へ置換され、家族名が複数行に割れない。
   assert.equal(canvasFontStack("a\nb"), '"a b", system-ui, sans-serif');
+});
+
+function createTextCtx(widths = {}) {
+  const calls = [];
+  return {
+    calls,
+    font: "",
+    textAlign: "center",
+    fillStyle: "",
+    strokeStyle: "",
+    lineWidth: 0,
+    shadowColor: "",
+    shadowBlur: 0,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    measureText(text) {
+      calls.push({ type: "measureText", text, font: this.font });
+      return { width: widths[text] ?? String(text).length * 10 };
+    },
+    fillText(text, x, y) {
+      calls.push({ type: "fillText", text, x, y, font: this.font, align: this.textAlign });
+    },
+    strokeText(text, x, y) {
+      calls.push({
+        type: "strokeText",
+        text,
+        x,
+        y,
+        font: this.font,
+        align: this.textAlign,
+        lineWidth: this.lineWidth
+      });
+    }
+  };
+}
+
+const shareTimeFormatted = {
+  time: "12:34:56",
+  timeMain: "12:34",
+  secondsText: "56"
+};
+
+test("hasSmallShareSeconds only enables the split seconds path when seconds are visible", () => {
+  const enabled = normalizeConfig({ showSeconds: true, smallSeconds: true });
+
+  assert.equal(hasSmallShareSeconds(enabled, shareTimeFormatted), true);
+  assert.equal(hasSmallShareSeconds(normalizeConfig({ showSeconds: false, smallSeconds: true }), shareTimeFormatted), false);
+  assert.equal(hasSmallShareSeconds(normalizeConfig({ showSeconds: true, smallSeconds: false }), shareTimeFormatted), false);
+  assert.equal(hasSmallShareSeconds(enabled, { ...shareTimeFormatted, secondsText: "" }), false);
+});
+
+test("measureShareTime mirrors live small-seconds width constants", () => {
+  const config = normalizeConfig({ showSeconds: true, smallSeconds: true, fontWeight: 700 });
+  const ctx = createTextCtx({ "12:34": 250, "56": 40, "12:34:56": 330 });
+
+  assert.equal(measureShareTime(ctx, config, shareTimeFormatted, 100, '"Roboto Mono", monospace'), 294);
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "measureText").map((call) => ({ text: call.text, font: call.font })),
+    [
+      { text: "12:34", font: '700 100px "Roboto Mono", monospace' },
+      { text: "56", font: '700 50px "Roboto Mono", monospace' }
+    ]
+  );
+
+  const fullCtx = createTextCtx({ "12:34:56": 330 });
+  const fullConfig = normalizeConfig({ showSeconds: true, smallSeconds: false, fontWeight: 700 });
+  assert.equal(measureShareTime(fullCtx, fullConfig, shareTimeFormatted, 100, '"Roboto Mono", monospace'), 330);
+});
+
+test("drawShareTime draws centered small seconds as a half-size lowered slot", () => {
+  const config = normalizeConfig({
+    showSeconds: true,
+    smallSeconds: true,
+    fontWeight: 700,
+    strokeWidth: 4,
+    textColor: "#ffffff",
+    strokeColor: "#101828"
+  });
+  const ctx = createTextCtx({ "12:34": 250, "56": 40 });
+
+  drawShareTime(ctx, config, shareTimeFormatted, {
+    x: 500,
+    y: 200,
+    px: 100,
+    fontStack: '"Roboto Mono", monospace',
+    align: "center",
+    strokeScale: 2
+  });
+
+  assert.equal(ctx.textAlign, "center", "textAlign should be restored after left-aligned segment drawing");
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "fillText"),
+    [
+      { type: "fillText", text: "12:34", x: 353, y: 200, font: '700 100px "Roboto Mono", monospace', align: "left" },
+      { type: "fillText", text: "56", x: 607, y: 218, font: '700 50px "Roboto Mono", monospace', align: "left" }
+    ]
+  );
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "strokeText").map((call) => ({
+      text: call.text,
+      x: call.x,
+      y: call.y,
+      font: call.font,
+      lineWidth: call.lineWidth
+    })),
+    [
+      { text: "12:34", x: 353, y: 200, font: '700 100px "Roboto Mono", monospace', lineWidth: 8 },
+      { text: "56", x: 607, y: 218, font: '700 50px "Roboto Mono", monospace', lineWidth: 4 }
+    ]
+  );
 });
 
 // 装飾なしテンプレ(影のみ)はすべての装飾フィールドが null。

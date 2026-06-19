@@ -21,6 +21,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   timezone: "Asia/Tokyo",
   hour12: false,
   showSeconds: false,
+  smallSeconds: false,
   showDate: false,
   dateFormat: "slash",
   showWeekday: false,
@@ -66,6 +67,42 @@ export const TEMPLATES = Object.freeze([
     category: "standard",
     config: {
       labelPosition: "hidden",
+      fontFamily: "Roboto Mono",
+      textColor: "#1a1a1a",
+      backgroundColor: "#ffffff",
+      backgroundOpacity: 0.9,
+      radius: 10,
+      paddingX: 18,
+      paddingY: 10,
+      fontSize: 42,
+      dateSize: 14,
+      labelSize: 12,
+      fontWeight: 700,
+      letterSpacing: 0.6,
+      lineHeight: 1,
+      gap: 4,
+      shadowColor: "#000000",
+      shadowOpacity: 0.18,
+      shadowBlur: 6,
+      shadowX: 0,
+      shadowY: 2,
+      strokeColor: "#000000",
+      strokeWidth: 0,
+      borderColor: "#d9d7cf",
+      borderOpacity: 1,
+      borderWidth: 1
+    }
+  },
+  {
+    id: "mono-sub",
+    name: "Mono Sub",
+    note: "秒を小さく添える",
+    sampleText: "12:43",
+    category: "standard",
+    config: {
+      labelPosition: "hidden",
+      showSeconds: true,
+      smallSeconds: true,
       fontFamily: "Roboto Mono",
       textColor: "#1a1a1a",
       backgroundColor: "#ffffff",
@@ -605,7 +642,8 @@ export function applyTemplate(config, templateId) {
     clockType: template.config.clockType ?? "digital",
     timezone: current.timezone,
     hour12: current.hour12,
-    showSeconds: current.showSeconds,
+    showSeconds: template.config.showSeconds ?? current.showSeconds,
+    smallSeconds: template.config.smallSeconds ?? current.smallSeconds,
     showDate: current.showDate,
     dateFormat: current.dateFormat,
     showWeekday: current.showWeekday,
@@ -632,6 +670,7 @@ export function normalizeConfig(input = {}) {
   config.timezone = sanitizeTimezone(raw.timezone ?? raw.tz, DEFAULT_CONFIG.timezone);
   config.hour12 = coerceBool(raw.hour12, DEFAULT_CONFIG.hour12);
   config.showSeconds = coerceBool(raw.showSeconds ?? raw.seconds, DEFAULT_CONFIG.showSeconds);
+  config.smallSeconds = coerceBool(raw.smallSeconds, DEFAULT_CONFIG.smallSeconds);
   config.showDate = coerceBool(raw.showDate ?? raw.date, DEFAULT_CONFIG.showDate);
   config.dateFormat = enumValue(raw.dateFormat, DATE_FORMATS, DEFAULT_CONFIG.dateFormat);
   config.showWeekday = coerceBool(raw.showWeekday ?? raw.weekday, DEFAULT_CONFIG.showWeekday);
@@ -773,6 +812,7 @@ function flatParamsToConfig(params) {
   assign("hour12");
   assign("seconds", "showSeconds");
   assign("showSeconds");
+  assign("smallSeconds");
   assign("date", "showDate");
   assign("showDate");
   assign("dateFormat");

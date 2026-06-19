@@ -55,6 +55,7 @@ function mountDigitalClock(container, config, options = {}) {
   const weekdayNode = document.createElement("span");
   const timeRow = document.createElement("div");
   const timeNode = document.createElement("span");
+  const secondsNode = document.createElement("span");
 
   root.className = "clock-widget";
   label.className = "clock-label";
@@ -64,9 +65,10 @@ function mountDigitalClock(container, config, options = {}) {
   weekdayNode.className = "clock-weekday";
   timeRow.className = "clock-time-row";
   timeNode.className = "clock-time";
+  secondsNode.className = "clock-seconds-small";
 
   dateRow.append(dateNode, weekdayNode);
-  timeRow.append(timeNode);
+  timeRow.append(timeNode, secondsNode);
   main.append(dateRow, timeRow);
   root.append(label, main);
   container.textContent = "";
@@ -89,7 +91,13 @@ function mountDigitalClock(container, config, options = {}) {
       label.textContent = currentConfig.label;
       dateNode.textContent = formatted.date;
       weekdayNode.textContent = formatted.weekday;
-      setFixedWidthDigits(timeNode, formatted.time);
+      if (currentConfig.smallSeconds && currentConfig.showSeconds) {
+        setFixedWidthDigits(timeNode, formatted.timeMain);
+        setFixedWidthDigits(secondsNode, formatted.secondsText);
+      } else {
+        setFixedWidthDigits(timeNode, formatted.time);
+        setFixedWidthDigits(secondsNode, "");
+      }
       updateVisibility();
     },
     getConfig() {
@@ -106,6 +114,7 @@ function mountDigitalClock(container, config, options = {}) {
     dateNode.hidden = !currentConfig.showDate;
     weekdayNode.hidden = !currentConfig.showWeekday;
     dateRow.hidden = !currentConfig.showDate && !currentConfig.showWeekday;
+    secondsNode.hidden = !(currentConfig.smallSeconds && currentConfig.showSeconds);
   }
 
   controller.updateConfig(currentConfig);

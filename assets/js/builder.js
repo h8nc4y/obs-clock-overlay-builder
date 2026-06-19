@@ -31,6 +31,7 @@ import {
   resolveShareText,
   templateDecoration
 } from "./share.js";
+import { drawShareTime, measureShareTime } from "./share-time.js";
 
 const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 const SHARE_IMAGE_WIDTH = 1200;
@@ -82,6 +83,7 @@ const elements = {
   useLocalTimezone: byId("useLocalTimezone"),
   hour12: byId("hour12"),
   showSeconds: byId("showSeconds"),
+  smallSeconds: byId("smallSeconds"),
   showDate: byId("showDate"),
   showWeekday: byId("showWeekday"),
   dateFormat: byId("dateFormat"),
@@ -175,7 +177,7 @@ const rangeFields = [
   "analogSize"
 ];
 const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
-const booleanFields = ["hour12", "showSeconds", "showDate", "showWeekday"];
+const booleanFields = ["hour12", "showSeconds", "smallSeconds", "showDate", "showWeekday"];
 const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let localFontSelectBound = false;
@@ -705,6 +707,7 @@ function syncFormFromState() {
   elements.timezone.value = state.timezone;
   elements.hour12.checked = state.hour12;
   elements.showSeconds.checked = state.showSeconds;
+  elements.smallSeconds.checked = state.smallSeconds;
   elements.showDate.checked = state.showDate;
   elements.showWeekday.checked = state.showWeekday;
   elements.dateFormat.value = state.dateFormat;
@@ -1223,17 +1226,6 @@ function drawShareClock(ctx, config) {
   }
 }
 
-// 時計の影と縁取りを Canvas のテキスト描画へ反映する共通処理。
-function applyTextEffects(ctx, config) {
-  if (config.shadowOpacity > 0 && config.shadowBlur > 0) {
-    ctx.shadowColor = hexToRgba(config.shadowColor, config.shadowOpacity);
-    ctx.shadowBlur = config.shadowBlur * 1.6;
-    ctx.shadowOffsetX = config.shadowX * 1.6;
-    ctx.shadowOffsetY = config.shadowY * 1.6;
-  } else {
-    clearShadow(ctx);
-  }
-}
 
 function drawDigitalShareClock(ctx, config) {
   // プレビューの時計パネル(背景色+枠+角丸)を、実寸より大きめに描いて主役にする。
@@ -1302,8 +1294,7 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
   }));
 
   clearShadow(ctx);
-  ctx.font = `${config.fontWeight} ${fontPx}px ${fontStack}`;
-  const timeWidth = ctx.measureText(formatted.time).width;
+  const timeWidth = measureShareTime(ctx, config, formatted, fontPx, fontStack);
   let panelContentWidth = timeWidth;
   for (const line of lines) {
     if (line.isTime) {
@@ -1351,7 +1342,9 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
     const line = lines[i];
     const linePx = line.px * fit;
     ctx.font = `${config.fontWeight} ${linePx}px ${fontStack}`;
-    const lineWidth = ctx.measureText(line.text).width;
+    const lineWidth = line.isTime
+      ? measureShareTime(ctx, config, formatted, linePx, fontStack)
+      : ctx.measureText(line.text).width;
     const metrics = { text: line.text, y: cursorY, px: linePx, width: lineWidth };
     if (line.isTime) {
       timeLineMetrics = metrics;
@@ -1359,17 +1352,18 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
       labelLineMetrics = metrics;
     }
     if (line.isTime) {
-      applyTextEffects(ctx, config);
+      drawShareTime(ctx, config, formatted, {
+        x: stage.cx,
+        y: cursorY,
+        px: linePx,
+        fontStack,
+        align: "center",
+        strokeScale: scale * fit
+      });
     } else {
       clearShadow(ctx);
-    }
-    ctx.fillStyle = config.textColor;
-    ctx.fillText(line.text, stage.cx, cursorY);
-    if (line.isTime && config.strokeWidth > 0) {
-      clearShadow(ctx);
-      ctx.lineWidth = config.strokeWidth * scale * fit;
-      ctx.strokeStyle = config.strokeColor;
-      ctx.strokeText(line.text, stage.cx, cursorY);
+      ctx.fillStyle = config.textColor;
+      ctx.fillText(line.text, stage.cx, cursorY);
     }
     if (i < lines.length - 1) {
       cursorY += linePx / 2 + fitGap + (lines[i + 1].px * fit) / 2;
@@ -1421,7 +1415,10 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
   const mainGap = config.gap * 0.55 * scale;
   for (const row of mainRows) {
     ctx.font = `${config.fontWeight} ${row.px}px ${fontStack}`;
-    mainW = Math.max(mainW, ctx.measureText(row.text).width);
+    mainW = Math.max(
+      mainW,
+      row.isTime ? measureShareTime(ctx, config, formatted, row.px, fontStack) : ctx.measureText(row.text).width
+    );
     mainH += row.px;
   }
   mainH += mainGap * (mainRows.length - 1);
@@ -1479,7 +1476,9 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     const rowPx = row.px * textFit;
     rowY += rowPx / 2;
     ctx.font = `${config.fontWeight} ${rowPx}px ${fontStack}`;
-    const rowWidth = ctx.measureText(row.text).width;
+    const rowWidth = row.isTime
+      ? measureShareTime(ctx, config, formatted, rowPx, fontStack)
+      : ctx.measureText(row.text).width;
     if (row.isTime) {
       // cx は時刻の中心x(左寄せ描画のため left + 幅/2)。装飾(下線)はこれを基準にする。
       timeLineMetrics = {
@@ -1489,17 +1488,18 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
         width: rowWidth,
         cx: mainLeft + rowWidth / 2
       };
-      applyTextEffects(ctx, config);
+      drawShareTime(ctx, config, formatted, {
+        x: mainLeft,
+        y: rowY,
+        px: rowPx,
+        fontStack,
+        align: "left",
+        strokeScale: scale * textFit
+      });
     } else {
       clearShadow(ctx);
-    }
-    ctx.fillStyle = config.textColor;
-    ctx.fillText(row.text, mainLeft, rowY);
-    if (row.isTime && config.strokeWidth > 0) {
-      clearShadow(ctx);
-      ctx.lineWidth = config.strokeWidth * scale * textFit;
-      ctx.strokeStyle = config.strokeColor;
-      ctx.strokeText(row.text, mainLeft, rowY);
+      ctx.fillStyle = config.textColor;
+      ctx.fillText(row.text, mainLeft, rowY);
     }
     rowY += rowPx / 2 + fitMainGap;
   }
