@@ -39,6 +39,28 @@ test("parses c parameter from a full generated URL", () => {
   assert.equal(config.showSeconds, false);
 });
 
+test("smallSeconds round-trips through full and compact encoded config", () => {
+  const source = normalizeConfig({
+    timezone: "UTC",
+    showSeconds: true,
+    smallSeconds: true
+  });
+
+  assert.equal(decodeConfig(encodeConfig(source)).smallSeconds, true);
+  assert.equal(decodeConfig(encodeConfig(source, { compact: true })).smallSeconds, true);
+});
+
+test("legacy encoded config without smallSeconds decodes with the default false value", () => {
+  const legacy = { ...DEFAULT_CONFIG };
+  delete legacy.smallSeconds;
+
+  const encoded = encodeConfig(legacy);
+  const decoded = decodeConfig(encoded);
+
+  assert.equal(decoded.showSeconds, DEFAULT_CONFIG.showSeconds);
+  assert.equal(decoded.smallSeconds, false);
+});
+
 test("generated clock URL round-trips through c parameter", () => {
   const source = normalizeConfig({
     label: "長い配信ラベル",
@@ -111,11 +133,14 @@ test("compact config preserves analog and flip-specific fields", () => {
 });
 
 test("parses flat GET parameters when c is missing", () => {
-  const config = parseConfigFromQuery("?tz=UTC&hour12=1&seconds=0&date=1&weekday=true&font=Poppins&theme=soda");
+  const config = parseConfigFromQuery(
+    "?tz=UTC&hour12=1&seconds=0&smallSeconds=true&date=1&weekday=true&font=Poppins&theme=soda"
+  );
 
   assert.equal(config.timezone, "UTC");
   assert.equal(config.hour12, true);
   assert.equal(config.showSeconds, false);
+  assert.equal(config.smallSeconds, true);
   assert.equal(config.showDate, true);
   assert.equal(config.showWeekday, true);
   assert.equal(config.fontFamily, "Poppins");

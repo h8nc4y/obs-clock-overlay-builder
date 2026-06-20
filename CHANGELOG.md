@@ -4,7 +4,17 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
-## [Unreleased]
+## [1.5.0] - 2026-06-19
+
+### Added
+
+- Digital clock: added a 「秒を小さく表示」 option that keeps the main time as `HH:MM` while rendering seconds as a smaller lower-right slot when seconds are enabled.
+- Templates: added the standard `Mono Sub` template for small-seconds display. The built-in template lineup is now 18 templates across the existing five categories.
+- Share image: the promo PNG renderer mirrors the small-seconds layout, including the half-size seconds, lowered baseline, spacing, and stroke scaling. The `/clock/?c=...` reproduction contract is unchanged.
+
+### Tests
+
+- Added direct unit coverage for the share-image small-seconds measurement and drawing helpers, in addition to the config/time/render coverage for the new URL field and live `/clock/` DOM slot.
 
 ## [1.4.0] - 2026-06-17
 

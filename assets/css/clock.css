@@ -112,13 +112,31 @@
   paint-order: stroke fill;
 }
 
+.clock-time-row {
+  font-size: var(--clock-font-size);
+}
+
 .clock-time {
   display: inline-block;
-  font-size: var(--clock-font-size);
+  font-size: 1em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   -webkit-text-stroke: var(--clock-stroke-width) var(--clock-stroke-color);
   paint-order: stroke fill;
+}
+
+.clock-seconds-small {
+  display: inline-block;
+  margin-inline-start: 0.04em;
+  font-size: 0.5em;
+  line-height: 0;
+  vertical-align: sub;
+  -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.5) var(--clock-stroke-color);
+  paint-order: stroke fill;
+}
+
+.clock-seconds-small[hidden] {
+  display: none;
 }
 
 /* 各数字を等幅スロットにして、配信中に時刻が変わっても外枠とコロン位置を固定する。
