@@ -1,7 +1,7 @@
 # HANDOFF — OBS Clock Overlay Builder（Codex 引き継ぎ＆自走プロンプト）
 
 > このファイルは **Codex がこのリポジトリの開発を単独で引き継いで進める**ための「最新状況サマリ＋作業指示＋運用ルール」です。
-> 更新: 2026-06-19 / 作成者: Claude (Opus 4.8, 司令塔) / 想定読者: Codex（実装主担当）
+> 更新: 2026-06-21 / 作成者: Claude (Opus 4.8, 司令塔) + Codex / 想定読者: Codex（実装主担当）
 >
 > **読む順番**: ① この HANDOFF.md（運用と現状） → ② [AGENTS.md](AGENTS.md)（正の規約） → ③ 該当コードを実読。
 > 本文は日本語、コード識別子・ファイル名は原文のまま。`file:line` 参照は確認の起点（行は前後しうるので必ず実コードで照合）。
@@ -25,33 +25,31 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（未コミットの smallSeconds WIP／テスト緑＝現状 146 pass）を確認し、HANDOFF.md §1 の
-「出荷までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
+最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／テスト緑＝現状 146 pass）を確認し、HANDOFF.md §1.4 の
+「本番反映までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
 ---
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **`master` は アプリ版 `v1.4.0` で本番デプロイ済み**。`https://obs-clock-overlay-builder.h8nc4y.workers.dev` で稼働。`v1.4.0` 以降の `master` コミットは **ドキュメント追加のみ**（この HANDOFF.md と引き継ぎサマリ）で、デプロイ済みアプリの中身は `v1.4.0` のまま。
-2. **未コミットの作業中機能が1つだけある = 「秒を小さく表示」(`smallSeconds`)**。11ファイル・約 +455 行。
-   - ⚠️ **状態は「機能完成・テスト追加済み・全チェック緑・ライブ `/clock/` で描画確認済み・ただし未コミット」**。
-   - `git status` だけ見ると「壊れた途中変更」に見えるが、**違う。完成しておりコミット待ち**。下の §1 が全容。
-   - この WIP の **デザイン（意匠）は完成済み**なので、出荷は Codex 単独で進めてよい（Claude Design への再依頼は不要）。
-3. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
+1. **`master` は `v1.5.0` のコードリリースまで完了**。PR #110 は merge 済み、annotated tag `v1.5.0` と GitHub Release も作成済み。
+2. **本番デプロイは未実施**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は、オーナーGO後に `release:check` / production deploy / remote smoke を通して更新する。Cloudflare `cf:dry-run` は外部ネットワーク・認証境界なので明示承認が必要。
+3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。`node --test` は 146 pass / 0 fail、`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過。
+4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
-まず現物を確認（筆者実測 2026-06-19: すべて緑、`node --test` = **146 pass / 0 fail**）:
+まず現物を確認:
 
 ```bash
 git status
-git --no-pager diff --stat -- ':!HANDOFF.md'   # コードのみ = 11 files / +455 -33（=smallSeconds WIP）。HANDOFF.md 自体も作業ツリー変更にある点に注意
 node --test                       # → 146 pass / 0 fail
 npm run lint                      # node --check 構文チェックのみ（ESLintではない）
 npm run typecheck                 # import/encode/decode/time のスモーク（tscではない）
 npm run format:check              # 末尾改行・行末空白のみを見る独自チェック（整形器ではない）
+npm run release:http-smoke        # ローカルHTTP smoke（production deployではない）
 ```
 
-> **テスト数 146 は「現時点のスナップショット」**で不変条件ではない。内訳は v1.4.0 の baseline 139 ＋ smallSeconds WIP の新規テスト分（共有Canvas小秒の直接テストを含む）。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
+> **テスト数 146 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
 
 ---
 
@@ -82,49 +80,36 @@ npm run format:check              # 末尾改行・行末空白のみを見る�
 
 ---
 
-## 1. 未コミット WIP の全容 — `smallSeconds`（秒を小さく表示）
+## 1. v1.5.0 `smallSeconds`（秒を小さく表示）
 
 ### 1.1 何の機能か
-デジタル時計で、秒を本体時刻（`HH:MM`）の右下に**小さく（半分サイズ・下付き）**添える表示オプション。`12:43₅₆` のような見た目。配信者が「秒は欲しいが主張させたくない」要望に応える定番デザイン。**意匠は完成済み**（Claude Design 再依頼不要）。
+デジタル時計で、秒を本体時刻（`HH:MM`）の右下に**小さく（半分サイズ・下付き）**添える表示オプション。配信者が「秒は欲しいが主張させたくない」要望に応える定番デザイン。**意匠は完成済み**（Claude Design 再依頼不要）。
 
-### 1.2 変更ファイルと役割（`git diff` の実体）
+### 1.2 完了済みの変更
 
 | ファイル | 変更内容 |
 |---|---|
-| `assets/js/config.js` | `DEFAULT_CONFIG.smallSeconds = false` 追加。`normalizeConfig`/`flatParamsToConfig`/`applyTemplate` に配線。新テンプレ **`mono-sub`**（standard カテゴリ・`showSeconds:true`+`smallSeconds:true`・Roboto Mono 白パネル）を追加。 |
-| `assets/js/time.js` | `formatTimeParts` を新設し `formatClock`/`formatTime` が `time`（フル `HH:MM:SS`）に加え **`timeMain`（`HH:MM`＋AM/PM、秒なし）** と **`secondsText`（`SS` のみ）** を返すよう分離。 |
-| `assets/js/render.js` | デジタル時計に `.clock-seconds-small` 別スパンを追加。`smallSeconds && showSeconds` のとき本体に `timeMain`・別スロットに `secondsText` を `setFixedWidthDigits` で描き、それ以外は従来どおりフル `time`。`secondsNode.hidden` も連動。 |
-| `assets/css/clock.css` | `.clock-time-row`（font-size を集約）＋ `.clock-seconds-small`（`font-size:0.5em; vertical-align:sub; margin-inline-start:0.04em; -webkit-text-stroke は半分`）を追加。 |
-| `assets/js/builder.js` | エディタUIに `#smallSeconds` チェックボックス配線（boolean field 追加）。**共有画像(Canvas)側の鏡像実装**を追加: `hasSmallShareSeconds` / `measureShareTime` / `drawShareTime`。stacked / side-label 両レイアウトの時刻描画を新ヘルパ経由に置換。 |
-| `index.html` | `#smallSeconds`「秒を小さく表示」トグル（`data-clock-mode="digital"`）を追加。 |
-| `tests/time.test.mjs` | `timeMain`/`secondsText` の期待値を各ケースに追加。 |
-| `tests/render.test.mjs` | 小秒の別スロット描画／無効時に本体がフル `time` のままを検証。 |
-| `tests/config.test.mjs` | `smallSeconds` の compact/full 往復・`smallSeconds` 欠落の旧payloadが既定 false で復号・flat param `smallSeconds=true` の解釈を検証。 |
-| `tests/template-lineup.test.mjs` | `TEMPLATES.length` 期待値 17 → **18**。 |
-| `tests/fixtures/template-compat.golden.json` | 全エントリに `smallSeconds:false` を追加＋ `mono-sub` の template/compact/full/styleSnapshot を追加（=golden 再生成済み）。 |
+| `assets/js/config.js` | `DEFAULT_CONFIG.smallSeconds = false` 追加。`normalizeConfig`/`flatParamsToConfig`/`applyTemplate` に配線。新テンプレ **`mono-sub`** を追加。 |
+| `assets/js/time.js` | `timeMain`（秒なし本体）と `secondsText`（秒のみ）を返すよう分離。 |
+| `assets/js/render.js` / `assets/css/clock.css` | デジタル時計に `.clock-seconds-small` 別スロットを追加。 |
+| `assets/js/builder.js` / `assets/js/share-time.js` | エディタUI配線と共有PNG側の小秒描画鏡像を追加。 |
+| `index.html` | `#smallSeconds`「秒を小さく表示」トグルを追加。 |
+| `tests/*` / `tests/fixtures/template-compat.golden.json` | config/time/render/share/template/golden のテストを更新。 |
+| `README.md` / `CHANGELOG.md` / `docs/manual-qa.md` | v1.5.0 とテンプレ18種、小秒QAを反映。 |
 
 ### 1.3 動作確認（実施済み）
-- `/clock/?c=<mono-sub full>` を実ブラウザで開き DOM を実測: `.clock-time` = `HH:MM`（本体）、`.clock-seconds-small` = `SS`（秒だけ別スロット）、秒の `font-size` は本体のちょうど半分、`hidden=false`。
-- → **ライブ `/clock/` 面で意図どおり描画**。共有Canvas側は §3.4 の鏡像実装＋テスト（render/time/config）で間接カバー（直接テストの穴は §1.4-5）。
+- `/clock/?c=<mono-sub compact>` を Chrome DevTools で確認: `.clock-time` = `HH:MM`、`.clock-seconds-small` = `SS`、秒の `font-size` は本体の半分、透明背景、横スクロールなし。
+- Builder 390 / 768 / 1280px で横スクロールなし、Mono Sub 選択、生成URL payload `smallSeconds:true`、共有PNG生成を確認。
+- 自動検証: `node --test` 146 pass、`lint` / `typecheck` / `format:check` / `build` / `git diff --check` / `release:http-smoke` 通過。
 
-### 1.4 出荷までの残タスク（= Codex が単独で進めてよい）
+### 1.4 残タスク
 
-> いずれも「機能を壊す変更」ではなく「完成品を出荷ラインに乗せる」作業。コミット〜版上げ〜CHANGELOG〜docs〜staging までは **Codex 自走**。**本番デプロイのみオーナー最終GO**。
+1. **本番デプロイ前ゲート**: `npm run release:check`（`cf:dry-run` 含む）は Cloudflare 外部ネットワーク・認証境界のため明示承認が必要。
+2. **production deploy**: オーナー最終GO後に `npm run deploy:production`。
+3. **remote smoke**: production URL に対して `SMOKE_BASE_URL=<prod> npm run release:remote-smoke`。
+4. **post-launch ops 更新**: production URL、rollback candidate、GitHub Actions cost state、Cloudflare binding state、manual dashboard checks に変更があれば `docs/post-launch-ops.md` を更新。
 
-1. **コミット**（自走可）。Conventional Commits ＋日本語要約＋版トークン。案:
-   `feat(clock): 秒を小さく表示するオプションと mono-sub テンプレを追加 v1.5.0`
-2. **版上げ**（自走可）: `package.json` `1.4.0` → **`1.5.0`**（新ユーザー機能＝minor。過去 v1.2.0 がピン機能追加で minor にした前例に倣う）。
-3. **CHANGELOG.md**（自走可）: 先頭の `## [Unreleased]` を `## [1.5.0] - YYYY-MM-DD` 化。Keep a Changelog 準拠で `### Added`（小秒オプション＋mono-subテンプレ）。**「`/clock/?c=...` 再現契約は不変」を明記**するのが当リポの慣習。
-4. **ドキュメント反映（日本語ファースト・自走可）**:
-   - `README.md` の機能箇条書き／日本語概要に「秒を小さく表示」を1行追加。**テンプレ数 17 → 18**。⚠️ README にはテンプレ数が**2か所**ある（英語 L15 `17 built-in templates` と 日本語概要 L150 `テンプレートは全17種`）。**両方**を 18 に更新すること（片方だけ直すと不整合）。
-   - `docs/manual-qa.md` に小秒の手動QA項目（ライブ＝`/clock/` と 共有画像 の一致確認）を追加。
-5. **軽微な綻び**（任意・低優先・自走可）:
-   - `tests/template-lineup.test.mjs` の新しい assert 行が**インデント4スペース**（周囲は2スペース）。`format:check` は通る（インデント非検査）が見栄えが悪い。2スペースへ揃える。
-   - **テストの穴**: 共有Canvasの小秒3関数 `measureShareTime`/`drawShareTime`/`hasSmallShareSeconds` は `tests/share.test.mjs` で**直接テストされていない**（render/time 経由の間接カバーのみ）。`share.js` の純関数化前例に倣い、可能なら fake ctx で直接テストを足すと堅い。
-6. **出荷前ゲート**（本番デプロイする場合・**オーナーGO後**）: `npm run release:check` → `npm run release:http-smoke` →（デプロイ先に対し）`SMOKE_BASE_URL=<url> npm run release:remote-smoke`。タグ `v1.5.0` ＋日本語タイトルの GitHub Release。
-
-**Codex 2026-06-19 実施メモ**: 1〜5 は `feature/small-seconds` で実施済み（版上げ、CHANGELOG/README/manual QA、共有Canvas小秒ヘルパ直接テスト、template-lineup 整形）。`node --test` は 146 pass。`npm run lint` / `npm run typecheck` / `npm run format:check` / `npm run build` / `git diff --check` / `npm run release:http-smoke` は通過。`npm run release:check` は `cf:dry-run` が Cloudflare 資格情報・外部ネットワーク境界として承認レイヤーに拒否されたため未実行。タグ、GitHub Release、本番 deploy、remote smoke はオーナーGO後に実施。
-
+**Codex 2026-06-21 実施メモ**: PR #110 merge 済み、merge commit `88506a9`。annotated tag `v1.5.0` と GitHub Release `https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v1.5.0` 作成済み。本番 deploy は未実施。
 ---
 
 ## 2. 引き継ぎ後の最初の一手
@@ -186,10 +171,10 @@ npm run dev                      # http://localhost:4173/ （使用中なら別�
 - flat互換: `?tz=&seconds=&date=&weekday=&font=&theme=&smallSeconds=...`。`?c=` が優先。テンプレ名付き flat はそのテンプレ config に上書きで重ねる。
 
 ### 3.4 テンプレートと共有画像
-- `TEMPLATES`（`Object.freeze`、**WIP適用後 18 件**）。各要素 = `{id,name,note,sampleText,category,config}`。カテゴリ内訳（WIP後・合計18）: **standard 4**（mono-compact / mono-sub / minimal-clear / studio-live）/ cute 4 / cool 3 / analog 4 / flip 3。※`mono-sub` は standard の **4件目**（standard を 5 にしない）。`applyTemplate` はテンプレで見た目を上書きしつつ **timezone/hour12/showDate/dateFormat/showWeekday/weekdayFormat はユーザー値を保持**、`showSeconds`/`smallSeconds` は「テンプレが明示すれば従う、なければ保持」（`mono-sub` だけ true を明示）。
+- `TEMPLATES`（`Object.freeze`、**18 件**）。各要素 = `{id,name,note,sampleText,category,config}`。カテゴリ内訳（合計18）: **standard 4**（mono-compact / mono-sub / minimal-clear / studio-live）/ cute 4 / cool 3 / analog 4 / flip 3。※`mono-sub` は standard の **4件目**（standard を 5 にしない）。`applyTemplate` はテンプレで見た目を上書きしつつ **timezone/hour12/showDate/dateFormat/showWeekday/weekdayFormat はユーザー値を保持**、`showSeconds`/`smallSeconds` は「テンプレが明示すれば従う、なければ保持」（`mono-sub` だけ true を明示）。
 - **共有画像 = 時計の見た目を“二度目に”実装している**（重要な構造）。ライブは DOM+CSS（`render.js`+`clock.css`）、共有PNGは Canvas（`builder.js` の `drawDigitalShareClock*` 群＋ `share.js`/`share-decorations.js`）。**正は常にライブ(`clock.css`)。共有Canvasを後から合わせる（逆は禁止）**。1200×675・完全クライアント内・ネット/外部フォント不使用（CSP安全）。モバイルは `navigator.share`、PCは「PNG保存→X投稿画面」フォールバック。
 - レイアウト数学は純関数化済み（`computeStackedLayout`/`computeSideLabelLayout` in `share.js`）＝Canvasに触れずユニットテスト可能。装飾は `templateDecoration`(データ)＋`drawDigitalTemplateDecorations`(描画)。
-- **小秒の鏡像**（§1のWIP）: Canvas側の定数 `0.5`(サイズ)/`0.04`(gap)/`0.18`(sub下げ)/`0.5`(stroke) は `clock.css` 側の値の手写し。`hasSmallShareSeconds` ゲートで measure/draw を分岐。
+- **小秒の鏡像**（§1）: Canvas側の定数 `0.5`(サイズ)/`0.04`(gap)/`0.18`(sub下げ)/`0.5`(stroke) は `clock.css` 側の値の手写し。`hasSmallShareSeconds` ゲートで measure/draw を分岐。
 
 ### 3.5 ビルド / デプロイ / 運用
 - npm scripts: `build`(コピーのみ)/`dev`(serve.mjs, 既定:4173, 本番同等のセキュリティヘッダ注入)/`lint`(`node --check`)/`typecheck`(module-smoke)/`format:check`(末尾改行・行末空白のみ)/`test`(`node --test`)/`release:check`(lint→typecheck→format→test→build→cf:dry-run→`git diff --check` を順に)/`release:http-smoke`/`release:remote-smoke`(要 `SMOKE_BASE_URL`)/`cf:dry-run`/`deploy:staging`/`deploy:production`。
@@ -241,10 +226,10 @@ AGENTS.md / CONTRIBUTING.md / PRODUCT_REQUIREMENTS.md / ROADMAP.md に横断し�
 
 ### Git / リリースの実務（自走の手順）
 
-- **ブランチ**: 既定ブランチは `master`。`master` に直接コミットせず、作業ブランチを切る（例: `feat/small-seconds`）。直近の履歴は PR マージ運用（`git log` の #101〜#109 がその例）。
+- **ブランチ**: 既定ブランチは `master`。通常は `master` に直接コミットせず、作業ブランチを切る（例: `feature/small-seconds`）。直近の履歴は PR マージ運用（`git log` の #101〜#110 がその例）。
 - **コミット**: メッセージは上記 Conventional Commits。**secret/token/実データを含めない**。コミット末尾の Co-Authored-By 等の署名規約があれば従う（無ければ付けない）。意匠変更なら §⚙ の `Design:` trailer を付す。
-- **PR**: `gh pr create`（本文は日本語・標準構成: 概要/変更/検証/レビュー観点/残リスク/費用）。**マージはオーナー承認後**。セルフレビューが既定だが、不確実性が高い/契約に触れる変更は任意で ChatGPT・Claude にレビュー依頼してよい（依頼はオーナー経由）。
-- **タグ＆Release（手動）**: このリポは **GitHub Actions を意図的に置いていない**ので、リリースは手動。版上げ＋CHANGELOG確定後、`git tag v1.5.0` → push → `gh release create v1.5.0 --title "<日本語タイトル>" --notes-file <CHANGELOG該当節>`。**本番デプロイはこのタグ確定とゲート（§3.5）通過＋オーナーGOの後**。
+- **PR**: `gh pr create`（本文は日本語・標準構成: 概要/変更/検証/レビュー観点/残リスク/費用）。通常のコード/ドキュメント変更は Codex セルフレビューで merge まで自走可。不確実性が高い/契約に触れる変更は任意で ChatGPT・Claude にレビュー依頼してよい（依頼はオーナー経由）。
+- **タグ＆Release（手動）**: このリポは **GitHub Actions を意図的に置いていない**ので、リリースは手動。版上げ＋CHANGELOG確定後、`git tag vX.Y.Z` → push → `gh release create vX.Y.Z --title "<日本語タイトル>" --notes-file <CHANGELOG該当節>`。**本番デプロイはこのタグ確定とゲート（§3.5）通過＋オーナーGOの後**。`v1.5.0` は PR #110 merge 後に作成済み。
 - **本番デプロイ（唯一の人間確認ゲート）**: `npm run release:check`（cf:dry-run 含む）→ `npm run release:http-smoke` → オーナーGO → `npm run deploy:production` → `SMOKE_BASE_URL=<prod> npm run release:remote-smoke`。Cloudflare の課金/上限はダッシュボードで人が確認（数値は repo に書かない）。
 
 ---
@@ -254,7 +239,7 @@ AGENTS.md / CONTRIBUTING.md / PRODUCT_REQUIREMENTS.md / ROADMAP.md に横断し�
 - **Windows サンドボックスはサブプロセスのファイル書込を弾く**（`os error 5` / `CreateProcessAsUserW failed: 5`）。`ruff --fix`/`git apply`/外部整形器など「子プロセスがファイルを書く」操作は途中で失敗し、最悪ファイルが削除状態で残る。
   - 対策: 編集は `apply_patch` 主体に。大規模な機械置換は避けるか、最終検証（`npm run release:check` 等）は**サンドボックス外**で回す前提に。`git apply` 系を使うなら影響を小さく。
   - 競合誘発を避けるため、同一ファイルを複数エージェントで同時編集しない（ファイル所有権で分割）。
-- **未コミットのまま放置しない**: この環境は別リポで「未コミット変更が再同期で消える」事故例がある。意図する変更は最終的にコミットして durable に。**今ある smallSeconds WIP も早めにコミットして保全するのが安全**。
+- **未コミットのまま放置しない**: この環境は別リポで「未コミット変更が再同期で消える」事故例がある。意図する変更は最終的にコミットして durable に。実装済みの機能や handoff 更新も、確認後に小さく commit/push して保全する。
 - **正直な記録**: 検証で飛ばしたチェック・不明点・残リスクは捏造せず正直に記録する（テスト結果・コミット・デプロイ・PR・アプリ状態をでっち上げない）。
 - **secret/実データ非接触**: token/OAuth/実ユーザーデータを読まない・送らない・repoや決定ファイルに書かない。
 
@@ -279,17 +264,17 @@ ROADMAP（短期）＋直近の全体レビュー（v1.4.0で大半消化済み�
 ```bash
 # 状態
 git status
-git --no-pager diff -- ':!HANDOFF.md'         # コード差分だけ見る（HANDOFF.md の更新を除く）
+git --no-pager diff --stat
 node --test                                   # 緑を確認（現状 146 pass・減っていないこと）
 
 # 動かす
 npm run dev                                    # / と /clock/
 
-# 出荷前フルゲート（本番デプロイ前・オーナーGO後。cf:dry-run 含む。実行可な環境でのみ）
+# 本番デプロイ前フルゲート（オーナーGO後。cf:dry-run 含む）
 npm run release:check
 
 # golden を意図的に更新するとき（フィールド/テンプレ変更時のみ）
 node tests/fixtures/generate-template-compat-golden.mjs
 ```
 
-正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-19）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-21）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
