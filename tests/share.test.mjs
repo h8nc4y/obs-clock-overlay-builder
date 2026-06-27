@@ -12,7 +12,7 @@ import {
   templateDecoration
 } from "../assets/js/share.js";
 import { drawShareTime, hasSmallShareSeconds, measureShareTime } from "../assets/js/share-time.js";
-import { normalizeConfig } from "../assets/js/config.js";
+import { cssStringLiteral, normalizeConfig } from "../assets/js/config.js";
 import { tokenizeFlip } from "../assets/js/render.js";
 
 const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
@@ -88,6 +88,23 @@ test("canvasFontStack slices to 80 chars and removes newlines", () => {
   assert.equal(canvasFontStack(long), `"${"a".repeat(80)}", system-ui, sans-serif`);
   // 改行は空白へ置換され、家族名が複数行に割れない。
   assert.equal(canvasFontStack("a\nb"), '"a b", system-ui, sans-serif');
+});
+
+test("font sanitizers keep the same hostile family safe for CSS and Canvas", () => {
+  const hostile = 'Bad"; color:red;\\evil\nFont😀';
+
+  const cssLiteral = cssStringLiteral(hostile);
+  assert.equal(cssLiteral.includes("\n"), false);
+  assert.equal(JSON.parse(cssLiteral), 'Bad"; color:red;\\evil Font😀');
+
+  const canvasStack = canvasFontStack(hostile);
+  const canvasFamily = canvasStack.replace(/^"/, "").replace(/", system-ui, sans-serif$/, "");
+  assert.equal(canvasStack.endsWith('", system-ui, sans-serif'), true);
+  assert.equal(canvasFamily.includes('"'), false);
+  assert.equal(canvasFamily.includes(";"), false);
+  assert.equal(canvasFamily.includes("\\"), false);
+  assert.equal(canvasFamily.includes("\n"), false);
+  assert.match(canvasFamily, /Bad\s+color:red\s+evil\s+Font😀/);
 });
 
 function createTextCtx(widths = {}) {
