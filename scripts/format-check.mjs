@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const roots = ["."];
 const allowed = /\.(html|css|js|mjs|md|json|jsonc)$/;
-const ignoredDirectories = new Set([".git", "dist", "node_modules"]);
+const ignoredDirectories = new Set([".codex", ".git", "dist", "node_modules"]);
 const ignoredDirectoryPatterns = [
   /^chrome-.*-profile/,
   /^edge-.*-profile/,
