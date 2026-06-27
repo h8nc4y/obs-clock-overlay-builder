@@ -110,6 +110,8 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 4. **post-launch ops 更新**: production URL、rollback candidate、GitHub Actions cost state、Cloudflare binding state、manual dashboard checks に変更があれば `docs/post-launch-ops.md` を更新。
 
 **Codex 2026-06-21 実施メモ**: PR #110 merge 済み、merge commit `88506a9`。annotated tag `v1.5.0` と GitHub Release `https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v1.5.0` 作成済み。本番 deploy は未実施。
+
+**Codex 2026-06-27 実施メモ**: Claude advisory の「remote smoke に HTML セキュリティヘッダ検証を追加」は `release-remote-smoke.mjs` と `tests/release-remote-smoke.test.mjs` で実装済み。`/`、`/clock/`、`/clock` は CSP / `X-Content-Type-Options` / `Referrer-Policy` を検査し、OBS 埋め込み維持のため `frame-ancestors` 混入も回帰として落とす。production deploy / remote smoke 実行は引き続きオーナーGO後。
 ---
 
 ## 2. 引き継ぎ後の最初の一手
@@ -277,4 +279,4 @@ npm run release:check
 node tests/fixtures/generate-template-compat-golden.mjs
 ```
 
-正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-21）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-27）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。

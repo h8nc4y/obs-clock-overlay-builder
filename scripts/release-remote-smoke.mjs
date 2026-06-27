@@ -5,10 +5,29 @@ if (!baseUrl) {
   process.exit(1);
 }
 
+const securityHeaderRules = [
+  {
+    name: "content-security-policy",
+    includes: [
+      "default-src 'self'",
+      "script-src 'self'",
+      "style-src 'self'",
+      "img-src 'self' data:",
+      "connect-src 'self'",
+      "base-uri 'none'",
+      "object-src 'none'",
+      "form-action 'self'"
+    ],
+    excludes: ["unsafe-inline", "frame-ancestors"]
+  },
+  { name: "x-content-type-options", equals: "nosniff" },
+  { name: "referrer-policy", equals: "no-referrer" }
+];
+
 const checks = [
-  { path: "/", contentType: "text/html", bodyIncludes: "OBS時計URLビルダー" },
-  { path: "/clock/", contentType: "text/html", bodyIncludes: "clockRoot" },
-  { path: "/clock", contentType: "text/html", bodyIncludes: "clockRoot" },
+  { path: "/", contentType: "text/html", bodyIncludes: "OBS時計URLビルダー", securityHeaders: true },
+  { path: "/clock/", contentType: "text/html", bodyIncludes: "clockRoot", securityHeaders: true },
+  { path: "/clock", contentType: "text/html", bodyIncludes: "clockRoot", securityHeaders: true },
   {
     path: "/api/defaults",
     contentType: "application/json",
@@ -48,6 +67,9 @@ for (const check of checks) {
       failed = true;
       console.error(`  expected body to include ${check.bodyIncludes}`);
     }
+    if (check.securityHeaders && !validateSecurityHeaders(response)) {
+      failed = true;
+    }
     if (check.json) {
       const parsed = JSON.parse(text);
       if (JSON.stringify(parsed) !== JSON.stringify(check.json)) {
@@ -66,3 +88,34 @@ if (failed) {
 }
 
 console.log("Remote release smoke passed.");
+
+function validateSecurityHeaders(response) {
+  // 本番HTML面の防御ヘッダを検査する。/clock/ はOBS埋め込みを維持するため
+  // frame-ancestors を要求せず、混入も回帰として扱う。
+  let valid = true;
+  for (const rule of securityHeaderRules) {
+    const value = response.headers.get(rule.name) ?? "";
+    if (!value) {
+      console.error(`  expected ${rule.name} header`);
+      valid = false;
+      continue;
+    }
+    if (rule.equals && value.toLowerCase() !== rule.equals) {
+      console.error(`  expected ${rule.name} to equal ${rule.equals}`);
+      valid = false;
+    }
+    for (const token of rule.includes ?? []) {
+      if (!value.includes(token)) {
+        console.error(`  expected ${rule.name} to include ${token}`);
+        valid = false;
+      }
+    }
+    for (const token of rule.excludes ?? []) {
+      if (value.includes(token)) {
+        console.error(`  expected ${rule.name} not to include ${token}`);
+        valid = false;
+      }
+    }
+  }
+  return valid;
+}
