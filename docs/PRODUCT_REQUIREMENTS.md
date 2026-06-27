@@ -37,13 +37,13 @@ OBSのブラウザソースで使う時計オーバーレイURLを生成する�
 - PC内フォント読み込みは、対応ブラウザでユーザー操作後だけ実行し、非対応・拒否・空状態では手入力へ案内すること。
 - フォント名はOBSを動かすPCに同じfontがある場合だけ同じ表示になります。未インストール時はsystem fallbackを許容します。
 - `/clock/` は同一オリジンの `Date` レスポンスヘッダでサーバー時刻へ自動補正し、取得に失敗したときはPCのsystem timeへフォールバックすること(バックエンドは追加しない)。
-- `/api/defaults` は公開先の補助情報だけを返します。候補が取れない環境でも、時計表示はURL設定だけで動くこと。
+- `/api/defaults` は公開先の補助情報だけを返します。Workers Static Assets では `timezone:null` の静的fallbackであり、timezone自動提案は行いません。候補が取れない環境でも、時計表示はURL設定だけで動くこと。
 
 ## Deployment and operations requirements
 
 - 新規Cloudflare公開はWorkers with Static Assetsを第一候補にします。
 - Cloudflare Pages compatibilityは、`functions/api/defaults.js` が harmless optional fallbackである限り残してよいです。
-- `api/defaults` は拡張子なしの静的JSONです。JSON `Content-Type` と `Cache-Control: no-store` は `_headers` によって指定します。
+- `api/defaults` は拡張子なしの静的JSONです。Worker-first path では `{"timezone":null,"country":null,"source":"static"}` を返し、JSON `Content-Type` と `Cache-Control: no-store` は `_headers` によって指定します。
 - `/api/defaults` のstatus、JSON body、`Content-Type`、`Cache-Control` はlocal/remote smoke checksで監視します。
 - `wrangler.jsonc` では `run_worker_first` を使わず、通常の静的配信は `dist/` のStatic Assetsへ任せます。
 - productionが正常な間は、訓練目的だけでproduction rollbackを実行しません。

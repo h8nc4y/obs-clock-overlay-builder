@@ -46,7 +46,7 @@ Current project posture:
 - Workers Static Assets is the preferred hosting model.
 - `assets.binding` is `ASSETS`.
 - D1, KV, R2, Queues, Durable Objects, Workflows, Hyperdrive, Workers AI, and AI Gateway are not part of the current app contract.
-- `/api/defaults` is static fallback JSON; `_headers` provides JSON `Content-Type` and `Cache-Control: no-store`.
+- `/api/defaults` is static fallback JSON (`{"timezone":null,"country":null,"source":"static"}`); `_headers` provides JSON `Content-Type` and `Cache-Control: no-store`. Workers Static Assets does not auto-detect or suggest a timezone from this endpoint.
 - Smoke checks guard the `/api/defaults` header and body assumptions.
 
 Before production deploys or settings changes, manually confirm Cloudflare usage, spend limits, alerts, and paid binding state in the dashboard. Do not record account identifiers, usage numbers, payment details, or private dashboard values here.
@@ -92,7 +92,7 @@ For public demo or production checks:
 - `/` displays the editor.
 - `/clock/` displays only the clock surface.
 - `/clock` reaches the clock surface.
-- `/api/defaults` returns static fallback JSON with no-store caching.
+- `/api/defaults` returns static fallback JSON with `timezone:null` and no-store caching.
 - 390px, 768px, and 1280px+ widths have no unexpected horizontal scroll.
 - Preview background controls have 44px or larger label targets with visible hover and focus states.
 - Local font loading explains permission prompts, empty-list fallback, and actual font-name storage for OBS.

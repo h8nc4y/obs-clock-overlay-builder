@@ -61,7 +61,7 @@ Older flat query parameters are still read for compatibility, for example:
 - Clock rendering is based on the URL and the local browser runtime.
 - This app does not intentionally send user clock configuration to its server.
 - Local font discovery and clipboard are optional browser features. Browser permission prompts and browser behavior depend on the user's environment.
-- The clock fetches the same-origin `/api/defaults` with `no-store` only to read the response `Date` header for time correction; no clock configuration or personal data is sent.
+- The clock fetches the same-origin `/api/defaults` with `no-store` only to read the response `Date` header for time correction; no clock configuration or personal data is sent. On Workers Static Assets, `/api/defaults` is static fallback JSON (`timezone:null`) and does not auto-suggest a timezone.
 
 ## Security
 
@@ -107,7 +107,7 @@ Notes:
 
 The preferred deployment target is Cloudflare Workers with Static Assets. The static output is generated into `dist/`, and `wrangler.jsonc` keeps the Workers Static Assets configuration.
 
-Cloudflare Pages compatibility remains documented because `functions/api/defaults.js` is a harmless optional fallback. The OBS clock surface does not depend on `/api/defaults`.
+Cloudflare Pages compatibility remains documented because `functions/api/defaults.js` is a harmless optional fallback. Workers Static Assets serves `/api/defaults` as static fallback JSON with no timezone auto-detection, and the OBS clock surface does not depend on that body.
 
 Remote smoke checks use an explicit base URL:
 
