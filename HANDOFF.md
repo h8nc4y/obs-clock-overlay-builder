@@ -1,7 +1,7 @@
 # HANDOFF — OBS Clock Overlay Builder（Codex 引き継ぎ＆自走プロンプト）
 
 > このファイルは **Codex がこのリポジトリの開発を単独で引き継いで進める**ための「最新状況サマリ＋作業指示＋運用ルール」です。
-> 更新: 2026-06-21 / 作成者: Claude (Opus 4.8, 司令塔) + Codex / 想定読者: Codex（実装主担当）
+> 更新: 2026-06-28 / 作成者: Claude (Opus 4.8, 司令塔) + Codex / 想定読者: Codex（実装主担当）
 >
 > **読む順番**: ① この HANDOFF.md（運用と現状） → ② [AGENTS.md](AGENTS.md)（正の規約） → ③ 該当コードを実読。
 > 本文は日本語、コード識別子・ファイル名は原文のまま。`file:line` 参照は確認の起点（行は前後しうるので必ず実コードで照合）。
@@ -25,7 +25,7 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／テスト緑＝現状 146 pass）を確認し、HANDOFF.md §1.4 の
+最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／テスト緑＝現状 149 pass）を確認し、HANDOFF.md §1.4 の
 「本番反映までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
@@ -33,23 +33,23 @@
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **`master` は `v1.5.0` のコードリリースまで完了**。PR #110 は merge 済み、annotated tag `v1.5.0` と GitHub Release も作成済み。
+1. **`master` は `v1.5.0` のコードリリース後の保守PR #115まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では static defaults timezone contract の docs/test 同期が merge 済み。
 2. **本番デプロイは未実施**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は、オーナーGO後に `release:check` / production deploy / remote smoke を通して更新する。Cloudflare `cf:dry-run` は外部ネットワーク・認証境界なので明示承認が必要。
-3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。`node --test` は 146 pass / 0 fail、`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過。
+3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 149 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
 まず現物を確認:
 
 ```bash
 git status
-node --test                       # → 146 pass / 0 fail
+node --test                       # → 149 pass / 0 fail
 npm run lint                      # node --check 構文チェックのみ（ESLintではない）
 npm run typecheck                 # import/encode/decode/time のスモーク（tscではない）
 npm run format:check              # 末尾改行・行末空白のみを見る独自チェック（整形器ではない）
 npm run release:http-smoke        # ローカルHTTP smoke（production deployではない）
 ```
 
-> **テスト数 146 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
+> **テスト数 149 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
 
 ---
 
@@ -100,7 +100,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 ### 1.3 動作確認（実施済み）
 - `/clock/?c=<mono-sub compact>` を Chrome DevTools で確認: `.clock-time` = `HH:MM`、`.clock-seconds-small` = `SS`、秒の `font-size` は本体の半分、透明背景、横スクロールなし。
 - Builder 390 / 768 / 1280px で横スクロールなし、Mono Sub 選択、生成URL payload `smallSeconds:true`、共有PNG生成を確認。
-- 自動検証: `node --test` 146 pass、`lint` / `typecheck` / `format:check` / `build` / `git diff --check` / `release:http-smoke` 通過。
+- 自動検証: `node --test` 149 pass、`lint` / `typecheck` / `format:check` / `build` / `git diff --check` / `release:http-smoke` 通過。
 
 ### 1.4 残タスク
 
@@ -112,6 +112,8 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 **Codex 2026-06-21 実施メモ**: PR #110 merge 済み、merge commit `88506a9`。annotated tag `v1.5.0` と GitHub Release `https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v1.5.0` 作成済み。本番 deploy は未実施。
 
 **Codex 2026-06-27 実施メモ**: Claude advisory の「remote smoke に HTML セキュリティヘッダ検証を追加」は `release-remote-smoke.mjs` と `tests/release-remote-smoke.test.mjs` で実装済み。`/`、`/clock/`、`/clock` は CSP / `X-Content-Type-Options` / `Referrer-Policy` を検査し、OBS 埋め込み維持のため `frame-ancestors` 混入も回帰として落とす。production deploy / remote smoke 実行は引き続きオーナーGO後。
+
+**Codex 2026-06-28 実施メモ**: PR #115 / merge commit `d54452f` で、Workers Static Assets の `/api/defaults` は `timezone:null` の静的fallbackであり timezone自動提案をしない契約を README / post-launch ops / tests へ同期済み。
 ---
 
 ## 2. 引き継ぎ後の最初の一手
@@ -124,7 +126,7 @@ npm install                      # wrangler を入れる（release:check / cf:dr
 
 # 1) 現状把握
 git status && git --no-pager diff --stat
-node --test                      # 緑を確認（現状 146 pass・減っていないこと。数字は snapshot）
+node --test                      # 緑を確認（現状 149 pass・減っていないこと。数字は snapshot）
 
 # 2) ローカルで実物を見る
 npm run dev                      # http://localhost:4173/ （使用中なら別ポート）
@@ -186,7 +188,7 @@ npm run dev                      # http://localhost:4173/ （使用中なら別�
 - 運用ポリシー（`docs/post-launch-ops.md`）: 本番デプロイ/ロールバックは承認＋ゲート必須。**健全な本番でロールバックを訓練実行しない**。ロールバック候補IDやWorker版IDは**repoに記録しない**（インシデント時にCloudflare実リストから選ぶ）。secret/token/実データ/private URL/ローカルパスをrepoに書かない。GitHub Actions は**意図的に不在**（費用管理）＝勝手に `push`/`pull_request` トリガを足さない。
 
 ### 3.6 テストと golden fixture
-- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**146 pass**。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
+- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**149 pass**。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
 - **golden fixture**（`tests/template-compat.golden.json` ＋ `tests/template-compat.test.mjs`）が「既出 `?c=` URLが二度と無言で見た目変化しない」契約を凍結（`defaultConfig`・全テンプレ・compact/full 復号結果・flat query・`applyClockStyles` スナップショット）。
   - **再生成は「契約を意図的に変えた時だけ」**: `node tests/fixtures/generate-template-compat-golden.mjs`（npmエイリアスなし）。configフィールド/テンプレ追加・encode/decode・`applyClockStyles` 変更時に実行し、**差分をレビューしてコミット**。`template-lineup.test.mjs` の件数も同時更新。
   - ⚠️ **意図しない失敗を再生成で握りつぶさない**。それは実バグ＝コードを直す。再生成は「契約を意図的に変えた」宣言行為。
@@ -219,7 +221,7 @@ AGENTS.md / CONTRIBUTING.md / PRODUCT_REQUIREMENTS.md / ROADMAP.md に横断し�
 - **テンプレ/configフィールドを足したら**: ①`DEFAULT_CONFIG`/`normalizeConfig`/flat/`compactConfig` 全層に配線 ②`template-lineup.test.mjs` の件数更新 ③golden 再生成（§3.6）④共有Canvas（ライブと二重描画）への反映 ⑤READMEの種類数表記。今回の `smallSeconds` がまさにこの全層変更の実例＝参考にできる。
 
 **コミット前セルフレビュー（最低限これを通す）**:
-1. `node --test` 緑（pass 数が**減っていない**／意図して増えている。146 は snapshot で不変条件ではない）。
+1. `node --test` 緑（pass 数が**減っていない**／意図して増えている。149 は snapshot で不変条件ではない）。
 2. `npm run lint && npm run typecheck && npm run format:check` 緑。
 3. 再現性契約（§3.3）・hard contracts（§4）を壊していないか自問。
 4. config/テンプレ変更なら golden を**意図的に**再生成し diff をレビュー済みか。
@@ -267,7 +269,7 @@ ROADMAP（短期）＋直近の全体レビュー（v1.4.0で大半消化済み�
 # 状態
 git status
 git --no-pager diff --stat
-node --test                                   # 緑を確認（現状 146 pass・減っていないこと）
+node --test                                   # 緑を確認（現状 149 pass・減っていないこと）
 
 # 動かす
 npm run dev                                    # / と /clock/
@@ -279,4 +281,4 @@ npm run release:check
 node tests/fixtures/generate-template-compat-golden.mjs
 ```
 
-正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-27）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-28）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
