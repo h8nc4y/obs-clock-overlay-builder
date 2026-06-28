@@ -612,7 +612,7 @@ export const NUMBER_LIMITS = {
   letterSpacing: [-1, 8],
   lineHeight: [0.9, 1.8],
   fontWeight: [300, 900],
-  // gap はテンプレ専用・編集UI非公開。旧flat/テンプレ/描画の互換性維持用。
+  // gap はテンプレ専用・編集UI非公開。旧flat/共有URL/描画互換のため受理を続ける。
   gap: [0, 40],
   shadowOpacity: [0, 1],
   shadowBlur: [0, 36],
@@ -640,8 +640,10 @@ export function applyTemplate(config, templateId) {
     ...template.config,
     template: template.id,
     clockType: template.config.clockType ?? "digital",
+    // タイムゾーン/12時間表記/日付は配信者の設定を守り、テンプレ切替で共有URLを揺らさない。
     timezone: current.timezone,
     hour12: current.hour12,
+    // 秒表示だけは mono-sub などのテンプレ表現を優先し、未指定なら現在設定を引き継ぐ。
     showSeconds: template.config.showSeconds ?? current.showSeconds,
     smallSeconds: template.config.smallSeconds ?? current.smallSeconds,
     showDate: current.showDate,
