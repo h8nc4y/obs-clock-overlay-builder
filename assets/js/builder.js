@@ -548,6 +548,8 @@ function renderTemplateButtons() {
     button.className = "template-button";
     button.dataset.template = template.id;
     button.setAttribute("aria-pressed", "false");
+    // ミニプレビューは aria-hidden なので、操作名と補足文をボタン名へ明示して迷子を防ぐ。
+    button.setAttribute("aria-label", `テンプレート「${template.name}」を適用: ${template.note}`);
 
     const name = document.createElement("span");
     name.className = "template-name";

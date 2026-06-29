@@ -25,7 +25,7 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／テスト緑＝現状 149 pass）を確認し、HANDOFF.md §1.4 の
+最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／テスト緑＝現状 151 pass）を確認し、HANDOFF.md §1.4 の
 「本番反映までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
@@ -35,21 +35,21 @@
 
 1. **`master` は `v1.5.0` のコードリリース後の保守PR #118まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #116 の handoff refresh、PR #117 の template URL compatibility comments、PR #118 の PR #117 後 handoff state sync が merge 済み。
 2. **本番デプロイは未実施**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は、オーナーGO後に `release:check` / production deploy / remote smoke を通して更新する。Cloudflare `cf:dry-run` は外部ネットワーク・認証境界なので明示承認が必要。
-3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 149 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
+3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 151 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
 まず現物を確認:
 
 ```bash
 git status
-node --test                       # → 149 pass / 0 fail
+node --test                       # → 151 pass / 0 fail
 npm run lint                      # node --check 構文チェックのみ（ESLintではない）
 npm run typecheck                 # import/encode/decode/time のスモーク（tscではない）
 npm run format:check              # 末尾改行・行末空白のみを見る独自チェック（整形器ではない）
 npm run release:http-smoke        # ローカルHTTP smoke（production deployではない）
 ```
 
-> **テスト数 149 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
+> **テスト数 151 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
 
 ---
 
@@ -116,6 +116,9 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 **Codex 2026-06-28 実施メモ**: PR #115 / merge commit `d54452f` で、Workers Static Assets の `/api/defaults` は `timezone:null` の静的fallbackであり timezone自動提案をしない契約を README / post-launch ops / tests へ同期済み。PR #116 / merge commit `1e7e91c` で handoff を PR #115 後の状態へ更新し、PR #117 / merge commit `640a5ad` で template URL compatibility comments を明確化済み。PR #118 / merge commit `f8eac6c` で handoff を PR #117 後の状態へ同期済み。本番 deploy / remote smoke / Cloudflare dashboard確認は引き続き未実行。
 
 **Codex 2026-06-29 実施メモ**: `scripts/check-js.mjs` は `node --check` 子プロセスが起動前に失敗して `stderr/stdout` が空でも、`ERR_INVALID_ARG_TYPE` で二次クラッシュせず対象ファイルと起動エラーを表示する。Windows sandbox で `spawnSync ... EPERM` が出る場合は通常の構文エラーではなく実行環境の子プロセス制限として扱い、必要に応じて権限付き実行で `npm run lint` を再確認する。
+
+**Codex 2026-06-30 実施メモ**: `fix/template-picker-a11y-names` でテンプレート一覧に `role="group"` / `aria-label="テンプレート一覧"` を追加し、生成テンプレートボタンの `aria-label` を「テンプレート『名前』を適用: 補足文」に揃えた。機能面の a11y/キーボード QA として `docs/manual-qa.md` にロール/Tab確認項目を追記。検証は `npm run lint` / `typecheck` / `format:check` / `npm test`（151 pass）/ `npm run build` / `git diff --check` が通過。Chrome DevTools で 500/768/1280px の横スクロールなし、テンプレート一覧DOM属性、テンプレートボタン名を確認。390px相当は Chrome DevTools の最小実測幅が500pxになり、Playwrightはbrowser未導入/起動制約のため未確認。`release:check` は Cloudflare dry-runを含むため未実行。
+
 ---
 
 ## 2. 引き継ぎ後の最初の一手
@@ -128,7 +131,7 @@ npm install                      # wrangler を入れる（release:check / cf:dr
 
 # 1) 現状把握
 git status && git --no-pager diff --stat
-node --test                      # 緑を確認（現状 149 pass・減っていないこと。数字は snapshot）
+node --test                      # 緑を確認（現状 151 pass・減っていないこと。数字は snapshot）
 
 # 2) ローカルで実物を見る
 npm run dev                      # http://localhost:4173/ （使用中なら別ポート）
@@ -190,7 +193,7 @@ npm run dev                      # http://localhost:4173/ （使用中なら別�
 - 運用ポリシー（`docs/post-launch-ops.md`）: 本番デプロイ/ロールバックは承認＋ゲート必須。**健全な本番でロールバックを訓練実行しない**。ロールバック候補IDやWorker版IDは**repoに記録しない**（インシデント時にCloudflare実リストから選ぶ）。secret/token/実データ/private URL/ローカルパスをrepoに書かない。GitHub Actions は**意図的に不在**（費用管理）＝勝手に `push`/`pull_request` トリガを足さない。
 
 ### 3.6 テストと golden fixture
-- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**149 pass**。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
+- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**151 pass**。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
 - **golden fixture**（`tests/template-compat.golden.json` ＋ `tests/template-compat.test.mjs`）が「既出 `?c=` URLが二度と無言で見た目変化しない」契約を凍結（`defaultConfig`・全テンプレ・compact/full 復号結果・flat query・`applyClockStyles` スナップショット）。
   - **再生成は「契約を意図的に変えた時だけ」**: `node tests/fixtures/generate-template-compat-golden.mjs`（npmエイリアスなし）。configフィールド/テンプレ追加・encode/decode・`applyClockStyles` 変更時に実行し、**差分をレビューしてコミット**。`template-lineup.test.mjs` の件数も同時更新。
   - ⚠️ **意図しない失敗を再生成で握りつぶさない**。それは実バグ＝コードを直す。再生成は「契約を意図的に変えた」宣言行為。
@@ -223,7 +226,7 @@ AGENTS.md / CONTRIBUTING.md / PRODUCT_REQUIREMENTS.md / ROADMAP.md に横断し�
 - **テンプレ/configフィールドを足したら**: ①`DEFAULT_CONFIG`/`normalizeConfig`/flat/`compactConfig` 全層に配線 ②`template-lineup.test.mjs` の件数更新 ③golden 再生成（§3.6）④共有Canvas（ライブと二重描画）への反映 ⑤READMEの種類数表記。今回の `smallSeconds` がまさにこの全層変更の実例＝参考にできる。
 
 **コミット前セルフレビュー（最低限これを通す）**:
-1. `node --test` 緑（pass 数が**減っていない**／意図して増えている。149 は snapshot で不変条件ではない）。
+1. `node --test` 緑（pass 数が**減っていない**／意図して増えている。151 は snapshot で不変条件ではない）。
 2. `npm run lint && npm run typecheck && npm run format:check` 緑。
 3. 再現性契約（§3.3）・hard contracts（§4）を壊していないか自問。
 4. config/テンプレ変更なら golden を**意図的に**再生成し diff をレビュー済みか。
@@ -258,7 +261,7 @@ ROADMAP（短期）＋直近の全体レビュー（v1.4.0で大半消化済み�
 - ★ README スクショ/例を UI 変更に追従更新（小秒・mono-sub のスクショ追加候補。撮影/構図は意匠寄り）。
 - 配信者フィードバックを GitHub Issue テンプレで収集 → ★ digital/analog/flip テンプレ陣容の意匠磨き（新テンプレの見た目は Claude、配線/テスト/golden は Codex）。
 - 公開可能な実機 OBS QA 結果の記録（`docs/manual-qa.md` 系）。
-- ★ a11y/キーボード QA の拡充（色コントラスト/視覚部分は Claude、フォーカス順序/ロール等の機能部分は Codex）。
+- a11y/キーボード QA の拡充: テンプレート一覧のロール/ボタン名は Codex 側で実装済み。色コントラスト/視覚部分は引き続き Claude Design 領域。
 - ラベルの NFKC/全半角/かな正規化は**具体的な要望が出たときだけ**再検討（先回りしない）。
 
 **やらないこと**: チャット反応機能・YouTube連携・有料バインディング・フォント同梱・GitHub Actions の常時トリガ・`/clock/` の localStorage 依存化・公開ガバナンス文書の無断改変。
@@ -271,7 +274,7 @@ ROADMAP（短期）＋直近の全体レビュー（v1.4.0で大半消化済み�
 # 状態
 git status
 git --no-pager diff --stat
-node --test                                   # 緑を確認（現状 149 pass・減っていないこと）
+node --test                                   # 緑を確認（現状 151 pass・減っていないこと）
 
 # 動かす
 npm run dev                                    # / と /clock/

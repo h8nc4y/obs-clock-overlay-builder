@@ -64,6 +64,8 @@ test("manual QA and ops docs cover current post-launch checks", () => {
   assert.match(manualQa, /ブラウザから許可を求められたら/);
   assert.match(manualQa, /一覧が空/);
   assert.match(manualQa, /表示名ではなく、OBSで実際に参照するフォント名/);
+  assert.match(manualQa, /キーボード \/ ロール確認/);
+  assert.match(manualQa, /Tabで.*テンプレートの系統.*テンプレート一覧.*時計の種類/);
   assert.match(postLaunchOps, /Issue #12/);
   assert.match(postLaunchOps, /dashboard確認結果は公開safeな要約だけ/);
   assert.match(postLaunchOps, /数値、支払い詳細、account識別子、個人情報/);
@@ -206,4 +208,13 @@ test("labeled control groups expose an accessible name via role=group + aria-lab
       `group "${label}" should expose role="group" + aria-label`
     );
   }
+});
+
+test("template picker exposes group and button names for keyboard users", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const builder = readFileSync(new URL("../assets/js/builder.js", import.meta.url), "utf8");
+
+  assert.match(html, /id="templateGrid"[^>]*role="group"[^>]*aria-label="テンプレート一覧"/);
+  assert.match(builder, /button\.setAttribute\("aria-label", `テンプレート「\$\{template\.name\}」を適用/);
+  assert.match(builder, /template\.note/);
 });
