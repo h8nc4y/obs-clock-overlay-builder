@@ -33,7 +33,7 @@
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **`master` は `v1.5.0` のコードリリース後の保守PR #115まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では static defaults timezone contract の docs/test 同期が merge 済み。
+1. **`master` は `v1.5.0` のコードリリース後の保守PR #117まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #116 の handoff refresh と PR #117 の template URL compatibility comments が merge 済み。
 2. **本番デプロイは未実施**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は、オーナーGO後に `release:check` / production deploy / remote smoke を通して更新する。Cloudflare `cf:dry-run` は外部ネットワーク・認証境界なので明示承認が必要。
 3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 149 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
@@ -113,7 +113,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 
 **Codex 2026-06-27 実施メモ**: Claude advisory の「remote smoke に HTML セキュリティヘッダ検証を追加」は `release-remote-smoke.mjs` と `tests/release-remote-smoke.test.mjs` で実装済み。`/`、`/clock/`、`/clock` は CSP / `X-Content-Type-Options` / `Referrer-Policy` を検査し、OBS 埋め込み維持のため `frame-ancestors` 混入も回帰として落とす。production deploy / remote smoke 実行は引き続きオーナーGO後。
 
-**Codex 2026-06-28 実施メモ**: PR #115 / merge commit `d54452f` で、Workers Static Assets の `/api/defaults` は `timezone:null` の静的fallbackであり timezone自動提案をしない契約を README / post-launch ops / tests へ同期済み。
+**Codex 2026-06-28 実施メモ**: PR #115 / merge commit `d54452f` で、Workers Static Assets の `/api/defaults` は `timezone:null` の静的fallbackであり timezone自動提案をしない契約を README / post-launch ops / tests へ同期済み。PR #116 / merge commit `1e7e91c` で handoff を PR #115 後の状態へ更新し、PR #117 / merge commit `640a5ad` で template URL compatibility comments を明確化済み。本番 deploy / remote smoke / Cloudflare dashboard確認は引き続き未実行。
 ---
 
 ## 2. 引き継ぎ後の最初の一手
