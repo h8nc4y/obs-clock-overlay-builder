@@ -42,6 +42,16 @@
 - `Tab` キーでスキップリンク、時計画面リンク、プレビュー背景、生成URL、コピー操作、設定項目へ順に移動でき、フォーカス表示が見える。
 - 文字、背景と枠、影と縁取りの3グループでデザイン調整の場所が分かる。
 
+### 記録済みローカルviewport evidence
+
+2026-07-01 21:50 JST に、Chrome DevTools MCP と `node scripts/serve.mjs` のローカル4173番で次を確認済み。
+
+- Builder `/` と clock-only `/clock/` を 390x844 / 768x1024 / 1280x900 で実測。
+- 全viewportで `documentElement.scrollWidth <= clientWidth` となり、横スクロールなし。
+- `/clock/` は `builderControlsPresent:false` で、編集UIが出ていない。
+- Network は app asset/API が 200。console は DevTools の `evaluate_script` 由来と思われる CSP issue のみで、app error/warn は未検出。
+- production deploy、remote smoke、Cloudflare dashboard確認、OBS実機確認は未実行。
+
 ## キーボード / ロール確認
 
 - Tabでスキップリンク、時計画面リンク、プレビュー背景、生成URL、テンプレートの系統、テンプレート一覧、時計の種類、調整モード、各入力欄へ順に移動できる。
