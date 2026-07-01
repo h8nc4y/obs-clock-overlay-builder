@@ -25,7 +25,7 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／PR #120 反映後もテスト緑＝現状 151 pass）を確認し、HANDOFF.md §1.4 の
+最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／PR #121 反映後もテスト緑＝現状 151 pass）を確認し、HANDOFF.md §1.4 の
 「本番反映までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
@@ -33,7 +33,7 @@
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **`master` は `v1.5.0` のコードリリース後の保守PR #120まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #118 の PR #117 後 handoff state sync、PR #119 の `check-js` Node 24 出力guard、PR #120 の template picker accessible name 改善が merge 済み。
+1. **`master` は `v1.5.0` のコードリリース後の保守PR #121まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #118 の PR #117 後 handoff state sync、PR #119 の `check-js` Node 24 出力guard、PR #120 の template picker accessible name 改善と PR #121 の handoff state sync が merge 済み。
 2. **本番デプロイは未実施**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は、オーナーGO後に `release:check` / production deploy / remote smoke を通して更新する。Cloudflare `cf:dry-run` は外部ネットワーク・認証境界なので明示承認が必要。
 3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 151 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
@@ -120,6 +120,8 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 **Codex 2026-06-30 実施メモ**: `fix/template-picker-a11y-names` でテンプレート一覧に `role="group"` / `aria-label="テンプレート一覧"` を追加し、生成テンプレートボタンの `aria-label` を「テンプレート『名前』を適用: 補足文」に揃えた。機能面の a11y/キーボード QA として `docs/manual-qa.md` にロール/Tab確認項目を追記。検証は `npm run lint` / `typecheck` / `format:check` / `npm test`（151 pass）/ `npm run build` / `git diff --check` が通過。Chrome DevTools で 500/768/1280px の横スクロールなし、テンプレート一覧DOM属性、テンプレートボタン名を確認。390px相当は Chrome DevTools の最小実測幅が500pxになり、Playwrightはbrowser未導入/起動制約のため未確認。`release:check` は Cloudflare dry-runを含むため未実行。
 
 **Codex 2026-07-01 実施メモ**: `docs/sync-pr120-current-state` でこの handoff の冒頭サマリを PR #119/#120 後の実状態へ同期。コード・公開プロセス文書・Cloudflare ゲートには触れていない。
+
+**Codex 2026-07-01 21:50 実施メモ**: Chrome DevTools MCP で `node scripts/serve.mjs` のローカル 4173 番を確認し、Builder `/` と clock-only `/clock/` を 390x844 / 768x1024 / 1280x900 で実測。全 viewport で `documentElement.scrollWidth <= clientWidth`、横スクロールなし。`/clock/` は `builderControlsPresent:false` で編集 UI 不在。Network は app asset/API が 200、console は DevTools の `evaluate_script` 由来と思われる CSP issue のみで app error/warn は未検出。これにより 2026-06-30 メモの「390px相当未確認」は解消済み。production deploy / remote smoke / Cloudflare dashboard確認は引き続き未実行。
 
 ---
 
