@@ -62,6 +62,7 @@ Older flat query parameters are still read for compatibility, for example:
 - This app does not intentionally send user clock configuration to its server.
 - Local font discovery and clipboard are optional browser features. Browser permission prompts and browser behavior depend on the user's environment.
 - The clock fetches the same-origin `/api/defaults` with `no-store` only to read the response `Date` header for time correction; no clock configuration or personal data is sent. On Workers Static Assets, `/api/defaults` is static fallback JSON (`timezone:null`) and does not auto-suggest a timezone.
+- The generated `/clock/?c=...` URL contains your clock settings, including the label text. If you share the URL or a share image publicly, avoid putting private information (such as unannounced stream plans) in the label.
 
 ## Security
 
