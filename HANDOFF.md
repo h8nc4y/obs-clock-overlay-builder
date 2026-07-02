@@ -25,7 +25,7 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／PR #120 反映後もテスト緑＝現状 151 pass）を確認し、HANDOFF.md §1.4 の
+最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／PR #121 反映後もテスト緑＝現状 151 pass）を確認し、HANDOFF.md §1.4 の
 「本番反映までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
@@ -33,8 +33,8 @@
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **`master` は `v1.5.0` のコードリリース後の保守PR #120まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #118 の PR #117 後 handoff state sync、PR #119 の `check-js` Node 24 出力guard、PR #120 の template picker accessible name 改善が merge 済み。
-2. **本番デプロイは未実施**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は、オーナーGO後に `release:check` / production deploy / remote smoke を通して更新する。Cloudflare `cf:dry-run` は外部ネットワーク・認証境界なので明示承認が必要。
+1. **`master` は `v1.5.0` のコードリリース後の保守PR #121まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #118 の PR #117 後 handoff state sync、PR #119 の `check-js` Node 24 出力guard、PR #120 の template picker accessible name 改善と PR #121 の handoff state sync が merge 済み。
+2. **本番デプロイは 2026-07-02 に実施済み**。オーナーGO(AskUserQuestionで承認取得)後に `release:check`(cf:dry-run 含む)→ `deploy:production` → remote smoke を全通過し、production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は v1.5.0 配信中(配信中 `config.js` に `smallSeconds` を確認)。Worker version ID は運用ポリシーに従い repo へ記録しない。
 3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 151 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
@@ -104,10 +104,11 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 
 ### 1.4 残タスク
 
-1. **本番デプロイ前ゲート**: `npm run release:check`（`cf:dry-run` 含む）は Cloudflare 外部ネットワーク・認証境界のため明示承認が必要。
-2. **production deploy**: オーナー最終GO後に `npm run deploy:production`。
-3. **remote smoke**: production URL に対して `SMOKE_BASE_URL=<prod> npm run release:remote-smoke`。
-4. **post-launch ops 更新**: production URL、rollback candidate、GitHub Actions cost state、Cloudflare binding state、manual dashboard checks に変更があれば `docs/post-launch-ops.md` を更新。
+1. ~~本番デプロイ前ゲート~~ **完了(2026-07-02)**: `npm run release:check`(cf:dry-run 含む)通過。
+2. ~~production deploy~~ **完了(2026-07-02)**: オーナーGO取得後に `npm run deploy:production` 実施。
+3. ~~remote smoke~~ **完了(2026-07-02)**: `SMOKE_BASE_URL=<prod> npm run release:remote-smoke` 全通過(CSP/nosniff/Referrer-Policy/`frame-ancestors`不在を含む)。
+4. **post-launch ops 更新**: production URL・binding・Actions 状態に変更なしのため更新不要と判断(2026-07-02)。Cloudflare dashboard の費用確認はオーナー側で継続。
+5. **OBS実機QA**(次の残タスク): `docs/manual-qa.md` の記録欄を production URL ベースで埋める(オーナー実機)。
 
 **Codex 2026-06-21 実施メモ**: PR #110 merge 済み、merge commit `88506a9`。annotated tag `v1.5.0` と GitHub Release `https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v1.5.0` 作成済み。本番 deploy は未実施。
 
@@ -120,6 +121,10 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 **Codex 2026-06-30 実施メモ**: `fix/template-picker-a11y-names` でテンプレート一覧に `role="group"` / `aria-label="テンプレート一覧"` を追加し、生成テンプレートボタンの `aria-label` を「テンプレート『名前』を適用: 補足文」に揃えた。機能面の a11y/キーボード QA として `docs/manual-qa.md` にロール/Tab確認項目を追記。検証は `npm run lint` / `typecheck` / `format:check` / `npm test`（151 pass）/ `npm run build` / `git diff --check` が通過。Chrome DevTools で 500/768/1280px の横スクロールなし、テンプレート一覧DOM属性、テンプレートボタン名を確認。390px相当は Chrome DevTools の最小実測幅が500pxになり、Playwrightはbrowser未導入/起動制約のため未確認。`release:check` は Cloudflare dry-runを含むため未実行。
 
 **Codex 2026-07-01 実施メモ**: `docs/sync-pr120-current-state` でこの handoff の冒頭サマリを PR #119/#120 後の実状態へ同期。コード・公開プロセス文書・Cloudflare ゲートには触れていない。
+
+**Claude Fable5 2026-07-02 実施メモ**: オーナーGO(第一目的=実ユーザー獲得、成功指標=外部利用シグナル+自分のOBSで常用+公開品質、公開方針=無料範囲で露出増)を取得し、`release:check` → `release:http-smoke` → `deploy:production` → remote smoke を全通過。production は v1.5.0 配信中。要件再定義・市場調査・Codexセカンドオピニオンは `docs/FABLE5_REQUIREMENTS_REVIEW.md`(repo-local draft)参照。次の優先順位: P1=OBS実機QA公開記録 → P2=READMEスクショ/日本語導線(★意匠=Claude Design)+「ラベルに未公開情報を入れない」注意書き → P3=発見可能性(OGP点検・まとめブログ掲載打診)。
+
+**Codex 2026-07-01 21:50 実施メモ**: Chrome DevTools MCP で `node scripts/serve.mjs` のローカル 4173 番を確認し、Builder `/` と clock-only `/clock/` を 390x844 / 768x1024 / 1280x900 で実測。全 viewport で `documentElement.scrollWidth <= clientWidth`、横スクロールなし。`/clock/` は `builderControlsPresent:false` で編集 UI 不在。Network は app asset/API が 200、console は DevTools の `evaluate_script` 由来と思われる CSP issue のみで app error/warn は未検出。これにより 2026-06-30 メモの「390px相当未確認」は解消済み。production deploy / remote smoke / Cloudflare dashboard確認は引き続き未実行。
 
 ---
 
