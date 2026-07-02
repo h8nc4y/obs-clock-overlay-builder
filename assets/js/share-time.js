@@ -5,7 +5,7 @@ import { clearShadow } from "./share-decorations.js";
 // ライブ描画が正なので、ここでは CSS 側の比率を手写しして回帰テストで固定する。
 const SMALL_SECONDS_SCALE = 0.5;
 const SMALL_SECONDS_GAP_EM = 0.04;
-const SMALL_SECONDS_BASELINE_OFFSET_EM = 0.18;
+const SMALL_SECONDS_BASELINE_OFFSET_EM = 0;
 const SMALL_SECONDS_STROKE_SCALE = 0.5;
 
 export function hasSmallShareSeconds(config, formatted) {

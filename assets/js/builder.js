@@ -13,7 +13,6 @@ import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import {
   ROMAN_NUMERALS,
-  applyClockStyles,
   computeAnalogAngles,
   mountClock,
   recommendedObsSize,
@@ -525,15 +524,12 @@ function buildTemplateMiniPreview(template) {
     return mini;
   }
 
-  const widget = document.createElement("span");
-  applyClockStyles(widget, applied);
-  widget.classList.add("template-mini-clock");
-
-  const timeText = document.createElement("span");
-  timeText.className = "clock-time";
-  timeText.textContent = template.sampleText;
-  widget.append(timeText);
-  mini.append(widget);
+  const holder = document.createElement("span");
+  holder.className = "template-mini-digital";
+  // デジタルも実描画で作り、ラベル位置・テンプレ装飾・小秒表示をライブプレビューと同じ構造にする。
+  const clock = mountClock(holder, applied, { now: () => new Date(2026, 0, 1, 12, 34, 56) });
+  clock.element.classList.add("template-mini-clock");
+  mini.append(holder);
   return mini;
 }
 
@@ -577,9 +573,11 @@ function fitTemplateMiniPreviews() {
       return;
     }
     const innerWidth = widget.offsetWidth;
-    const available = mini.clientWidth - 12;
-    if (innerWidth > 0 && available > 0) {
-      const scale = Math.min(0.42, available / innerWidth);
+    const innerHeight = widget.offsetHeight;
+    const availableWidth = mini.clientWidth - 12;
+    const availableHeight = mini.clientHeight - 12;
+    if (innerWidth > 0 && innerHeight > 0 && availableWidth > 0 && availableHeight > 0) {
+      const scale = Math.min(0.42, availableWidth / innerWidth, availableHeight / innerHeight);
       widget.style.transform = `scale(${scale.toFixed(3)})`;
     }
   });

@@ -4,6 +4,13 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
+## [Unreleased]
+
+### Fixed
+
+- Digital clock 「秒を小さく表示」: the small seconds slot is now bottom-aligned with the main `HH:MM` digits (`vertical-align: baseline`) instead of hanging below them. The share-image PNG renderer mirrors the same alignment. Requested and approved by the owner (2026-07-02).
+- Template picker: digital template cards now render the real clock structure (label badge, template decorations, small seconds) via the same renderer as the live preview, so the mini preview no longer differs from what applying the template shows.
+
 ## [1.5.0] - 2026-06-19
 
 ### Added

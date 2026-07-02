@@ -130,7 +130,7 @@
   margin-inline-start: 0.04em;
   font-size: 0.5em;
   line-height: 0;
-  vertical-align: sub;
+  vertical-align: baseline;
   -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.5) var(--clock-stroke-color);
   paint-order: stroke fill;
 }
