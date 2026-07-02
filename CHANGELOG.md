@@ -4,6 +4,27 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
+## [1.5.1] - 2026-07-02
+
+### Fixed
+
+- Digital clock 「秒を小さく表示」: the small seconds slot is now bottom-aligned with the main `HH:MM` digits (`vertical-align: baseline`) instead of hanging below them. The share-image PNG renderer mirrors the same alignment. Requested and approved by the owner (2026-07-02).
+- Template picker: digital template cards now render the real clock structure (label badge, template decorations, small seconds) via the same renderer as the live preview, so the mini preview no longer differs from what applying the template shows.
+- Template picker: the mini preview cards now reflect your current display settings (seconds, small seconds, date, weekday, and their formats, plus timezone/12-hour) instead of always showing the defaults, so a card previews exactly what clicking it will produce. Requested and approved by the owner (2026-07-02).
+- Templates `Studio Live` / `Night Studio`: the accent underline under the time now extends beneath the small seconds when 「秒を小さく表示」 is on, instead of stopping at the `HH:MM` digits. The share-image PNG renderer already spanned the full width and is unchanged. Requested and approved by the owner (2026-07-02).
+
+### Changed
+
+A batch of approved UI/UX review polish items (2026-07-02). The `/clock/?c=...` reproduction contract, the live clock rendering, and the strict CSP are unchanged. Requested and approved by the owner.
+
+- Mobile layout (≤1100px): the 「作った時計をXでシェア」 share panel now appears after the STEP sections instead of immediately below the live preview, so the setup steps are not buried under the promotional panel. The desktop two-column layout is unchanged.
+- Accessibility: the floating mini preview no longer hides the settings-side headings on mobile — STEP headings and anchor/skip-link targets now reserve `scroll-margin-top` so keyboard focus and jumps land below the floating preview.
+- The generated-URL character count now uses a neutral muted color instead of the success green, so it reads as information rather than a copy confirmation; the actual "copied" message still shows in green.
+- Accessibility: the STEP numbers (1/2/3) are now announced to screen readers via a visually-hidden 「STEP 1: 」 prefix in each step heading (the visible badge stays `aria-hidden`).
+- Added a short helper line under the recommended width/height explaining they are the values to enter in OBS's browser source.
+- Reworded the lead paragraph's second sentence to be more active and concrete about saving/sharing the single generated URL to restore the same clock on another PC.
+- Reworded the share section heading to 「作った時計をXでシェア」 and softened the body copy's promotional tone slightly while keeping the discovery/word-of-mouth intent.
+
 ## [1.5.0] - 2026-06-19
 
 ### Added

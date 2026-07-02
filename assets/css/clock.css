@@ -130,7 +130,7 @@
   margin-inline-start: 0.04em;
   font-size: 0.5em;
   line-height: 0;
-  vertical-align: sub;
+  vertical-align: baseline;
   -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.5) var(--clock-stroke-color);
   paint-order: stroke fill;
 }
@@ -310,7 +310,7 @@
   box-shadow: 0 9px 24px rgba(22, 24, 29, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-.template-studio-live .clock-time {
+.template-studio-live .clock-time-row {
   border-bottom: 3px solid #ff3b5c;
   padding-bottom: 3px;
 }
@@ -401,7 +401,7 @@
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(95, 208, 224, 0.22);
 }
 
-.template-night-studio .clock-time {
+.template-night-studio .clock-time-row {
   border-bottom: 2px solid #5fd0e0;
   padding-bottom: 3px;
 }

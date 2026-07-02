@@ -636,6 +636,12 @@ output {
   font-size: 0.9rem;
 }
 
+/* 文字数カウントなど「単なる案内」の行。成功メッセージ(緑)と区別して控えめな色にする。
+   コピー成功などの本物の確認文が入るときは JS 側でこの修飾を外し、緑に戻す。 */
+.status-line.is-info {
+  color: var(--muted);
+}
+
 /* 調整タブ直下の常時表示ステータス。空でも高さを確保して切替時のガタつきを防ぐ。 */
 .builder-status {
   margin: 6px 0 12px;
@@ -909,15 +915,47 @@ details p {
   display: none !important;
 }
 
+/* 視覚的には隠すがアクセシビリティツリーには残す(display:none/visibility:hidden は不可)。
+   STEP番号などをスクリーンリーダーだけに読ませる用途で使う。 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 1100px) {
   .builder-layout {
     grid-template-columns: 1fr;
-    /* スマホ/タブレットでは PC版の左列(ライブプレビュー/OBS用URL/Xでシェア)を先頭に出し、
-       テンプレ選択・調整などの設定はその下に置く(オーナー指定の順序)。
-       これで共有パネルが下に埋もれて見つからない問題も解消する。DOM順は変えず areas だけ入れ替える。 */
-    grid-template-areas:
-      "preview"
-      "controls";
+    /* スマホ/タブレットでは1カラムに積む。左列(.preview-column)を display:contents で
+       透過させ、中の各パネルを .builder-layout 直下のグリッド子に昇格させることで、
+       ライブプレビュー/時計ステージ/OBS用URL → 設定(STEP群) → Xでシェア の順に並べ替える。
+       areas は使わず order で制御する(単一カラムなので order→DOM順で配置される)。 */
+    grid-template-areas: none;
+  }
+
+  /* 左列の器を消し、中のパネルを外側グリッドの子として直接並べる。
+     ピン留め/浮遊は .preview-stage-dock / #previewShell を狙うので display:contents でも維持される。 */
+  .preview-column {
+    display: contents;
+  }
+
+  /* ライブプレビュー・時計ステージ・OBS用URL(order 0) → 設定STEP群(order 1) →
+     Xでシェア(order 2、最後)。共有パネルが設定より前に埋もれないようにする(オーナー指定の順序)。
+     基底の grid-area: controls は areas: none の下では実グリッド線への明示配置として解決され、
+     order が効かなくなるため、ここで auto に戻して自動配置(order順)に乗せる。 */
+  .control-surface {
+    grid-area: auto;
+    order: 1;
+  }
+
+  .share-panel {
+    order: 2;
   }
 
   /* 1カラムではプレビューが下に来てスクロールで見えなくなる。ピンON かつ
@@ -949,6 +987,16 @@ details p {
     max-width: min(420px, 100%);
     margin: 0 auto;
     box-shadow: 0 10px 26px rgba(20, 18, 16, 0.3);
+  }
+
+  /* 浮遊プレビュー(fixed で画面上部に居る、高さ~210px+余白)が、Tab移動・スキップリンク・
+     アンカー到達の着地点に被って隠さないよう、設定側の見出しとフォーカス可能要素へ
+     スクロール余白を確保する。浮遊が起きるのはこのモバイル幅だけなので、
+     デスクトップのアンカー移動には影響させない。 */
+  #builderMain,
+  .control-surface :is(h2, h3, summary, a, button, input, select, textarea),
+  .share-panel :is(h2, summary, a, button, input, select, textarea) {
+    scroll-margin-top: 240px;
   }
 }
 
@@ -1145,6 +1193,14 @@ details p {
 
 .template-mini-flip .clock-flip {
   transform: scale(0.92);
+}
+
+.template-mini-digital {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .adjust-tabs {

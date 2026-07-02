@@ -174,7 +174,8 @@ test("measureShareTime mirrors live small-seconds width constants", () => {
   assert.equal(measureShareTime(fullCtx, fullConfig, shareTimeFormatted, 100, '"Roboto Mono", monospace'), 330);
 });
 
-test("drawShareTime draws centered small seconds as a half-size lowered slot", () => {
+test("drawShareTime baseline-aligns centered small seconds as a half-size slot", () => {
+  // 小秒の契約を CSS の `vertical-align: baseline` に合わせ、共有Canvasでも分と秒の底辺をそろえる。
   const config = normalizeConfig({
     showSeconds: true,
     smallSeconds: true,
@@ -199,7 +200,7 @@ test("drawShareTime draws centered small seconds as a half-size lowered slot", (
     ctx.calls.filter((call) => call.type === "fillText"),
     [
       { type: "fillText", text: "12:34", x: 353, y: 200, font: '700 100px "Roboto Mono", monospace', align: "left" },
-      { type: "fillText", text: "56", x: 607, y: 218, font: '700 50px "Roboto Mono", monospace', align: "left" }
+      { type: "fillText", text: "56", x: 607, y: 200, font: '700 50px "Roboto Mono", monospace', align: "left" }
     ]
   );
   assert.deepEqual(
@@ -212,7 +213,7 @@ test("drawShareTime draws centered small seconds as a half-size lowered slot", (
     })),
     [
       { text: "12:34", x: 353, y: 200, font: '700 100px "Roboto Mono", monospace', lineWidth: 8 },
-      { text: "56", x: 607, y: 218, font: '700 50px "Roboto Mono", monospace', lineWidth: 4 }
+      { text: "56", x: 607, y: 200, font: '700 50px "Roboto Mono", monospace', lineWidth: 4 }
     ]
   );
 });

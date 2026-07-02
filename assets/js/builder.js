@@ -13,7 +13,6 @@ import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
 import {
   ROMAN_NUMERALS,
-  applyClockStyles,
   computeAnalogAngles,
   mountClock,
   recommendedObsSize,
@@ -181,6 +180,9 @@ const booleanFields = ["hour12", "showSeconds", "smallSeconds", "showDate", "sho
 const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let localFontSelectBound = false;
+// テンプレカードのミニプレビューが最後に反映した表示設定8項目の署名。
+// これと現在の state が変わったときだけカードを差し替える。
+let lastMiniPreviewSignature = "";
 // 生成済みの宣伝画像をキャッシュし、設定が変わったら無効化する。
 // 共有時にまだ無ければ作り、ある間は再生成を省く。
 let shareImageBlob = null;
@@ -495,12 +497,29 @@ function renderTemplateCategoryTabs() {
   }
 }
 
+// ミニプレビューは「今の設定にテンプレを重ねたらどう見えるか」を示す。
+// applyTemplate が引き継ぐ8項目(タイムゾーン/12時間/秒/小秒/日付/日付書式/曜日/曜日書式)を
+// 現在の state から流し込み、カードとクリック結果を一致させる。
+function miniPreviewSignature(cfg) {
+  return [
+    cfg.timezone,
+    cfg.hour12,
+    cfg.showSeconds,
+    cfg.smallSeconds,
+    cfg.showDate,
+    cfg.dateFormat,
+    cfg.showWeekday,
+    cfg.weekdayFormat
+  ].join("|");
+}
+
 function buildTemplateMiniPreview(template) {
   const mini = document.createElement("span");
   mini.className = "template-mini";
   // 常時更新される装飾プレビューはラベルが無く、スクリーンリーダーには雑音なので隠す。
   mini.setAttribute("aria-hidden", "true");
-  const applied = applyTemplate(cloneDefaultConfig(), template.id);
+  // 既定値ではなく現在の state を土台にし、秒・日付・曜日などの表示設定をカードへ反映する。
+  const applied = applyTemplate({ ...state }, template.id);
 
   if (applied.clockType === "analog") {
     const holder = document.createElement("span");
@@ -525,15 +544,12 @@ function buildTemplateMiniPreview(template) {
     return mini;
   }
 
-  const widget = document.createElement("span");
-  applyClockStyles(widget, applied);
-  widget.classList.add("template-mini-clock");
-
-  const timeText = document.createElement("span");
-  timeText.className = "clock-time";
-  timeText.textContent = template.sampleText;
-  widget.append(timeText);
-  mini.append(widget);
+  const holder = document.createElement("span");
+  holder.className = "template-mini-digital";
+  // デジタルも実描画で作り、ラベル位置・テンプレ装飾・小秒表示をライブプレビューと同じ構造にする。
+  const clock = mountClock(holder, applied, { now: () => new Date(2026, 0, 1, 12, 34, 56) });
+  clock.element.classList.add("template-mini-clock");
+  mini.append(holder);
   return mini;
 }
 
@@ -567,6 +583,33 @@ function renderTemplateButtons() {
     });
     elements.templateGrid.append(button);
   }
+  // 作り直した時点のカードは現在の state を反映済みなので署名を合わせておく。
+  lastMiniPreviewSignature = miniPreviewSignature(state);
+  window.requestAnimationFrame(fitTemplateMiniPreviews);
+}
+
+// 表示設定(秒/日付/曜日など8項目)が変わったら、ボタンを作り直さずに
+// 各カードの .template-mini だけ差し替える。focus や aria-pressed を保つため
+// ボタンや DOM の同一性は壊さない。署名が変わったときだけ走らせて無駄な再描画を避ける。
+function refreshTemplateMiniPreviews() {
+  const signature = miniPreviewSignature(state);
+  if (signature === lastMiniPreviewSignature) {
+    return;
+  }
+  lastMiniPreviewSignature = signature;
+  document.querySelectorAll(".template-button").forEach((button) => {
+    const templateId = button.dataset.template;
+    const template = TEMPLATES.find((item) => item.id === templateId);
+    if (!template) {
+      return;
+    }
+    const oldMini = button.querySelector(".template-mini");
+    if (!oldMini) {
+      return;
+    }
+    const newMini = buildTemplateMiniPreview(template);
+    button.replaceChild(newMini, oldMini);
+  });
   window.requestAnimationFrame(fitTemplateMiniPreviews);
 }
 
@@ -577,9 +620,11 @@ function fitTemplateMiniPreviews() {
       return;
     }
     const innerWidth = widget.offsetWidth;
-    const available = mini.clientWidth - 12;
-    if (innerWidth > 0 && available > 0) {
-      const scale = Math.min(0.42, available / innerWidth);
+    const innerHeight = widget.offsetHeight;
+    const availableWidth = mini.clientWidth - 12;
+    const availableHeight = mini.clientHeight - 12;
+    if (innerWidth > 0 && innerHeight > 0 && availableWidth > 0 && availableHeight > 0) {
+      const scale = Math.min(0.42, availableWidth / innerWidth, availableHeight / innerHeight);
       widget.style.transform = `scale(${scale.toFixed(3)})`;
     }
   });
@@ -673,7 +718,7 @@ function bindForm() {
     copyText(
       elements.generatedUrl.value,
       elements.urlStatus,
-      "URLをコピーしました。OBSのブラウザソースに貼り付け、最後に下の『Xでシェアして広める』で宣伝できます。"
+      "URLをコピーしました。OBSのブラウザソースに貼り付け、最後に下の『作った時計をXでシェア』で共有できます。"
     )
   );
   elements.openClock.addEventListener("click", () => {
@@ -767,6 +812,8 @@ function updateEverything(status = "", options = {}) {
   updateContrastWarning();
   updateTemplatePressed();
   updateClockTypeVisibility();
+  // 表示設定が変わったら、既存カードのミニプレビューを差し替えて実際の適用結果に合わせる。
+  refreshTemplateMiniPreviews();
   // 設定が変わったら生成済み画像は古くなる。次の共有時に作り直す。
   // 既に画像を作っていてこれが「初めて古くなった」瞬間なら、プレビュー/説明/保存リンクを
   // 一時的に古い状態として示す。生成済みプレビューがある場合は debounce 後に自動更新する。
@@ -801,7 +848,9 @@ function updateGeneratedUrl() {
   const baseUrl = new URL("./clock/", window.location.href).href;
   const url = configToClockUrl(state, baseUrl, { compact: elements.compactUrl.checked });
   elements.generatedUrl.value = url;
+  // 文字数は「案内」なので控えめな色に。コピー成功などの本物の確認文が来たら copyText 側で外す。
   elements.urlStatus.textContent = `${url.length}文字`;
+  elements.urlStatus.classList.add("is-info");
   elements.urlWarning.hidden = true;
   elements.urlWarning.textContent = "";
   if (url.length > TOO_LONG_URL_WARNING) {
@@ -933,6 +982,8 @@ function importConfig() {
 }
 
 async function copyText(text, statusElement, successMessage) {
+  // 本物の確認文を出すので「案内」修飾(控えめ色)を外し、成功色(緑)へ戻す。
+  statusElement.classList.remove("is-info");
   try {
     await navigator.clipboard.writeText(text);
     statusElement.textContent = successMessage;
