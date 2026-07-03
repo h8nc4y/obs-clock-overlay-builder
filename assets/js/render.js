@@ -54,6 +54,7 @@ function mountDigitalClock(container, config, options = {}) {
   const dateNode = document.createElement("span");
   const weekdayNode = document.createElement("span");
   const timeRow = document.createElement("div");
+  const meridiemNode = document.createElement("span");
   const timeNode = document.createElement("span");
   const secondsNode = document.createElement("span");
 
@@ -64,11 +65,13 @@ function mountDigitalClock(container, config, options = {}) {
   dateNode.className = "clock-date";
   weekdayNode.className = "clock-weekday";
   timeRow.className = "clock-time-row";
+  meridiemNode.className = "clock-meridiem";
   timeNode.className = "clock-time";
   secondsNode.className = "clock-seconds-small";
 
   dateRow.append(dateNode, weekdayNode);
-  timeRow.append(timeNode, secondsNode);
+  // meridiemNode の前置/後置は tick 側で insert 位置を切り替える(要素は1個のみ)。
+  timeRow.append(meridiemNode, timeNode, secondsNode);
   main.append(dateRow, timeRow);
   root.append(label, main);
   container.textContent = "";
@@ -92,12 +95,26 @@ function mountDigitalClock(container, config, options = {}) {
       dateNode.textContent = formatted.date;
       weekdayNode.textContent = formatted.weekday;
       if (currentConfig.smallSeconds && currentConfig.showSeconds) {
-        setFixedWidthDigits(timeNode, formatted.timeMain);
+        // 小秒ON: 本体(.clock-time)は meridiem を含まない HH:MM、秒は別スロットへ小さく。
+        setFixedWidthDigits(timeNode, formatted.timeDigitsMain);
         setFixedWidthDigits(secondsNode, formatted.secondsText);
       } else {
-        setFixedWidthDigits(timeNode, formatted.time);
+        // 小秒OFF: meridiem だけを分離し、秒は従来どおり本体(.clock-time)へ連結して表示する。
+        const digitsWithSeconds = formatted.secondsText
+          ? `${formatted.timeDigitsMain}:${formatted.secondsText}`
+          : formatted.timeDigitsMain;
+        setFixedWidthDigits(timeNode, digitsWithSeconds);
         setFixedWidthDigits(secondsNode, "");
       }
+      meridiemNode.textContent = formatted.meridiemText;
+      // meridiemFirst に応じて timeRow 内の位置を切り替える(要素は使い回し、insert位置のみ変える)。
+      if (currentConfig.meridiemFirst) {
+        timeRow.insertBefore(meridiemNode, timeNode);
+      } else {
+        timeRow.insertBefore(meridiemNode, secondsNode);
+      }
+      meridiemNode.classList.toggle("clock-meridiem-lead", currentConfig.meridiemFirst);
+      meridiemNode.classList.toggle("clock-meridiem-trail", !currentConfig.meridiemFirst);
       updateVisibility();
     },
     getConfig() {
@@ -115,6 +132,7 @@ function mountDigitalClock(container, config, options = {}) {
     weekdayNode.hidden = !currentConfig.showWeekday;
     dateRow.hidden = !currentConfig.showDate && !currentConfig.showWeekday;
     secondsNode.hidden = !(currentConfig.smallSeconds && currentConfig.showSeconds);
+    meridiemNode.hidden = !meridiemNode.textContent;
   }
 
   controller.updateConfig(currentConfig);
@@ -217,7 +235,11 @@ export function tokenizeFlip(text, group) {
 // 短いフリップアニメを再生する。パタパタ時計という形式の独自実装。
 function mountFlipClock(container, config, options = {}) {
   const root = document.createElement("div");
+  const meridiemNode = document.createElement("span");
   root.className = "clock-flip";
+  meridiemNode.className = "clock-flip-meridiem";
+  // meridiemNode の前置/後置は tick 側で insert 位置を切り替える(要素は1個のみ)。
+  root.append(meridiemNode);
   container.textContent = "";
   container.append(root);
 
@@ -252,6 +274,8 @@ function mountFlipClock(container, config, options = {}) {
   }
 
   function build(tokens) {
+    // root.textContent = "" は静的な meridiemNode も消してしまうため、カード部分のみを
+    // 作り直し、meridiemNode は使い回して最後に位置を戻す(tick 側で before/after を決める)。
     root.textContent = "";
     slots = tokens.map((token) => {
       if (token.digit) {
@@ -265,6 +289,7 @@ function mountFlipClock(container, config, options = {}) {
       root.append(sep);
       return { digit: false, value: token.value };
     });
+    root.append(meridiemNode);
   }
 
   // 上半分(古い値)が手前に折れ、続いて下半分(新しい値)が起き上がる本物のめくれ。
@@ -307,6 +332,23 @@ function mountFlipClock(container, config, options = {}) {
     });
   }
 
+  function updateMeridiem(meridiemText) {
+    meridiemNode.textContent = meridiemText;
+    meridiemNode.hidden = !meridiemText;
+    meridiemNode.style.fontSize = `calc(var(--flip-size) * ${currentConfig.meridiemSize})`;
+    meridiemNode.classList.toggle("clock-flip-meridiem-lead", currentConfig.meridiemFirst);
+    meridiemNode.classList.toggle("clock-flip-meridiem-trail", !currentConfig.meridiemFirst);
+    // メリディエムはカードの外に静的表示するため、先頭/末尾どちらでも DOM 位置を差し替えるだけでよい
+    // (カードは常に数字・コロンのみでめくれ、meridiemNode 自体はめくれ対象に含めない)。
+    // insertBefore は挿入対象を一度取り除いてから差し込むため、meridiemNode 自身が既に
+    // 先頭にいても firstChild を渡して安全に「先頭固定」できる。
+    if (currentConfig.meridiemFirst) {
+      root.insertBefore(meridiemNode, root.firstChild);
+    } else {
+      root.append(meridiemNode);
+    }
+  }
+
   const controller = {
     element: root,
     updateConfig(nextConfig) {
@@ -317,7 +359,14 @@ function mountFlipClock(container, config, options = {}) {
       this.tick(options.now ? options.now() : new Date());
     },
     tick(now = new Date()) {
-      update(formatClock(formatters, now).time);
+      const formatted = formatClock(formatters, now);
+      // カードのめくれ対象は数字・コロンのみ(meridiemText は含めない)。
+      // timeDigitsMain(HH:MM)へ秒表示時だけ ":SS" を足し、meridiem を除いた文字列を作る。
+      const digitsText = formatted.secondsText
+        ? `${formatted.timeDigitsMain}:${formatted.secondsText}`
+        : formatted.timeDigitsMain;
+      update(digitsText);
+      updateMeridiem(formatted.meridiemText);
     },
     getConfig() {
       return { ...currentConfig };
@@ -485,6 +534,23 @@ export function applyClockStyles(element, config) {
   element.style.setProperty("--clock-stroke-color", normalized.strokeColor);
   element.style.setProperty("--clock-stroke-width", `${normalized.strokeWidth}px`);
   element.style.setProperty("--clock-shadow", shadowValue(normalized));
+  // meridiemSize/dateWeekdayGap は既定値でも常時 set(clock.css 側の calc()/gap の引数として使うため)。
+  element.style.setProperty("--clock-meridiem-size", String(normalized.meridiemSize));
+  element.style.setProperty("--clock-date-weekday-gap", `${normalized.dateWeekdayGap}px`);
+  // labelWeight/labelLetterSpacing/dateWeight/dateLetterSpacing は null なら「未設定」にして
+  // clock.css の var(--clock-*, 既定値) フォールバックへ委ね、旧URLの見た目を完全維持する。
+  setOrRemoveProperty(element, "--clock-label-weight", normalized.labelWeight, (value) => String(value));
+  setOrRemoveProperty(element, "--clock-label-letter-spacing", normalized.labelLetterSpacing, (value) => `${value}px`);
+  setOrRemoveProperty(element, "--clock-date-weight", normalized.dateWeight, (value) => String(value));
+  setOrRemoveProperty(element, "--clock-date-letter-spacing", normalized.dateLetterSpacing, (value) => `${value}px`);
+}
+
+function setOrRemoveProperty(element, name, value, format) {
+  if (value === null || value === undefined) {
+    element.style.removeProperty(name);
+    return;
+  }
+  element.style.setProperty(name, format(value));
 }
 
 export function recommendedObsSize(element) {

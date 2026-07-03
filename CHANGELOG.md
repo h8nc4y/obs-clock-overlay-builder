@@ -4,6 +4,19 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
+## [1.7.0] - 2026-07-03
+
+### Added
+
+- Text fine-tuning: the 「文字の詳細」 group is reorganized into 「文字調整：ラベル / 日付 / 時刻」. Label and date each gain optional per-part weight and letter-spacing overrides (`labelWeight` / `labelLetterSpacing` / `dateWeight` / `dateLetterSpacing`); the default is 「連動」 (`null`), which keeps the previous shared styling, so existing URLs render identically. Requested and approved by the owner (2026-07-03).
+- Date row: a new 「曜日との間隔」 slider (`dateWeekdayGap`, 0–24px) controls the space between the date and the weekday.
+- 12-hour clock: a new 「AM/PMの大きさ」 slider (`meridiemSize`, 0.3–1.0) sizes the AM/PM text relative to the time digits; it applies to the live clock, the flip clock (rendered as a static, non-flipping token), and the share PNG. The slider is disabled while 24-hour display is selected.
+
+### Changed
+
+- **Intentional default changes approved by the owner (2026-07-03), affecting existing 12-hour / date+weekday URLs**: AM/PM now renders at 0.55× the time size by default (was full size), and the date-weekday gap defaults to 0 (was a fixed 0.55em), e.g. 「2026/7/3（金）」. All other appearance defaults are unchanged; the template-compat golden fixture was intentionally regenerated (existing template visual values byte-identical).
+- Template picker cards now also react to the date-axis, weekday-bracket, AM/PM, and per-part override settings (the refresh signature previously still referenced the removed `dateFormat` field).
+
 ## [1.6.0] - 2026-07-03
 
 ### Added

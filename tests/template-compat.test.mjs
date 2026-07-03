@@ -28,6 +28,10 @@ class FakeStyle {
     this.values.set(name, value);
   }
 
+  removeProperty(name) {
+    this.values.delete(name);
+  }
+
   getPropertyValue(name) {
     return this.values.get(name) ?? "";
   }

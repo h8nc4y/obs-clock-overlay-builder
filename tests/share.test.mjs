@@ -144,6 +144,8 @@ function createTextCtx(widths = {}) {
 const shareTimeFormatted = {
   time: "12:34:56",
   timeMain: "12:34",
+  timeDigitsMain: "12:34",
+  meridiemText: "",
   secondsText: "56"
 };
 
@@ -172,6 +174,53 @@ test("measureShareTime mirrors live small-seconds width constants", () => {
   const fullCtx = createTextCtx({ "12:34:56": 330 });
   const fullConfig = normalizeConfig({ showSeconds: true, smallSeconds: false, fontWeight: 700 });
   assert.equal(measureShareTime(fullCtx, fullConfig, shareTimeFormatted, 100, '"Roboto Mono", monospace'), 330);
+});
+
+test("measureShareTime adds a meridiem segment sized by meridiemSize with 0.12em gap, leading or trailing", () => {
+  const px = 100;
+  const trailingFormatted = { ...shareTimeFormatted, secondsText: "", meridiemText: "AM" };
+  const fontStack = '"Roboto Mono", monospace';
+
+  const trailingConfig = normalizeConfig({ hour12: true, meridiemFirst: false, meridiemSize: 0.5, fontWeight: 700 });
+  const trailingCtx = createTextCtx({ "12:34": 250, AM: 60 });
+  const trailingWidth = measureShareTime(trailingCtx, trailingConfig, trailingFormatted, px, fontStack);
+  assert.equal(trailingWidth, 250 + px * 0.12 + 60);
+  assert.deepEqual(
+    trailingCtx.calls.filter((call) => call.type === "measureText").map((call) => ({ text: call.text, font: call.font })),
+    [
+      { text: "12:34", font: '700 100px "Roboto Mono", monospace' },
+      { text: "AM", font: '700 50px "Roboto Mono", monospace' }
+    ]
+  );
+
+  const leadingConfig = normalizeConfig({ hour12: true, meridiemFirst: true, meridiemSize: 0.5, fontWeight: 700 });
+  const leadingCtx = createTextCtx({ "12:34": 250, AM: 60 });
+  const leadingWidth = measureShareTime(leadingCtx, leadingConfig, trailingFormatted, px, fontStack);
+  assert.equal(leadingWidth, 60 + px * 0.12 + 250);
+  assert.deepEqual(
+    leadingCtx.calls.filter((call) => call.type === "measureText").map((call) => call.text),
+    ["AM", "12:34"]
+  );
+});
+
+test("measureShareTime combines a leading meridiem with trailing small seconds", () => {
+  const config = normalizeConfig({
+    hour12: true,
+    meridiemFirst: true,
+    showSeconds: true,
+    smallSeconds: true,
+    meridiemSize: 0.5,
+    fontWeight: 700
+  });
+  const formatted = { ...shareTimeFormatted, meridiemText: "PM", secondsText: "56" };
+  const ctx = createTextCtx({ "12:34": 250, "56": 40, PM: 60 });
+
+  const width = measureShareTime(ctx, config, formatted, 100, '"Roboto Mono", monospace');
+  assert.equal(width, 60 + 100 * 0.12 + 250 + 100 * 0.04 + 40);
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "measureText").map((call) => call.text),
+    ["PM", "12:34", "56"]
+  );
 });
 
 test("drawShareTime baseline-aligns centered small seconds as a half-size slot", () => {
@@ -215,6 +264,103 @@ test("drawShareTime baseline-aligns centered small seconds as a half-size slot",
       { text: "12:34", x: 353, y: 200, font: '700 100px "Roboto Mono", monospace', lineWidth: 8 },
       { text: "56", x: 607, y: 200, font: '700 50px "Roboto Mono", monospace', lineWidth: 4 }
     ]
+  );
+});
+
+test("drawShareTime places a trailing meridiem after the digits with a 0.12em gap", () => {
+  const config = normalizeConfig({ hour12: true, meridiemFirst: false, meridiemSize: 0.5, fontWeight: 700 });
+  const formatted = { ...shareTimeFormatted, secondsText: "", meridiemText: "PM" };
+  const ctx = createTextCtx({ "12:34": 250, PM: 60 });
+
+  drawShareTime(ctx, config, formatted, {
+    x: 500,
+    y: 200,
+    px: 100,
+    fontStack: '"Roboto Mono", monospace',
+    align: "center",
+    strokeScale: 1
+  });
+
+  const totalWidth = 250 + 100 * 0.12 + 60;
+  const left = 500 - totalWidth / 2;
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "fillText"),
+    [
+      { type: "fillText", text: "12:34", x: left, y: 200, font: '700 100px "Roboto Mono", monospace', align: "left" },
+      {
+        type: "fillText",
+        text: "PM",
+        x: left + 250 + 100 * 0.12,
+        y: 200,
+        font: '700 50px "Roboto Mono", monospace',
+        align: "left"
+      }
+    ]
+  );
+});
+
+test("drawShareTime places a leading meridiem before the digits with a 0.12em gap", () => {
+  const config = normalizeConfig({ hour12: true, meridiemFirst: true, meridiemSize: 0.5, fontWeight: 700 });
+  const formatted = { ...shareTimeFormatted, secondsText: "", meridiemText: "AM" };
+  const ctx = createTextCtx({ "12:34": 250, AM: 60 });
+
+  drawShareTime(ctx, config, formatted, {
+    x: 500,
+    y: 200,
+    px: 100,
+    fontStack: '"Roboto Mono", monospace',
+    align: "center",
+    strokeScale: 1
+  });
+
+  const totalWidth = 60 + 100 * 0.12 + 250;
+  const left = 500 - totalWidth / 2;
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "fillText"),
+    [
+      { type: "fillText", text: "AM", x: left, y: 200, font: '700 50px "Roboto Mono", monospace', align: "left" },
+      {
+        type: "fillText",
+        text: "12:34",
+        x: left + 60 + 100 * 0.12,
+        y: 200,
+        font: '700 100px "Roboto Mono", monospace',
+        align: "left"
+      }
+    ]
+  );
+});
+
+test("drawShareTime combines a leading meridiem with trailing small seconds in one pass", () => {
+  const config = normalizeConfig({
+    hour12: true,
+    meridiemFirst: true,
+    showSeconds: true,
+    smallSeconds: true,
+    meridiemSize: 0.5,
+    fontWeight: 700
+  });
+  const formatted = { ...shareTimeFormatted, meridiemText: "PM", secondsText: "56" };
+  const ctx = createTextCtx({ "12:34": 250, "56": 40, PM: 60 });
+
+  drawShareTime(ctx, config, formatted, {
+    x: 500,
+    y: 200,
+    px: 100,
+    fontStack: '"Roboto Mono", monospace',
+    align: "center",
+    strokeScale: 1
+  });
+
+  const totalWidth = 60 + 100 * 0.12 + 250 + 100 * 0.04 + 40;
+  const left = 500 - totalWidth / 2;
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "fillText").map((call) => call.text),
+    ["PM", "12:34", "56"]
+  );
+  assert.deepEqual(
+    ctx.calls.filter((call) => call.type === "fillText").map((call) => call.x),
+    [left, left + 60 + 100 * 0.12, left + 60 + 100 * 0.12 + 250 + 100 * 0.04]
   );
 });
 

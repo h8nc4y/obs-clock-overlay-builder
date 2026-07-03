@@ -25,6 +25,7 @@ import {
   buildShareText,
   buildXIntentUrl,
   canvasFontStack,
+  computeDateWeekdayPositions,
   computeSideLabelLayout,
   computeStackedLayout,
   resolveShareText,
@@ -91,6 +92,16 @@ const elements = {
   weekdayFormat: byId("weekdayFormat"),
   weekdayBrackets: byId("weekdayBrackets"),
   meridiemFirst: byId("meridiemFirst"),
+  meridiemSize: byId("meridiemSize"),
+  dateWeekdayGap: byId("dateWeekdayGap"),
+  labelFineTune: byId("labelFineTune"),
+  labelFineTuneFields: byId("labelFineTuneFields"),
+  labelWeight: byId("labelWeight"),
+  labelLetterSpacing: byId("labelLetterSpacing"),
+  dateFineTune: byId("dateFineTune"),
+  dateFineTuneFields: byId("dateFineTuneFields"),
+  dateWeight: byId("dateWeight"),
+  dateLetterSpacing: byId("dateLetterSpacing"),
   labelText: byId("labelText"),
   labelPosition: byId("labelPosition"),
   fontPreset: byId("fontPreset"),
@@ -177,8 +188,14 @@ const rangeFields = [
   "shadowX",
   "shadowY",
   "strokeWidth",
-  "analogSize"
+  "analogSize",
+  "meridiemSize",
+  "dateWeekdayGap"
 ];
+// labelWeight/labelLetterSpacing/dateWeight/dateLetterSpacing は null(=連動)を表現できる
+// nullable override。rangeFields に直載せすると null を表せないため、
+// 「個別に調整する」トグルの ON/OFF と合わせて専用配線(bindFineTuneToggle)で扱う。
+const nullableRangeFields = ["labelWeight", "labelLetterSpacing", "dateWeight", "dateLetterSpacing"];
 const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
 const booleanFields = [
   "hour12",
@@ -512,18 +529,29 @@ function renderTemplateCategoryTabs() {
 }
 
 // ミニプレビューは「今の設定にテンプレを重ねたらどう見えるか」を示す。
-// applyTemplate が引き継ぐ8項目(タイムゾーン/12時間/秒/小秒/日付/日付書式/曜日/曜日書式)を
-// 現在の state から流し込み、カードとクリック結果を一致させる。
+// applyTemplate がユーザー値として保持するフィールド全部を現在の state から
+// 流し込み、カードとクリック結果を一致させる。ここに漏れがあると、その設定を
+// 変えてもテンプレカードが追従しない。
 function miniPreviewSignature(cfg) {
   return [
     cfg.timezone,
     cfg.hour12,
+    cfg.meridiemFirst,
+    cfg.meridiemSize,
     cfg.showSeconds,
     cfg.smallSeconds,
     cfg.showDate,
-    cfg.dateFormat,
+    cfg.dateYear,
+    cfg.dateZeroPad,
+    cfg.dateSeparator,
+    cfg.dateWeekdayGap,
+    cfg.dateWeight,
+    cfg.dateLetterSpacing,
     cfg.showWeekday,
-    cfg.weekdayFormat
+    cfg.weekdayFormat,
+    cfg.weekdayBrackets,
+    cfg.labelWeight,
+    cfg.labelLetterSpacing
   ].join("|");
 }
 
@@ -716,6 +744,30 @@ function bindForm() {
     );
     elements[field].addEventListener("change", () => updateState({ [field]: Number(elements[field].value) }));
   }
+  for (const field of nullableRangeFields) {
+    elements[field].addEventListener("input", () =>
+      updateState({ [field]: Number(elements[field].value) }, false, { deferPersistent: true })
+    );
+    elements[field].addEventListener("change", () => updateState({ [field]: Number(elements[field].value) }));
+  }
+  bindFineTuneToggle({
+    toggle: elements.labelFineTune,
+    fields: ["labelWeight", "labelLetterSpacing"],
+    effectiveDefaults: () => ({
+      labelWeight: 800,
+      // ライブの既定は 0.12em。px換算はラベルサイズ(labelSize)基準で、小数第1位に丸める。
+      labelLetterSpacing: Math.round(0.12 * state.labelSize * 10) / 10
+    })
+  });
+  bindFineTuneToggle({
+    toggle: elements.dateFineTune,
+    fields: ["dateWeight", "dateLetterSpacing"],
+    effectiveDefaults: () => ({
+      dateWeight: 700,
+      // ライブの既定は共有 --clock-letter-spacing(=letterSpacing) を継承。
+      dateLetterSpacing: state.letterSpacing
+    })
+  });
 
   elements.useLocalTimezone.addEventListener("click", () => {
     updateState({ timezone: elements.localTimezone.textContent }, true);
@@ -737,6 +789,27 @@ function bindForm() {
   );
   elements.openClock.addEventListener("click", () => {
     window.open(elements.generatedUrl.value, "_blank", "noopener");
+  });
+}
+
+// 「太さ・間隔を個別に調整する」トグル。config フィールードではなく UI状態(トグルON/OFFで
+// 対象2フィールドの null 有無が決まる)。ON にした瞬間は「今の実効値」で初期化し、OFF に
+// 戻すと null(=CSSフォールバックへ連動)へ戻す。トグル自体の見た目は syncFormFromState 側で
+// null 有無から復元する。
+function bindFineTuneToggle({ toggle, fields, effectiveDefaults }) {
+  toggle.addEventListener("change", () => {
+    // sync=true でフォーム全体を再同期する。syncFormFromState 経由の syncFineTuneFromState が
+    // トグルの見た目・フィールド表示・スライダー value を state から一括で揃え直す
+    // (syncOutputValues だけでは elements[field].value を state から書き戻せないため)。
+    if (toggle.checked) {
+      updateState(effectiveDefaults(), true);
+    } else {
+      const nulled = {};
+      for (const field of fields) {
+        nulled[field] = null;
+      }
+      updateState(nulled, true);
+    }
   });
 }
 
@@ -790,23 +863,48 @@ function syncFormFromState() {
   for (const field of rangeFields) {
     elements[field].value = String(state[field]);
   }
+  syncFineTuneFromState({
+    toggle: elements.labelFineTune,
+    fieldsWrap: elements.labelFineTuneFields,
+    fields: ["labelWeight", "labelLetterSpacing"],
+    effectiveDefaults: { labelWeight: 800, labelLetterSpacing: Math.round(0.12 * state.labelSize * 10) / 10 }
+  });
+  syncFineTuneFromState({
+    toggle: elements.dateFineTune,
+    fieldsWrap: elements.dateFineTuneFields,
+    fields: ["dateWeight", "dateLetterSpacing"],
+    effectiveDefaults: { dateWeight: 700, dateLetterSpacing: state.letterSpacing }
+  });
   syncOutputValues();
   updateTemplatePressed();
 }
 
+// nullable override(labelWeight等)の初期表示をフィールドの null 有無から復元する。
+// null が1つでもあればOFF(トグル外し・フィールド非表示・実効値をスライダーへ表示)、
+// 全て非nullならON(トグル入り・フィールド表示・現在値をそのまま表示)。
+function syncFineTuneFromState({ toggle, fieldsWrap, fields, effectiveDefaults }) {
+  const allSet = fields.every((field) => state[field] !== null);
+  toggle.checked = allSet;
+  fieldsWrap.classList.toggle("is-hidden", !allSet);
+  for (const field of fields) {
+    const value = allSet ? state[field] : effectiveDefaults[field];
+    elements[field].value = String(value);
+  }
+}
+
 function syncOutputValues() {
-  for (const field of rangeFields) {
+  for (const field of [...rangeFields, ...nullableRangeFields]) {
     const output = byId(`${field}Value`);
     if (!output) {
       continue;
     }
     const value = Number(elements[field].value);
     let text;
-    if (["backgroundOpacity", "borderOpacity", "shadowOpacity", "lineHeight"].includes(field)) {
+    if (["backgroundOpacity", "borderOpacity", "shadowOpacity", "lineHeight", "meridiemSize"].includes(field)) {
       text = value.toFixed(2);
-    } else if (field === "letterSpacing" || field === "strokeWidth") {
+    } else if (["letterSpacing", "strokeWidth", "labelLetterSpacing", "dateLetterSpacing"].includes(field)) {
       text = `${value.toFixed(1)}px`;
-    } else if (field === "fontWeight") {
+    } else if (field === "fontWeight" || field === "labelWeight" || field === "dateWeight") {
       text = String(value);
     } else {
       text = `${value}px`;
@@ -820,8 +918,9 @@ function syncOutputValues() {
 
 function updateEverything(status = "", options = {}) {
   state = normalizeConfig(state);
-  // AM/PM位置は12時間表示のときだけ意味を持つ。どの更新経路でも連動させる。
+  // AM/PM位置・大きさは12時間表示のときだけ意味を持つ。どの更新経路でも連動させる。
   elements.meridiemFirst.disabled = !state.hour12;
+  elements.meridiemSize.disabled = !state.hour12;
   previewClock.updateConfig(state);
   if (options.deferPersistent) {
     schedulePersistentOutputs();
@@ -1330,14 +1429,16 @@ function drawDigitalShareClock(ctx, config) {
       formatted,
       fontStack,
       label,
-      scale
+      scale,
+      baseLetterSpacingCss: letterSpacingCss
     });
   } else {
     drawDigitalShareClockStacked(ctx, config, {
       formatted,
       fontStack,
       label,
-      scale
+      scale,
+      baseLetterSpacingCss: letterSpacingCss
     });
   }
 
@@ -1349,9 +1450,71 @@ function drawDigitalShareClock(ctx, config) {
   }
 }
 
+// ラベル/日付行の共有Canvasフォント太さ。labelWeight/dateWeight(null=連動)が
+// あればそれを、無ければ従来どおり config.fontWeight を使う(旧URLの見た目を維持)。
+function shareLineFontWeight(config, line) {
+  if (line.isLabel && config.labelWeight !== null) {
+    return config.labelWeight;
+  }
+  if (line.isDate && config.dateWeight !== null) {
+    return config.dateWeight;
+  }
+  return config.fontWeight;
+}
+
+// letterSpacing は drawDigitalShareClock 側で描画全体に ctx.letterSpacing を1回だけ設定する
+// 従来仕様(builder.js 冒頭のコメント参照)。ラベル/日付行だけ override があるときは、
+// その行を描く直前だけ上書きし、描画後に呼び出し元の全体設定(baseLetterSpacingCss)へ戻す。
+function applyShareLineLetterSpacing(ctx, config, line, scale, baseLetterSpacingCss) {
+  if (!("letterSpacing" in ctx)) {
+    return;
+  }
+  if (line.isLabel && config.labelLetterSpacing !== null) {
+    ctx.letterSpacing = `${config.labelLetterSpacing * scale}px`;
+  } else if (line.isDate && config.dateLetterSpacing !== null) {
+    ctx.letterSpacing = `${config.dateLetterSpacing * scale}px`;
+  } else {
+    ctx.letterSpacing = baseLetterSpacingCss;
+  }
+}
+
+// 日付+曜日を dateWeekdayGap(px)で個別配置するための幅測定。
+// dateText/weekdayText を別々に測り、computeDateWeekdayPositions と同じ合計幅を返す。
+function measureDateWeekdayLine(ctx, config, line, linePx, fontStack, drawScale) {
+  const gapPx = config.dateWeekdayGap * drawScale;
+  const dateWidth = line.dateText ? ctx.measureText(line.dateText).width : 0;
+  const weekdayWidth = line.weekdayText ? ctx.measureText(line.weekdayText).width : 0;
+  return computeDateWeekdayPositions({ dateWidth, weekdayWidth, gapPx, centerX: 0 }).totalWidth;
+}
+
+// 日付+曜日をdateWeekdayGapの間隔で描く。書式は同じ(dateWeight/dateLetterSpacing override込み)。
+function drawDateWeekdayLine(ctx, config, line, { x, y, px, fontStack, scale, baseLetterSpacingCss }) {
+  applyShareLineLetterSpacing(ctx, config, line, scale, baseLetterSpacingCss);
+  ctx.font = `${shareLineFontWeight(config, line)} ${px}px ${fontStack}`;
+  const gapPx = config.dateWeekdayGap * scale;
+  const dateWidth = line.dateText ? ctx.measureText(line.dateText).width : 0;
+  const weekdayWidth = line.weekdayText ? ctx.measureText(line.weekdayText).width : 0;
+  const { dateX, weekdayX } = computeDateWeekdayPositions({ dateWidth, weekdayWidth, gapPx, centerX: x });
+
+  clearShadow(ctx);
+  ctx.fillStyle = config.textColor;
+  const previousAlign = ctx.textAlign;
+  ctx.textAlign = "left";
+  if (line.dateText) {
+    ctx.fillText(line.dateText, dateX, y);
+  }
+  if (line.weekdayText) {
+    ctx.fillText(line.weekdayText, weekdayX, y);
+  }
+  ctx.textAlign = previousAlign;
+  if ("letterSpacing" in ctx) {
+    ctx.letterSpacing = baseLetterSpacingCss;
+  }
+}
+
 // 従来の縦積みパス: 各行(ラベル/日付/時刻)を上から下へ積み、パネル中央へ置く。
 // top / bottom / hidden ラベルと、ラベル非表示の left/right はこのパスで描く。
-function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label, scale }) {
+function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label, scale, baseLetterSpacingCss }) {
   const stage = ctx.__stage;
   const fontPx = Math.round(config.fontSize * scale);
 
@@ -1373,7 +1536,7 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
     if (line.isTime) {
       continue;
     }
-    ctx.font = `${config.fontWeight} ${line.px}px ${fontStack}`;
+    ctx.font = `${shareLineFontWeight(config, line)} ${line.px}px ${fontStack}`;
     panelContentWidth = Math.max(panelContentWidth, ctx.measureText(line.text).width);
   }
 
@@ -1414,10 +1577,12 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
     const linePx = line.px * fit;
-    ctx.font = `${config.fontWeight} ${linePx}px ${fontStack}`;
+    ctx.font = `${shareLineFontWeight(config, line)} ${linePx}px ${fontStack}`;
     const lineWidth = line.isTime
       ? measureShareTime(ctx, config, formatted, linePx, fontStack)
-      : ctx.measureText(line.text).width;
+      : line.isDate
+        ? measureDateWeekdayLine(ctx, config, line, linePx, fontStack, scale * fit)
+        : ctx.measureText(line.text).width;
     const metrics = { text: line.text, y: cursorY, px: linePx, width: lineWidth };
     if (line.isTime) {
       timeLineMetrics = metrics;
@@ -1433,7 +1598,17 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
         align: "center",
         strokeScale: scale * fit
       });
+    } else if (line.isDate) {
+      drawDateWeekdayLine(ctx, config, line, {
+        x: stage.cx,
+        y: cursorY,
+        px: linePx,
+        fontStack,
+        scale: scale * fit,
+        baseLetterSpacingCss
+      });
     } else {
+      applyShareLineLetterSpacing(ctx, config, line, scale * fit, baseLetterSpacingCss);
       clearShadow(ctx);
       ctx.fillStyle = config.textColor;
       ctx.fillText(line.text, stage.cx, cursorY);
@@ -1441,6 +1616,11 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
     if (i < lines.length - 1) {
       cursorY += linePx / 2 + fitGap + (lines[i + 1].px * fit) / 2;
     }
+  }
+  // ラベル/日付行の override が letterSpacing を書き換えた場合に備え、次の描画(装飾/呼び出し元)
+  // へ影響しないよう、この縦積みパス全体の基準値へ確実に戻す。
+  if ("letterSpacing" in ctx) {
+    ctx.letterSpacing = baseLetterSpacingCss;
   }
   drawDigitalTemplateDecorations(ctx, {
     config,
@@ -1466,19 +1646,22 @@ function drawDigitalShareClockStacked(ctx, config, { formatted, fontStack, label
 //   left  → [ LABEL ] [gap] [ main ]
 // を縦中央に揃え、ウィジェット全体をパネル中央へ置く。
 // .clock-main は grid(日付行↑時刻行↓・行間 --clock-gap*0.55)。
-function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, label, scale }) {
+function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, label, scale, baseLetterSpacingCss }) {
   const stage = ctx.__stage;
 
-  // main 行を作る。buildShareLines と同じ作り(日付と曜日は全角スペース2つで連結)。
-  const dateText = [
-    config.showDate ? formatted.date : "",
-    config.showWeekday ? formatted.weekday : ""
-  ]
-    .filter(Boolean)
-    .join("  ");
+  // main 行を作る。buildShareLines と同じ作り(日付と曜日は dateWeekdayGap で個別に置く)。
+  const dateTextValue = config.showDate ? formatted.date : "";
+  const weekdayTextValue = config.showWeekday ? formatted.weekday : "";
+  const hasDateRow = Boolean(dateTextValue || weekdayTextValue);
   const mainRows = [];
-  if (dateText) {
-    mainRows.push({ text: dateText, px: Math.round(config.dateSize * scale), isTime: false });
+  if (hasDateRow) {
+    mainRows.push({
+      isDate: true,
+      isTime: false,
+      dateText: dateTextValue,
+      weekdayText: weekdayTextValue,
+      px: Math.round(config.dateSize * scale)
+    });
   }
   mainRows.push({ text: formatted.time, px: Math.round(config.fontSize * scale), isTime: true });
 
@@ -1487,20 +1670,25 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
   let mainH = 0;
   const mainGap = config.gap * 0.55 * scale;
   for (const row of mainRows) {
-    ctx.font = `${config.fontWeight} ${row.px}px ${fontStack}`;
-    mainW = Math.max(
-      mainW,
-      row.isTime ? measureShareTime(ctx, config, formatted, row.px, fontStack) : ctx.measureText(row.text).width
-    );
+    ctx.font = `${shareLineFontWeight(config, row)} ${row.px}px ${fontStack}`;
+    const rowWidth = row.isTime
+      ? measureShareTime(ctx, config, formatted, row.px, fontStack)
+      : measureDateWeekdayLine(ctx, config, row, row.px, fontStack, scale);
+    mainW = Math.max(mainW, rowWidth);
     mainH += row.px;
   }
   mainH += mainGap * (mainRows.length - 1);
 
-  // ラベル(LABEL)の幅/高さ。ライブの .clock-label は font-weight:800。
+  // ラベル(LABEL)の幅/高さ。ライブの .clock-label は font-weight:800(labelWeight override可)。
+  const labelLine = { isLabel: true };
   const labelPx = Math.round(config.labelSize * scale);
-  ctx.font = `800 ${labelPx}px ${fontStack}`;
+  ctx.font = `${shareLineFontWeight(config, labelLine)} ${labelPx}px ${fontStack}`;
+  applyShareLineLetterSpacing(ctx, config, labelLine, scale, baseLetterSpacingCss);
   const labelW = ctx.measureText(label).width;
   const labelH = labelPx;
+  if ("letterSpacing" in ctx) {
+    ctx.letterSpacing = baseLetterSpacingCss;
+  }
 
   // ウィジェット間ギャップ(--clock-gap)。
   const widgetGap = config.gap * scale;
@@ -1548,10 +1736,12 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
     const row = mainRows[i];
     const rowPx = row.px * textFit;
     rowY += rowPx / 2;
-    ctx.font = `${config.fontWeight} ${rowPx}px ${fontStack}`;
+    ctx.font = `${shareLineFontWeight(config, row)} ${rowPx}px ${fontStack}`;
     const rowWidth = row.isTime
       ? measureShareTime(ctx, config, formatted, rowPx, fontStack)
-      : ctx.measureText(row.text).width;
+      : row.isDate
+        ? measureDateWeekdayLine(ctx, config, row, rowPx, fontStack, scale * textFit)
+        : ctx.measureText(row.text).width;
     if (row.isTime) {
       // cx は時刻の中心x(左寄せ描画のため left + 幅/2)。装飾(下線)はこれを基準にする。
       timeLineMetrics = {
@@ -1569,6 +1759,16 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
         align: "left",
         strokeScale: scale * textFit
       });
+    } else if (row.isDate) {
+      // drawDateWeekdayLine は centerX 基準で置くため、左端が mainLeft に来る中心 x を渡す。
+      drawDateWeekdayLine(ctx, config, row, {
+        x: mainLeft + rowWidth / 2,
+        y: rowY,
+        px: rowPx,
+        fontStack,
+        scale: scale * textFit,
+        baseLetterSpacingCss
+      });
     } else {
       clearShadow(ctx);
       ctx.fillStyle = config.textColor;
@@ -1581,9 +1781,13 @@ function drawDigitalShareClockSideLabel(ctx, config, { formatted, fontStack, lab
   const fitLabelPx = labelPx * textFit;
   clearShadow(ctx);
   ctx.textAlign = "center";
-  ctx.font = `800 ${fitLabelPx}px ${fontStack}`;
+  ctx.font = `${shareLineFontWeight(config, labelLine)} ${fitLabelPx}px ${fontStack}`;
+  applyShareLineLetterSpacing(ctx, config, labelLine, scale * textFit, baseLetterSpacingCss);
   ctx.fillStyle = config.textColor;
   ctx.fillText(label, labelCx, groupCenterY);
+  if ("letterSpacing" in ctx) {
+    ctx.letterSpacing = baseLetterSpacingCss;
+  }
   const labelLineMetrics = {
     text: label,
     y: groupCenterY,
