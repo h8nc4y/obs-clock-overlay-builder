@@ -40,6 +40,8 @@
   --clock-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
   --clock-stroke-color: #000000;
   --clock-stroke-width: 0px;
+  --clock-meridiem-size: 0.55;
+  --clock-date-weekday-gap: 0px;
   display: inline-flex;
   align-items: center;
   gap: var(--clock-gap);
@@ -82,8 +84,8 @@
 
 .clock-label {
   font-size: var(--clock-label-size);
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-weight: var(--clock-label-weight, 800);
+  letter-spacing: var(--clock-label-letter-spacing, 0.12em);
   text-transform: uppercase;
   -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.35) var(--clock-stroke-color);
   paint-order: stroke fill;
@@ -105,9 +107,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55em;
+  gap: var(--clock-date-weekday-gap, 0px);
   font-size: var(--clock-date-size);
-  font-weight: 700;
+  font-weight: var(--clock-date-weight, 700);
+  letter-spacing: var(--clock-date-letter-spacing, var(--clock-letter-spacing));
   -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.45) var(--clock-stroke-color);
   paint-order: stroke fill;
 }
@@ -137,6 +140,27 @@
 
 .clock-seconds-small[hidden] {
   display: none;
+}
+
+.clock-meridiem {
+  display: inline-block;
+  font-size: calc(var(--clock-meridiem-size, 0.55) * 1em);
+  line-height: 0;
+  vertical-align: baseline;
+  -webkit-text-stroke: calc(var(--clock-stroke-width) * 0.5) var(--clock-stroke-color);
+  paint-order: stroke fill;
+}
+
+.clock-meridiem[hidden] {
+  display: none;
+}
+
+.clock-meridiem-lead {
+  margin-inline-end: 0.12em;
+}
+
+.clock-meridiem-trail {
+  margin-inline-start: 0.12em;
 }
 
 /* 各数字を等幅スロットにして、配信中に時刻が変わっても外枠とコロン位置を固定する。
@@ -276,6 +300,26 @@
   color: var(--flip-ink);
   font-size: 0.7em;
   font-weight: 800;
+}
+
+/* フリップ時計のAM/PM。カード外の静的テキストとして描き、めくれの対象にはしない。
+   フォントサイズは render.js が --flip-size * meridiemSize で element.style へ直接書く。 */
+.clock-flip-meridiem {
+  display: inline-block;
+  color: var(--flip-ink);
+  line-height: 1;
+}
+
+.clock-flip-meridiem[hidden] {
+  display: none;
+}
+
+.clock-flip-meridiem-lead {
+  margin-inline-end: 0.12em;
+}
+
+.clock-flip-meridiem-trail {
+  margin-inline-start: 0.12em;
 }
 
 @media (prefers-reduced-motion: reduce) {

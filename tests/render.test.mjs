@@ -12,6 +12,10 @@ class FakeStyle {
     this.values.set(name, value);
   }
 
+  removeProperty(name) {
+    this.values.delete(name);
+  }
+
   getPropertyValue(name) {
     return this.values.get(name) ?? "";
   }
@@ -49,6 +53,25 @@ class FakeElement {
     this.children = this.children.filter((c) => c !== child);
     child.parent = null;
     return child;
+  }
+
+  insertBefore(node, referenceNode) {
+    // node === referenceNode(既に目的の位置にいる)は real DOM と同じく無変化にする。
+    // それ以外は node を一旦取り除いてから referenceNode の直前(無ければ末尾)へ差し込む。
+    if (referenceNode === node) {
+      return node;
+    }
+    if (node.parent) {
+      node.parent.children = node.parent.children.filter((child) => child !== node);
+    }
+    node.parent = this;
+    const insertAt = referenceNode == null ? -1 : this.children.indexOf(referenceNode);
+    if (insertAt === -1) {
+      this.children.push(node);
+    } else {
+      this.children.splice(insertAt, 0, node);
+    }
+    return node;
   }
 
   setAttribute(name, value) {
@@ -90,6 +113,19 @@ class FakeElement {
       },
       contains(name) {
         return el.className.split(" ").includes(name);
+      },
+      toggle(name, force) {
+        const has = el.className.split(" ").includes(name);
+        const shouldHave = force === undefined ? !has : Boolean(force);
+        if (shouldHave && !has) {
+          el.className = `${el.className} ${name}`.trim();
+        } else if (!shouldHave && has) {
+          el.className = el.className
+            .split(" ")
+            .filter((token) => token && token !== name)
+            .join(" ");
+        }
+        return shouldHave;
       }
     };
   }
@@ -234,6 +270,46 @@ test("applyClockStyles writes none for disabled shadows", () => {
   assert.equal(element.style.getPropertyValue("--clock-shadow"), "none");
 });
 
+// 回帰: 既定config(4つのnullable override)では --clock-label-weight 等の CSS変数を
+// setしない(removePropertyのみ)。v1.6.0以前のURLの見た目(CSSフォールバック値)を
+// 壊さないための最重要契約。meridiemSize/dateWeekdayGapは意図的な仕様変更のため常時setする。
+test("applyClockStyles never sets the 4 nullable override CSS variables for the default config", () => {
+  const element = new FakeElement("div");
+  applyClockStyles(element, normalizeConfig({}));
+
+  assert.equal(element.style.getPropertyValue("--clock-label-weight"), "");
+  assert.equal(element.style.getPropertyValue("--clock-label-letter-spacing"), "");
+  assert.equal(element.style.getPropertyValue("--clock-date-weight"), "");
+  assert.equal(element.style.getPropertyValue("--clock-date-letter-spacing"), "");
+  // 意図的な仕様変更の2つは既定configでも常時setされる。
+  assert.equal(element.style.getPropertyValue("--clock-meridiem-size"), "0.55");
+  assert.equal(element.style.getPropertyValue("--clock-date-weekday-gap"), "0px");
+});
+
+test("applyClockStyles sets the 4 nullable override CSS variables only when non-null, and removes them again when reset to null", () => {
+  const element = new FakeElement("div");
+  applyClockStyles(
+    element,
+    normalizeConfig({
+      labelWeight: 900,
+      labelLetterSpacing: 1.2,
+      dateWeight: 300,
+      dateLetterSpacing: -0.5
+    })
+  );
+
+  assert.equal(element.style.getPropertyValue("--clock-label-weight"), "900");
+  assert.equal(element.style.getPropertyValue("--clock-label-letter-spacing"), "1.2px");
+  assert.equal(element.style.getPropertyValue("--clock-date-weight"), "300");
+  assert.equal(element.style.getPropertyValue("--clock-date-letter-spacing"), "-0.5px");
+
+  applyClockStyles(element, normalizeConfig({}));
+  assert.equal(element.style.getPropertyValue("--clock-label-weight"), "");
+  assert.equal(element.style.getPropertyValue("--clock-label-letter-spacing"), "");
+  assert.equal(element.style.getPropertyValue("--clock-date-weight"), "");
+  assert.equal(element.style.getPropertyValue("--clock-date-letter-spacing"), "");
+});
+
 test("time renders each digit in a fixed-width slot for a stable frame", () => {
   const container = new FakeElement("div");
   mountClock(container, normalizeConfig({ showSeconds: true, timezone: "UTC" }), {
@@ -280,6 +356,70 @@ test("small seconds node stays hidden and full time remains unchanged when disab
   assert.equal(seconds.hidden, true);
   assert.equal(fixedText(time), "03:45:06");
   assert.equal(fixedText(seconds), "");
+});
+
+test("digital clock hides .clock-meridiem in 24-hour mode", () => {
+  const container = new FakeElement("div");
+  mountClock(container, normalizeConfig({ hour12: false, timezone: "UTC" }), {
+    now: () => new Date("2026-01-02T15:04:00Z")
+  });
+
+  const meridiem = findByClass(container, "clock-meridiem");
+  assert.equal(meridiem.hidden, true);
+  assert.equal(meridiem.textContent, "");
+});
+
+test("digital clock places .clock-meridiem after the time by default (meridiemFirst=false)", () => {
+  const container = new FakeElement("div");
+  mountClock(container, normalizeConfig({ hour12: true, timezone: "UTC" }), {
+    now: () => new Date("2026-01-02T15:04:00Z")
+  });
+
+  const timeRow = findByClass(container, "clock-time-row");
+  const meridiem = findByClass(container, "clock-meridiem");
+  const time = findByClass(container, "clock-time");
+
+  assert.equal(meridiem.hidden, false);
+  assert.equal(meridiem.textContent, "PM");
+  assert.equal(meridiem.className.includes("clock-meridiem-trail"), true);
+  assert.equal(fixedText(time), "03:04");
+  // 後置: time の後ろ(index 1 = meridiem, since order = [time, meridiem]) にいる。
+  const order = timeRow.children.map((child) => child.className.split(" ")[0]);
+  assert.ok(order.indexOf("clock-time") < order.indexOf("clock-meridiem"), "meridiem should come after clock-time");
+});
+
+test("digital clock places .clock-meridiem before the time when meridiemFirst=true", () => {
+  const container = new FakeElement("div");
+  mountClock(container, normalizeConfig({ hour12: true, meridiemFirst: true, timezone: "UTC" }), {
+    now: () => new Date("2026-01-02T03:04:00Z")
+  });
+
+  const timeRow = findByClass(container, "clock-time-row");
+  const meridiem = findByClass(container, "clock-meridiem");
+
+  assert.equal(meridiem.hidden, false);
+  assert.equal(meridiem.textContent, "AM");
+  assert.equal(meridiem.className.includes("clock-meridiem-lead"), true);
+  const order = timeRow.children.map((child) => child.className.split(" ")[0]);
+  assert.ok(order.indexOf("clock-meridiem") < order.indexOf("clock-time"), "meridiem should come before clock-time");
+});
+
+test("digital clock keeps .clock-meridiem separate from small seconds (both can show together)", () => {
+  const container = new FakeElement("div");
+  mountClock(
+    container,
+    normalizeConfig({ hour12: true, showSeconds: true, smallSeconds: true, timezone: "UTC" }),
+    { now: () => new Date("2026-01-02T15:04:06Z") }
+  );
+
+  const time = findByClass(container, "clock-time");
+  const seconds = findByClass(container, "clock-seconds-small");
+  const meridiem = findByClass(container, "clock-meridiem");
+
+  assert.equal(fixedText(time), "03:04");
+  assert.equal(fixedText(seconds), "06");
+  assert.equal(meridiem.textContent, "PM");
+  assert.equal(meridiem.hidden, false);
 });
 
 test("recommended OBS size reserves the shared visual safe inset around glow", () => {
@@ -392,6 +532,61 @@ test("flip clock builds one card per digit and groups pairs into one card", () =
   // "12:34" pair → "12" and "34" = 2 cards, ":" = 1 separator
   assert.equal(pairRoot.children.filter((c) => c.className === "flip-card").length, 2);
   assert.equal(pairRoot.children.filter((c) => c.className === "flip-sep").length, 1);
+});
+
+test("flip clock hides the static meridiem span in 24-hour mode and only flips digits/colons", () => {
+  const container = new FakeElement("div");
+  mountClock(
+    container,
+    normalizeConfig({ clockType: "flip", hour12: false, showSeconds: false, timezone: "UTC" }),
+    { now: () => new Date("2026-01-01T15:04:00Z") }
+  );
+
+  const root = container.children[0];
+  const meridiem = root.children.find((c) => c.className.split(" ")[0] === "clock-flip-meridiem");
+  assert.ok(meridiem, "static meridiem span should exist even when hidden");
+  assert.equal(meridiem.hidden, true);
+  assert.equal(meridiem.textContent, "");
+  // カードは数字("15:04" → 1,5,0,4)とコロンのみ。
+  assert.equal(root.children.filter((c) => c.className === "flip-card").length, 4);
+});
+
+test("flip clock shows a static (non-flipping) trailing meridiem span for 12-hour mode", () => {
+  const container = new FakeElement("div");
+  mountClock(
+    container,
+    normalizeConfig({ clockType: "flip", hour12: true, meridiemFirst: false, showSeconds: false, timezone: "UTC" }),
+    { now: () => new Date("2026-01-01T15:04:00Z") }
+  );
+
+  const root = container.children[0];
+  const meridiem = root.children.find((c) => c.className.split(" ")[0] === "clock-flip-meridiem");
+  assert.ok(meridiem);
+  assert.equal(meridiem.hidden, false);
+  assert.equal(meridiem.textContent, "PM");
+  assert.equal(meridiem.className.includes("clock-flip-meridiem-trail"), true);
+  // カードは "03:04" の数字+コロンのみ(meridiemは独自のspanで、flip-cardではない)。
+  assert.equal(root.children.filter((c) => c.className === "flip-card").length, 4);
+  assert.equal(root.children.filter((c) => c.className === "flip-sep").length, 1);
+  // meridiemNode は最後の子(後置)。
+  assert.equal(root.children[root.children.length - 1], meridiem);
+});
+
+test("flip clock shows a static leading meridiem span when meridiemFirst=true", () => {
+  const container = new FakeElement("div");
+  mountClock(
+    container,
+    normalizeConfig({ clockType: "flip", hour12: true, meridiemFirst: true, showSeconds: false, timezone: "UTC" }),
+    { now: () => new Date("2026-01-01T03:04:00Z") }
+  );
+
+  const root = container.children[0];
+  const meridiem = root.children.find((c) => c.className.split(" ")[0] === "clock-flip-meridiem");
+  assert.ok(meridiem);
+  assert.equal(meridiem.textContent, "AM");
+  assert.equal(meridiem.className.includes("clock-flip-meridiem-lead"), true);
+  // meridiemNode は先頭の子(前置)。
+  assert.equal(root.children[0], meridiem);
 });
 
 test("flip clock writes flip CSS variables on its root", () => {

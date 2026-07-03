@@ -27,10 +27,11 @@ export function resolveShareText(userText, builderUrl) {
 
 export function buildShareLines(config, formatted) {
   const label = config.labelPosition === "hidden" ? "" : config.label;
-  const dateLine = [
-    config.showDate ? formatted.date : "",
-    config.showWeekday ? formatted.weekday : ""
-  ].filter(Boolean).join("  ");
+  const dateText = config.showDate ? formatted.date : "";
+  const weekdayText = config.showWeekday ? formatted.weekday : "";
+  // 表示用の1本の文字列(dateWeekdayGapを鏡像化しない従来互換の合算表示や、
+  // 幅測定の当たりを付ける用途)。実際の描画は date/weekday を dateWeekdayGap で分けて置く。
+  const dateLine = [dateText, weekdayText].filter(Boolean).join("  ");
 
   const labelAbove = config.labelPosition === "top" || config.labelPosition === "left";
   const labelBelow = config.labelPosition === "bottom" || config.labelPosition === "right";
@@ -39,13 +40,30 @@ export function buildShareLines(config, formatted) {
     lines.push({ text: label, size: config.labelSize, isLabel: true });
   }
   if (dateLine) {
-    lines.push({ text: dateLine, size: config.dateSize });
+    lines.push({ text: dateLine, size: config.dateSize, isDate: true, dateText, weekdayText });
   }
   lines.push({ text: formatted.time, size: config.fontSize, isTime: true });
   if (label && labelBelow) {
     lines.push({ text: label, size: config.labelSize, isLabel: true });
   }
   return lines;
+}
+
+// 日付+曜日を dateWeekdayGap(px)で並べる位置を計算する純関数。
+// ライブ(.clock-date-row の gap)と同じ間隔で、中央揃えの行として date/weekday を
+// 個別に fillText できるよう、それぞれの左端x(centerX 基準)を返す。
+// 片方だけが空のときは単純に中央へ1本分だけ置く形になる。
+export function computeDateWeekdayPositions({ dateWidth, weekdayWidth, gapPx, centerX }) {
+  const hasDate = dateWidth > 0;
+  const hasWeekday = weekdayWidth > 0;
+  const gap = hasDate && hasWeekday ? gapPx : 0;
+  const totalWidth = dateWidth + gap + weekdayWidth;
+  const left = centerX - totalWidth / 2;
+  return {
+    dateX: left,
+    weekdayX: left + dateWidth + gap,
+    totalWidth
+  };
 }
 
 // 共有カードのデジタル時計テンプレ装飾を「種類と色」の純粋データで返す。

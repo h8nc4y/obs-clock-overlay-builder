@@ -30,6 +30,7 @@ export const DEFAULT_CONFIG = Object.freeze({
   weekdayFormat: "ja-short",
   weekdayBrackets: false,
   meridiemFirst: false,
+  meridiemSize: 0.55,
   label: "JST",
   labelPosition: "hidden",
   fontFamily: "Roboto Mono",
@@ -46,6 +47,11 @@ export const DEFAULT_CONFIG = Object.freeze({
   lineHeight: 1,
   fontWeight: 700,
   gap: 4,
+  dateWeekdayGap: 0,
+  labelWeight: null,
+  labelLetterSpacing: null,
+  dateWeight: null,
+  dateLetterSpacing: null,
   shadowColor: "#000000",
   shadowOpacity: 0.18,
   shadowBlur: 6,
@@ -625,7 +631,20 @@ export const NUMBER_LIMITS = {
   strokeWidth: [0, 8],
   borderOpacity: [0, 1],
   borderWidth: [0, 8],
-  analogSize: [120, 480]
+  analogSize: [120, 480],
+  meridiemSize: [0.3, 1],
+  dateWeekdayGap: [0, 24]
+};
+
+// nullable override 4フィールド専用の clamp 範囲。clampNumber(既定値へ丸め込む)とは別に、
+// 「null/未指定なら null のまま」を許すヘルパー(clampNullableNumber)から使う。
+// NUMBER_LIMITS と分けているのは「既定値に丸め込むか、null を維持するか」が違うため。
+// HTML側のrange inputのmin/max検証(number-limits系テスト)はこちらも見る。
+export const NULLABLE_NUMBER_LIMITS = {
+  labelWeight: [100, 900],
+  labelLetterSpacing: NUMBER_LIMITS.letterSpacing,
+  dateWeight: [100, 900],
+  dateLetterSpacing: NUMBER_LIMITS.letterSpacing
 };
 
 export function cloneDefaultConfig() {
@@ -648,6 +667,7 @@ export function applyTemplate(config, templateId) {
     timezone: current.timezone,
     hour12: current.hour12,
     meridiemFirst: current.meridiemFirst,
+    meridiemSize: current.meridiemSize,
     // 秒表示だけは mono-sub などのテンプレ表現を優先し、未指定なら現在設定を引き継ぐ。
     showSeconds: template.config.showSeconds ?? current.showSeconds,
     smallSeconds: template.config.smallSeconds ?? current.smallSeconds,
@@ -655,9 +675,15 @@ export function applyTemplate(config, templateId) {
     dateYear: current.dateYear,
     dateZeroPad: current.dateZeroPad,
     dateSeparator: current.dateSeparator,
+    dateWeekdayGap: current.dateWeekdayGap,
     showWeekday: current.showWeekday,
     weekdayFormat: current.weekdayFormat,
-    weekdayBrackets: current.weekdayBrackets
+    weekdayBrackets: current.weekdayBrackets,
+    // 文字の太さ/字間の個別調整(null=連動)も配信者の設定であり、テンプレ意匠より優先する。
+    labelWeight: current.labelWeight,
+    labelLetterSpacing: current.labelLetterSpacing,
+    dateWeight: current.dateWeight,
+    dateLetterSpacing: current.dateLetterSpacing
   });
 }
 
@@ -713,6 +739,19 @@ export function normalizeConfig(input = {}) {
 
   // NUMBER_LIMITS.fontWeight ([300,900]) で既にクランプ済みなので、100刻みへの丸めだけ行う。
   config.fontWeight = Math.round(config.fontWeight / 100) * 100;
+
+  // labelWeight/dateWeight/labelLetterSpacing/dateLetterSpacing は「null=CSSフォールバックへ連動」を
+  // 表す nullable override。未指定/null/空は null のまま保持し、既定値へ丸め込まない
+  // (既存の clampNumber は null を DEFAULT_CONFIG[key] へ落とすため、ここでは流用しない)。
+  for (const [key, [min, max]] of Object.entries(NULLABLE_NUMBER_LIMITS)) {
+    config[key] = clampNullableNumber(raw[key], min, max);
+  }
+  if (config.labelWeight !== null) {
+    config.labelWeight = Math.round(config.labelWeight / 100) * 100;
+  }
+  if (config.dateWeight !== null) {
+    config.dateWeight = Math.round(config.dateWeight / 100) * 100;
+  }
   return config;
 }
 
@@ -844,6 +883,7 @@ function flatParamsToConfig(params) {
   assign("weekdayFormat");
   assign("weekdayBrackets");
   assign("meridiemFirst");
+  assign("meridiemSize");
   assign("label");
   assign("labelPosition");
   assign("font", "fontFamily");
@@ -862,6 +902,11 @@ function flatParamsToConfig(params) {
   assign("lineHeight");
   assign("fontWeight");
   assign("gap");
+  assign("dateWeekdayGap");
+  assign("labelWeight");
+  assign("labelLetterSpacing");
+  assign("dateWeight");
+  assign("dateLetterSpacing");
   assign("shadowColor");
   assign("shadowOpacity");
   assign("shadowBlur");
@@ -1003,6 +1048,20 @@ function clampNumber(value, min, max, fallback) {
   const number = Number(value);
   if (!Number.isFinite(number)) {
     return fallback;
+  }
+  return Math.min(max, Math.max(min, number));
+}
+
+// labelWeight/labelLetterSpacing/dateWeight/dateLetterSpacing 専用。
+// null/undefined/空文字/数値化不能はすべて null(=CSSフォールバックへ連動)へ落とす。
+// clampNumber は同じ入力を「既定値」へ落とすため、null を維持したいここでは流用できない。
+function clampNullableNumber(value, min, max) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return null;
   }
   return Math.min(max, Math.max(min, number));
 }

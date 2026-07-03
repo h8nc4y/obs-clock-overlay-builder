@@ -41,6 +41,8 @@ export function formatClock(formatters, date = new Date()) {
   const result = {
     time: timeParts.time,
     timeMain: timeParts.timeMain,
+    timeDigitsMain: timeParts.timeDigitsMain,
+    meridiemText: timeParts.meridiemText,
     secondsText: timeParts.secondsText,
     date: "",
     weekday: ""
@@ -64,6 +66,7 @@ function formatTimeParts(formatters, date) {
   const minute = parts.minute ?? "00";
   const secondsText = formatters.config.showSeconds ? parts.second ?? "00" : "";
   const second = secondsText ? `:${secondsText}` : "";
+  // 24時間表示では meridiemText は常に空文字("")。
   const meridiem = formatters.config.hour12 && parts.dayPeriod ? parts.dayPeriod.toUpperCase() : "";
   const main = `${hour}:${minute}`;
   const timeWithoutMeridiem = `${main}${second}`;
@@ -76,6 +79,9 @@ function formatTimeParts(formatters, date) {
   return {
     time,
     timeMain,
+    // digital描画でAM/PMを別スパンに切り出すための、meridiemを含まないHH:MM。
+    timeDigitsMain: main,
+    meridiemText: meridiem,
     secondsText
   };
 }

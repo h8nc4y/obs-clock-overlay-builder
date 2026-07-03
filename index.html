@@ -379,18 +379,67 @@
               </div>
 
               <div class="control-group">
-                <h3>文字の詳細</h3>
+                <h3>文字調整：ラベル</h3>
+                <div class="form-grid dense-grid">
+                  <label class="field" for="labelSize">
+                    <span>ラベルサイズ</span>
+                    <input id="labelSize" type="range" min="10" max="48" step="1" aria-describedby="labelSizeValue">
+                    <output id="labelSizeValue"></output>
+                  </label>
+                </div>
+                <label class="toggle" for="labelFineTune">
+                  <input id="labelFineTune" type="checkbox">
+                  <span>太さ・間隔を個別に調整する</span>
+                </label>
+                <div class="form-grid dense-grid is-hidden" id="labelFineTuneFields">
+                  <label class="field" for="labelWeight">
+                    <span>ラベルの太さ</span>
+                    <input id="labelWeight" type="range" min="100" max="900" step="100" aria-describedby="labelWeightValue">
+                    <output id="labelWeightValue"></output>
+                  </label>
+                  <label class="field" for="labelLetterSpacing">
+                    <span>ラベルの文字間隔</span>
+                    <input id="labelLetterSpacing" type="range" min="-1" max="8" step="0.1" aria-describedby="labelLetterSpacingValue">
+                    <output id="labelLetterSpacingValue"></output>
+                  </label>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <h3>文字調整：日付</h3>
                 <div class="form-grid dense-grid">
                   <label class="field" for="dateSize">
                     <span>日付サイズ</span>
                     <input id="dateSize" type="range" min="10" max="56" step="1" aria-describedby="dateSizeValue">
                     <output id="dateSizeValue"></output>
                   </label>
-                  <label class="field" for="labelSize">
-                    <span>ラベルサイズ</span>
-                    <input id="labelSize" type="range" min="10" max="48" step="1" aria-describedby="labelSizeValue">
-                    <output id="labelSizeValue"></output>
+                  <label class="field" for="dateWeekdayGap">
+                    <span>曜日との間隔</span>
+                    <input id="dateWeekdayGap" type="range" min="0" max="24" step="1" aria-describedby="dateWeekdayGapValue">
+                    <output id="dateWeekdayGapValue"></output>
                   </label>
+                </div>
+                <label class="toggle" for="dateFineTune">
+                  <input id="dateFineTune" type="checkbox">
+                  <span>太さ・間隔を個別に調整する</span>
+                </label>
+                <div class="form-grid dense-grid is-hidden" id="dateFineTuneFields">
+                  <label class="field" for="dateWeight">
+                    <span>日付の太さ</span>
+                    <input id="dateWeight" type="range" min="100" max="900" step="100" aria-describedby="dateWeightValue">
+                    <output id="dateWeightValue"></output>
+                  </label>
+                  <label class="field" for="dateLetterSpacing">
+                    <span>日付の文字間隔</span>
+                    <input id="dateLetterSpacing" type="range" min="-1" max="8" step="0.1" aria-describedby="dateLetterSpacingValue">
+                    <output id="dateLetterSpacingValue"></output>
+                  </label>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <h3>文字調整：時刻</h3>
+                <div class="form-grid dense-grid">
                   <label class="field" for="fontWeight">
                     <span>太さ</span>
                     <input id="fontWeight" type="range" min="300" max="900" step="100" aria-describedby="fontWeightValue">
@@ -405,6 +454,11 @@
                     <span>行間</span>
                     <input id="lineHeight" type="range" min="0.9" max="1.8" step="0.01" aria-describedby="lineHeightValue">
                     <output id="lineHeightValue"></output>
+                  </label>
+                  <label class="field" for="meridiemSize">
+                    <span>AM/PMの大きさ</span>
+                    <input id="meridiemSize" type="range" min="0.3" max="1" step="0.05" aria-describedby="meridiemSizeValue">
+                    <output id="meridiemSizeValue"></output>
                   </label>
                 </div>
               </div>
