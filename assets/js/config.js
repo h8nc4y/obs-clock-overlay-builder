@@ -23,9 +23,13 @@ export const DEFAULT_CONFIG = Object.freeze({
   showSeconds: false,
   smallSeconds: false,
   showDate: false,
-  dateFormat: "slash",
+  dateYear: true,
+  dateZeroPad: true,
+  dateSeparator: "slash",
   showWeekday: false,
   weekdayFormat: "ja-short",
+  weekdayBrackets: false,
+  meridiemFirst: false,
   label: "JST",
   labelPosition: "hidden",
   fontFamily: "Roboto Mono",
@@ -592,7 +596,7 @@ export const TEMPLATES = Object.freeze([
   }
 ]);
 
-const DATE_FORMATS = new Set(["slash", "dash", "monthDay", "jp"]);
+const DATE_SEPARATORS = new Set(["slash", "dash", "jp"]);
 const WEEKDAY_FORMATS = new Set(["ja-short", "ja-long", "en-short", "en-long"]);
 const LABEL_POSITIONS = new Set(["top", "bottom", "left", "right", "hidden"]);
 const CLOCK_TYPES = new Set(["digital", "analog", "flip"]);
@@ -643,13 +647,17 @@ export function applyTemplate(config, templateId) {
     // タイムゾーン/12時間表記/日付は配信者の設定を守り、テンプレ切替で共有URLを揺らさない。
     timezone: current.timezone,
     hour12: current.hour12,
+    meridiemFirst: current.meridiemFirst,
     // 秒表示だけは mono-sub などのテンプレ表現を優先し、未指定なら現在設定を引き継ぐ。
     showSeconds: template.config.showSeconds ?? current.showSeconds,
     smallSeconds: template.config.smallSeconds ?? current.smallSeconds,
     showDate: current.showDate,
-    dateFormat: current.dateFormat,
+    dateYear: current.dateYear,
+    dateZeroPad: current.dateZeroPad,
+    dateSeparator: current.dateSeparator,
     showWeekday: current.showWeekday,
-    weekdayFormat: current.weekdayFormat
+    weekdayFormat: current.weekdayFormat,
+    weekdayBrackets: current.weekdayBrackets
   });
 }
 
@@ -663,6 +671,7 @@ export function normalizeConfig(input = {}) {
   }
 
   const config = { ...DEFAULT_CONFIG };
+  const legacyDate = legacyDateFormatConfig(raw.dateFormat);
   config.version = CONFIG_VERSION;
   config.template = enumValue(raw.template, TEMPLATE_IDS, DEFAULT_CONFIG.template);
   config.clockType = enumValue(raw.clockType, CLOCK_TYPES, DEFAULT_CONFIG.clockType);
@@ -674,9 +683,18 @@ export function normalizeConfig(input = {}) {
   config.showSeconds = coerceBool(raw.showSeconds ?? raw.seconds, DEFAULT_CONFIG.showSeconds);
   config.smallSeconds = coerceBool(raw.smallSeconds, DEFAULT_CONFIG.smallSeconds);
   config.showDate = coerceBool(raw.showDate ?? raw.date, DEFAULT_CONFIG.showDate);
-  config.dateFormat = enumValue(raw.dateFormat, DATE_FORMATS, DEFAULT_CONFIG.dateFormat);
+  // 旧 dateFormat は入力エイリアスとしてだけ受け、新フィールドがあるキーを必ず優先する。
+  config.dateYear = coerceBool(raw.dateYear, legacyDate?.dateYear ?? DEFAULT_CONFIG.dateYear);
+  config.dateZeroPad = coerceBool(raw.dateZeroPad, legacyDate?.dateZeroPad ?? DEFAULT_CONFIG.dateZeroPad);
+  config.dateSeparator = enumValue(
+    raw.dateSeparator,
+    DATE_SEPARATORS,
+    legacyDate?.dateSeparator ?? DEFAULT_CONFIG.dateSeparator
+  );
   config.showWeekday = coerceBool(raw.showWeekday ?? raw.weekday, DEFAULT_CONFIG.showWeekday);
   config.weekdayFormat = enumValue(raw.weekdayFormat, WEEKDAY_FORMATS, DEFAULT_CONFIG.weekdayFormat);
+  config.weekdayBrackets = coerceBool(raw.weekdayBrackets, DEFAULT_CONFIG.weekdayBrackets);
+  config.meridiemFirst = coerceBool(raw.meridiemFirst, DEFAULT_CONFIG.meridiemFirst);
   config.label =
     raw.label === undefined || raw.label === null
       ? DEFAULT_CONFIG.label
@@ -818,9 +836,14 @@ function flatParamsToConfig(params) {
   assign("date", "showDate");
   assign("showDate");
   assign("dateFormat");
+  assign("dateYear");
+  assign("dateZeroPad");
+  assign("dateSeparator");
   assign("weekday", "showWeekday");
   assign("showWeekday");
   assign("weekdayFormat");
+  assign("weekdayBrackets");
+  assign("meridiemFirst");
   assign("label");
   assign("labelPosition");
   assign("font", "fontFamily");
@@ -951,6 +974,21 @@ function coerceBool(value, fallback) {
 function enumValue(value, allowed, fallback) {
   const normalized = String(value ?? "");
   return allowed.has(normalized) ? normalized : fallback;
+}
+
+function legacyDateFormatConfig(value) {
+  switch (String(value ?? "")) {
+    case "slash":
+      return { dateYear: true, dateZeroPad: true, dateSeparator: "slash" };
+    case "dash":
+      return { dateYear: true, dateZeroPad: true, dateSeparator: "dash" };
+    case "monthDay":
+      return { dateYear: false, dateZeroPad: true, dateSeparator: "slash" };
+    case "jp":
+      return { dateYear: true, dateZeroPad: false, dateSeparator: "jp" };
+    default:
+      return null;
+  }
 }
 
 function normalizeHex(value, fallback) {

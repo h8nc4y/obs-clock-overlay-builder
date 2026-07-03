@@ -25,8 +25,8 @@ export function createFormatters(config) {
     dateFormatter: new Intl.DateTimeFormat("en-US", {
       timeZone: timezone,
       year: "numeric",
-      month: normalized.dateFormat === "jp" ? "numeric" : "2-digit",
-      day: normalized.dateFormat === "jp" ? "numeric" : "2-digit"
+      month: normalized.dateZeroPad ? "2-digit" : "numeric",
+      day: normalized.dateZeroPad ? "2-digit" : "numeric"
     }),
     weekdayFormatter: new Intl.DateTimeFormat(weekdayLocale(normalized.weekdayFormat), {
       timeZone: timezone,
@@ -49,7 +49,7 @@ export function formatClock(formatters, date = new Date()) {
     result.date = formatDate(formatters, date);
   }
   if (config.showWeekday) {
-    result.weekday = formatters.weekdayFormatter.format(date);
+    result.weekday = formatWeekday(formatters, date);
   }
   return result;
 }
@@ -64,10 +64,18 @@ function formatTimeParts(formatters, date) {
   const minute = parts.minute ?? "00";
   const secondsText = formatters.config.showSeconds ? parts.second ?? "00" : "";
   const second = secondsText ? `:${secondsText}` : "";
-  const dayPeriod = formatters.config.hour12 && parts.dayPeriod ? ` ${parts.dayPeriod.toUpperCase()}` : "";
+  const meridiem = formatters.config.hour12 && parts.dayPeriod ? parts.dayPeriod.toUpperCase() : "";
+  const main = `${hour}:${minute}`;
+  const timeWithoutMeridiem = `${main}${second}`;
+  const time = formatters.config.meridiemFirst
+    ? [meridiem, timeWithoutMeridiem].filter(Boolean).join(" ")
+    : [timeWithoutMeridiem, meridiem].filter(Boolean).join(" ");
+  const timeMain = formatters.config.meridiemFirst
+    ? [meridiem, main].filter(Boolean).join(" ")
+    : [main, meridiem].filter(Boolean).join(" ");
   return {
-    time: `${hour}:${minute}${second}${dayPeriod}`,
-    timeMain: `${hour}:${minute}${dayPeriod}`,
+    time,
+    timeMain,
     secondsText
   };
 }
@@ -75,21 +83,34 @@ function formatTimeParts(formatters, date) {
 export function formatDate(formatters, date = new Date()) {
   const { config } = formatters;
   const parts = partsToObject(formatters.dateFormatter.formatToParts(date));
-  const year = parts.year ?? "0000";
-  const month = parts.month ?? "01";
-  const day = parts.day ?? "01";
+  const year = String(parts.year ?? "0000").padStart(4, "0");
+  const month = formatMonthDay(parts.month, config.dateZeroPad);
+  const day = formatMonthDay(parts.day, config.dateZeroPad);
 
-  switch (config.dateFormat) {
+  switch (config.dateSeparator) {
     case "dash":
-      return `${year}-${month}-${day}`;
-    case "monthDay":
-      return `${month}/${day}`;
+      return config.dateYear ? `${year}-${month}-${day}` : `${month}-${day}`;
     case "jp":
-      return `${year}年${Number(month)}月${Number(day)}日`;
+      return config.dateYear ? `${year}年${month}月${day}日` : `${month}月${day}日`;
     case "slash":
     default:
-      return `${year}/${month}/${day}`;
+      return config.dateYear ? `${year}/${month}/${day}` : `${month}/${day}`;
   }
+}
+
+function formatWeekday(formatters, date) {
+  const weekday = formatters.weekdayFormatter.format(date);
+  if (!formatters.config.weekdayBrackets) {
+    return weekday;
+  }
+  return formatters.config.weekdayFormat.startsWith("ja") ? `（${weekday}）` : `(${weekday})`;
+}
+
+function formatMonthDay(value, zeroPad) {
+  if (zeroPad) {
+    return String(value ?? "01").padStart(2, "0");
+  }
+  return String(Number(value ?? "1"));
 }
 
 // アナログ時計の針角度に使う、タイムゾーン補正済みの時・分・秒を取り出す。
