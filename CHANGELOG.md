@@ -4,6 +4,19 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
+## [Unreleased]
+
+### Added
+
+- Date display is now tuned by independent axes instead of a single preset: year on/off (`dateYear`), month/day zero-padding (`dateZeroPad`), and separator (`dateSeparator`: `/`, `-`, or Japanese 「Y年M月D日」). All 12 combinations render. Requested and approved by the owner (2026-07-03).
+- Weekday: a new 「曜日を（）で囲む」 option wraps the weekday in brackets — full-width （金） for Japanese formats, ASCII (Fri) for English formats (`weekdayBrackets`).
+- 12-hour clock: a new 「AM/PMを時刻の前にする」 option renders `AM 09:51` instead of `09:51 AM` (`meridiemFirst`); it flows through the live clock, the flip clock, and the share PNG. The checkbox is disabled while 24-hour display is selected.
+- Editor: in the 「こだわり」 display settings, the label-position select moved to the left end of the row, matching the label controls' position in the simple mode.
+
+### Changed
+
+- Backward compatibility: legacy `dateFormat` values (`slash` / `dash` / `monthDay` / `jp`) in shared `?c=` URLs, flat queries, JSON imports, and saved editor drafts are mapped onto the new fields and render **identically** to before; `dateFormat` itself is no longer emitted. The template-compat golden fixture was intentionally regenerated for the new config fields (no template visual values changed).
+
 ## [1.5.1] - 2026-07-02
 
 ### Fixed

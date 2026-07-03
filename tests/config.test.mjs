@@ -92,7 +92,8 @@ test("compact URL round-trips non-default template values", () => {
     hour12: true,
     showSeconds: false,
     showDate: true,
-    dateFormat: "jp",
+    dateZeroPad: false,
+    dateSeparator: "jp",
     showWeekday: true,
     weekdayFormat: "en-long"
   });
@@ -106,7 +107,10 @@ test("compact URL round-trips non-default template values", () => {
   assert.equal(restored.hour12, true);
   assert.equal(restored.showSeconds, false);
   assert.equal(restored.showDate, true);
-  assert.equal(restored.dateFormat, "jp");
+  // 旧 dateFormat="jp" は入力エイリアスとして新3フィールドへ写像された上で round-trip する。
+  assert.equal(restored.dateYear, true);
+  assert.equal(restored.dateZeroPad, false);
+  assert.equal(restored.dateSeparator, "jp");
   assert.equal(restored.showWeekday, true);
   assert.equal(restored.weekdayFormat, "en-long");
 });
@@ -278,7 +282,10 @@ test("template application preserves clock behavior settings", () => {
   assert.equal(applied.hour12, true);
   assert.equal(applied.showSeconds, false);
   assert.equal(applied.showDate, true);
-  assert.equal(applied.dateFormat, "jp");
+  // 旧 dateFormat="jp" 相当の新3フィールドがテンプレ適用後も保持される。
+  assert.equal(applied.dateYear, true);
+  assert.equal(applied.dateZeroPad, false);
+  assert.equal(applied.dateSeparator, "jp");
   assert.equal(applied.showWeekday, true);
   assert.equal(applied.weekdayFormat, "en-long");
 });

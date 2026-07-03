@@ -85,8 +85,12 @@ const elements = {
   smallSeconds: byId("smallSeconds"),
   showDate: byId("showDate"),
   showWeekday: byId("showWeekday"),
-  dateFormat: byId("dateFormat"),
+  dateYear: byId("dateYear"),
+  dateZeroPad: byId("dateZeroPad"),
+  dateSeparator: byId("dateSeparator"),
   weekdayFormat: byId("weekdayFormat"),
+  weekdayBrackets: byId("weekdayBrackets"),
+  meridiemFirst: byId("meridiemFirst"),
   labelText: byId("labelText"),
   labelPosition: byId("labelPosition"),
   fontPreset: byId("fontPreset"),
@@ -176,8 +180,18 @@ const rangeFields = [
   "analogSize"
 ];
 const colorFields = ["textColor", "backgroundColor", "borderColor", "shadowColor", "strokeColor"];
-const booleanFields = ["hour12", "showSeconds", "smallSeconds", "showDate", "showWeekday"];
-const selectFields = ["dateFormat", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
+const booleanFields = [
+  "hour12",
+  "meridiemFirst",
+  "showSeconds",
+  "smallSeconds",
+  "showDate",
+  "dateYear",
+  "dateZeroPad",
+  "showWeekday",
+  "weekdayBrackets"
+];
+const selectFields = ["dateSeparator", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let localFontSelectBound = false;
 // テンプレカードのミニプレビューが最後に反映した表示設定8項目の署名。
@@ -753,11 +767,15 @@ function updateState(partial, sync = false, options = {}) {
 function syncFormFromState() {
   elements.timezone.value = state.timezone;
   elements.hour12.checked = state.hour12;
+  elements.meridiemFirst.checked = state.meridiemFirst;
   elements.showSeconds.checked = state.showSeconds;
   elements.smallSeconds.checked = state.smallSeconds;
   elements.showDate.checked = state.showDate;
+  elements.dateYear.checked = state.dateYear;
+  elements.dateZeroPad.checked = state.dateZeroPad;
+  elements.dateSeparator.value = state.dateSeparator;
   elements.showWeekday.checked = state.showWeekday;
-  elements.dateFormat.value = state.dateFormat;
+  elements.weekdayBrackets.checked = state.weekdayBrackets;
   elements.weekdayFormat.value = state.weekdayFormat;
   elements.labelText.value = state.label;
   elements.labelPosition.value = state.labelPosition;
@@ -802,6 +820,8 @@ function syncOutputValues() {
 
 function updateEverything(status = "", options = {}) {
   state = normalizeConfig(state);
+  // AM/PM位置は12時間表示のときだけ意味を持つ。どの更新経路でも連動させる。
+  elements.meridiemFirst.disabled = !state.hour12;
   previewClock.updateConfig(state);
   if (options.deferPersistent) {
     schedulePersistentOutputs();

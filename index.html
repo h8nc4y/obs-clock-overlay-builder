@@ -291,13 +291,14 @@
                   <small id="timezoneHelp">初期値は Asia/Tokyo。候補から選ぶか、IANA名を入力します。<br>この端末の地域: <span id="localTimezone" class="muted">未確認</span></small>
                 </label>
                 <div class="form-grid dense-grid form-grid-top">
-                  <label class="field" for="dateFormat">
-                    <span>日付フォーマット</span>
-                    <select id="dateFormat">
-                      <option value="slash">YYYY/MM/DD</option>
-                      <option value="dash">YYYY-MM-DD</option>
-                      <option value="monthDay">MM/DD</option>
-                      <option value="jp">YYYY年M月D日</option>
+                  <label class="field" for="labelPosition">
+                    <span>ラベル位置</span>
+                    <select id="labelPosition">
+                      <option value="top">上</option>
+                      <option value="bottom">下</option>
+                      <option value="left">左</option>
+                      <option value="right">右</option>
+                      <option value="hidden">非表示</option>
                     </select>
                   </label>
                   <label class="field" for="weekdayFormat">
@@ -309,21 +310,39 @@
                       <option value="en-long">長い英語</option>
                     </select>
                   </label>
-                  <label class="field" for="labelPosition">
-                    <span>ラベル位置</span>
-                    <select id="labelPosition">
-                      <option value="top">上</option>
-                      <option value="bottom">下</option>
-                      <option value="left">左</option>
-                      <option value="right">右</option>
-                      <option value="hidden">非表示</option>
+                  <label class="field" for="dateSeparator">
+                    <span>日付の区切り</span>
+                    <select id="dateSeparator">
+                      <option value="slash">/ 区切り(2026/07/03)</option>
+                      <option value="dash">- 区切り(2026-07-03)</option>
+                      <option value="jp">日本語(2026年7月3日)</option>
                     </select>
                   </label>
                 </div>
-                <label class="toggle" for="hour12">
-                  <input id="hour12" type="checkbox">
-                  <span>12時間表示にする</span>
-                </label>
+                <div class="toggle-row">
+                  <label class="toggle" for="dateYear">
+                    <input id="dateYear" type="checkbox">
+                    <span>年を表示する</span>
+                  </label>
+                  <label class="toggle" for="dateZeroPad">
+                    <input id="dateZeroPad" type="checkbox">
+                    <span>月・日をゼロ埋めする(07/03)</span>
+                  </label>
+                  <label class="toggle" for="weekdayBrackets">
+                    <input id="weekdayBrackets" type="checkbox">
+                    <span>曜日を（）で囲む</span>
+                  </label>
+                </div>
+                <div class="toggle-row">
+                  <label class="toggle" for="hour12">
+                    <input id="hour12" type="checkbox">
+                    <span>12時間表示にする</span>
+                  </label>
+                  <label class="toggle" for="meridiemFirst">
+                    <input id="meridiemFirst" type="checkbox">
+                    <span>AM/PMを時刻の前にする</span>
+                  </label>
+                </div>
               </div>
 
               <div class="control-group">
