@@ -69,7 +69,7 @@
         <div class="preview-stage-dock">
           <div id="previewShell" class="preview-shell preview-checker">
             <button id="pinPreview" type="button" class="pin-toggle pin-toggle-on-stage" aria-pressed="true" aria-label="プレビューの固定を外す" title="プレビューの固定を外す">
-              <span class="pin-toggle-icon" aria-hidden="true">📌</span>
+              <span class="pin-toggle-icon" aria-hidden="true"><!-- 絵文字依存を避けた幾何プリミティブのピン(丸頭+針)。1emで親のfont-size指定に追従 --><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" focusable="false"><circle cx="12" cy="8" r="5" fill="currentColor"/><path d="M12 13v8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
               <span class="pin-toggle-label">固定中</span>
             </button>
             <div id="clockPreview" class="preview-stage" aria-hidden="true"></div>
