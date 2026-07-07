@@ -4,6 +4,13 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
+## [1.7.1] - 2026-07-07
+
+### Changed
+
+- Editor headings are now clearly larger than body text (h2 17.3→19.5px, h3 15.4→17.0px), so the visual hierarchy no longer relies on weight alone. From a design-taste audit approved by the owner (2026-07-07).
+- The live-preview pin toggle now uses a geometric inline SVG (circle + needle, `currentColor`) instead of the 📌 emoji; the unpinned 45° tilt and state colors are unchanged. Editor-only changes; the `/clock/?c=...` output is unaffected.
+
 ## [1.7.0] - 2026-07-03
 
 ### Added
