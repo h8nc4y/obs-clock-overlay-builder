@@ -42,13 +42,14 @@
 
 ## 主要ファイル（reading order）
 
-1. `AGENTS.md` — Codex側運用ポリシー
-2. `HANDOFF.md` — 現況サマリ、直近の完了タスク、残タスク、運用モデルの注記
-3. `docs/PRODUCT_REQUIREMENTS.md` — プロダクト要件
+1. `HANDOFF.md` — 現況サマリ、残タスク（§1）、運用モデル（§2）、アーキテクチャ、不変条件
+2. `AGENTS.md` — Codex側運用ポリシー（プロジェクト固有の差分のみ）
+3. `docs/PRODUCT_REQUIREMENTS.md` — プロダクト要件・価値仮説・成功指標の正本
 4. `docs/ROADMAP.md` — ロードマップ
 5. `docs/HOW_WE_USE_CODEX.md` — 公開ガバナンス文書（歴史的記録。文面はオーナー承認なく書き換えない）
 6. `docs/manual-qa.md` / `docs/pre-release-qa.md` / `docs/post-launch-ops.md` — QA・運用手順
-7. `README.md` — repo概要
+7. `docs/HANDOFF_HISTORY.md` — 過去の日付付き実施メモ（時系列の歴史的記録）
+8. `README.md` — repo概要
 
 `HANDOFF.md` 冒頭の「30秒で掴む現状」節と「残タスク」節は、着手前に必ず現物確認
 （`git status` / テスト実行 / lint・typecheck・format:check）で裏取りしてから読み進める。

@@ -56,6 +56,8 @@
 - Network は app asset/API が 200。console は DevTools の `evaluate_script` 由来と思われる CSP issue のみで、app error/warn は未検出。
 - production deploy、remote smoke、Cloudflare dashboard確認、OBS実機確認は未実行。
 
+(注: 上記は 2026-07-01 時点の記録。production deploy と remote smoke はその後 2026-07-02 に実施済み。OBS実機確認は引き続き未実施で、下の記録欄が空のままである。)
+
 ## キーボード / ロール確認
 
 - Tabでスキップリンク、時計画面リンク、プレビュー背景、生成URL、テンプレートの系統、テンプレート一覧、時計の種類、調整モード、各入力欄へ順に移動できる。
