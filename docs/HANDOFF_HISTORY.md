@@ -34,6 +34,6 @@ GitHub Releases、コード変更の詳細は git log / PR を参照してくだ
 
 **Claude Fable5 2026-07-07（v1.7.1）**: design-taste-frontend 監査の承認2件を実装し v1.7.1 として版上げ(PR #128)。①h2 1.08→1.22rem / h3 0.96→1.06rem で見出し階層をサイズでも支える ②浮遊プレビューのピン📌絵文字をインラインSVG(丸頭+針、currentColor・1em追従)へ置換、未固定時45°傾きと状態色切替は維持。エディタ専用変更で `/clock/` 出力・再現性契約に影響なし。tag / GitHub Release 作成済み、本番反映済み(2026-07-11 実測で一致確認)。
 
-**Claude Fable5 2026-07-11（引き継ぎ整備）**: HANDOFF を v1.7.1 実状態へ同期(184 pass / 51フィールド / 本番一致の実測を反映)し、残タスクを出荷後フェーズへ再構成。README 日本語版プライバシーへ「ラベルに未公開情報を入れない」注意書きを追加(英語版は反映済みだった)。Fable5 期の引き継ぎドラフト3件(`docs/CLAUDECODE_FABLE5_HANDOFF.md` / `docs/CLAUDECODE_FABLE5_PROMPT.md` / `docs/FABLE5_REQUIREMENTS_REVIEW.md`、いずれも 2026-07-02 時点 v1.5.0 基準の歴史的記録)を履歴としてコミット。以後の司令塔運用は `docs/CLAUDECODE_HANDOFF.md`(post-Fable5・役割名ベース)が正。
+**Claude Fable5 2026-07-11（引き継ぎ整備）**: HANDOFF を v1.7.1 実状態へ同期(184 pass / 51フィールド / 本番一致の実測を反映)し、残タスクを出荷後フェーズへ再構成。README 日本語版プライバシーへ「ラベルに未公開情報を入れない」注意書きを追加(英語版は反映済みだった)。Fable5 期の専用 prompt / handoff と `docs/FABLE5_REQUIREMENTS_REVIEW.md`（いずれも 2026-07-02 時点 v1.5.0 基準）を当時コミットした。専用 prompt / handoff は 2026-07-12 に active tree から削除し、git 履歴だけに保持。現行運用は `docs/CLAUDECODE_HANDOFF.md` が正。
 
 **Claude Fable5 2026-07-12（docs 全面整理）**: HANDOFF.md を再構成し、日付付き実施メモを本ファイルへ移設。`docs/PRODUCT_REQUIREMENTS.md` へオーナー確定済みの目的・価値仮説・成功指標(2026-07-02 回答)を統合し、機能要件を v1.7.1 の実装へ追従、旧「ChatGPT司令塔」体制の記述を現行運用へ更新。ROADMAP を残タスク P1〜P3 と整合させ、「Issueテンプレ整備」が実は完了済み(.github/ISSUE_TEMPLATE に3種在存)だった誤りを修正。
