@@ -1,7 +1,7 @@
 # HANDOFF — OBS Clock Overlay Builder（Codex 引き継ぎ＆自走プロンプト）
 
 > このファイルは **Codex がこのリポジトリの開発を単独で引き継いで進める**ための「最新状況サマリ＋作業指示＋運用ルール」です。
-> 更新: 2026-07-01 / 作成者: Claude (Opus 4.8, 司令塔) + Codex / 想定読者: Codex（実装主担当）
+> 更新: 2026-07-11 / 作成者: Claude (Fable 5, 司令塔) + Codex / 想定読者: Codex（実装主担当）
 >
 > **読む順番**: ① この HANDOFF.md（運用と現状） → ② [AGENTS.md](AGENTS.md)（正の規約） → ③ 該当コードを実読。
 > 本文は日本語、コード識別子・ファイル名は原文のまま。`file:line` 参照は確認の起点（行は前後しうるので必ず実コードで照合）。
@@ -25,31 +25,31 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（`v1.5.0` はコードリリース済み／PR #121 反映後もテスト緑＝現状 151 pass）を確認し、HANDOFF.md §1.4 の
-「本番反映までの残タスク」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
+最初の一手: `git status` と `node --test` で現状（`v1.7.1` はリリース済み・本番反映済み／現状 184 pass）を確認し、HANDOFF.md §1.4 の
+「残タスク（v1.7.1 出荷後）」から着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
 ---
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **`master` は `v1.5.0` のコードリリース後の保守PR #121まで完了**。PR #110 の annotated tag `v1.5.0` と GitHub Release は作成済みで、直近では PR #118 の PR #117 後 handoff state sync、PR #119 の `check-js` Node 24 出力guard、PR #120 の template picker accessible name 改善と PR #121 の handoff state sync が merge 済み。
-2. **本番デプロイは 2026-07-02 に実施済み**。オーナーGO(AskUserQuestionで承認取得)後に `release:check`(cf:dry-run 含む)→ `deploy:production` → remote smoke を全通過し、production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` は v1.5.0 配信中(配信中 `config.js` に `smallSeconds` を確認)。Worker version ID は運用ポリシーに従い repo へ記録しない。
-3. **`smallSeconds`（秒を小さく表示）は実装・テスト・docs 済み**。直近のローカル基準では `node --test` は 151 pass / 0 fail。`npm run lint` / `typecheck` / `format:check` / `build` / `release:http-smoke` は通過記録あり。
+1. **`master` は `v1.7.1` リリース＋PR #128 まで完了**。v1.5.1(UI微調整11件)→v1.6.0(日付3軸分解・曜日括弧・AM/PM前置)→v1.7.0(文字調整3グループ・AM/PM小型化・nullable override)→v1.7.1(見出しスケール・ピンSVG化)の順に annotated tag と GitHub Release 作成済み。
+2. **本番は v1.7.1 と一致**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` の配信物を 2026-07-11 に実測し、`config.js` に `meridiemSize`/`labelWeight` を確認、`builder.css` はローカルと byte 一致（見出しスケール・ピンSVG反映済み）。Worker version ID は運用ポリシーに従い repo へ記録しない。
+3. **テストは `node --test` 184 pass / 0 fail**（2026-07-11 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
 まず現物を確認:
 
 ```bash
 git status
-node --test                       # → 151 pass / 0 fail
+node --test                       # → 184 pass / 0 fail
 npm run lint                      # node --check 構文チェックのみ（ESLintではない）
 npm run typecheck                 # import/encode/decode/time のスモーク（tscではない）
 npm run format:check              # 末尾改行・行末空白のみを見る独自チェック（整形器ではない）
 npm run release:http-smoke        # ローカルHTTP smoke（production deployではない）
 ```
 
-> **テスト数 151 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
+> **テスト数 184 は「現時点のスナップショット」**で不変条件ではない。テストを足せば増える。**減ったら回帰＝バグ**として扱う（再生成や件数下方修正で握りつぶさない）。
 
 ---
 
@@ -102,13 +102,14 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 - Builder 390 / 768 / 1280px で横スクロールなし、Mono Sub 選択、生成URL payload `smallSeconds:true`、共有PNG生成を確認。
 - 自動検証: `node --test` 149 pass、`lint` / `typecheck` / `format:check` / `build` / `git diff --check` / `release:http-smoke` 通過。
 
-### 1.4 残タスク
+### 1.4 残タスク（v1.7.1 出荷後・2026-07-11 整理）
 
-1. ~~本番デプロイ前ゲート~~ **完了(2026-07-02)**: `npm run release:check`(cf:dry-run 含む)通過。
-2. ~~production deploy~~ **完了(2026-07-02)**: オーナーGO取得後に `npm run deploy:production` 実施。
-3. ~~remote smoke~~ **完了(2026-07-02)**: `SMOKE_BASE_URL=<prod> npm run release:remote-smoke` 全通過(CSP/nosniff/Referrer-Policy/`frame-ancestors`不在を含む)。
-4. **post-launch ops 更新**: production URL・binding・Actions 状態に変更なしのため更新不要と判断(2026-07-02)。Cloudflare dashboard の費用確認はオーナー側で継続。
-5. **OBS実機QA**(次の残タスク): `docs/manual-qa.md` の記録欄を production URL ベースで埋める(オーナー実機)。
+v1.5.0〜v1.7.1 の実装・リリース・本番反映はすべて完了済み（§0）。残りは「出す・見せる・見つかる」フェーズ（優先順位の根拠は `docs/FABLE5_REQUIREMENTS_REVIEW.md`）:
+
+1. **P1: OBS実機QA の公開記録** — `docs/manual-qa.md` §OBS実機確認 の記録欄を production URL ベースで埋める。**実機操作はオーナー**。Codex は手順書・チェックリスト・記録テンプレの整備で支援できる（OBS Browser Source 固有差分: 透明背景・キャッシュ・フォント解決・DPI・URL長・秒更新の安定性）。
+2. **P2: README スクショ更新** — v1.5.1〜v1.7.1 のUI変化（文字調整3グループ・日付書式・見出しスケール等）へスクショを追従させる。**撮影構図・意匠はデザインエスカレーション対象**（§⚙）。「ラベルに未公開情報を入れない」注意書きは README 日英とも反映済み(2026-07-11)。
+3. **P3: 発見可能性** — `index.html` に OGP/`twitter:card` メタが**未設置**（2026-07-11 実測。`meta name="description"` のみ在る）。OGP追加は CSP・依存ゼロ制約内で可能な純HTML作業＝Codex 単独可。共有画像との整合（`og:image` に何を使うか）は意匠判断が絡むなら先にデザイン方針を得る。
+4. **P4: フィードバック収集導線** — GitHub Issue テンプレ整備（ROADMAP Short Term）。新機能・新テンプレは配信者フィードバックが来てから（先回りしない）。
 
 **Codex 2026-06-21 実施メモ**: PR #110 merge 済み、merge commit `88506a9`。annotated tag `v1.5.0` と GitHub Release `https://github.com/h8nc4y/obs-clock-overlay-builder/releases/tag/v1.5.0` 作成済み。本番 deploy は未実施。
 
@@ -121,6 +122,10 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 **Codex 2026-06-30 実施メモ**: `fix/template-picker-a11y-names` でテンプレート一覧に `role="group"` / `aria-label="テンプレート一覧"` を追加し、生成テンプレートボタンの `aria-label` を「テンプレート『名前』を適用: 補足文」に揃えた。機能面の a11y/キーボード QA として `docs/manual-qa.md` にロール/Tab確認項目を追記。検証は `npm run lint` / `typecheck` / `format:check` / `npm test`（151 pass）/ `npm run build` / `git diff --check` が通過。Chrome DevTools で 500/768/1280px の横スクロールなし、テンプレート一覧DOM属性、テンプレートボタン名を確認。390px相当は Chrome DevTools の最小実測幅が500pxになり、Playwrightはbrowser未導入/起動制約のため未確認。`release:check` は Cloudflare dry-runを含むため未実行。
 
 **Codex 2026-07-01 実施メモ**: `docs/sync-pr120-current-state` でこの handoff の冒頭サマリを PR #119/#120 後の実状態へ同期。コード・公開プロセス文書・Cloudflare ゲートには触れていない。
+
+**Claude Fable5 2026-07-11 実施メモ(引き継ぎ整備)**: HANDOFF を v1.7.1 実状態へ同期(184 pass / 51フィールド / 本番一致の実測を反映)し、§1.4 を「出荷後の残タスク P1〜P4」へ再構成。README 日本語版プライバシーへ「ラベルに未公開情報を入れない」注意書きを追加(英語版は反映済みだった)。Fable5 期の引き継ぎドラフト3件(`docs/CLAUDECODE_FABLE5_HANDOFF.md` / `docs/CLAUDECODE_FABLE5_PROMPT.md` / `docs/FABLE5_REQUIREMENTS_REVIEW.md`、いずれも 2026-07-02 時点 v1.5.0 基準の歴史的記録)を履歴としてコミット。以後の司令塔運用は `docs/CLAUDECODE_HANDOFF.md`(post-Fable5・役割名ベース)が正。
+
+**Claude Fable5 2026-07-07 実施メモ(v1.7.1)**: design-taste-frontend 監査の承認2件を実装し v1.7.1 として版上げ(PR #128)。①h2 1.08→1.22rem / h3 0.96→1.06rem で見出し階層をサイズでも支える ②浮遊プレビューのピン📌絵文字をインラインSVG(丸頭+針、currentColor・1em追従)へ置換、未固定時45°傾きと状態色切替は維持。エディタ専用変更で `/clock/` 出力・再現性契約に影響なし。tag / GitHub Release 作成済み、本番反映済み(2026-07-11 実測で一致確認)。
 
 **Claude Fable5 2026-07-03 実施メモ(v1.7.0)**: 文字調整の細分化を実装し v1.7.0 として版上げ。①`meridiemSize`(既定0.55、意図的デザイン変更)でAM/PMを時刻より小さく(digital/flip静的トークン/共有PNG共通、24h時disabled) ②`dateWeekdayGap`(既定0=詰める、意図的変更)③`labelWeight`/`labelLetterSpacing`/`dateWeight`/`dateLetterSpacing` は **nullable override(null=連動)**で旧URL完全互換(CSSは `var(--x, 従来固定値)` フォールバック化、applyClockStylesはnon-null時のみset)④こだわり「文字の詳細」→「文字調整：ラベル/日付/時刻」3グループ+個別調整トグル(UI状態、OFF=null)⑤miniPreviewSignature の廃止済みdateFormat参照を修正。DEFAULT_CONFIG 51フィールド。`NULLABLE_NUMBER_LIMITS` 新設。テスト184 pass。golden再生成(既存見た目値はbyte-identical)。**実装=Sonnet 5**(codex-deep が sandbox 障害 `CreateProcessAsUserW failed: 5` でファイル読取も不能だったためフォールバック。トリアージ済み・他ウィンドウのCodexセッション競合疑い)。オーナー「deployまでGO」(2026-07-03)。
 
@@ -144,7 +149,7 @@ npm install                      # wrangler を入れる（release:check / cf:dr
 
 # 1) 現状把握
 git status && git --no-pager diff --stat
-node --test                      # 緑を確認（現状 151 pass・減っていないこと。数字は snapshot）
+node --test                      # 緑を確認（現状 184 pass・減っていないこと。数字は snapshot）
 
 # 2) ローカルで実物を見る
 npm run dev                      # http://localhost:4173/ （使用中なら別ポート）
@@ -180,7 +185,7 @@ npm run dev                      # http://localhost:4173/ （使用中なら別�
 - CSS: `tokens.css`（両面共有値のみ）/ `base.css`（リセット・`html.clock-page-root` で透明背景強制）/ `clock.css`（**時計描画契約＝凍結扱い**、compatテスト＋承認でのみ変更）/ `builder.css`（エディタ専用＋3テーマ）/ `styles.css`（旧キャッシュ救済の `@import` シムのみ、現HTMLは未参照）。
 
 ### 3.3 再現性契約（最重要・`config.js`）
-- **正本 = `?c=` ペイロード**。`CONFIG_VERSION = 1`。`DEFAULT_CONFIG` は `Object.freeze`（`smallSeconds` 追加後 41 フィールド）。
+- **正本 = `?c=` ペイロード**。`CONFIG_VERSION = 1`。`DEFAULT_CONFIG` は `Object.freeze`（v1.7.0 時点で **51 フィールド**。v1.7.0 で `NULLABLE_NUMBER_LIMITS`＝null許容override群が追加済み）。
 - **`normalizeConfig` が唯一のサニタイズ関門**。全フィールドが既定値seedから始まり既知キーのみ代入＝未知キーは落ちる。
   - boolean: `coerceBool`（`hour12/showSeconds/smallSeconds/showDate/showWeekday`。`showSeconds` は `raw.showSeconds ?? raw.seconds` 等の別名フォールバックあり）。
   - enum: `enumValue`（厳格 allowlist。`template/clockType/dateFormat/weekdayFormat/labelPosition/analogMarks/analogSecondHand/flipGroup`）。
@@ -206,7 +211,7 @@ npm run dev                      # http://localhost:4173/ （使用中なら別�
 - 運用ポリシー（`docs/post-launch-ops.md`）: 本番デプロイ/ロールバックは承認＋ゲート必須。**健全な本番でロールバックを訓練実行しない**。ロールバック候補IDやWorker版IDは**repoに記録しない**（インシデント時にCloudflare実リストから選ぶ）。secret/token/実データ/private URL/ローカルパスをrepoに書かない。GitHub Actions は**意図的に不在**（費用管理）＝勝手に `push`/`pull_request` トリガを足さない。
 
 ### 3.6 テストと golden fixture
-- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**151 pass**。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
+- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**184 pass**（2026-07-11 時点）。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
 - **golden fixture**（`tests/template-compat.golden.json` ＋ `tests/template-compat.test.mjs`）が「既出 `?c=` URLが二度と無言で見た目変化しない」契約を凍結（`defaultConfig`・全テンプレ・compact/full 復号結果・flat query・`applyClockStyles` スナップショット）。
   - **再生成は「契約を意図的に変えた時だけ」**: `node tests/fixtures/generate-template-compat-golden.mjs`（npmエイリアスなし）。configフィールド/テンプレ追加・encode/decode・`applyClockStyles` 変更時に実行し、**差分をレビューしてコミット**。`template-lineup.test.mjs` の件数も同時更新。
   - ⚠️ **意図しない失敗を再生成で握りつぶさない**。それは実バグ＝コードを直す。再生成は「契約を意図的に変えた」宣言行為。
@@ -239,7 +244,7 @@ AGENTS.md / CONTRIBUTING.md / PRODUCT_REQUIREMENTS.md / ROADMAP.md に横断し�
 - **テンプレ/configフィールドを足したら**: ①`DEFAULT_CONFIG`/`normalizeConfig`/flat/`compactConfig` 全層に配線 ②`template-lineup.test.mjs` の件数更新 ③golden 再生成（§3.6）④共有Canvas（ライブと二重描画）への反映 ⑤READMEの種類数表記。今回の `smallSeconds` がまさにこの全層変更の実例＝参考にできる。
 
 **コミット前セルフレビュー（最低限これを通す）**:
-1. `node --test` 緑（pass 数が**減っていない**／意図して増えている。151 は snapshot で不変条件ではない）。
+1. `node --test` 緑（pass 数が**減っていない**／意図して増えている。184 は snapshot で不変条件ではない）。
 2. `npm run lint && npm run typecheck && npm run format:check` 緑。
 3. 再現性契約（§3.3）・hard contracts（§4）を壊していないか自問。
 4. config/テンプレ変更なら golden を**意図的に**再生成し diff をレビュー済みか。
@@ -287,7 +292,7 @@ ROADMAP（短期）＋直近の全体レビュー（v1.4.0で大半消化済み�
 # 状態
 git status
 git --no-pager diff --stat
-node --test                                   # 緑を確認（現状 151 pass・減っていないこと）
+node --test                                   # 緑を確認（現状 184 pass・減っていないこと）
 
 # 動かす
 npm run dev                                    # / と /clock/
@@ -299,4 +304,4 @@ npm run release:check
 node tests/fixtures/generate-template-compat-golden.mjs
 ```
 
-正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-06-28）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。本ファイルはスナップショット（2026-07-11）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
