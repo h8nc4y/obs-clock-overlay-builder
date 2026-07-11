@@ -6,17 +6,18 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 
 ## Short Term
 
+現在の優先順位付きの残タスク一覧は `HANDOFF.md` §1 が正です。方向性としては:
+
+- Record public-safe OBS real-device QA results (`docs/manual-qa.md` の記録欄).
 - Improve README screenshots and examples when the UI changes.
-- Collect public feedback through GitHub issue templates.
-- Polish docs for OBS setup, troubleshooting, and contributor onboarding.
+- Improve discoverability of the public demo (OGP / social card metadata) within the zero-dependency and CSP constraints.
+- Triage feedback arriving through the existing GitHub issue templates (`.github/ISSUE_TEMPLATE/`).
 - Keep Codex for OSS readiness evidence current without claiming application submission or acceptance.
-- Gather streamer feedback on the digital / analog / flip clock templates and refine the lineup.
 
 ## Medium Term
 
-- Record public-safe OBS real-device QA results.
+- Gather streamer feedback on the digital / analog / flip clock templates and refine the lineup.
 - Expand accessibility and keyboard QA for the builder UI.
-- Use public issues to triage feedback, bugs, and small improvements.
 - Consider additional clock types or template genres only if feedback shows demand.
 - Revisit NFKC, full-width / half-width, and kana / katakana normalization for labels only when concrete cases justify it.
 
