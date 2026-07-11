@@ -80,4 +80,10 @@ product 判断が必要なときだけ止まる。production deployは費用見�
 
 ---
 
-既存の Fable5 期の引き継ぎ文書がある場合は、削除せずこの節からリンクして履歴として保持する。
+## Fable5 期の引き継ぎ文書（履歴・2026-07-02 時点 v1.5.0 基準）
+
+以下は Fable5 期のスナップショットであり、現状把握には使わない（現状は `HANDOFF.md` が正）。
+
+- [CLAUDECODE_FABLE5_HANDOFF.md](CLAUDECODE_FABLE5_HANDOFF.md) — repo handoff（当時の reading order・残タスク）
+- [CLAUDECODE_FABLE5_PROMPT.md](CLAUDECODE_FABLE5_PROMPT.md) — 当時の Fable5 向け共通プロンプト
+- [FABLE5_REQUIREMENTS_REVIEW.md](FABLE5_REQUIREMENTS_REVIEW.md) — 要件再定義・市場調査・優先順位（**P1〜P3 の優先順位根拠は現在も有効**）
