@@ -209,3 +209,11 @@ node tests/fixtures/generate-template-compat-golden.mjs
 前提（コールドスタート時）: Node は **20 以上**（`node:test` / ESM 前提）。`wrangler` は devDependency なので、`release:check`/`cf:dry-run` を回す前に一度 `npm install`（ランタイム依存はゼロなのでアプリ自体の動作には不要）。
 
 正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-12）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+
+## 外部レビュー指摘の台帳（2026-07-15 maxエフォート横断レビュー）
+
+読取専用レビュー（実行検証なし）の指摘。採否と実装は次担当が判断する。完了時は行頭を [x] にし、対応PRを追記する。
+
+- [ ] docs/README.md(資料マップ)が無い — README部分リンクのみ。026/027形式の索引追加を推奨。
+- [ ] PRODUCT_REQUIREMENTS.mdに「未決事項」節がない(残タスクはHANDOFF委譲)。1節追加を推奨。
+- [ ] builder.js:36 — BUILDER_URLが本番URLハードコード(fork/staging配布時もシェア文言が本番を指す。意図的なら注記)。confidence低
