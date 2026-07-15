@@ -98,6 +98,10 @@
 - ライセンス確認と `docs/licenses` 記録なしのfont file同梱。
 - GitHub Actionsの支出上限未確認のままの `push` / `pull_request` trigger追加。
 
+## 未決事項（Open questions）
+
+本書は要件・非目標・品質契約の正本であり、個別の残タスク・優先順位・未決事項の最新状態は `HANDOFF.md`（§1 残タスク・§末尾の外部レビュー指摘台帳）に委譲しています。要件レベルで新たな未決事項が生じた場合は、まず `HANDOFF.md` に記録し、要件として確定したものだけを本書へ反映してください。
+
 ## AI-assisted workflow
 
 - 公開向けの歴史的プロセス記録は `docs/HOW_WE_USE_CODEX.md`（文面はオーナー承認なく変更しない）。
