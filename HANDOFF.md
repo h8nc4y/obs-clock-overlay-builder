@@ -214,6 +214,6 @@ node tests/fixtures/generate-template-compat-golden.mjs
 
 読取専用レビュー（実行検証なし）の指摘。採否と実装は次担当が判断する。完了時は行頭を [x] にし、対応PRを追記する。
 
-- [ ] docs/README.md(資料マップ)が無い — README部分リンクのみ。026/027形式の索引追加を推奨。
-- [ ] PRODUCT_REQUIREMENTS.mdに「未決事項」節がない(残タスクはHANDOFF委譲)。1節追加を推奨。
+- [x] docs/README.md(資料マップ)が無い — README部分リンクのみ。026/027形式の索引追加を推奨。対応PR: #134
+- [x] PRODUCT_REQUIREMENTS.mdに「未決事項」節がない(残タスクはHANDOFF委譲)。1節追加を推奨。対応PR: #134
 - [ ] builder.js:36 — BUILDER_URLが本番URLハードコード(fork/staging配布時もシェア文言が本番を指す。意図的なら注記)。confidence低
