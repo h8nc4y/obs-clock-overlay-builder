@@ -53,7 +53,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 実装・リリース・本番反映は v1.7.1 まで完了済み。残りは「出す・見せる・見つかる」フェーズ。優先順位と市場調査の根拠は [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §目的・§成功指標（経緯の詳細は `docs/FABLE5_REQUIREMENTS_REVIEW.md`）:
 
 1. [ ] **P1: OBS実機QA の公開記録** — [docs/manual-qa.md](docs/manual-qa.md) §OBS実機確認 の記録欄を production URL ベースで埋める。**実機操作はオーナー**。手順書・チェックリスト・記録テンプレは整備済みで、残るのは実機結果の記入（OBS Browser Source 固有差分: 透明背景・キャッシュ・フォント解決・DPI・URL長・秒更新の安定性）。
-2. [x] **P2: README スクショ更新** — `docs/assets/editor-preview.png` を v1.7.1 の現行UIへ更新。1440×900 のローカル実画面を採用し、390×844 / 768×1024 / 1440×900 で横スクロールなし、console error/warning なし、失敗requestなしを 2026-07-16 に確認。
+2. [x] **P2: README スクショ更新** — `docs/assets/editor-preview.png` を v1.7.1 の現行UIへ更新。1440×900 のローカル実画面を採用し、390×844 / 768×1024 / 1440×900 で横スクロールなし、console error/warning なし、失敗requestなしを 2026-07-16 に確認。対応PR: #135
 3. [ ] **P3: 発見可能性** — `index.html` に OGP / `twitter:card` メタが**未設置**（2026-07-16 再確認。`meta name="description"` のみ在る）。CSP・依存ゼロ制約内で、更新済みの README スクリーンショットを `og:image` 候補として追加する。
 4. **保留: 新機能・新テンプレ** — 配信者フィードバック（GitHub Issue）が来てから。Issue テンプレは `.github/ISSUE_TEMPLATE/`（bug_report / feature_request / feedback）に**整備済み**なので、収集導線の新設は不要。
 
