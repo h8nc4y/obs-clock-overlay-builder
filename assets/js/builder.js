@@ -21,6 +21,7 @@ import {
 import { clearShadow, drawDigitalTemplateDecorations, drawRoundedRectPath } from "./share-decorations.js";
 import { analogParts, createAnalogFormatter, createFormatters, formatClock } from "./time.js";
 import {
+  PUBLIC_BUILDER_URL,
   buildShareLines,
   buildShareText,
   buildXIntentUrl,
@@ -33,7 +34,6 @@ import {
 } from "./share.js";
 import { drawShareTime, measureShareTime } from "./share-time.js";
 
-const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 const SHARE_IMAGE_WIDTH = 1200;
 const SHARE_IMAGE_HEIGHT = 675;
 const SHARE_IMAGE_AUTO_REGENERATE_DELAY_MS = 400;
@@ -1219,7 +1219,7 @@ function scheduleShareImageAutoRegenerate() {
 function updateShareText() {
   // 既定文は最初の一度だけ流し込み、ユーザーが編集した内容は上書きしない。
   if (!elements.shareText.value) {
-    elements.shareText.value = buildShareText(BUILDER_URL);
+    elements.shareText.value = buildShareText(PUBLIC_BUILDER_URL);
   }
 }
 
@@ -1231,7 +1231,7 @@ function updateXIntent() {
   }
   // 本文(buildShareText)に URL とハッシュタグを既に含めているため、intent には text のみ
   // 渡す。url= / hashtags= を併せて渡すと X Web Intent が本文末へ二重に追記してしまう。
-  const text = resolveShareText(elements.shareText.value, BUILDER_URL);
+  const text = resolveShareText(elements.shareText.value, PUBLIC_BUILDER_URL);
   elements.xIntent.href = buildXIntentUrl({ text });
 }
 
@@ -1291,7 +1291,7 @@ async function shareGeneratedImage() {
     return;
   }
   const file = new File([shareImageBlob], "obs-clock-share.png", { type: "image/png" });
-  const text = resolveShareText(elements.shareText.value, BUILDER_URL);
+  const text = resolveShareText(elements.shareText.value, PUBLIC_BUILDER_URL);
 
   // 画像ファイルごと共有できる端末(主にスマホ)では OS の共有シートを開く。
   if (typeof navigator !== "undefined" && navigator.canShare?.({ files: [file] }) && navigator.share) {
@@ -2025,7 +2025,7 @@ function drawShareFooter(ctx) {
   ctx.fillText("OBS時計URLビルダーで作成", SHARE_IMAGE_WIDTH / 2, 588);
   ctx.fillStyle = "#5a6172";
   ctx.font = "500 26px system-ui, sans-serif";
-  ctx.fillText(BUILDER_URL, SHARE_IMAGE_WIDTH / 2, 628);
+  ctx.fillText(PUBLIC_BUILDER_URL, SHARE_IMAGE_WIDTH / 2, 628);
 }
 
 function byId(id) {
