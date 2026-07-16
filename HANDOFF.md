@@ -30,7 +30,7 @@ HANDOFF.md §1 の残タスクから着手してください。壊してはい�
 
 ## 0. 最重要 — 30秒で掴む現状
 
-1. **最新リリースは `v1.7.1`**。v1.5.0（小秒表示）→ v1.5.1（UI微調整11件）→ v1.6.0（日付3軸分解・曜日括弧・AM/PM前置）→ v1.7.0（文字調整3グループ・AM/PM小型化・nullable override）→ v1.7.1（見出しスケール・ピンSVG化）まで、各版とも annotated tag と GitHub Release 作成済み。出荷後の README / 発見可能性改善は PR #135 / #136 で追跡する。
+1. **最新リリースは `v1.7.1`**。v1.5.0（小秒表示）→ v1.5.1（UI微調整11件）→ v1.6.0（日付3軸分解・曜日括弧・AM/PM前置）→ v1.7.0（文字調整3グループ・AM/PM小型化・nullable override）→ v1.7.1（見出しスケール・ピンSVG化）まで、各版とも annotated tag と GitHub Release 作成済み。出荷後の README / 発見可能性 / 共有URL契約改善は PR #135〜#137 で追跡する。
 2. **本番は v1.7.1 と一致**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` の配信物を 2026-07-11 に実測し、ローカルとの一致を確認済み。Worker version ID は運用ポリシーに従い repo へ記録しない。
 3. **テストは `node --test` 185 pass / 0 fail**（2026-07-16 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
@@ -215,4 +215,4 @@ node tests/fixtures/generate-template-compat-golden.mjs
 
 - [x] docs/README.md(資料マップ)が無い — README部分リンクのみ。026/027形式の索引追加を推奨。対応PR: #134
 - [x] PRODUCT_REQUIREMENTS.mdに「未決事項」節がない(残タスクはHANDOFF委譲)。1節追加を推奨。対応PR: #134
-- [ ] builder.js:36 — BUILDER_URLが本番URLハードコード(fork/staging配布時もシェア文言が本番を指す。意図的なら注記)。confidence低
+- [x] builder.js:36 — 本番URL固定は、localhost / staging / fork の一時URLではなく公式公開ビルダーへ共有導線を戻す意図的な契約。`PUBLIC_BUILDER_URL` として `share.js` へ一本化し、コメントとtestで固定。対応PR: #137
