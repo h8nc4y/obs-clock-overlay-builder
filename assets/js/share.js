@@ -6,6 +6,10 @@
 // 配信者向けに、ツールの存在を広めることを目的とした既定の投稿文。
 // 末尾に必ずビルダーURLを含め、画像が無くても文章だけで導線になるようにする。
 export const SHARE_HASHTAGS = ["OBS", "配信素材", "VTuber"];
+// 共有文・共有PNGは、localhost / staging / fork の一時URLではなく、
+// 利用者がそのまま使える公式公開ビルダーへ戻す。forkで独自公開先を使う場合は、
+// このcanonical URLを意図的に差し替える。
+export const PUBLIC_BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
 
 export function buildShareText(builderUrl) {
   const url = normalizeBuilderUrl(builderUrl);
@@ -313,7 +317,7 @@ function normalizeHashtags(hashtags) {
 
 function normalizeBuilderUrl(builderUrl) {
   const url = String(builderUrl ?? "").trim();
-  return url || "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
+  return url || PUBLIC_BUILDER_URL;
 }
 
 // Canvas 描画でフォント名をそのまま font プロパティへ入れると、引用符や

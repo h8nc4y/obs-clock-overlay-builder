@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  PUBLIC_BUILDER_URL,
   SHARE_HASHTAGS,
   buildShareLines,
   buildShareText,
@@ -15,12 +16,10 @@ import { drawShareTime, hasSmallShareSeconds, measureShareTime } from "../assets
 import { cssStringLiteral, normalizeConfig } from "../assets/js/config.js";
 import { tokenizeFlip } from "../assets/js/render.js";
 
-const BUILDER_URL = "https://obs-clock-overlay-builder.h8nc4y.workers.dev";
-
 test("buildShareText embeds the builder URL and promo hashtags", () => {
-  const text = buildShareText(BUILDER_URL);
+  const text = buildShareText(PUBLIC_BUILDER_URL);
 
-  assert.ok(text.includes(BUILDER_URL), "share text should carry the builder URL");
+  assert.ok(text.includes(PUBLIC_BUILDER_URL), "share text should carry the builder URL");
   for (const tag of SHARE_HASHTAGS) {
     assert.ok(text.includes(`#${tag}`), `share text should include #${tag}`);
   }
@@ -29,22 +28,23 @@ test("buildShareText embeds the builder URL and promo hashtags", () => {
   assert.match(text, /時計/);
 });
 
-test("buildShareText falls back to the production URL when none is given", () => {
+test("buildShareText falls back to the canonical public URL when none is given", () => {
+  assert.equal(PUBLIC_BUILDER_URL, "https://obs-clock-overlay-builder.h8nc4y.workers.dev");
   const text = buildShareText("");
-  assert.ok(text.includes(BUILDER_URL));
+  assert.ok(text.includes(PUBLIC_BUILDER_URL));
 });
 
 test("buildXIntentUrl builds an x.com intent with text, url and hashtags", () => {
   const href = buildXIntentUrl({
     text: "テスト投稿",
-    url: BUILDER_URL,
+    url: PUBLIC_BUILDER_URL,
     hashtags: ["OBS", "配信素材"]
   });
 
   assert.ok(href.startsWith("https://x.com/intent/tweet?"));
   const params = new URL(href).searchParams;
   assert.equal(params.get("text"), "テスト投稿");
-  assert.equal(params.get("url"), BUILDER_URL);
+  assert.equal(params.get("url"), PUBLIC_BUILDER_URL);
   assert.equal(params.get("hashtags"), "OBS,配信素材");
 });
 
@@ -69,7 +69,7 @@ test("buildXIntentUrl omits empty params instead of sending blanks", () => {
 });
 
 test("buildXIntentUrl percent-encodes the text so the link stays valid", () => {
-  const href = buildXIntentUrl({ text: "a&b c", url: BUILDER_URL });
+  const href = buildXIntentUrl({ text: "a&b c", url: PUBLIC_BUILDER_URL });
   // & や空白がそのまま出るとリンクが壊れる。エンコードされていること。
   assert.ok(!href.includes("a&b c"));
   assert.equal(new URL(href).searchParams.get("text"), "a&b c");
@@ -458,7 +458,7 @@ test("templateDecoration returns empty decoration data for unknown templates", (
 // 回帰: 既定の投稿文から intent を組むと、本文に URL/ハッシュタグが既に入っているので
 // url= / hashtags= を付けてはいけない(付けると X が本文末へ二重追記し、URL/タグが重複する)。
 test("buildXIntentUrl from the default share text carries the URL exactly once and no duplicate params", () => {
-  const text = buildShareText(BUILDER_URL);
+  const text = buildShareText(PUBLIC_BUILDER_URL);
   const href = buildXIntentUrl({ text });
   const params = new URL(href).searchParams;
 
@@ -471,7 +471,7 @@ test("buildXIntentUrl from the default share text carries the URL exactly once a
 
   // 本文(デコード済み)にビルダーURLがちょうど1回だけ含まれる。
   const decoded = params.get("text");
-  const occurrences = decoded.split(BUILDER_URL).length - 1;
+  const occurrences = decoded.split(PUBLIC_BUILDER_URL).length - 1;
   assert.equal(occurrences, 1, "builder URL should appear exactly once in the tweet body");
   // ハッシュタグも本文側に1組だけ。
   for (const tag of SHARE_HASHTAGS) {
@@ -499,12 +499,12 @@ test("normalizeHashtags (via buildXIntentUrl) strips leading #, inner whitespace
 
 test("resolveShareText returns the edited text or falls back to the default", () => {
   // 空・空白のみは既定文へフォールバック。
-  assert.equal(resolveShareText("", BUILDER_URL), buildShareText(BUILDER_URL));
-  assert.equal(resolveShareText("   \n  ", BUILDER_URL), buildShareText(BUILDER_URL));
-  assert.equal(resolveShareText(null, BUILDER_URL), buildShareText(BUILDER_URL));
-  assert.equal(resolveShareText(undefined, BUILDER_URL), buildShareText(BUILDER_URL));
+  assert.equal(resolveShareText("", PUBLIC_BUILDER_URL), buildShareText(PUBLIC_BUILDER_URL));
+  assert.equal(resolveShareText("   \n  ", PUBLIC_BUILDER_URL), buildShareText(PUBLIC_BUILDER_URL));
+  assert.equal(resolveShareText(null, PUBLIC_BUILDER_URL), buildShareText(PUBLIC_BUILDER_URL));
+  assert.equal(resolveShareText(undefined, PUBLIC_BUILDER_URL), buildShareText(PUBLIC_BUILDER_URL));
   // 編集済みはそのまま返す(trim はされない先頭末尾以外は維持)。
-  assert.equal(resolveShareText("好きな投稿文", BUILDER_URL), "好きな投稿文");
+  assert.equal(resolveShareText("好きな投稿文", PUBLIC_BUILDER_URL), "好きな投稿文");
 });
 
 test("tokenizeFlip keeps each digit as a card in single grouping", () => {
