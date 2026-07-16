@@ -54,6 +54,34 @@ test("pages use embedded favicon to avoid browser 404 noise", () => {
   assert.match(favicon, /<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
 });
 
+test("builder exposes canonical Open Graph and X card metadata", () => {
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const requiredTags = [
+    '<meta name="description" content="アカウント不要。時計を調整して生成URLをOBSへ貼るだけで、透明な時計オーバーレイを同じ見た目で再現できます。">',
+    '<link rel="canonical" href="https://obs-clock-overlay-builder.h8nc4y.workers.dev/">',
+    '<meta property="og:type" content="website">',
+    '<meta property="og:locale" content="ja_JP">',
+    '<meta property="og:site_name" content="OBS Clock Overlay Builder">',
+    '<meta property="og:title" content="OBS時計URLビルダー | 無料・登録不要">',
+    '<meta property="og:description" content="アカウント不要。時計を調整して生成URLをOBSへ貼るだけで、透明な時計オーバーレイを同じ見た目で再現できます。">',
+    '<meta property="og:url" content="https://obs-clock-overlay-builder.h8nc4y.workers.dev/">',
+    '<meta property="og:image" content="https://obs-clock-overlay-builder.h8nc4y.workers.dev/assets/og-image.png">',
+    '<meta property="og:image:type" content="image/png">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta property="og:image:alt" content="OBS時計URLビルダーの編集画面。ライブプレビューとテンプレート選択を表示。">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:title" content="OBS時計URLビルダー | 無料・登録不要">',
+    '<meta name="twitter:description" content="アカウント不要。時計を調整して生成URLをOBSへ貼るだけで、透明な時計オーバーレイを同じ見た目で再現できます。">',
+    '<meta name="twitter:image" content="https://obs-clock-overlay-builder.h8nc4y.workers.dev/assets/og-image.png">',
+    '<meta name="twitter:image:alt" content="OBS時計URLビルダーの編集画面。ライブプレビューとテンプレート選択を表示。">'
+  ];
+
+  for (const tag of requiredTags) {
+    assert.ok(html.includes(tag), `missing social metadata: ${tag}`);
+  }
+});
+
 test("manual QA and ops docs cover current post-launch checks", () => {
   const manualQa = readFileSync(new URL("../docs/manual-qa.md", import.meta.url), "utf8");
   const postLaunchOps = readFileSync(new URL("../docs/post-launch-ops.md", import.meta.url), "utf8");

@@ -4,7 +4,8 @@ const targets = [
   "/clock/",
   "/clock",
   "/api/defaults",
-  "/favicon.ico"
+  "/favicon.ico",
+  "/assets/og-image.png"
 ];
 let failed = false;
 

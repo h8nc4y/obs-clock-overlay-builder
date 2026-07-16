@@ -22,7 +22,7 @@
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
-最初の一手: `git status` と `node --test` で現状（v1.7.1 リリース済み・本番反映済み／184 pass）を確認し、
+最初の一手: `git status` と `node --test` で現状（v1.7.1 リリース済み・本番反映済み／185 pass）を確認し、
 HANDOFF.md §1 の残タスクから着手してください。壊してはいけない不変条件は §4、規約・Git/リリース実務は §5 にまとめてあります。
 ```
 
@@ -32,14 +32,14 @@ HANDOFF.md §1 の残タスクから着手してください。壊してはい�
 
 1. **`master` は `v1.7.1` リリース＋PR #129 まで完了**。v1.5.0（小秒表示）→ v1.5.1（UI微調整11件）→ v1.6.0（日付3軸分解・曜日括弧・AM/PM前置）→ v1.7.0（文字調整3グループ・AM/PM小型化・nullable override）→ v1.7.1（見出しスケール・ピンSVG化）まで、各版とも annotated tag と GitHub Release 作成済み。
 2. **本番は v1.7.1 と一致**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` の配信物を 2026-07-11 に実測し、ローカルとの一致を確認済み。Worker version ID は運用ポリシーに従い repo へ記録しない。
-3. **テストは `node --test` 184 pass / 0 fail**（2026-07-12 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
+3. **テストは `node --test` 185 pass / 0 fail**（2026-07-16 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
 まず現物を確認:
 
 ```bash
 git status
-node --test                       # → 184 pass / 0 fail
+node --test                       # → 185 pass / 0 fail
 npm run lint                      # node --check 構文チェックのみ（ESLintではない）
 npm run typecheck                 # import/encode/decode/time のスモーク（tscではない）
 npm run format:check              # 末尾改行・行末空白のみを見る独自チェック（整形器ではない）
@@ -54,7 +54,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 
 1. [ ] **P1: OBS実機QA の公開記録** — [docs/manual-qa.md](docs/manual-qa.md) §OBS実機確認 の記録欄を production URL ベースで埋める。**実機操作はオーナー**。手順書・チェックリスト・記録テンプレは整備済みで、残るのは実機結果の記入（OBS Browser Source 固有差分: 透明背景・キャッシュ・フォント解決・DPI・URL長・秒更新の安定性）。
 2. [x] **P2: README スクショ更新** — `docs/assets/editor-preview.png` を v1.7.1 の現行UIへ更新。1440×900 のローカル実画面を採用し、390×844 / 768×1024 / 1440×900 で横スクロールなし、console error/warning なし、失敗requestなしを 2026-07-16 に確認。対応PR: #135
-3. [ ] **P3: 発見可能性** — `index.html` に OGP / `twitter:card` メタが**未設置**（2026-07-16 再確認。`meta name="description"` のみ在る）。CSP・依存ゼロ制約内で、更新済みの README スクリーンショットを `og:image` 候補として追加する。
+3. [x] **P3: 発見可能性** — `index.html` に canonical / Open Graph / X Card metadata を追加し、1200×630 のローカル実画面 `assets/og-image.png` を配信対象へ追加。build artifact・PNG実寸・remote smoke fixture をテストで固定し、`npm run release:check` / `npm run release:http-smoke` を通過。Playwright でローカル metadata、画像 200 / `image/png`、console / network error なしを 2026-07-16 に確認。production deploy / production URL の remote smoke は未実施。
 4. **保留: 新機能・新テンプレ** — 配信者フィードバック（GitHub Issue）が来てから。Issue テンプレは `.github/ISSUE_TEMPLATE/`（bug_report / feature_request / feedback）に**整備済み**なので、収集導線の新設は不要。
 
 ---
@@ -124,7 +124,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 - 運用ポリシー（[docs/post-launch-ops.md](docs/post-launch-ops.md)）: 本番デプロイ/ロールバックは承認＋ゲート必須。**健全な本番でロールバックを訓練実行しない**。ロールバック候補IDやWorker版IDは**repoに記録しない**（インシデント時にCloudflare実リストから選ぶ）。secret/token/実データ/private URL/ローカルパスをrepoに書かない。GitHub Actions は**意図的に不在**（費用管理）＝勝手に `push`/`pull_request` トリガを足さない。
 
 ### 3.6 テストと golden fixture
-- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**184 pass**（2026-07-12 時点）。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
+- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**185 pass**（2026-07-16 時点）。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
 - **golden fixture**（`tests/fixtures/template-compat.golden.json` ＋ `tests/template-compat.test.mjs`）が「既出 `?c=` URLが二度と無言で見た目変化しない」契約を凍結（`defaultConfig`・全テンプレ・compact/full 復号結果・flat query・`applyClockStyles` スナップショット）。
   - **再生成は「契約を意図的に変えた時だけ」**: `node tests/fixtures/generate-template-compat-golden.mjs`（npmエイリアスなし）。configフィールド/テンプレ追加・encode/decode・`applyClockStyles` 変更時に実行し、**差分をレビューしてコミット**。`template-lineup.test.mjs` の件数も同時更新。
   - ⚠️ **意図しない失敗を再生成で握りつぶさない**。それは実バグ＝コードを直す。再生成は「契約を意図的に変えた」宣言行為。
@@ -191,7 +191,7 @@ AGENTS.md / CONTRIBUTING.md / PRODUCT_REQUIREMENTS.md / ROADMAP.md に横断し�
 # 状態
 git status
 git --no-pager diff --stat
-node --test                                   # 緑を確認（現状 184 pass・減っていないこと）
+node --test                                   # 緑を確認（現状 185 pass・減っていないこと）
 
 # 動かす
 npm run dev                                    # http://localhost:4173/ （builder: / 時計面: /clock/）

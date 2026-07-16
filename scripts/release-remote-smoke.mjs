@@ -34,7 +34,8 @@ const checks = [
     cacheControl: "no-store",
     json: { timezone: null, country: null, source: "static" }
   },
-  { path: "/favicon.ico", bodyIncludes: "<svg" }
+  { path: "/favicon.ico", bodyIncludes: "<svg" },
+  { path: "/assets/og-image.png", contentType: "image/png" }
 ];
 
 let failed = false;

@@ -65,6 +65,12 @@ function serveFixture({ includeSecurityHeaders }) {
       return;
     }
 
+    if (url.pathname === "/assets/og-image.png") {
+      response.writeHead(200, { "content-type": "image/png" });
+      response.end(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+      return;
+    }
+
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
     response.end("not found");
   });
