@@ -10,6 +10,7 @@ const requiredArtifacts = [
   "clock/index.html",
   "api/defaults",
   "favicon.ico",
+  "assets/og-image.png",
   "assets/css/styles.css",
   "assets/css/tokens.css",
   "assets/css/base.css",
@@ -37,6 +38,13 @@ test("build creates required Cloudflare static assets", () => {
       assert.equal(statSync(path).isFile(), true, `${path} should be a file`);
       assert.ok(statSync(path).size > 0, `${path} should not be empty`);
     }
+
+    // social metadata の width/height と実PNGがずれるとカード側で不自然なcropになるため、
+    // PNGシグネチャとIHDRの実寸を外部画像ライブラリなしで固定する。
+    const socialImage = readFileSync(join(outDir, "assets/og-image.png"));
+    assert.equal(socialImage.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+    assert.equal(socialImage.readUInt32BE(16), 1200);
+    assert.equal(socialImage.readUInt32BE(20), 630);
 
     assert.deepEqual(JSON.parse(readFileSync(join(outDir, "api/defaults"), "utf8")), {
       timezone: null,
