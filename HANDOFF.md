@@ -1,9 +1,9 @@
 # HANDOFF — OBS Clock Overlay Builder（Codex 引き継ぎ＆自走プロンプト）
 
 > このファイルは **Codex がこのリポジトリの開発を単独で引き継いで進める**ための「最新状況サマリ＋作業指示＋運用ルール」です。
-> 更新: 2026-07-12 / 2026-07-11 固定分掌廃止を反映 / 想定読者: Codex（開発主軸）
+> 更新: 2026-07-16 / 2026-07-11 固定分掌廃止を反映 / 想定読者: Codex（開発主軸）
 >
-> **読む順番**: ① この HANDOFF.md（運用と現状） → ② [AGENTS.md](AGENTS.md)（正の規約） → ③ [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md)（要件） → ④ 該当コードを実読。
+> **読む順番**: リポジトリ直下の [CODEX_START_HERE.md](CODEX_START_HERE.md) に記載された「読み順（正本）」に従う。
 > 過去の日付付き実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md) に時系列で保管。リリース内容は [CHANGELOG.md](CHANGELOG.md) が正。
 > 本文は日本語、コード識別子・ファイル名は原文のまま。`file:line` 参照は確認の起点（行は前後しうるので必ず実コードで照合）。
 
@@ -13,13 +13,12 @@
 
 ```
 あなた（Codex）はこのリポジトリ（011_obs-clock-overlay-builder）の開発主担当です。
-まず HANDOFF.md を最後まで読み、続いて AGENTS.md と docs/PRODUCT_REQUIREMENTS.md を読んでから着手してください。
+まず CODEX_START_HERE.md を読み、そこに記載された正本資料を順に読んでから着手してください。
 
 運用ルール:
 - 開発はあなた（Codex）が単独で進めて構いません。レビューは原則あなたのセルフレビューで十分です。
-- フロントエンドの「見た目・デザイン」（色/タイポ/余白/レイアウトの美観・新テンプレの意匠・テーマ配色・共有画像の構図）は
-  あなたが独断で決めず、作業を止めてオーナー経由で Claude（デザイン担当）に設計を依頼し、回答を待って再開してください。
-  あなたは構造・ロジック・配線・テスト・ドキュメント・リリース機構を担当します。
+- 要件・設計・UI・実装・テスト・ドキュメントを end-to-end で担当してください。補助 skill や外部レビューは、
+  リスク・曖昧さ・専門性・反復失敗などで品質向上に実益がある場合だけ使い、固定分掌として待たないでください。
 - 本番デプロイ（production）だけは外向き・課金が絡むので、ゲート（release:check 等）を通したうえでオーナーに最終GOを取ってください。
   それ以外（コード/テスト/docs/コミット/ブランチ/PR/版上げ準備/CHANGELOG/staging 検証）は自走で進めて構いません。
 
@@ -49,13 +48,13 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 
 ---
 
-## 1. 残タスク（v1.7.1 出荷後・2026-07-12 整理）
+## 1. 残タスク（v1.7.1 出荷後・2026-07-16 更新）
 
 実装・リリース・本番反映は v1.7.1 まで完了済み。残りは「出す・見せる・見つかる」フェーズ。優先順位と市場調査の根拠は [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §目的・§成功指標（経緯の詳細は `docs/FABLE5_REQUIREMENTS_REVIEW.md`）:
 
-1. **P1: OBS実機QA の公開記録** — [docs/manual-qa.md](docs/manual-qa.md) §OBS実機確認 の記録欄を production URL ベースで埋める。**実機操作はオーナー**。Codex は手順書・チェックリスト・記録テンプレの整備で支援できる（OBS Browser Source 固有差分: 透明背景・キャッシュ・フォント解決・DPI・URL長・秒更新の安定性）。
-2. **P2: README スクショ更新** — v1.5.1〜v1.7.1 のUI変化（文字調整3グループ・日付書式・見出しスケール等）へ `docs/assets/editor-preview.png` を追従させる。**撮影構図・意匠はデザインエスカレーション対象**（§2）。
-3. **P3: 発見可能性** — `index.html` に OGP / `twitter:card` メタが**未設置**（2026-07-11 実測。`meta name="description"` のみ在る）。OGP追加は CSP・依存ゼロ制約内で可能な純HTML作業＝Codex 単独可。ただし `og:image` に何を使うかは意匠判断が絡むため、先にデザイン方針を得るのが安全。
+1. [ ] **P1: OBS実機QA の公開記録** — [docs/manual-qa.md](docs/manual-qa.md) §OBS実機確認 の記録欄を production URL ベースで埋める。**実機操作はオーナー**。手順書・チェックリスト・記録テンプレは整備済みで、残るのは実機結果の記入（OBS Browser Source 固有差分: 透明背景・キャッシュ・フォント解決・DPI・URL長・秒更新の安定性）。
+2. [x] **P2: README スクショ更新** — `docs/assets/editor-preview.png` を v1.7.1 の現行UIへ更新。1440×900 のローカル実画面を採用し、390×844 / 768×1024 / 1440×900 で横スクロールなし、console error/warning なし、失敗requestなしを 2026-07-16 に確認。
+3. [ ] **P3: 発見可能性** — `index.html` に OGP / `twitter:card` メタが**未設置**（2026-07-16 再確認。`meta name="description"` のみ在る）。CSP・依存ゼロ制約内で、更新済みの README スクリーンショットを `og:image` 候補として追加する。
 4. **保留: 新機能・新テンプレ** — 配信者フィードバック（GitHub Issue）が来てから。Issue テンプレは `.github/ISSUE_TEMPLATE/`（bug_report / feature_request / feedback）に**整備済み**なので、収集導線の新設は不要。
 
 ---
@@ -72,7 +71,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 | **Codex が担当する範囲** | 要件、意匠、ロジック/状態/配線、サニタイズ・コーデック・正規化、テスト・golden fixture、共有Canvasの鏡像化、ドキュメント、リリース機構、バグ修正。 |
 | **本番デプロイ** | 外向き＋課金が絡むため**ゲート通過＋オーナー最終GO**（唯一の人間確認ゲート）。staging までは自走可。 |
 
-迷ったら: 「ピクセルの見た目が変わる審美的判断」なら Claude、「挙動・契約・配線・検証」なら Codex。
+迷ったら: Codex が要件・意匠・挙動・契約・配線・検証を一貫して担当し、補助 skill や外部レビューは固定分掌ではなく必要性で選ぶ。
 
 **公開ガバナンス文書の扱い**: [docs/HOW_WE_USE_CODEX.md](docs/HOW_WE_USE_CODEX.md) は「ChatGPT=司令塔、Claude=助言レビュー、Codex=承認スコープのみ実装」という**歴史的・対外的なプロセス記録**であり、文面はオーナー承認なく書き換えない。ただしそれは日々の作業ゲートではない — オーナーが上表の通り Codex セルフレビューへ権限委譲済み。「公開文書は承認前提と書いてあるのに自走してよいのか？」で止まらないこと。答えは「日々の実装は自走、公開文書はそのまま保全」。
 
@@ -208,7 +207,7 @@ node tests/fixtures/generate-template-compat-golden.mjs
 
 前提（コールドスタート時）: Node は **20 以上**（`node:test` / ESM 前提）。`wrangler` は devDependency なので、`release:check`/`cf:dry-run` を回す前に一度 `npm install`（ランタイム依存はゼロなのでアプリ自体の動作には不要）。
 
-正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-12）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-16）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
 
 ## 外部レビュー指摘の台帳（2026-07-15 maxエフォート横断レビュー）
 
