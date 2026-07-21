@@ -1,7 +1,7 @@
 # HANDOFF — OBS Clock Overlay Builder（Codex 引き継ぎ＆自走プロンプト）
 
 > このファイルは **Codex がこのリポジトリの開発を単独で引き継いで進める**ための「最新状況サマリ＋作業指示＋運用ルール」です。
-> 更新: 2026-07-16 / 2026-07-11 固定分掌廃止を反映 / 想定読者: Codex（開発主軸）
+> 更新: 2026-07-21 / 2026-07-11 固定分掌廃止を反映 / 想定読者: Codex（開発主軸）
 >
 > **読む順番**: リポジトリ直下の [CODEX_START_HERE.md](CODEX_START_HERE.md) に記載された「読み順（正本）」に従う。
 > 過去の日付付き実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md) に時系列で保管。リリース内容は [CHANGELOG.md](CHANGELOG.md) が正。
@@ -32,7 +32,7 @@ HANDOFF.md §1 の残タスクから着手してください。壊してはい�
 
 1. **最新リリースは `v1.7.1`**。v1.5.0（小秒表示）→ v1.5.1（UI微調整11件）→ v1.6.0（日付3軸分解・曜日括弧・AM/PM前置）→ v1.7.0（文字調整3グループ・AM/PM小型化・nullable override）→ v1.7.1（見出しスケール・ピンSVG化）まで、各版とも annotated tag と GitHub Release 作成済み。出荷後の README / 発見可能性 / 共有URL契約改善は PR #135〜#137 で追跡する。
 2. **本番は v1.7.1 と一致**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` の配信物を 2026-07-11 に実測し、ローカルとの一致を確認済み。Worker version ID は運用ポリシーに従い repo へ記録しない。
-3. **テストは `node --test` 185 pass / 0 fail**（2026-07-16 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
+3. **テストは `node --test` 185 pass / 0 fail**（2026-07-21 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
 
 まず現物を確認:
@@ -48,13 +48,13 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 
 ---
 
-## 1. 残タスク（v1.7.1 出荷後・2026-07-16 更新）
+## 1. 残タスク（v1.7.1 出荷後・2026-07-21 更新）
 
 実装・リリース・本番反映は v1.7.1 まで完了済み。残りは「出す・見せる・見つかる」フェーズ。優先順位と市場調査の根拠は [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §目的・§成功指標（経緯の詳細は `docs/FABLE5_REQUIREMENTS_REVIEW.md`）:
 
 1. [ ] **P1: OBS実機QA の公開記録** — [docs/manual-qa.md](docs/manual-qa.md) §OBS実機確認 の記録欄を production URL ベースで埋める。**実機操作はオーナー**。手順書・チェックリスト・記録テンプレは整備済みで、残るのは実機結果の記入（OBS Browser Source 固有差分: 透明背景・キャッシュ・フォント解決・DPI・URL長・秒更新の安定性）。
 2. [x] **P2: README スクショ更新** — `docs/assets/editor-preview.png` を v1.7.1 の現行UIへ更新。1440×900 のローカル実画面を採用し、390×844 / 768×1024 / 1440×900 で横スクロールなし、console error/warning なし、失敗requestなしを 2026-07-16 に確認。対応PR: #135
-3. [x] **P3: 発見可能性** — `index.html` に canonical / Open Graph / X Card metadata を追加し、1200×630 のローカル実画面 `assets/og-image.png` を配信対象へ追加。build artifact・PNG実寸・remote smoke fixture をテストで固定し、`npm run release:check` / `npm run release:http-smoke` を通過。Playwright でローカル metadata、画像 200 / `image/png`、console / network error なしを 2026-07-16 に確認。production deploy / production URL の remote smoke は未実施。対応PR: #136
+3. [x] **P3: 発見可能性** — `index.html` に canonical / Open Graph / X Card metadata を追加し、1200×630 のローカル実画面 `assets/og-image.png` を配信対象へ追加。build artifact・PNG実寸・remote smoke fixture をテストで固定し、`npm run release:check` / `npm run release:http-smoke` を通過。Playwright でローカル metadata、画像 200 / `image/png`、console / network error なしを 2026-07-17 に確認。production deploy / production URL の remote smoke は未実施。対応PR: #136
 4. **保留: 新機能・新テンプレ** — 配信者フィードバック（GitHub Issue）が来てから。Issue テンプレは `.github/ISSUE_TEMPLATE/`（bug_report / feature_request / feedback）に**整備済み**なので、収集導線の新設は不要。
 
 ---
@@ -124,7 +124,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 - 運用ポリシー（[docs/post-launch-ops.md](docs/post-launch-ops.md)）: 本番デプロイ/ロールバックは承認＋ゲート必須。**健全な本番でロールバックを訓練実行しない**。ロールバック候補IDやWorker版IDは**repoに記録しない**（インシデント時にCloudflare実リストから選ぶ）。secret/token/実データ/private URL/ローカルパスをrepoに書かない。GitHub Actions は**意図的に不在**（費用管理）＝勝手に `push`/`pull_request` トリガを足さない。
 
 ### 3.6 テストと golden fixture
-- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**185 pass**（2026-07-16 時点）。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
+- `node:test`＋`node:assert/strict` のみ（外部フレームワークなし）。**185 pass**（2026-07-21 時点）。DOMは自前 `FakeElement`/`FakeStyle`、Canvasは「呼び出し記録するfake ctx」、`fetch`/`document` はスタブ。
 - **golden fixture**（`tests/fixtures/template-compat.golden.json` ＋ `tests/template-compat.test.mjs`）が「既出 `?c=` URLが二度と無言で見た目変化しない」契約を凍結（`defaultConfig`・全テンプレ・compact/full 復号結果・flat query・`applyClockStyles` スナップショット）。
   - **再生成は「契約を意図的に変えた時だけ」**: `node tests/fixtures/generate-template-compat-golden.mjs`（npmエイリアスなし）。configフィールド/テンプレ追加・encode/decode・`applyClockStyles` 変更時に実行し、**差分をレビューしてコミット**。`template-lineup.test.mjs` の件数も同時更新。
   - ⚠️ **意図しない失敗を再生成で握りつぶさない**。それは実バグ＝コードを直す。再生成は「契約を意図的に変えた」宣言行為。
@@ -207,7 +207,7 @@ node tests/fixtures/generate-template-compat-golden.mjs
 
 前提（コールドスタート時）: Node は **20 以上**（`node:test` / ESM 前提）。`wrangler` は devDependency なので、`release:check`/`cf:dry-run` を回す前に一度 `npm install`（ランタイム依存はゼロなのでアプリ自体の動作には不要）。
 
-正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-16）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-21）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
 
 ## 外部レビュー指摘の台帳（2026-07-15 maxエフォート横断レビュー）
 
