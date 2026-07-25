@@ -10,6 +10,9 @@
   },
   "homepage": "https://obs-clock-overlay-builder.h8nc4y.workers.dev",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
     "cf:dry-run": "npm run build && wrangler deploy --dry-run --env staging",
@@ -26,6 +29,6 @@
     "test": "node --test"
   },
   "devDependencies": {
-    "wrangler": "^4.92.0"
+    "wrangler": "^4.114.0"
   }
 }

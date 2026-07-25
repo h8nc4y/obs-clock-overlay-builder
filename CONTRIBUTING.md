@@ -4,6 +4,9 @@ Thanks for helping improve OBS Clock Overlay Builder.
 
 ## Development Setup
 
+Use Node.js 22 or newer. This matches the minimum runtime required by the
+current Wrangler development dependency.
+
 ```bash
 npm install
 npm run dev

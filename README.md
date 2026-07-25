@@ -74,7 +74,7 @@ Older flat query parameters are still read for compatibility, for example:
 
 ## Development
 
-Install dependencies once, then use the npm scripts:
+Use Node.js 22 or newer, install dependencies once, then use the npm scripts:
 
 ```bash
 npm install
@@ -205,6 +205,7 @@ npm run build
 npm run release:check
 ```
 
+- 開発には Node.js 22 以上を使用してください。現行の Wrangler が必要とする最小バージョンです。
 - 開発手順と PR 期待値は [CONTRIBUTING.md](CONTRIBUTING.md) を確認してください。
 - 不具合報告、機能提案、感想は [docs/FEEDBACK_GUIDE.md](docs/FEEDBACK_GUIDE.md) を確認して GitHub Issues へ投稿してください。
 - 今後の方向性は [docs/ROADMAP.md](docs/ROADMAP.md)、変更履歴は [CHANGELOG.md](CHANGELOG.md) に記録します。

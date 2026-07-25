@@ -1,7 +1,7 @@
 # HANDOFF — OBS Clock Overlay Builder（Codex 引き継ぎ＆自走プロンプト）
 
 > このファイルは **Codex がこのリポジトリの開発を単独で引き継いで進める**ための「最新状況サマリ＋作業指示＋運用ルール」です。
-> 更新: 2026-07-21 / 2026-07-11 固定分掌廃止を反映 / 想定読者: Codex（開発主軸）
+> 更新: 2026-07-25 / 2026-07-11 固定分掌廃止を反映 / 想定読者: Codex（開発主軸）
 >
 > **読む順番**: リポジトリ直下の [CODEX_START_HERE.md](CODEX_START_HERE.md) に記載された「読み順（正本）」に従う。
 > 過去の日付付き実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md) に時系列で保管。リリース内容は [CHANGELOG.md](CHANGELOG.md) が正。
@@ -32,8 +32,9 @@ HANDOFF.md §1 の残タスクから着手してください。壊してはい�
 
 1. **最新リリースは `v1.7.1`**。v1.5.0（小秒表示）→ v1.5.1（UI微調整11件）→ v1.6.0（日付3軸分解・曜日括弧・AM/PM前置）→ v1.7.0（文字調整3グループ・AM/PM小型化・nullable override）→ v1.7.1（見出しスケール・ピンSVG化）まで、各版とも annotated tag と GitHub Release 作成済み。出荷後の README / 発見可能性 / 共有URL契約改善は PR #135〜#137 で追跡する。
 2. **本番は v1.7.1 と一致**。production URL `https://obs-clock-overlay-builder.h8nc4y.workers.dev` の配信物を 2026-07-11 に実測し、ローカルとの一致を確認済み。Worker version ID は運用ポリシーに従い repo へ記録しない。
-3. **テストは `node --test` 185 pass / 0 fail**（2026-07-21 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
+3. **テストは `node --test` 185 pass / 0 fail**（2026-07-25 実測。数字は snapshot、減ったら回帰）。`DEFAULT_CONFIG` は **51 フィールド**、テンプレは **18 種**。
 4. **このリポは「時計オーバーレイ専用」**。チャット/コメント反応は別プロジェクト `007_yt-live-word-alert-overlay` の担当で、ここには絶対に足さない。
+5. **開発ツールは Wrangler 4.114.0 / Node.js 22 以上**。2026-07-25 に `npm audit` 0件と staging dry-run を実測済み。
 
 まず現物を確認:
 
@@ -48,7 +49,7 @@ npm run release:http-smoke        # ローカルHTTP smoke（production deploy�
 
 ---
 
-## 1. 残タスク（v1.7.1 出荷後・2026-07-21 更新）
+## 1. 残タスク（v1.7.1 出荷後・2026-07-25 更新）
 
 実装・リリース・本番反映は v1.7.1 まで完了済み。残りは「出す・見せる・見つかる」フェーズ。優先順位と市場調査の根拠は [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §目的・§成功指標（経緯の詳細は `docs/FABLE5_REQUIREMENTS_REVIEW.md`）:
 
@@ -205,9 +206,9 @@ npm run release:check
 node tests/fixtures/generate-template-compat-golden.mjs
 ```
 
-前提（コールドスタート時）: Node は **20 以上**（`node:test` / ESM 前提）。`wrangler` は devDependency なので、`release:check`/`cf:dry-run` を回す前に一度 `npm install`（ランタイム依存はゼロなのでアプリ自体の動作には不要）。
+前提（コールドスタート時）: Node は **22 以上**（Wrangler 4.114.0 以降の実行要件）。`wrangler` は devDependency なので、`release:check`/`cf:dry-run` を回す前に一度 `npm install`（ランタイム依存はゼロなのでアプリ自体の動作には不要）。
 
-正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-21）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
+正の規約は [AGENTS.md](AGENTS.md)。過去の実施メモは [docs/HANDOFF_HISTORY.md](docs/HANDOFF_HISTORY.md)。本ファイルはスナップショット（2026-07-25）。コミット後やデプロイ後は内容が古くなるので、節目ごとに実状へ更新すること。
 
 ## 外部レビュー指摘の台帳（2026-07-15 maxエフォート横断レビュー）
 
