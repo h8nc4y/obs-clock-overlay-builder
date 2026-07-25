@@ -4,6 +4,12 @@ All notable public changes to this project will be recorded in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Every version ships a git tag and a GitHub Release; see the [GitHub Releases](https://github.com/h8nc4y/obs-clock-overlay-builder/releases) page and `package.json` for the current version.
 
+## [Unreleased]
+
+### Changed
+
+- Updated the Wrangler development dependency to 4.114.0, removing the currently reported transitive npm audit findings. Development and release checks now require Node.js 22 or newer, matching Wrangler's supported runtime.
+
 ## [1.7.1] - 2026-07-07
 
 ### Changed
