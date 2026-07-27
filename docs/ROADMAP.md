@@ -6,7 +6,8 @@ This roadmap records likely directions for OBS Clock Overlay Builder. It is not 
 
 ## Short Term
 
-現在の優先順位付きの残タスク一覧は `HANDOFF.md` §1 が正です。方向性としては:
+現在の優先順位付き残タスクは `HANDOFF.md` の「Known issues / owner gates」と
+「Next steps」が正です。方向性としては:
 
 - Record public-safe OBS real-device QA results (`docs/manual-qa.md` の記録欄).
 - Improve README screenshots and examples when the UI changes.

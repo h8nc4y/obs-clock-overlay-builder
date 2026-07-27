@@ -35,7 +35,7 @@
 
 ## 主要ファイル（reading order）
 
-1. `HANDOFF.md` — 現況サマリ、残タスク（§1）、運用モデル（§2）、アーキテクチャ、不変条件
+1. `HANDOFF.md` — current state、hard contracts、owner gates、next steps
 2. `AGENTS.md` — Codex側運用ポリシー（プロジェクト固有の差分のみ）
 3. `docs/PRODUCT_REQUIREMENTS.md` — プロダクト要件・価値仮説・成功指標の正本
 4. `docs/ROADMAP.md` — ロードマップ
@@ -44,12 +44,12 @@
 7. `docs/HANDOFF_HISTORY.md` — 過去の日付付き実施メモ（時系列の歴史的記録）
 8. `README.md` — repo概要
 
-`HANDOFF.md` 冒頭の「30秒で掴む現状」節と「残タスク」節は、着手前に必ず現物確認
+`HANDOFF.md` の「Current state」と「Known issues / owner gates」は、着手前に必ず現物確認
 （`git status` / テスト実行 / lint・typecheck・format:check）で裏取りしてから読み進める。
 
 ## 次アクション候補（着手前に HANDOFF.md で最新化を確認）
 
-1. HANDOFF.md の「残タスク」節にある未完了項目（引き継ぎ時点では実機QAなど運用側の確認作業が
+1. HANDOFF.md の「Known issues / owner gates」にある未完了項目（引き継ぎ時点では実機QAなど運用側の確認作業が
    残っている想定）を確認し、ローカルで支援できる範囲（手順整備・チェックリスト・検証スクリプト）
    を先回りで進める。
 2. 直近のPRマージ履歴とCHANGELOGを確認し、HANDOFF.mdの記述と実際のmasterの状態が一致しているか
