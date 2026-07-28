@@ -11,6 +11,7 @@ import {
 } from "./config.js";
 import { loadInitialConfigFromSources } from "./builder-initial-config.js";
 import { createLocalFontOption } from "./font-names.js";
+import { createLatestLocalFontLoader, resetLocalFontResults } from "./local-font-state.js";
 import {
   ROMAN_NUMERALS,
   computeAnalogAngles,
@@ -211,6 +212,11 @@ const booleanFields = [
 const selectFields = ["dateSeparator", "weekdayFormat", "labelPosition", "analogMarks", "analogSecondHand", "flipGroup"];
 let state = loadInitialConfig();
 let localFontSelectBound = false;
+const loadLatestLocalFonts = createLatestLocalFontLoader({
+  isSupported: () => "queryLocalFonts" in window,
+  query: () => window.queryLocalFonts(),
+  toOptions: localFontOptions
+});
 // テンプレカードのミニプレビューが最後に反映した表示設定8項目の署名。
 // これと現在の state が変わったときだけカードを差し替える。
 let lastMiniPreviewSignature = "";
@@ -1034,38 +1040,39 @@ function updateContrastWarning() {
 }
 
 async function loadLocalFonts() {
-  if (!("queryLocalFonts" in window)) {
+  resetLocalFontResults(elements.localFontSelectWrap, elements.localFontSelect);
+  elements.localFontStatus.textContent = "PC内フォント名を確認中…";
+  const result = await loadLatestLocalFonts();
+  if (!result) {
+    return;
+  }
+  if (result.state === "unsupported") {
     elements.localFontStatus.textContent =
       "このブラウザではPC内フォント一覧を読み込めません。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
     return;
   }
-  elements.localFontStatus.textContent = "PC内フォント名を確認中…";
-  try {
-    const fonts = await window.queryLocalFonts();
-    const options = localFontOptions(fonts);
-    if (options.length === 0) {
-      elements.localFontSelectWrap.classList.add("is-hidden");
-      elements.localFontStatus.textContent =
-        "読み込めるフォント名が見つかりませんでした。許可後でも一覧が空になる場合があります。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
-      return;
-    }
-    elements.localFontSelect.textContent = "";
-    for (const fontOption of options) {
-      const option = document.createElement("option");
-      option.value = fontOption.value;
-      option.textContent = fontOption.label;
-      option.dataset.displayName = fontOption.displayName;
-      option.dataset.searchText = fontOption.searchText;
-      option.title = fontOption.searchText;
-      elements.localFontSelect.append(option);
-    }
-    elements.localFontSelectWrap.classList.remove("is-hidden");
-    elements.localFontStatus.textContent = `${options.length}件のフォント名を読み込みました。表示名ではなく、OBSで参照する実フォント名をURLに保存します。`;
-    bindLocalFontSelect();
-  } catch {
+  if (result.state === "error") {
     elements.localFontStatus.textContent =
       "フォント一覧の取得が拒否されました。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
+    return;
   }
+  if (result.state === "empty") {
+    elements.localFontStatus.textContent =
+      "読み込めるフォント名が見つかりませんでした。許可後でも一覧が空になる場合があります。手入力フォント名に、OBS側PCで使えるフォント名を入れてください。";
+    return;
+  }
+  for (const fontOption of result.options) {
+    const option = document.createElement("option");
+    option.value = fontOption.value;
+    option.textContent = fontOption.label;
+    option.dataset.displayName = fontOption.displayName;
+    option.dataset.searchText = fontOption.searchText;
+    option.title = fontOption.searchText;
+    elements.localFontSelect.append(option);
+  }
+  elements.localFontSelectWrap.classList.remove("is-hidden");
+  elements.localFontStatus.textContent = `${result.options.length}件のフォント名を読み込みました。表示名ではなく、OBSで参照する実フォント名をURLに保存します。`;
+  bindLocalFontSelect();
 }
 
 function localFontOptions(fonts) {
