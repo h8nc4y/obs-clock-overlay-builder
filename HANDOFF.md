@@ -13,7 +13,7 @@
 
 ## Current state
 
-- product/tooling baseline: `c58d095`（PR #140、Wrangler 4.114.0 security update）。
+- product/tooling baseline: `14e5852`（PR #142、PC内フォント再読み込み状態の修正）。
 - release: v1.7.1。production は 2026-07-11 に v1.7.1 と一致を実測済み。
 - local baseline: Node.js 22以上、Wrangler 4.114.0、runtime dependency 0、
   `DEFAULT_CONFIG` 51 fields、18 templates。
@@ -23,7 +23,7 @@
   build、local HTTP smoke 6 routes、
   `npm audit` 0件。
   `npm run release:check`（Wrangler staging dry-runを含む）もpass。
-- PR #135〜#141 は merge済み。PR #136 の OGP asset はproduction未反映で、
+- PR #135〜#142 は merge済み。PR #136 の OGP asset はproduction未反映で、
   2026-07-21 のremote smokeでは既存5経路が200、`/assets/og-image.png`が404。
 
 ## Hard contracts
