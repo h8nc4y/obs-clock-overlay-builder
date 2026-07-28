@@ -28,15 +28,19 @@ const securityHeaders = {
 
 const server = createServer((request, response) => {
   let url;
+  let cleanPath;
   try {
     url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
+    // filesystem参照前に一度だけdecodeする。不正percent/UTF-8は固定400へ閉じ、
+    // 二重decodeでencoded separatorやtraversalの意味が変わらないようにする。
+    cleanPath = decodeURIComponent(url.pathname);
   } catch {
-    // 不正なリクエストターゲット(例: "//", "/\\")で new URL が throw してもサーバを落とさない。
+    // 不正なrequest targetまたはpercent encodingでも、入力を反射せずサーバを継続する。
     response.writeHead(400, { "content-type": "text/plain; charset=utf-8", ...securityHeaders });
     response.end("Bad request");
     return;
   }
-  const filePath = resolvePath(url.pathname);
+  const filePath = resolvePath(cleanPath);
   if (!filePath) {
     response.writeHead(403);
     response.end("Forbidden");
@@ -60,7 +64,7 @@ server.listen(port, () => {
 });
 
 function resolvePath(pathname) {
-  let cleanPath = decodeURIComponent(pathname);
+  let cleanPath = pathname;
   if (cleanPath === "/clock") {
     cleanPath = "/clock/";
   }

@@ -1,6 +1,6 @@
 # HANDOFF — OBS Clock Overlay Builder
 
-最終更新: 2026/07/28 JST
+最終更新: 2026/07/29 JST
 
 このファイルは現況だけを持つ短い引き継ぎです。要件は
 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md)、過去の実施記録は
@@ -23,6 +23,11 @@
   build、local HTTP smoke 6 routes、
   `npm audit` 0件。
   `npm run release:check`（Wrangler staging dry-runを含む）もpass。
+- 2026-07-29: local server は malformed percent / UTF-8 path をfilesystem参照前に
+  固定400と既存security headersへ閉じ、同じprocessで正常GETを継続する。
+  二重decodeはせず、encoded separator / NUL / traversalの既存境界を維持。
+  lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、
+  build、local HTTP smoke 6 routes、Wrangler staging dry-runがpass。
 - PR #135〜#142 は merge済み。PR #136 の OGP asset はproduction未反映で、
   2026-07-21 のremote smokeでは既存5経路が200、`/assets/og-image.png`が404。
 
