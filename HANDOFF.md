@@ -13,7 +13,7 @@
 
 ## Current state
 
-- product/tooling baseline: `14e5852`（PR #142、PC内フォント再読み込み状態の修正）。
+- product/tooling baseline: `aad85c6`（PR #144、local serverのmalformed path耐性）。
 - release: v1.7.1。production は 2026-07-11 に v1.7.1 と一致を実測済み。
 - local baseline: Node.js 22以上、Wrangler 4.114.0、runtime dependency 0、
   `DEFAULT_CONFIG` 51 fields、18 templates。
@@ -28,7 +28,7 @@
   二重decodeはせず、encoded separator / NUL / traversalの既存境界を維持。
   lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、
   build、local HTTP smoke 6 routes、Wrangler staging dry-runがpass。
-- PR #135〜#142 は merge済み。PR #136 の OGP asset はproduction未反映で、
+- PR #135〜#144 は merge済み。PR #136 の OGP asset はproduction未反映で、
   2026-07-21 のremote smokeでは既存5経路が200、`/assets/og-image.png`が404。
 
 ## Hard contracts
