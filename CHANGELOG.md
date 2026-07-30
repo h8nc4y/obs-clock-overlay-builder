@@ -6,9 +6,19 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+- Added Open Graph / X Card metadata and a 1200x630 social preview image to the build (PR #136). The image remains undeployed in production; the latest recorded production smoke returned 404 for `/assets/og-image.png`.
+
 ### Changed
 
+- Centralized share text, X intent, Web Share, and Canvas footer URLs on `PUBLIC_BUILDER_URL`, so public shares consistently point to the canonical builder (PR #137).
 - Updated the Wrangler development dependency to 4.114.0, removing the currently reported transitive npm audit findings. Development and release checks now require Node.js 22 or newer, matching Wrangler's supported runtime.
+
+### Fixed
+
+- Reloading local fonts after a permission denial or empty result now clears the previous choices, and overlapping loads apply only the latest-started result (PR #142).
+- The local development server now returns a fixed, non-reflective 400 response for malformed percent-encoded or UTF-8 request paths and continues serving later requests (PR #144).
 
 ## [1.7.1] - 2026-07-07
 
