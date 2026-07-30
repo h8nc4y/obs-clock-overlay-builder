@@ -13,7 +13,7 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 ### Changed
 
 - Centralized share text, X intent, Web Share, and Canvas footer URLs on `PUBLIC_BUILDER_URL`, so public shares consistently point to the canonical builder (PR #137).
-- Updated the Wrangler development dependency to 4.114.0, removing the currently reported transitive npm audit findings. Development and release checks now require Node.js 22 or newer, matching Wrangler's supported runtime.
+- Updated the Wrangler development dependency to 4.115.0. The current npm audit remains at zero findings, and development and release checks still require Node.js 22 or newer.
 
 ### Fixed
 
