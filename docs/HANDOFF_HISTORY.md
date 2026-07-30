@@ -43,3 +43,11 @@ GitHub Releases、コード変更の詳細は git log / PR を参照してくだ
 **Codex 2026-07-28（PC内フォント再読み込み状態）**: PR #142 / merge commit `14e5852`。Issue #10 の残課題から、一度成功したPC内フォント読み込みを再実行して権限拒否または空状態になると、以前の一覧が選択可能なまま残る不具合を修正。問い合わせ前に前回結果を不可視・空へ戻し、非対応を含む並行応答の順が逆転しても最後に開始した結果だけを反映する。失敗時は手入力案内だけを残す契約を要件・manual QA・単体テストへ同期した。検証は lint 42 files、typecheck、format 108 files、`node --test` 188 pass / 0 fail、build、`release:check`（Wrangler staging dry-run 29 assetsを含む）、local HTTP smoke 6 routes、`npm audit` 0件、`npm outdated` 0件、`git diff --check` がpass。Chrome DevToolsで390x844 / 768x1024 / 1280x900を確認し、全viewportで旧一覧0件・非表示、手入力欄表示、横スクロール0、app console error/warn 0、app network失敗0を実測。合成した遅い成功→速い拒否の逆順応答でも拒否表示と空一覧を維持した。production deploy / remote smoke / OBS実機確認は未実行。
 
 **Codex 2026-07-29（local server malformed path耐性）**: `scripts/serve.mjs` が malformed percent escape、truncated `%`、不正UTF-8 escapeを `decodeURIComponent` で未捕捉のまま落としていたため、filesystem参照前にpathnameを一度だけdecodeし、失敗時は入力非反射の固定400本文と既存security headersを返してprocessを継続するよう修正した。二重decodeは行わず、encoded slash/backslash、NUL、dot traversalの既存fail-closed境界を回帰テストへ固定。公開UI、`/clock/?c=...`、production配信内容は変更していない。検証は lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、build、`release:check`（Wrangler staging dry-run 29 assetsを含む）、local HTTP smoke 6 routes、`git diff --check` がpass。production deploy / remote smoke / OBS実機確認は未実行。
+
+**Codex 2026-07-30（次期release判断材料）**: Class Mのdocs-only作業として、`v1.7.1..c2f0694` の公開影響を `CHANGELOG.md` の `[Unreleased]` と突合した。
+OGP / X Cardと1200×630画像、公開共有URLの一本化、Wrangler 4.114.0とNode.js 22要件、PC内フォント再読み込み、local server pathの5件が対応し、欠落は見つからなかったため `CHANGELOG.md` は変更していない。
+README画像更新と正本整理等のdocs-only差分は製品挙動を変えないため、release note項目と分離した。
+後方互換な公開metadata追加を含むためSemVer候補を `v1.8.0` としたが、release scope / versionはオーナー未確定であり、`package.json`、tag、GitHub Release、productionは変更していない。
+検証は lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、build、`release:check`（uploadしないWrangler staging dry-run 29 assetsを含む）、local HTTP smoke 6 routes、`git diff --check` がpass。
+scanner / check-all / readiness / global hook、browser、production remote smoke、OBS実機QAは未実行。
+productionでは `/assets/og-image.png` の404記録が残り、version確定、公開Release、production deployは引き続きオーナーgate。
