@@ -1,6 +1,6 @@
 # HANDOFF — OBS Clock Overlay Builder
 
-最終更新: 2026/07/29 JST
+最終更新: 2026/07/30 JST
 
 このファイルは現況だけを持つ短い引き継ぎです。要件は
 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md)、過去の実施記録は
@@ -28,7 +28,17 @@
   二重decodeはせず、encoded separator / NUL / traversalの既存境界を維持。
   lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、
   build、local HTTP smoke 6 routes、Wrangler staging dry-runがpass。
-- PR #135〜#144 は merge済み。PR #136 の OGP asset はproduction未反映で、
+- next release decision base: `v1.7.1..c2f0694`。
+  `CHANGELOG.md` の `[Unreleased]` は、OGP / X Card、公開共有URL、Wrangler更新、
+  PC内フォント再読み込み、local server pathの公開挙動・開発要件5件を収録。
+  README画像更新と正本整理等のdocs-only差分は製品挙動を変えないため分離し、
+  release note対象の欠落は未検出。
+- 後方互換な公開metadata追加を含むためSemVer候補は `v1.8.0`。
+  release scope / versionはオーナー未確定で、`package.json` は `1.7.1` のまま。
+- 2026-07-30: lint 43 files、typecheck、format 78 files、`node --test`
+  192 pass / 0 fail、build、local HTTP smoke 6 routes、
+  `release:check`（Wrangler staging dry-run 29 assets）がpass。
+- PR #135〜#146 は merge済み。PR #136 の OGP asset はproduction未反映で、
   2026-07-21 のremote smokeでは既存5経路が200、`/assets/og-image.png`が404。
 
 ## Hard contracts
@@ -75,8 +85,9 @@ production remote smoke、rollback、OBS実機確認は下記gateを越えてか
 ## Known issues / owner gates
 
 1. P1: production URLをOBS Browser Sourceへ貼る実機QAと公開記録。
-2. P3: 現行masterのrelease scope/versionを確定し、`package.json` / `CHANGELOG.md`、
-   tag、GitHub Releaseを揃えた後のproduction deployとremote smoke。
+2. P3: `v1.7.1..c2f0694` の公開影響は `[Unreleased]` と突合済み。
+   オーナーがrelease scope / versionを確定してから `package.json` / `CHANGELOG.md`、
+   tag、GitHub Release、production deploy、remote smokeを揃える。
 3. 新機能・新テンプレ・意匠変更: Issue #10 / #29等の利用者feedbackまたは
    オーナーがscopeを確定してから。
 
@@ -86,8 +97,9 @@ OBS実接続・実配信、secret/OAuth、実データ、費用、production操�
 
 - local checks、依存・security health、docs driftを保守する。
 - P1はオーナー実機結果を受けて `docs/manual-qa.md` を更新する。
-- P3はversion / `CHANGELOG.md` → preflight → merge → tag / GitHub Releaseを
-  確定し、オーナーGO後にproduction deploy → remote smokeを行う。未リリースの
+- P3はオーナーがscope / versionを確定後、`package.json` / `CHANGELOG.md` →
+  preflight → merge → tag / GitHub Releaseを揃える。
+  production deploy → remote smokeはオーナーGO後に行い、未リリースの
   `master`を直接productionへ出さない。
 
 ## Do not re-read
