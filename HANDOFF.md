@@ -15,7 +15,7 @@
 
 - product/tooling baseline: `aad85c6`（PR #144、local serverのmalformed path耐性）。
 - release: v1.7.1。production は 2026-07-11 に v1.7.1 と一致を実測済み。
-- local baseline: Node.js 22以上、Wrangler 4.114.0、runtime dependency 0、
+- local baseline: Node.js 22以上、Wrangler 4.115.0、runtime dependency 0、
   `DEFAULT_CONFIG` 51 fields、18 templates。
 - 2026-07-28: Issue #10 のPC内フォント再読み込みで、拒否・空状態後に
   以前の選択肢を残さず、応答順が逆転しても最後の取得結果だけを表示するよう修正。
@@ -38,6 +38,8 @@
 - 2026-07-30: lint 43 files、typecheck、format 78 files、`node --test`
   192 pass / 0 fail、build、local HTTP smoke 6 routes、
   `release:check`（Wrangler staging dry-run 29 assets）がpass。
+- 2026-07-30: 開発専用Wranglerを4.115.0へ更新。`npm ci`、version確認、
+  `npm audit` 0件、`release:check`（192 pass / dry-run 29 assets）がpass。runtime・公開挙動は変更なし。
 - PR #135〜#146 は merge済み。PR #136 の OGP asset はproduction未反映で、
   2026-07-21 のremote smokeでは既存5経路が200、`/assets/og-image.png`が404。
 
