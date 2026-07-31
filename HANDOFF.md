@@ -1,6 +1,6 @@
 # HANDOFF — OBS Clock Overlay Builder
 
-最終更新: 2026/07/30 JST
+最終更新: 2026/08/01 JST
 
 このファイルは現況だけを持つ短い引き継ぎです。要件は
 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md)、過去の実施記録は
@@ -13,34 +13,25 @@
 
 ## Current state
 
-- product/tooling baseline: `aad85c6`（PR #144、local serverのmalformed path耐性）。
+- product behavior baseline: `aad85c6`（PR #144、local serverのmalformed path耐性）。
+- repository/tooling baseline: `cfe0fcb`（PR #148、Wrangler 4.115.0）。
+  merge commit `e497b16`と同一treeで、runtime・公開挙動は変更していない。
 - release: v1.7.1。production は 2026-07-11 に v1.7.1 と一致を実測済み。
 - local baseline: Node.js 22以上、Wrangler 4.115.0、runtime dependency 0、
   `DEFAULT_CONFIG` 51 fields、18 templates。
-- 2026-07-28: Issue #10 のPC内フォント再読み込みで、拒否・空状態後に
-  以前の選択肢を残さず、応答順が逆転しても最後の取得結果だけを表示するよう修正。
-  lint 42 files、typecheck、format 108 files、`node --test` 188 pass / 0 fail、
-  build、local HTTP smoke 6 routes、
-  `npm audit` 0件。
-  `npm run release:check`（Wrangler staging dry-runを含む）もpass。
-- 2026-07-29: local server は malformed percent / UTF-8 path をfilesystem参照前に
-  固定400と既存security headersへ閉じ、同じprocessで正常GETを継続する。
-  二重decodeはせず、encoded separator / NUL / traversalの既存境界を維持。
-  lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、
-  build、local HTTP smoke 6 routes、Wrangler staging dry-runがpass。
-- next release decision base: `v1.7.1..c2f0694`。
+- local-safe verification baseline（2026-08-01）: `release:check`（lint 43 files、
+  typecheck、format 78 files、192 pass / 0 fail、build、Wrangler staging dry-run
+  29 assets）、local HTTP smoke 6 routes、`npm audit` 0件がpass。
+  Gitleaksは作業木と190 commits、Semgrepはlocal security rulesで検出0件。
+- next release decision content range: `v1.7.1..cfe0fcb`。末尾はPR #148の
+  release影響を持つ最終commitで、merge commitは`e497b16`。
   `CHANGELOG.md` の `[Unreleased]` は、OGP / X Card、公開共有URL、Wrangler更新、
   PC内フォント再読み込み、local server pathの公開挙動・開発要件5件を収録。
   README画像更新と正本整理等のdocs-only差分は製品挙動を変えないため分離し、
   release note対象の欠落は未検出。
 - 後方互換な公開metadata追加を含むためSemVer候補は `v1.8.0`。
   release scope / versionはオーナー未確定で、`package.json` は `1.7.1` のまま。
-- 2026-07-30: lint 43 files、typecheck、format 78 files、`node --test`
-  192 pass / 0 fail、build、local HTTP smoke 6 routes、
-  `release:check`（Wrangler staging dry-run 29 assets）がpass。
-- 2026-07-30: 開発専用Wranglerを4.115.0へ更新。`npm ci`、version確認、
-  `npm audit` 0件、`release:check`（192 pass / dry-run 29 assets）がpass。runtime・公開挙動は変更なし。
-- PR #135〜#146 は merge済み。PR #136 の OGP asset はproduction未反映で、
+- PR #135〜#148 は merge済み。PR #136 の OGP asset はproduction未反映で、
   2026-07-21 のremote smokeでは既存5経路が200、`/assets/og-image.png`が404。
 
 ## Hard contracts
@@ -87,7 +78,7 @@ production remote smoke、rollback、OBS実機確認は下記gateを越えてか
 ## Known issues / owner gates
 
 1. P1: production URLをOBS Browser Sourceへ貼る実機QAと公開記録。
-2. P3: `v1.7.1..c2f0694` の公開影響は `[Unreleased]` と突合済み。
+2. P3: `v1.7.1..cfe0fcb` の公開影響は `[Unreleased]` と突合済み。
    オーナーがrelease scope / versionを確定してから `package.json` / `CHANGELOG.md`、
    tag、GitHub Release、production deploy、remote smokeを揃える。
 3. 新機能・新テンプレ・意匠変更: Issue #10 / #29等の利用者feedbackまたは

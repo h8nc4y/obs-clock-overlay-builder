@@ -51,3 +51,10 @@ README画像更新と正本整理等のdocs-only差分は製品挙動を変え�
 検証は lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、build、`release:check`（uploadしないWrangler staging dry-run 29 assetsを含む）、local HTTP smoke 6 routes、`git diff --check` がpass。
 scanner / check-all / readiness / global hook、browser、production remote smoke、OBS実機QAは未実行。
 productionでは `/assets/og-image.png` の404記録が残り、version確定、公開Release、production deployは引き続きオーナーgate。
+
+**Codex 2026-08-01（release判断範囲をPR #148へ同期）**: `v1.7.1..cfe0fcb` を `CHANGELOG.md` の `[Unreleased]` と再突合し、PR #147のrelease判断文書とPR #148のWrangler 4.115.0更新までを現行範囲へ含めた。
+製品挙動の基準はPR #144の `aad85c6`、repository/toolingの基準はPR #148の `cfe0fcb` と分け、後者とmerge commit `e497b16` が同一treeであることを確認した。
+公開影響・開発要件の5件、SemVer候補 `v1.8.0`、production OGP 404の既存記録、オーナーgateは変更していない。
+検証は lint 43 files、typecheck、format 78 files、`node --test` 192 pass / 0 fail、build、`release:check`（uploadしないWrangler staging dry-run 29 assetsを含む）、local HTTP smoke 6 routes、`npm audit` 0件（91 dependencies）、`git diff --check` がpass。
+Gitleaksは作業木と190 commits、Semgrepはlocal security rulesを走査し、いずれも検出0件。
+tag、GitHub Release、production deploy、remote smoke、OBS実機QAは未実行。
