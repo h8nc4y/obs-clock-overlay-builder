@@ -68,6 +68,7 @@
 - 新規Cloudflare公開はWorkers with Static Assetsを第一候補にします。
 - Cloudflare Pages compatibilityは、`functions/api/defaults.js` が harmless optional fallbackである限り残してよいです。
 - `api/defaults` は拡張子なしの静的JSONです。`{"timezone":null,"country":null,"source":"static"}` を返し、JSON `Content-Type` と `Cache-Control: no-store` は `_headers` によって指定します。この前提はlocal/remote smoke checksで監視します。
+- local dev serverは成功・errorを問わず、公開配信と同じCSP・`X-Content-Type-Options: nosniff`・`Referrer-Policy: no-referrer`を返します。400/403/404は入力pathを反射しない固定plain textとします。
 - `wrangler.jsonc` では `run_worker_first` を使わず、通常の静的配信は `dist/` のStatic Assetsへ任せます。
 - productionが正常な間は、訓練目的だけでproduction rollbackを実行しません。
 - GitHub ActionsやCloudflare運用は、費用・無料枠・支出上限の確認を前提にします。運用手順の詳細は `docs/post-launch-ops.md`。
@@ -77,6 +78,7 @@
 - `npm run lint` はESLintではなく、`node --check` によるJavaScript構文チェックです。
 - `npm run typecheck` はTypeScript型検査ではなく、主要module importとencode/decode/time formatのsmoke checkです。
 - `npm test` はNode testを実行します。`tests/build.test.mjs` は `DIST_DIR` で指定した一時ディレクトリへビルドして検証するため、共有 `dist/` を生成・変更せず、並列実行でも競合しません。
+- local serverのpath回帰testはmalformed・存在しないpathの固定error response、security headers、error後のprocess継続を検証します。
 - golden fixture（`tests/fixtures/template-compat.golden.json`）が「既出 `?c=` URLが無言で見た目変化しない」契約を凍結します。再生成は契約を意図的に変えたときだけ行い、差分をレビューします。
 - 通常のrelease preflightは `npm run release:check` と `npm run release:http-smoke`、staging/production確認は `SMOKE_BASE_URL=<deploy-url> npm run release:remote-smoke` です。手順の詳細は `docs/pre-release-qa.md`。
 

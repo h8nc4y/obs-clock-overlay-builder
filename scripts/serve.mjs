@@ -26,6 +26,12 @@ const securityHeaders = {
     "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'"
 };
 
+function sendTextError(response, status, body) {
+  // error種別ごとの差をstatusと固定本文だけに限定し、防御ヘッダの付け忘れを防ぐ。
+  response.writeHead(status, { "content-type": "text/plain; charset=utf-8", ...securityHeaders });
+  response.end(body);
+}
+
 const server = createServer((request, response) => {
   let url;
   let cleanPath;
@@ -36,19 +42,16 @@ const server = createServer((request, response) => {
     cleanPath = decodeURIComponent(url.pathname);
   } catch {
     // 不正なrequest targetまたはpercent encodingでも、入力を反射せずサーバを継続する。
-    response.writeHead(400, { "content-type": "text/plain; charset=utf-8", ...securityHeaders });
-    response.end("Bad request");
+    sendTextError(response, 400, "Bad request");
     return;
   }
   const filePath = resolvePath(cleanPath);
   if (!filePath) {
-    response.writeHead(403);
-    response.end("Forbidden");
+    sendTextError(response, 403, "Forbidden");
     return;
   }
   if (!existsSync(filePath)) {
-    response.writeHead(404);
-    response.end("Not found");
+    sendTextError(response, 404, "Not found");
     return;
   }
   response.writeHead(200, {

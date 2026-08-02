@@ -1,6 +1,6 @@
 # HANDOFF — OBS Clock Overlay Builder
 
-最終更新: 2026/08/01 JST
+最終更新: 2026/08/02 JST
 
 このファイルは現況だけを持つ短い引き継ぎです。要件は
 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md)、過去の実施記録は
@@ -10,6 +10,28 @@
 
 公開済み v1.7.1 を安定運用し、`/clock/?c=...` の再現性と時計専用面を守る。
 新機能・新テンプレは利用者 feedback またはオーナーが task を確定するまで着手しない。
+
+## Integration-ready Class M — local error response headers
+
+- 目的: local dev serverの404/403も、200/400と同じCSP・`nosniff`・
+  `no-referrer`を返し、「全レスポンス」の公開説明とlocal検証環境を一致させる。
+- 影響: `scripts/serve.mjs` のlocal error responseと合成testだけ。公開asset、
+  production配信、OBS表示、release versionは変更しない。
+- 受入条件: 既存statusと固定本文を維持し、入力pathを反射せず、404/403へ
+  `text/plain; charset=utf-8`と既定security headersを付け、error後も同じprocessが
+  正常GETを処理できる。
+- 実装状態: `fix/dev-server-error-headers`で固定text error helperへ400/403/404を
+  共通化し、404のbody・非反射・headers・process継続を合成testへ固定した。
+- 実測: 404 test追加直後は4 pass / 1 fail（`Content-Type`欠落）でRED、実装後は
+  targeted 5 pass / 0 fail。Wranglerをtracked正本の4.115.0へ揃えた後、
+  `release:check`（lint 43 files、typecheck、format 109 files、193 pass / 0 fail、
+  build、staging dry-run 29 assets、`git diff --check`）とlocal HTTP smoke 6 routesがpass。
+- 独立review: P0/P1/P2なし。403はshared helper適用を静的確認したが、現在の
+  path正規化から403へ到達する合成fixtureがなく、直接のintegration testは未確認（P3）。
+- security実測: private-markerは`master` / 候補treeとも33件でdelta 0、
+  Gitleaksはstaged差分0件、Semgrepは200 rules / 4 targetsで0件。
+  marker値は記録・再掲していない。
+- 未実行: production deploy / remote smoke、OBS実機確認。
 
 ## Current state
 
