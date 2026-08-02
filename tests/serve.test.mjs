@@ -43,6 +43,31 @@ for (const malformedPath of malformedPaths) {
   });
 }
 
+test("local server protects a missing-path response without terminating", async () => {
+  const fixture = await startLocalServer();
+  try {
+    const missingPath = "/codex-missing-local-asset.html";
+
+    // 存在しないpathも固定404へ閉じ、成功面と同じ防御ヘッダを返す。
+    const rejected = await requestPath(fixture.port, missingPath);
+    assert.equal(rejected.status, 404);
+    assert.equal(rejected.body, "Not found");
+    assert.doesNotMatch(rejected.body, new RegExp(escapeRegExp(missingPath)));
+    assert.equal(rejected.headers["content-type"], "text/plain; charset=utf-8");
+    for (const [name, value] of Object.entries(expectedSecurityHeaders)) {
+      assert.equal(rejected.headers[name], value);
+    }
+
+    // error応答後も同じprocessが通常面を配信できることを固定する。
+    assert.equal(fixture.child.exitCode, null, fixture.stderr());
+    const healthy = await requestPath(fixture.port, "/");
+    assert.equal(healthy.status, 200);
+    assert.match(healthy.body, /OBS時計URLビルダー/);
+  } finally {
+    await fixture.close();
+  }
+});
+
 test("local server decodes a request path exactly once and keeps traversal fail-closed", async () => {
   const fixture = await startLocalServer();
   try {
