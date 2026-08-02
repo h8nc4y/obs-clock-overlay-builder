@@ -11,7 +11,7 @@
 公開済み v1.7.1 を安定運用し、`/clock/?c=...` の再現性と時計専用面を守る。
 新機能・新テンプレは利用者 feedback またはオーナーが task を確定するまで着手しない。
 
-## Integration-ready Class M — local error response headers
+## Latest completed Class M — local error response headers
 
 - 目的: local dev serverの404/403も、200/400と同じCSP・`nosniff`・
   `no-referrer`を返し、「全レスポンス」の公開説明とlocal検証環境を一致させる。
@@ -20,7 +20,7 @@
 - 受入条件: 既存statusと固定本文を維持し、入力pathを反射せず、404/403へ
   `text/plain; charset=utf-8`と既定security headersを付け、error後も同じprocessが
   正常GETを処理できる。
-- 実装状態: `fix/dev-server-error-headers`で固定text error helperへ400/403/404を
+- 実装状態: PR #150 / merge `9b37048`で固定text error helperへ400/403/404を
   共通化し、404のbody・非反射・headers・process継続を合成testへ固定した。
 - 実測: 404 test追加直後は4 pass / 1 fail（`Content-Type`欠落）でRED、実装後は
   targeted 5 pass / 0 fail。Wranglerをtracked正本の4.115.0へ揃えた後、
@@ -31,6 +31,8 @@
 - security実測: private-markerは`master` / 候補treeとも33件でdelta 0、
   Gitleaksはstaged差分0件、Semgrepは200 rules / 4 targetsで0件。
   marker値は記録・再掲していない。
+- post-main実測: `release:check`は193 pass / 0 fail、build、Wrangler staging
+  dry-run 29 assetsを含めpass。local HTTP smoke 6 routesと`git diff --check`もpass。
 - 未実行: production deploy / remote smoke、OBS実機確認。
 
 ## Current state
@@ -38,6 +40,8 @@
 - product behavior baseline: `aad85c6`（PR #144、local serverのmalformed path耐性）。
 - repository/tooling baseline: `cfe0fcb`（PR #148、Wrangler 4.115.0）。
   merge commit `e497b16`と同一treeで、runtime・公開挙動は変更していない。
+- local server security baseline: `9b37048`（PR #150、400/403/404の固定本文と
+  security headers）。production assetとrelease versionは変更していない。
 - release: v1.7.1。production は 2026-07-11 に v1.7.1 と一致を実測済み。
 - local baseline: Node.js 22以上、Wrangler 4.115.0、runtime dependency 0、
   `DEFAULT_CONFIG` 51 fields、18 templates。
